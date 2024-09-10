@@ -166,6 +166,7 @@ node_modules/
 
 # media files
 media/
+staticfiles/
 
 # testing data
 .data/
