@@ -57,13 +57,13 @@
         
         <div class="card bg-base-200 shadow-xl w-full">
           <div class="card-body">
-            <h2 class="card-title">Personal Info</h2>
+            <h2 class="card-title">Skills</h2>
             <p>Your personal information here</p>
           </div>
         </div>
         <div class="card bg-base-200 shadow-xl w-full">
           <div class="card-body">
-            <h2 class="card-title">Skills</h2>
+            <h2 class="card-title">Information</h2>
             <p>Your skills list here</p>
           </div>
         </div>
@@ -72,10 +72,54 @@
       
       <!-- Columns 2-3: Wide cards -->
       <div class="md:col-span-2 space-y-4">
+
+        <div class="card bg-base-200 shadow-xl w-full">
+            <div class="card-body">
+              <h2 class="card-title mb-4">Skills</h2>
+              <div x-data="{ activeCategory: null }" class="space-y-4">
+                {% for category, skills in skills_data.items %}
+                  <div class="border-b border-base-300 pb-2">
+                    <button 
+                      @click="activeCategory = (activeCategory === '{{ category }}') ? null : '{{ category }}'"
+                      class="flex justify-between items-center w-full text-left font-semibold"
+                    >
+                      {{ category }}
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transform transition-transform" :class="{'rotate-180': activeCategory === '{{ category }}'}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                    <div x-show="activeCategory === '{{ category }}'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 transform scale-95" x-transition:enter-end="opacity-100 transform scale-100" class="mt-2 ml-4">
+                      <ul class="list-disc list-inside space-y-2">
+                        {% for skill, subskills in skills.items %}
+                          <li>
+                            {{ skill }}
+                            {% if subskills %}
+                              <ul class="list-circle list-inside ml-4 mt-1 space-y-1">
+                                {% for subskill in subskills %}
+                                  <li>{{ subskill }}</li>
+                                {% endfor %}
+                              </ul>
+                            {% endif %}
+                          </li>
+                        {% endfor %}
+                      </ul>
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+
+        <div class="card bg-base-200 shadow-xl w-full">
+          <div class="card-body">
+            <h2 class="card-title">Achievements</h2>
+            <p>Your work experience details here</p>
+          </div>
+        </div>
         <div class="card bg-base-200 shadow-xl w-full">
           <div class="card-body">
             <h2 class="card-title">Work Experience</h2>
-            <p>Your work experience details here</p>
+            <p>Your education details here</p>
           </div>
         </div>
         <div class="card bg-base-200 shadow-xl w-full">
@@ -84,7 +128,6 @@
             <p>Your education details here</p>
           </div>
         </div>
-        <!-- Add more wide cards as needed -->
       </div>
     </div>
   </div>
