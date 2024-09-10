@@ -3,14 +3,30 @@
 {% block main %}
 <section class="bg-base-100">
   <div class="container mx-auto px-4 py-8">
+    {% if messages %}
+<div id="messages" class="fixed top-0 right-0 m-4">
+  {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} shadow-lg mb-4">
+      <div>
+        <span>{{ message }}</span>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+<script>
+  setTimeout(function() {
+    var messages = document.getElementById('messages');
+    messages.style.display = 'none';
+  }, 5000);  // Hide messages after 5 seconds
+</script>
+{% endif %}
+
     <h1 class="text-4xl font-bold mb-8">Resume</h1>
     
     <div class="grid md:grid-cols-3 gap-4">
       <!-- Column 1: Single-column cards -->
       <div class="space-y-4 md:col-span-1">
         
-        
-
         <div class="card bg-base-200 shadow-xl w-full">
             <div class="card-body">
                 <div class="flex flex-col items-start">
@@ -29,15 +45,15 @@
                         <span class="badge">Django</span>
                         <span class="badge">SQL</span>
                     </div>
-                    <div class="flex mt-4 space-x-3">
-                        <a href="#" class="btn btn-primary">Add friend</a>
-                        <a href="#" class="btn btn-outline">Message</a>
+                    <div x-data="{ showTooltip: false }" class="relative mt-4 inline-block w-full">
+                        <a href="{% url 'download_cv' %}" @click.prevent="showTooltip = true; setTimeout(() => showTooltip = false, 3000)" class="btn btn-outline w-full">Download CV</a>
+                        <div x-show="showTooltip" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform scale-90" x-transition:enter-end="opacity-100 transform scale-100" x-transition:leave="transition ease-in duration-300" x-transition:leave-start="opacity-100 transform scale-100" x-transition:leave-end="opacity-0 transform scale-90" class="absolute z-10 p-2 bg-gray-800 text-white text-sm rounded shadow-lg" style="bottom: 100%; left: 50%; transform: translateX(-50%); width: 200px;">
+                            All this effort for an online resume, and you want a PDF? (<span class="italic">I just haven't had the time yet</span>)
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-
-
         
         <div class="card bg-base-200 shadow-xl w-full">
           <div class="card-body">

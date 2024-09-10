@@ -691,6 +691,36 @@ html {
   }
 }
 
+.alert {
+  display: grid;
+  width: 100%;
+  grid-auto-flow: row;
+  align-content: flex-start;
+  align-items: center;
+  justify-items: center;
+  gap: 1rem;
+  text-align: center;
+  border-radius: var(--rounded-box, 1rem);
+  border-width: 1px;
+  --tw-border-opacity: 1;
+  border-color: var(--fallback-b2,oklch(var(--b2)/var(--tw-border-opacity)));
+  padding: 1rem;
+  --tw-text-opacity: 1;
+  color: var(--fallback-bc,oklch(var(--bc)/var(--tw-text-opacity)));
+  --alert-bg: var(--fallback-b2,oklch(var(--b2)/1));
+  --alert-bg-mix: var(--fallback-b1,oklch(var(--b1)/1));
+  background-color: var(--alert-bg);
+}
+
+@media (min-width: 640px) {
+  .alert {
+    grid-auto-flow: column;
+    grid-template-columns: auto minmax(auto,1fr);
+    justify-items: start;
+    text-align: start;
+  }
+}
+
 .badge {
   display: inline-flex;
   align-items: center;
@@ -1264,6 +1294,10 @@ html {
   .btn-primary {
     --btn-color: var(--fallback-p);
   }
+
+  .btn-secondary {
+    --btn-color: var(--fallback-s);
+  }
 }
 
 @supports (color: color-mix(in oklab, black, black)) {
@@ -1319,6 +1353,16 @@ html {
   .btn-primary {
     --btn-color: var(--p);
   }
+
+  .btn-secondary {
+    --btn-color: var(--s);
+  }
+}
+
+.btn-secondary {
+  --tw-text-opacity: 1;
+  color: var(--fallback-sc,oklch(var(--sc)/var(--tw-text-opacity)));
+  outline-color: var(--fallback-s,oklch(var(--s)/1));
 }
 
 .btn.glass {
@@ -1641,6 +1685,12 @@ html {
   margin-top: 0;
 }
 
+.mockup-phone .display {
+  overflow: hidden;
+  border-radius: 40px;
+  margin-top: -25px;
+}
+
 @keyframes modal-pop {
   0% {
     opacity: 0;
@@ -1727,6 +1777,23 @@ html {
   padding: 0px;
 }
 
+.avatar.online:before {
+  content: "";
+  position: absolute;
+  z-index: 10;
+  display: block;
+  border-radius: 9999px;
+  --tw-bg-opacity: 1;
+  background-color: var(--fallback-su,oklch(var(--su)/var(--tw-bg-opacity)));
+  outline-style: solid;
+  outline-width: 2px;
+  outline-color: var(--fallback-b1,oklch(var(--b1)/1));
+  width: 15%;
+  height: 15%;
+  top: 7%;
+  right: 7%;
+}
+
 .card-compact .card-body {
   padding: 1rem;
   font-size: 0.875rem;
@@ -1771,6 +1838,10 @@ html {
   position: static;
 }
 
+.fixed {
+  position: fixed;
+}
+
 .absolute {
   position: absolute;
 }
@@ -1783,6 +1854,14 @@ html {
   inset: 0px;
 }
 
+.right-0 {
+  right: 0px;
+}
+
+.top-0 {
+  top: 0px;
+}
+
 .z-10 {
   z-index: 10;
 }
@@ -1793,6 +1872,10 @@ html {
 
 .col-span-1 {
   grid-column: span 1 / span 1;
+}
+
+.m-4 {
+  margin: 1rem;
 }
 
 .-mx-2 {
@@ -1958,6 +2041,22 @@ html {
   max-width: 24rem;
 }
 
+.scale-100 {
+  --tw-scale-x: 1;
+  --tw-scale-y: 1;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
+.scale-90 {
+  --tw-scale-x: .9;
+  --tw-scale-y: .9;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
+.transform {
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
 .list-none {
   list-style-type: none;
 }
@@ -2096,6 +2195,11 @@ html {
   background-color: rgb(255 255 255 / var(--tw-bg-opacity));
 }
 
+.bg-gray-800 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(31 41 55 / var(--tw-bg-opacity));
+}
+
 .fill-current {
   fill: currentColor;
 }
@@ -2216,6 +2320,10 @@ html {
   font-weight: 600;
 }
 
+.italic {
+  font-style: italic;
+}
+
 .leading-none {
   line-height: 1;
 }
@@ -2316,12 +2424,28 @@ html {
   transition-duration: 150ms;
 }
 
+.transition {
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-backdrop-filter;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-backdrop-filter;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
 .duration-300 {
   transition-duration: 300ms;
 }
 
 .ease-in-out {
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ease-in {
+  transition-timing-function: cubic-bezier(0.4, 0, 1, 1);
+}
+
+.ease-out {
+  transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
 }
 
 .skeleton-wrapper>.skeleton-loader {
