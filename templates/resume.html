@@ -1,0 +1,45 @@
+{% extends "layouts/default.html" %}
+{% load static %}
+{% block main %}
+<section class="bg-base-100">
+  <div class="container mx-auto px-4 py-8">
+    <h1 class="text-4xl font-bold mb-8">Jonatan Snyders - Resume</h1>
+    
+    <div class="grid md:grid-cols-3 gap-4">
+      <!-- Column 1: Single-column cards -->
+      <div class="space-y-4 md:col-span-1">
+        <div class="card bg-base-200 shadow-xl w-full">
+          <div class="card-body">
+            <h2 class="card-title">Personal Info</h2>
+            <p>Your personal information here</p>
+          </div>
+        </div>
+        <div class="card bg-base-200 shadow-xl w-full">
+          <div class="card-body">
+            <h2 class="card-title">Skills</h2>
+            <p>Your skills list here</p>
+          </div>
+        </div>
+        <!-- Add more single-column cards as needed -->
+      </div>
+      
+      <!-- Columns 2-3: Wide cards -->
+      <div class="md:col-span-2 space-y-4">
+        <div class="card bg-base-200 shadow-xl w-full">
+          <div class="card-body">
+            <h2 class="card-title">Work Experience</h2>
+            <p>Your work experience details here</p>
+          </div>
+        </div>
+        <div class="card bg-base-200 shadow-xl w-full">
+          <div class="card-body">
+            <h2 class="card-title">Education</h2>
+            <p>Your education details here</p>
+          </div>
+        </div>
+        <!-- Add more wide cards as needed -->
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock main %}
