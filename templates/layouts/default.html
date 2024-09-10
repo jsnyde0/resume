@@ -2,13 +2,14 @@
 {% block content %}
     <div class="antialiased dark:bg-base-100">
         <!-- Navbar -->
-        {% comment %} {% include "components/navbar.html" %} {% endcomment %}
+        {% include "components/navbar.html" %}
         <!-- Sidebar -->
         {% comment %} {% include "components/sidebar.html" %} {% endcomment %}
         <main class="p-4 md:ml-64 h-auto pt-20">
             {% block main %}
             {% endblock main %}
         </main>
+        {% include "components/footer.html" %}
     </div>
 {% endblock content %}
 
