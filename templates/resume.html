@@ -34,16 +34,16 @@
                         <img class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ease-in-out opacity-100 group-hover:opacity-0" src="{% static 'img/jonatan_avatar_smiling_no_bg.png' %}" alt="Jonatan Profile Picture"/>
                         <img class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ease-in-out opacity-0 group-hover:opacity-100" src="{% static 'img/jonatan_avatar_roaring_no_bg.png' %}" alt="Jonatan Profile Picture (Roaring)"/>
                     </div>
-                    <h5 class="mb-1 text-xl font-medium">Jonatan Snyders</h5>
+                    <h3 class="mb-1 text-xl font-medium">Jonatan Snyders</h3>
                     <span class="text-sm text-base-content/70">Ex-Founder, Data Developer</span>
                     <p class="mt-2 text-sm text-base-content/70">An ex-founder and passionate Data Developer with an eye for Hypermedia Driven Applications and a love for data science.</p>
                     <div class="flex flex-wrap gap-2 mt-3">
-                        <span class="badge badge-primary">Web Dev</span>
-                        <span class="badge badge-secondary">Data Science</span>
-                        <span class="badge badge-accent">Ex-Founder</span>
-                        <span class="badge">Python</span>
-                        <span class="badge">Django</span>
-                        <span class="badge">SQL</span>
+                        <span class="badge badge-neutral">Web Dev</span>
+                        <span class="badge badge-neutral">Data Science</span>
+                        <span class="badge badge-neutral">Ex-Founder</span>
+                        <span class="badge badge-neutral">Python</span>
+                        <span class="badge badge-neutral">Django</span>
+                        <span class="badge badge-neutral">SQL</span>
                     </div>
                     <div x-data="{ showTooltip: false }" class="relative mt-4 inline-block w-full">
                         <a href="{% url 'download_cv' %}" @click.prevent="showTooltip = true; setTimeout(() => showTooltip = false, 3000)" class="btn btn-outline w-full">Download CV</a>
@@ -96,8 +96,8 @@
               accelerated by my programming and data science experience.</c-resume-item-card>
 
               <c-resume-item-card
-                  title="MeshMonk"
-                  role="Web Developer"
+                  title="Created MeshMonk - a medical image processing library"
+                  role="Data Scientist"
                   company="KULeuven"
                   location="Leuven, Belgium"
                   date_range="2017"
@@ -106,24 +106,24 @@
               >Developed <a href="https://github.com/TheWebMonks/meshmonk" target="_blank" class="link link-hover">MeshMonk</a> in C++, a high-performance medical image processing framework used or cited in 140+ research projects.</c-resume-item-card>
 
               <c-resume-item-card
-                  title="MeshMonk"
-                  role="Web Developer"
-                  company="KULeuven"
+                  title="Scaled international impact-first business to support 30 people"
+                  role="Ex-Founder"
+                  company="Humainly"
                   location="Leuven, Belgium"
                   date_range="2018 - 2022"
-                  image_url="{% static 'img/avatar_jonatan.png' %}"
-                  image_alt="KULeuven icon"
-              >This should be a quite long description or a short one or something in between or perhaps something else still.</c-resume-item-card>
+                  image_url="{% static 'img/humainly-logo-green.png' %}"
+                  image_alt="Humainly Logo"
+              >Scaled <a href="https://humainly.com/" target="_blank" class="link link-hover">Humainly</a> - a non-profit yet self-sustainable business - to support 30 people in Venezuela and Nigeria, providing living wages and professional training through local NGO partnerships.</c-resume-item-card>
 
               <c-resume-item-card
-                  title="MeshMonk"
-                  role="Web Developer"
+                  title="Data engineering and Bayesian modelling at eComm startup"
+                  role="Growth Engineer"
                   company="KULeuven"
                   location="Leuven, Belgium"
                   date_range="2018 - 2022"
-                  image_url="{% static 'img/avatar_jonatan.png' %}"
+                  image_url="{% static 'img/moonbird-logo.svg' %}"
                   image_alt="KULeuven icon"
-              >This should be a quite long description or a short one or something in between or perhaps something else still.</c-resume-item-card>
+              >Drove data-driven decision-making at eComm startup with a bespoke ELT pipeline, advanced server-side tracking, and self-developed Bayesian Marketing Mix Model.</c-resume-item-card>
         </c-resume-card>
 
         <!-- Work Experience -->
