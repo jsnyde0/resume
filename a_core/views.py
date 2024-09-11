@@ -1,59 +1,49 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
+import json
 
 def view_home(request):
     return render(request, 'home.html')
 
 def view_resume(request):
     skills_data = {
-        "PROGRAMMING": {
-            "Python": None,
-            "C++": None,
-            "SQL": None
-        },
-        "DATA": {
-            "Data Science": [
-                "Data Analysis and Modeling (Sci-kit Learn, Numpy, Pandas)",
-                "Bayesian Inference (PyMC)"
-            ],
-            "Technical Marketing": [
-                "Data Pipelines (BigQuery, Dataform) and Dashboards (Looker Studio)",
-                "Server-side Tracking (Server GTM)",
-                "Analytics (GA4, Amplitude)"
-            ]
-        },
-        "MARKETING": {
-            "Performance Marketing": [
-                "Facebook Ads (Advanced), Google Ads (Basic)"
-            ],
-            "SEO": [
-                "Content Strategy, Keyword Research (Ahrefs), Technical SEO"
-            ],
-            "CRO": [
-                "CRO Research (Hotjar), AB test implementation (convert.com) and evaluation"
-            ],
-            "Marketing Automation": [
-                "Affiliate and Referral Programs",
-                "Automated Email Campaigns (Klaviyo, ActiveCampaign)",
-                "Popups, surveys,..."
-            ]
-        },
-        "STARTUP STUFF": {
-            "Finance": [
-                "planning, budgeting, cashflow management"
-            ],
-            "Governance": [
-                "Holacracy"
-            ],
-            "Sales and Negotiations": None,
-            "Project Management": [
-                "Asana, Getting Things Done"
-            ]
-        }
+        "name": "Skills",
+        "children": [
+            {
+                "name": "PROGRAMMING",
+                "children": [
+                    {"name": "Python"},
+                    {"name": "C++"},
+                    {"name": "SQL"}
+                ]
+            },
+            {
+                "name": "DATA",
+                "children": [
+                    {
+                        "name": "Data Science",
+                        "children": [
+                            {"name": "Data Analysis and Modeling (Sci-kit Learn, Numpy, Pandas)"},
+                            {"name": "Bayesian Inference (PyMC)"}
+                        ]
+                    },
+                    {
+                        "name": "Technical Marketing",
+                        "children": [
+                            {"name": "Data Pipelines (BigQuery, Dataform)"},
+                            {"name": "Dashboards (Looker Studio)"},
+                            {"name": "Server-side Tracking (Server GTM)"},
+                            {"name": "Analytics (Posthog, GA4, Amplitude)"}
+                        ]
+                    }
+                ]
+            },
+            # ... other categories ...
+        ]
     }
 
     context = {
-        'skills_data': skills_data
+        'skills_data': json.dumps(skills_data)
     }
 
     return render(request, 'resume.html', context)
