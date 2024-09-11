@@ -7,38 +7,83 @@ def view_home(request):
 
 def view_resume(request):
     skills_data = {
-        "name": "Skills",
+        "name": "Skills by Role",
         "children": [
             {
-                "name": "PROGRAMMING",
-                "children": [
-                    {"name": "Python"},
-                    {"name": "C++"},
-                    {"name": "SQL"}
-                ]
-            },
-            {
-                "name": "DATA",
+                "name": "Web Developer",
                 "children": [
                     {
-                        "name": "Data Science",
+                        "name": "Back-End",
                         "children": [
-                            {"name": "Data Analysis and Modeling (Sci-kit Learn, Numpy, Pandas)"},
-                            {"name": "Bayesian Inference (PyMC)"}
+                            {"name": "Django"},
+                            {"name": "PostgreSQL, SQLite"}
                         ]
                     },
                     {
-                        "name": "Technical Marketing",
+                        "name": "Front-end",
                         "children": [
-                            {"name": "Data Pipelines (BigQuery, Dataform)"},
-                            {"name": "Dashboards (Looker Studio)"},
-                            {"name": "Server-side Tracking (Server GTM)"},
-                            {"name": "Analytics (Posthog, GA4, Amplitude)"}
+                            {"name": "HTML, CSS"},
+                            {"name": "HTMX, Tailwind, Cotton"},
+                            {"name": "Chart.js, D3.js"},
+                            {"name": "JavaScript (basic)"}
+                        ]
+                    },
+                    {
+                        "name": "Analytics",
+                        "children": [
+                            {"name": "Posthog"},
+                            {"name": "GA4"},
+                            {"name": "Server-side Tracking"}
+                        ]
+                    },
+                    {
+                        "name": "Deployment",
+                        "children": [
+                            {"name": "DigitalOcean"},
+                            {"name": "Render.com"}
+                        ]
+                    },
+                    {
+                        "name": "Data Pipelines",
+                        "children": [
+                            {"name": "BigQuery"},
+                            {"name": "Dataform"}
                         ]
                     }
                 ]
             },
-            # ... other categories ...
+            {
+                "name": "Data Scientist",
+                "children": [
+                    {"name": "Python, C++"},
+                    {"name": "Algorithm and library development"},
+                    {"name": "Machine Learning (Sci-kit Learn, Numpy, Pandas, ...)"},
+                    {"name": "Bayesian Modelling (PyMC, MMM)"},
+                    {"name": "Computer vision & Deep learning (OpenCV, Keras)"},
+                    {"name": "Dashboarding (Looker)"}
+                ]
+            },
+            {
+                "name": "Growth Engineer",
+                "children": [
+                    {"name": "Performance marketing (FB, Google, TikTok)"},
+                    {"name": "Growth Experimenting"},
+                    {"name": "SEO"},
+                    {"name": "CRO"},
+                    {"name": "Marketing Automation (Affiliate, Email, ...)"}
+                ]
+            },
+            {
+                "name": "Ex-Founder",
+                "children": [
+                    {"name": "Vision & Strategy"},
+                    {"name": "HR & Team (Holacracy)"},
+                    {"name": "Finance"},
+                    {"name": "Sales"},
+                    {"name": "Project Management (Asana, GTD)"},
+                    {"name": "Learning from failures"}
+                ]
+            }
         ]
     }
 

@@ -15,7 +15,7 @@ function createSkillsTree(data) {
     const marginTop = 10;
     const marginRight = 10;
     const marginBottom = 10;
-    const marginLeft = 40;
+    const marginLeft = 60;
     
     // Rows are separated by dx pixels, columns by dy pixels. These names can be counter-intuitive
     // (dx is a height, and dy a width). This because the tree must be viewed with the root at the
