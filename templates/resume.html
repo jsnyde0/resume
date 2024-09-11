@@ -79,36 +79,38 @@
                 <div id="skills-tree" class="overflow-x-auto"></div>
             </div>
         </div>
+        
+        <!-- Achievements -->
+        <c-resume-card
+            title="Achievements"
+            description="Your work experience details here"
+        >
+              <c-resume-item-card
+                  title="MeshMonk"
+                  role="Web Developer"
+                  company="KULeuven"
+                  location="Leuven, Belgium"
+                  date_range="2018 - 2022"
+                  image_url="{% static 'img/avatar_jonatan.png' %}"
+                  image_alt="KULeuven icon"
+              >This should be a quite long description or a short one or something in between or perhaps something else still.</c-resume-item-card>
 
-        <div class="card bg-base-200 shadow-xl w-full">
-          <div class="card-body">
-            <h2 class="card-title">Achievements</h2>
-            <p>Your work experience details here</p>
+        </c-resume-card>
 
-            <c-resume-item-card
-                title="MeshMonk"
-                role="Web Developer"
-                company="KULeuven"
-                location="Leuven, Belgium"
-                date_range="2018 - 2022"
-                image_url="{% static 'img/avatar_jonatan.png' %}"
-                image_alt="KULeuven icon"
-            >This should be a quite long description or a short one or something in between or perhaps something else still.</c-resume-item-card>
+        <!-- Work Experience -->
+        <c-resume-card
+            title="Work Experience"
+            description="Your work experience details here"
+        >
+        </c-resume-card>
 
-          </div>
-        </div>
-        <div class="card bg-base-200 shadow-xl w-full">
-          <div class="card-body">
-            <h2 class="card-title">Work Experience</h2>
-            <p>Your education details here</p>
-          </div>
-        </div>
-        <div class="card bg-base-200 shadow-xl w-full">
-          <div class="card-body">
-            <h2 class="card-title">Education</h2>
-            <p>Your education details here</p>
-          </div>
-        </div>
+        <!-- Education -->
+        <c-resume-card
+            title="Education"
+            description="Your education details here"
+        >
+        </c-resume-card>
+        
       </div>
     </div>
   </div>
