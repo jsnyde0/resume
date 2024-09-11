@@ -7,7 +7,7 @@ def view_home(request):
 
 def view_resume(request):
     skills_data = {
-        "name": "Skills by Role",
+        "name": "Role",
         "children": [
             {
                 "name": "Web Developer",
