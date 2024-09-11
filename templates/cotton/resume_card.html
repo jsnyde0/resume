@@ -1,9 +1,10 @@
 <div class="card bg-base-200 shadow-xl w-full">
     <div class="card-body">
-      <h2 class="card-title">{{ title }}</h2>
-      {% if description %}
-        <p>{{ description }}</p>
-      {% endif %}
+      <div class="relative inline-block">
+        <h2 class="card-title {% if description %}tooltip tooltip-top{% endif %}" data-tip="{{ description }}">
+          {{ title }}
+        </h2>
+      </div>
       {{ slot }}
     </div>
 </div>
