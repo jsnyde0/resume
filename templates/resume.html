@@ -76,7 +76,7 @@
         <c-resume-card
             title="Skills"
         >
-                <div id="skills-tree" class="overflow-x-auto"></div>
+          <c-collapsible-tree :tree_data="skills_data"></c-collapsible-tree>
         </c-resume-card>
         
         <!-- Achievements -->
@@ -147,11 +147,3 @@
   </div>
 </section>
 {% endblock main %}
-
-{% block extra_js %}
-<script>
-    const skillsData = JSON.parse('{{ skills_data|safe }}');
-</script>
-<script src="https://d3js.org/d3.v7.min.js"></script>
-<script src="{% static 'js/skills_tree.js' %}"></script>
-{% endblock extra_js %}
