@@ -12,9 +12,11 @@
             <div class="flex-grow">
                 <div class="flex justify-between items-center mb-2">
                     <h3 class="card-title text-primary">{{ title }}</h3>
-                    <span class="badge badge-neutral">{{ role }}</span>
+                    
                 </div>
                 <div class="flex items-center space-x-2 text-sm text-base-content/70">
+                    <span class="inline-flex items-center justify-center px-2 py-1 text-xs font-medium leading-none text-neutral-content bg-neutral rounded whitespace-normal break-words max-w-[40%] sm:max-w-[30%] md:max-w-[25%]">{{ role }}</span>
+                    <span>&bull;</span>
                     <span>{{ company }}</span>
                     <span>&bull;</span>
                     <span>{{ location }}</span>
