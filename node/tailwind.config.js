@@ -6,7 +6,15 @@ module.exports = {
     '../**/forms.py',
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontSize: {
+        // set the base font size to 15px
+        base: '0.9375rem',
+      },
+      textOpacity: {
+        '85': '0.85', // Custom text opacity
+      },
+    },
   },
   plugins: [
     require("@tailwindcss/typography"),

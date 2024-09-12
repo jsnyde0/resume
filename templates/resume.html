@@ -23,7 +23,7 @@
 
     <h1 class="text-3xl font-bold mb-8">Resume</h1>
     
-    <div class="grid md:grid-cols-3 gap-4">
+    <div class="grid md:grid-cols-2 gap-4">
       <!-- Column 1: Single-column cards -->
       <div class="space-y-4 md:col-span-1">
         
@@ -35,26 +35,29 @@
                         <img class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ease-in-out opacity-0 group-hover:opacity-100" src="{% static 'img/jonatan_avatar_roaring_no_bg.png' %}" alt="Jonatan Profile Picture (Roaring)"/>
                     </div>
                     <h3 class="mb-1 text-xl font-medium">Jonatan Snyders</h3>
-                    <span class="text-base text-base-content/70">Ex-Founder <span>&bull;</span> Web Developer <span>&bull;</span> Data Scientist</span>
-                    <p class="mt-2 text-base">I'm from Belgium, lived in Venezuela and Nigeria, and moving to Berlin in November 2024.</p>
-
-                    <p class="mt-2 text-base">I want to launch startups that make a social impact—climate change, inequality, that sort of thing. I ran a 5-person non-profit for 4-5 years and loved it, but we didn’t scale before I burned out.</p>
-                      
-                    <p class="mt-2 text-base">I hunt skills that excite me. Took a marketing job with zero experience just to learn. Following what gives me energy, not rigid plans. Right now, that’s data engineering and web development. While freelancing in data analytics, I’m looking for a web dev job to level up.</p>
-                      
-                    <p class="mt-2 text-base">With years of programming and data science behind me, learning web dev has been a blast—GPT and Claude help when I'm stuck.</p>
-                      
-                    <p class="mt-2 text-base">I like working late so I can take a long lunch for my workout.</p>
-                      
-                    <p class="mt-2 text-base">Transparency is my top value.</p>
                     <div class="flex flex-wrap gap-2 mt-3">
-                        <span class="badge badge-primary">Web Dev</span>
-                        <span class="badge badge-accent">Data Science</span>
-                        <span class="badge badge-secondary">Ex-Founder</span>
-                        <span class="badge badge-info">Growth Engineer</span>
+                      <span class="badge badge-primary">Web Developer</span>
+                      <span class="badge badge-accent">Data Scientist</span>
+                      <span class="badge badge-secondary">Ex-Founder</span>
+                      <span class="badge badge-info">Growth Engineer</span>
+                    </div>
+                    {% comment %} <span class="text-base text-base-content/70">Ex-Founder <span>&bull;</span> Web Developer <span>&bull;</span> Data Scientist</span> {% endcomment %}
+                    <p class="mt-2">I'm from Belgium, lived in Venezuela and Nigeria, and moving to Berlin in November 2024.</p>
+
+                    <p class="mt-2">I want to launch startups that make a social impact—climate change, inequality, that sort of thing. I ran a 5-person non-profit for 4-5 years and loved it, but we didn’t scale before I burned out.</p>
+                      
+                    <p class="mt-2">I hunt skills that excite me. Took a marketing job with zero experience just to learn. Following what gives me energy, not rigid plans. Right now, that’s data engineering and web development. While freelancing in data analytics, I’m looking for a web dev job to level up.</p>
+                      
+                    <p class="mt-2">With years of programming and data science behind me, learning web dev has been a blast—GPT and Claude help when I'm stuck.</p>
+                      
+                    <p class="mt-2">I like working late so I can take a long lunch for my workout.</p>
+                      
+                    <p class="mt-2">Transparency is my top value.</p>
+                    <div class="flex flex-wrap gap-2 mt-3">
                         <span class="badge badge-neutral">Python</span>
                         <span class="badge badge-neutral">Django</span>
                         <span class="badge badge-neutral">SQL</span>
+                        <span class="badge badge-neutral">Fashion Icon</span>
                     </div>
                     <div x-data="{ showTooltip: false }" class="relative mt-4 inline-block w-full">
                         <a href="{% url 'download_cv' %}" @click.prevent="showTooltip = true; setTimeout(() => showTooltip = false, 3000)" class="btn btn-outline w-full">Download CV</a>
@@ -92,7 +95,7 @@
       </div>
       
       <!-- Columns 2-3: Wide cards -->
-      <div class="md:col-span-2 space-y-4">
+      <div class="md:col-span-1 space-y-4">
 
         <c-resume-card
             title="Skills"
