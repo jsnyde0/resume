@@ -97,8 +97,17 @@ def view_resume(request):
         parents='parent',
         values='value',
     )
+
+    # Update layout to make the plot larger and remove padding
+    fig.update_layout(
+        # width=600,  # Adjust as needed
+        # height=600,  # Adjust as needed
+        margin=dict(t=0, l=0, r=0, b=0),
+        paper_bgcolor='rgba(0,0,0,0)',  # Transparent background
+        plot_bgcolor='rgba(0,0,0,0)'    # Transparent plot area
+    )
     
-    plot_div = pio.to_html(fig, full_html=False)
+    plot_div = pio.to_html(fig, full_html=False, config={'responsive': True})
 
     context = {
         'skills_data': json.dumps(skills_data),
