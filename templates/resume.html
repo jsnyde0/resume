@@ -77,13 +77,35 @@
         <c-resume-card
             title="Skills"
         >
-          <c-collapsible-tree :tree_data="skills_data"></c-collapsible-tree>
-        </c-resume-card>
-
-        <c-resume-card
-            title="Skills Sunburst"
-        >
-          {{ sunburst_plot|safe }}
+          <div class="mb-4">
+            <select id="skillsVisualizationSelector" class="select select-bordered w-full max-w-xs">
+              <option value="tree">Collapsible Tree</option>
+              <option value="sunburst">Sunburst Chart</option>
+            </select>
+          </div>
+    
+          <div id="treeVisualization">
+            <c-collapsible-tree :tree_data="skills_data"></c-collapsible-tree>
+          </div>
+          
+          <div id="sunburstVisualization" style="display: none;">
+              {{ sunburst_plot|safe }}
+          </div>
+    
+          <script>
+              document.getElementById('skillsVisualizationSelector').addEventListener('change', function() {
+                  var treeViz = document.getElementById('treeVisualization');
+                  var sunburstViz = document.getElementById('sunburstVisualization');
+                  
+                  if (this.value === 'tree') {
+                      treeViz.style.display = 'block';
+                      sunburstViz.style.display = 'none';
+                  } else {
+                      treeViz.style.display = 'none';
+                      sunburstViz.style.display = 'block';
+                  }
+              });
+          </script>
         </c-resume-card>
         
         <!-- Achievements -->
