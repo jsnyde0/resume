@@ -1,5 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
+import plotly.express as px
+import plotly.io as pio
 import json
 
 def view_home(request):
@@ -87,11 +89,33 @@ def view_resume(request):
         ]
     }
 
+    sunburst_data = prepare_sunburst_data(skills_data)
+
+    fig = px.sunburst(
+        sunburst_data,
+        names='name',
+        parents='parent',
+        values='value',
+    )
+    
+    plot_div = pio.to_html(fig, full_html=False)
+
     context = {
-        'skills_data': json.dumps(skills_data)
+        'skills_data': json.dumps(skills_data),
+        'sunburst_plot': plot_div
     }
 
     return render(request, 'resume.html', context)
+
+def prepare_sunburst_data(skills_data):
+    data = []
+    def flatten(item, parent=""):
+        data.append({"name": item["name"], "parent": parent, "value": 1})
+        for child in item.get("children", []):
+            flatten(child, item["name"])
+    
+    flatten(skills_data)
+    return data
 
 def download_cv(request):
     messages.warning(request, "All this effort for an online resume, and you want a PDF? (I just haven't had the time yet)")

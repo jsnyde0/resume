@@ -78,6 +78,12 @@
         >
           <c-collapsible-tree :tree_data="skills_data"></c-collapsible-tree>
         </c-resume-card>
+
+        <c-resume-card
+            title="Skills Sunburst"
+        >
+          {{ sunburst_plot|safe }}
+        </c-resume-card>
         
         <!-- Achievements -->
         <c-resume-card
