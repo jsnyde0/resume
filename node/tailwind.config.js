@@ -15,5 +15,11 @@ module.exports = {
   daisyui: {
     themes: ["sunset"],
   },
+  safelist: [
+    'bg-primary',
+    'bg-secondary',
+    'bg-accent',
+    'bg-info',
+  ],
 }
 
