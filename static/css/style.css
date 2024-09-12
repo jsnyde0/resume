@@ -1809,6 +1809,14 @@ html {
   bottom: var(--tooltip-offset);
 }
 
+.tooltip-bottom:before {
+  transform: translateX(-50%);
+  top: var(--tooltip-offset);
+  left: 50%;
+  right: auto;
+  bottom: auto;
+}
+
 .tooltip-right:before {
   transform: translateY(-50%);
   top: 50%;
@@ -1948,6 +1956,15 @@ html {
   left: 50%;
   right: auto;
   bottom: var(--tooltip-tail-offset);
+}
+
+.tooltip-bottom:after {
+  transform: translateX(-50%);
+  border-color: transparent transparent var(--tooltip-color) transparent;
+  top: var(--tooltip-tail-offset);
+  left: 50%;
+  right: auto;
+  bottom: auto;
 }
 
 .tooltip-right:after {
