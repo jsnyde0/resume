@@ -1809,6 +1809,14 @@ html {
   bottom: var(--tooltip-offset);
 }
 
+.tooltip-right:before {
+  transform: translateY(-50%);
+  top: 50%;
+  left: var(--tooltip-offset);
+  right: auto;
+  bottom: auto;
+}
+
 .avatar.online:before {
   content: "";
   position: absolute;
@@ -1940,6 +1948,15 @@ html {
   left: 50%;
   right: auto;
   bottom: var(--tooltip-tail-offset);
+}
+
+.tooltip-right:after {
+  transform: translateY(-50%);
+  border-color: transparent var(--tooltip-color) transparent transparent;
+  top: 50%;
+  left: calc(var(--tooltip-tail-offset) + 0.0625rem);
+  right: auto;
+  bottom: auto;
 }
 
 .sr-only {
