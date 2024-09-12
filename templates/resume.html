@@ -21,7 +21,7 @@
 </script>
 {% endif %}
 
-    <h1 class="text-4xl font-bold mb-8">Resume</h1>
+    <h1 class="text-3xl font-bold mb-8">Resume</h1>
     
     <div class="grid md:grid-cols-3 gap-4">
       <!-- Column 1: Single-column cards -->
@@ -35,8 +35,18 @@
                         <img class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ease-in-out opacity-0 group-hover:opacity-100" src="{% static 'img/jonatan_avatar_roaring_no_bg.png' %}" alt="Jonatan Profile Picture (Roaring)"/>
                     </div>
                     <h3 class="mb-1 text-xl font-medium">Jonatan Snyders</h3>
-                    <span class="text-sm text-base-content/70">Ex-Founder, Data Developer</span>
-                    <p class="mt-2 text-sm text-base-content/70">An ex-founder and passionate Data Developer with an eye for Hypermedia Driven Applications and a love for data science.</p>
+                    <span class="text-base text-base-content/70">Ex-Founder <span>&bull;</span> Web Developer <span>&bull;</span> Data Scientist</span>
+                    <p class="mt-2 text-base">I'm from Belgium, lived in Venezuela and Nigeria, and moving to Berlin in November 2024.</p>
+
+                    <p class="mt-2 text-base">I want to launch startups that make a social impact—climate change, inequality, that sort of thing. I ran a 5-person non-profit for 4-5 years and loved it, but we didn’t scale before I burned out.</p>
+                      
+                    <p class="mt-2 text-base">I hunt skills that excite me. Took a marketing job with zero experience just to learn. Following what gives me energy, not rigid plans. Right now, that’s data engineering and web development. While freelancing in data analytics, I’m looking for a web dev job to level up.</p>
+                      
+                    <p class="mt-2 text-base">With years of programming and data science behind me, learning web dev has been a blast—GPT and Claude help when I'm stuck.</p>
+                      
+                    <p class="mt-2 text-base">I like working late so I can take a long lunch for my workout.</p>
+                      
+                    <p class="mt-2 text-base">Transparency is my top value.</p>
                     <div class="flex flex-wrap gap-2 mt-3">
                         <span class="badge badge-primary">Web Dev</span>
                         <span class="badge badge-accent">Data Science</span>
@@ -64,8 +74,18 @@
         </div>
         <div class="card bg-base-200 shadow-xl w-full">
           <div class="card-body">
-            <h2 class="card-title">Information</h2>
-            <p>Your information here</p>
+            <h2 class="card-title">Bio</h2>
+            <p>I'm from Belgium, lived in Venezuela and Nigeria, and moving to Berlin in November 2024.</p>
+
+            <p>I want to launch startups that make a social impact—climate change, inequality, that sort of thing. I ran a 5-person non-profit for 4-5 years and loved it, but we didn’t scale before I burned out.</p>
+              
+            <p>I hunt skills that excite me. Took a marketing job with zero experience just to learn. Following what gives me energy, not rigid plans. Right now, that’s data engineering and web development. While freelancing in data analytics, I’m looking for a web dev job to level up.</p>
+              
+            <p>With years of programming and data science behind me, learning web dev has been a blast—GPT and Claude help when I'm stuck.</p>
+              
+            <p>I like working late so I can take a long lunch for my workout.</p>
+              
+            <p>Transparency is my top value.</p>
           </div>
         </div>
         <!-- Add more single-column cards as needed -->
@@ -76,6 +96,7 @@
 
         <c-resume-card
             title="Skills"
+            class="text-2xl font-semibold"
         >
           <div class="mb-4">
             <select id="skillsVisualizationSelector" class="select select-bordered w-full max-w-xs">
