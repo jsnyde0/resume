@@ -21,6 +21,7 @@
     <script defer src="{% static 'js/htmx.min.js' %}"></script>
     <script defer src="{% static 'js/alpine.js' %}"></script>
     <script defer src="{% static 'js/d3.v7.min.js' %}"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/flowbite@2.5.1/dist/flowbite.min.js"></script>
     
     
     {% django_htmx_script %}
@@ -42,8 +43,6 @@
             event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
         });
     </script>
-    <!-- flowbite -->
-    <script src="https://cdn.jsdelivr.net/npm/flowbite@2.5.1/dist/flowbite.min.js"></script>
     {% block extra_js %}
     {% endblock extra_js %}
   </body>

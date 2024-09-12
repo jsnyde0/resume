@@ -2004,6 +2004,10 @@ html {
   max-width: 1280px;
 }
 
+.max-w-\[40\%\] {
+  max-width: 40%;
+}
+
 .flex-shrink-0 {
   flex-shrink: 0;
 }
@@ -2104,8 +2108,20 @@ html {
   overflow-x: auto;
 }
 
+.whitespace-normal {
+  white-space: normal;
+}
+
 .whitespace-nowrap {
   white-space: nowrap;
+}
+
+.text-wrap {
+  text-wrap: wrap;
+}
+
+.break-words {
+  overflow-wrap: break-word;
 }
 
 .rounded {
@@ -2147,6 +2163,11 @@ html {
 .bg-primary {
   --tw-bg-opacity: 1;
   background-color: var(--fallback-p,oklch(var(--p)/var(--tw-bg-opacity)));
+}
+
+.bg-neutral {
+  --tw-bg-opacity: 1;
+  background-color: var(--fallback-n,oklch(var(--n)/var(--tw-bg-opacity)));
 }
 
 .fill-current {
@@ -2209,6 +2230,16 @@ html {
   padding-bottom: 2rem;
 }
 
+.py-1 {
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+}
+
+.px-2 {
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
 .pr-4 {
   padding-right: 1rem;
 }
@@ -2244,6 +2275,11 @@ html {
 .text-xl {
   font-size: 1.25rem;
   line-height: 1.75rem;
+}
+
+.text-xs {
+  font-size: 0.75rem;
+  line-height: 1rem;
 }
 
 .font-bold {
@@ -2300,6 +2336,11 @@ html {
 .text-white {
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity));
+}
+
+.text-neutral-content {
+  --tw-text-opacity: 1;
+  color: var(--fallback-nc,oklch(var(--nc)/var(--tw-text-opacity)));
 }
 
 .antialiased {
@@ -2484,6 +2525,10 @@ html {
 }
 
 @media (min-width: 640px) {
+  .sm\:max-w-\[30\%\] {
+    max-width: 30%;
+  }
+
   .sm\:flex-row {
     flex-direction: row;
   }
@@ -2518,6 +2563,10 @@ html {
 
   .md\:w-auto {
     width: auto;
+  }
+
+  .md\:max-w-\[25\%\] {
+    max-width: 25%;
   }
 
   .md\:grid-cols-3 {
