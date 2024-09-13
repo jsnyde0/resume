@@ -1809,14 +1809,6 @@ html {
   bottom: var(--tooltip-offset);
 }
 
-.tooltip-bottom:before {
-  transform: translateX(-50%);
-  top: var(--tooltip-offset);
-  left: 50%;
-  right: auto;
-  bottom: auto;
-}
-
 .tooltip-right:before {
   transform: translateY(-50%);
   top: 50%;
@@ -1956,15 +1948,6 @@ html {
   left: 50%;
   right: auto;
   bottom: var(--tooltip-tail-offset);
-}
-
-.tooltip-bottom:after {
-  transform: translateX(-50%);
-  border-color: transparent transparent var(--tooltip-color) transparent;
-  top: var(--tooltip-tail-offset);
-  left: 50%;
-  right: auto;
-  bottom: auto;
 }
 
 .tooltip-right:after {
@@ -2720,10 +2703,6 @@ html {
     grid-column: span 1 / span 1;
   }
 
-  .md\:col-span-2 {
-    grid-column: span 2 / span 2;
-  }
-
   .md\:mt-0 {
     margin-top: 0px;
   }
@@ -2742,14 +2721,6 @@ html {
 
   .md\:max-w-\[25\%\] {
     max-width: 25%;
-  }
-
-  .md\:grid-cols-3 {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .md\:grid-cols-1 {
-    grid-template-columns: repeat(1, minmax(0, 1fr));
   }
 
   .md\:grid-cols-2 {
