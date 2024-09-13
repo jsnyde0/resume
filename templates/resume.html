@@ -27,8 +27,7 @@
       <!-- Column 1: Single-column cards -->
       <div class="space-y-4 md:col-span-1">
         
-        <c-resume-card
-        >
+        <c-resume-card>
           <div class="flex flex-col items-start">
             <div class="relative w-24 h-24 mb-3 rounded-full shadow-lg overflow-hidden group">
                 <img class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ease-in-out opacity-100 group-hover:opacity-0" src="{% static 'img/jonatan_avatar_smiling_no_bg.png' %}" alt="Jonatan Profile Picture"/>
@@ -68,16 +67,115 @@
           </div>
         </c-resume-card>
 
-        <c-resume-card
-            title="Quirks"
-        >
-        <p>Your quirks here</p>
+        <c-resume-card title="Quirks">
+          <ul class="list-disc list-inside">
+            <li>
+              I’m prone to overthinking, but a quick “just do it” snaps me out of it.
+            </li>
+            <li>
+              I try to resist shiny new tech, sticking to <a href="https://mcfunley.com/choose-boring-technology" target="_blank" class="link">boring technology</a> until key moments.
+            </li>
+            <li>
+              I keep a running commentary to be more <a href="https://www.stevestreeting.com/2010/09/04/work-2-0/" target="_blank" class="link">interruptible</a>.
+            </li>
+            <li>
+              I struggle with being overruled when something feels like it’s my responsibility.
+            </li>
+            <li>
+              I fundamentally assume everyone’s doing their best, even when it doesn't seem that way.
+            </li>
+            <li>
+              I try to consider social imbalances and my own privilege, that I probably don't fully grasp.
+            </li>
+            <li>
+              I get restless in my comfort zone - I enjoy pushing boundaries and learning about myself.
+            </li>
+          </ul>
         </c-resume-card>
 
-        <c-resume-card
-            title="Bio"
-        >
-        <p>Your bio here</p>
+        <c-resume-card title="What I Value">
+          <ul class="list-disc list-inside">
+            <li>
+              Directness, especially when it's tough to say or hear.
+            </li>
+            <li>
+              Learning to set boundaries when you've been raised to please.
+            </li>
+            <li>
+              Transparency that fosters connection and inclusion.
+            </li>
+            <li>
+              Owning your work, responsibilities, and mistakes.
+            </li>
+            <li>
+              Honestly considering feedback before reacting defensively.
+            </li>
+            <li>
+              Asynchronous communication over constant meetings.
+            </li>
+            <li>
+              Autonomously tracking work, even when you can't act on it right away.
+            </li>
+            <li>
+              Allowing non-critical mistakes to foster ownership.
+            </li>
+            <li>
+              Pointing out my blind spots, including those tied to privilege.
+            </li>
+          </ul>
+        </c-resume-card>
+
+        <c-resume-card title="How I can help you">
+          <ul class="list-disc list-inside">
+            <li>
+              I'm good at organizing roles, projects, and tasks.
+            </li>
+            <li>
+              I consider your feedback honestly before jumping to defend myself.
+            </li>
+            <li>
+              I pick up complex stuff fast and enjoy sharing what I've learned.
+            </li>
+            <li>
+              I'm all about growth, so if you're into self-improvement, I'm here for it.
+            </li>
+            <li>
+              I can help you with direct non-violent communication.
+            </li>
+            <li>
+              I stay optimistic and focus on fixing systems, not placing blame, when things go wrong.
+            </li>
+            <li>
+              As an ex-founder, I don't need hand-holding to get things done.
+            </li>
+            <li>
+              Whether it's tech, business, or personal growth, I'm here to coach and support you.
+            </li>
+          </ul>
+        </c-resume-card>
+
+        <c-resume-card title="How you can help me">
+          <ul class="list-disc list-inside">
+            <li>
+              Tell me to "just do it" when I'm stuck in perfectionism - it snaps me out of it.
+            </li>
+            <li>
+              Give feedback, don't jump in - I want to maintain my sense of ownership.
+            </li>
+            <li>
+              Own your tasks; managing others' work drains me.
+            </li>
+            <li>
+              Meet with clear agendas so we use time well.
+            </li>
+            <li>
+              Remind me I can ask for help - I tend to tackle everything solo.
+            </li>
+          </ul>
+        </c-resume-card>
+
+        <c-resume-card title="Bio">
+          <p>Your bio here</p>
         </c-resume-card>
         
       </div>
@@ -85,9 +183,7 @@
       <!-- Columns 2-3: Wide cards -->
       <div class="md:col-span-1 space-y-4">
 
-        <c-resume-card
-            title="Skills"
-        >
+        <c-resume-card title="Skills">
           <div class="mb-4">
             <div class="tooltip tooltip-right" data-tip="Two visualizations just for fun: D3.js vs Plotly.">
             <select id="skillsVisualizationSelector" class="select select-bordered w-full max-w-xs">
@@ -127,50 +223,50 @@
             tooltip="I listed only 4 achievements but honestly who's going to read more than 1?"
             description="TLDR: Startup success and failure, lots of programming and data science, gotten pretty good at web development pretty fast."
         >
-              <c-resume-item-card
-                  title="Launched 3 Web Apps Within 3 Months of Learning"
-                  role="Web Developer"
-                  badge_color="primary"
-                  company="Autodidact"
-                  location="Antwerp, Belgium"
-                  date_range="Q2 2024"
-                  image_url="{% static 'img/django-logo.png' %}"
-                  image_alt="Django Logo"
-              >Built an ecommerce platform and marketing mix modeling app in just 3 months of self-study,
-              accelerated by my programming and data science experience.</c-resume-item-card>
+          <c-resume-item-card
+              title="Launched 3 Web Apps Within 3 Months of Learning"
+              role="Web Developer"
+              badge_color="primary"
+              company="Autodidact"
+              location="Antwerp, Belgium"
+              date_range="Q2 2024"
+              image_url="{% static 'img/django-logo.png' %}"
+              image_alt="Django Logo"
+          >Built an ecommerce platform and marketing mix modeling app in just 3 months of self-study,
+          accelerated by my programming and data science experience.</c-resume-item-card>
 
-              <c-resume-item-card
-                  title="Created MeshMonk - a medical image processing library"
-                  role="Data Scientist"
-                  badge_color="accent"
-                  company="KULeuven"
-                  location="Leuven, Belgium"
-                  date_range="2017"
-                  image_url="{% static 'img/meshmonk-logo-white.png' %}"
-                  image_alt="MeshMonk Logo"
-              >Developed <a href="https://github.com/TheWebMonks/meshmonk" target="_blank" class="link link-hover">MeshMonk</a> in C++, a high-performance medical image processing framework used or cited in 140+ research projects.</c-resume-item-card>
+          <c-resume-item-card
+              title="Created MeshMonk - a medical image processing library"
+              role="Data Scientist"
+              badge_color="accent"
+              company="KULeuven"
+              location="Leuven, Belgium"
+              date_range="2017"
+              image_url="{% static 'img/meshmonk-logo-white.png' %}"
+              image_alt="MeshMonk Logo"
+          >Developed <a href="https://github.com/TheWebMonks/meshmonk" target="_blank" class="link">MeshMonk</a> in C++, a high-performance medical image processing framework used or cited in 140+ research projects.</c-resume-item-card>
 
-              <c-resume-item-card
-                  title="Scaled international impact-first business to support 30 people"
-                  role="Ex-Founder"
-                  badge_color="secondary"
-                  company="Humainly"
-                  location="Hasselt, Belgium"
-                  date_range="2015 - 2020"
-                  image_url="{% static 'img/humainly-logo-green.png' %}"
-                  image_alt="Humainly Logo"
-              >Scaled <a href="https://humainly.com/" target="_blank" class="link link-hover">Humainly</a> - a non-profit yet self-sustainable business - to support 30 people in Venezuela and Nigeria, providing living wages and professional training through local NGO partnerships.</c-resume-item-card>
+          <c-resume-item-card
+              title="Scaled international impact-first business to support 30 people"
+              role="Ex-Founder"
+              badge_color="secondary"
+              company="Humainly"
+              location="Hasselt, Belgium"
+              date_range="2015 - 2020"
+              image_url="{% static 'img/humainly-logo-green.png' %}"
+              image_alt="Humainly Logo"
+          >Scaled <a href="https://humainly.com/" target="_blank" class="link">Humainly</a> - a non-profit yet self-sustainable business - to support 30 people in Venezuela and Nigeria, providing living wages and professional training through local NGO partnerships.</c-resume-item-card>
 
-              <c-resume-item-card
-                  title="Data engineering and Bayesian modelling at eComm startup"
-                  role="Growth Engineer"
-                  badge_color="info"
-                  company="Moonbird"
-                  location="Antwerp, Belgium"
-                  date_range="2018 - 2022"
-                  image_url="{% static 'img/moonbird_logo_blue.png' %}"
-                  image_alt="Moonbird icon"
-              >Drove data-driven decision-making at eComm startup with a bespoke ELT pipeline, advanced server-side tracking, and self-developed Bayesian Marketing Mix Model.</c-resume-item-card>
+          <c-resume-item-card
+              title="Data engineering and Bayesian modelling at eComm startup"
+              role="Growth Engineer"
+              badge_color="info"
+              company="Moonbird"
+              location="Antwerp, Belgium"
+              date_range="2018 - 2022"
+              image_url="{% static 'img/moonbird_logo_blue.png' %}"
+              image_alt="Moonbird icon"
+          >Drove data-driven decision-making at eComm startup with a bespoke ELT pipeline, advanced server-side tracking, and self-developed Bayesian Marketing Mix Model.</c-resume-item-card>
         </c-resume-card>
 
         <!-- Work Experience -->
@@ -199,7 +295,7 @@
           date_range="2015 - 2020"
           image_url="{% static 'img/humainly-logo-green.png' %}"
           image_alt="Humainly icon">
-            Launched startup <a href="https://humainly.com/" target="_blank" class="link link-hover">Humainly</a> providing digital jobs and education in low-income regions alongside a Computer Vision consulting service.
+            Launched startup <a href="https://humainly.com/" target="_blank" class="link">Humainly</a> providing digital jobs and education in low-income regions alongside a Computer Vision consulting service.
           </c-resume-item-card>
 
           <c-resume-item-card
@@ -211,7 +307,7 @@
           date_range="2012 - 2014"
           image_url="{% static 'img/KULeuven_old_logo.png' %}"
           image_alt="KULeuven Logo">
-            Developed algorithms for medical image processing which eventually led to the <a href="https://github.com/TheWebMonks/meshmonk" target="_blank" class="link link-hover">MeshMonk</a> library, used or cited in 140+ research projects.
+            Developed algorithms for medical image processing which eventually led to the <a href="https://github.com/TheWebMonks/meshmonk" target="_blank" class="link">MeshMonk</a> library, used or cited in 140+ research projects.
           </c-resume-item-card>
 
         </c-resume-card>
