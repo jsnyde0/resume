@@ -27,8 +27,8 @@ def get_skills_data():
                     {
                         "name": "Analytics",
                         "children": [
-                            {"name": "Posthog"},
-                            {"name": "GA4"},
+                            {"name": "Posthog, GA4"},
+                            {"name": "Looker Studio"},
                             {"name": "Server-side Tracking"}
                         ]
                     },
@@ -52,21 +52,21 @@ def get_skills_data():
                 "name": "Data Scientist",
                 "children": [
                     {"name": "Python, C++"},
-                    {"name": "Algorithm and library development"},
-                    {"name": "Machine Learning (Sci-kit Learn, Numpy, Pandas, ...)"},
-                    {"name": "Bayesian Modelling (PyMC, MMM)"},
-                    {"name": "Computer vision & Deep learning (OpenCV, Keras)"},
-                    {"name": "Dashboarding (Looker)"}
+                    {"name": "Algorithm development"},
+                    {"name": "Machine Learning"},
+                    {"name": "Bayesian Modelling"},
+                    {"name": "Computer vision"},
+                    {"name": "Dashboarding"}
                 ]
             },
             {
                 "name": "Growth Engineer",
                 "children": [
-                    {"name": "Performance marketing (FB, Google, TikTok)"},
+                    {"name": "Performance marketing"},
                     {"name": "Growth Experimenting"},
                     {"name": "SEO"},
                     {"name": "CRO"},
-                    {"name": "Marketing Automation (Affiliate, Email, ...)"}
+                    {"name": "Marketing Automation"}
                 ]
             },
             {
@@ -76,7 +76,7 @@ def get_skills_data():
                     {"name": "HR & Team (Holacracy)"},
                     {"name": "Finance"},
                     {"name": "Sales"},
-                    {"name": "Project Management (Asana, GTD)"},
+                    {"name": "Project Management"},
                     {"name": "Learning from failures"}
                 ]
             }
