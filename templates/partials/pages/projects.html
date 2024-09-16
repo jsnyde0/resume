@@ -1,0 +1,76 @@
+{% load static %}
+
+  <section id="projects" class="py-12">
+    <div class="container mx-auto px-4 max-w-7xl">
+      <!-- Project 1 -->
+      <div class="mb-24">
+        <h2 class="text-3xl font-bold mb-8 text-center">Todo App</h2>
+        <div class="lg:flex lg:space-x-8">
+          <!-- Gallery -->
+          <div class="lg:w-1/2 mb-8 lg:mb-0">
+            <div class="carousel w-full rounded-box shadow-xl">
+              <div id="slide1" class="carousel-item relative w-full">
+                <img src={% static 'img/getting_tasks_done-home.png'%} class="w-full" alt="Todo App Screenshot 1" />
+                <div class="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2">
+                  <a href="#slide2" class="btn btn-circle">❮</a> 
+                  <a href="#slide2" class="btn btn-circle">❯</a>
+                </div>
+              </div> 
+              <div id="slide2" class="carousel-item relative w-full">
+                <img src={% static 'img/getting_tasks_done-subtask.png'%} class="w-full" alt="Todo App Screenshot 2" />
+                <div class="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2">
+                  <a href="#slide1" class="btn btn-circle">❮</a> 
+                  <a href="#slide1" class="btn btn-circle">❯</a>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Project Information -->
+          <div class="lg:w-1/2">
+            <div class="card bg-base-200 shadow-xl">
+              <div class="card-body">
+                <p class="mb-4">A simple app for managing personal tasks with categories and deadlines.</p>
+                <div class="mb-4">
+                  <h3 class="text-lg font-semibold mb-2">Technology Stack</h3>
+                  <div class="flex flex-wrap gap-2">
+                    <span class="badge badge-primary">Django</span>
+                    <span class="badge badge-secondary">HTMX</span>
+                    <span class="badge badge-accent">TailwindCSS</span>
+                    <span class="badge badge-info">PostgreSQL</span>
+                  </div>
+                </div>
+                <div class="mb-4">
+                  <h3 class="text-lg font-semibold mb-2">Key Learnings</h3>
+                  <p>Implementing real-time updates with HTMX.</p>
+                </div>
+                <div class="card-actions justify-end">
+                  <a href="https://todoapp.com" target="_blank" rel="noopener noreferrer" class="btn btn-primary">Live Demo</a>
+                  <a href="https://github.com/username/todo-app" target="_blank" rel="noopener noreferrer" class="btn btn-outline">Source Code</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Project 2 (reverse layout) -->
+      <div class="mb-24">
+        <h2 class="text-3xl font-bold mb-8 text-center">Another Project</h2>
+        <div class="lg:flex lg:flex-row-reverse lg:space-x-reverse lg:space-x-8">
+          <!-- Gallery -->
+          <div class="lg:w-1/2 mb-8 lg:mb-0">
+            <!-- Carousel code here (same as Project 1) -->
+          </div>
+          
+          <!-- Project Information -->
+          <div class="lg:w-1/2">
+            <!-- Card code here (same as Project 1) -->
+          </div>
+        </div>
+      </div>
+  
+      <!-- Add more projects as needed, alternating the layout -->
+  
+    </div>
+  </section>

@@ -29,6 +29,11 @@ def view_readme(request):
         return render(request, 'partials/pages/readme_md.html')
     return render(request, 'readme_md.html')
 
+def view_projects(request):
+    if request.htmx:
+        return render(request, 'partials/pages/projects.html')
+    return render(request, 'projects.html')
+
 def prepare_sunburst_data(skills_data):
     data = []
     def flatten(item, parent=""):
