@@ -1,0 +1,140 @@
+{% extends "layouts/default.html" %}
+{% load static %}
+{% block main %}
+<section class="bg-base-100">
+  <div class="container mx-auto px-4 py-8">
+    {% if messages %}
+<div id="messages" class="fixed top-0 right-0 m-4">
+  {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} shadow-lg mb-4">
+      <div>
+        <span>{{ message }}</span>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+<script>
+  setTimeout(function() {
+    var messages = document.getElementById('messages');
+    messages.style.display = 'none';
+  }, 5000);  // Hide messages after 5 seconds
+</script>
+{% endif %}
+
+    
+    
+      <div class="space-y-4 max-w-4xl mx-auto">
+
+        <h1 class="text-3xl font-bold mb-8">README</h1>
+
+        <c-resume-card title="Quirks">
+          <ul class="list-disc list-inside">
+            <li>
+              I'm prone to overthinking, but a quick "just do it" snaps me out of it.
+            </li>
+            <li>
+              I try to resist shiny new tech, sticking to <a href="https://mcfunley.com/choose-boring-technology" target="_blank" class="link">boring technology</a> until key moments.
+            </li>
+            <li>
+              I keep a running commentary to be more <a href="https://www.stevestreeting.com/2010/09/04/work-2-0/" target="_blank" class="link">interruptible</a>.
+            </li>
+            <li>
+              I struggle with being overruled when something feels like it's my responsibility.
+            </li>
+            <li>
+              I fundamentally assume everyone's doing their best, even when it doesn't seem that way.
+            </li>
+            <li>
+              I try to consider social imbalances and my own privilege, that I probably don't fully grasp.
+            </li>
+            <li>
+              I get restless in my comfort zone - I enjoy pushing boundaries and learning about myself.
+            </li>
+          </ul>
+        </c-resume-card>
+
+        <c-resume-card title="What I Value">
+          <ul class="list-disc list-inside">
+            <li>
+              Directness, especially when it's tough to say or hear.
+            </li>
+            <li>
+              Learning to set boundaries when you've been raised to please.
+            </li>
+            <li>
+              Transparency that fosters connection and inclusion.
+            </li>
+            <li>
+              Owning your work, responsibilities, and mistakes.
+            </li>
+            <li>
+              Honestly considering feedback before reacting defensively.
+            </li>
+            <li>
+              Asynchronous communication over constant meetings.
+            </li>
+            <li>
+              Autonomously tracking work, even when you can't act on it right away.
+            </li>
+            <li>
+              Allowing non-critical mistakes to foster ownership.
+            </li>
+            <li>
+              Pointing out my blind spots, including those tied to privilege.
+            </li>
+          </ul>
+        </c-resume-card>
+
+        <c-resume-card title="How I can help you">
+          <ul class="list-disc list-inside">
+            <li>
+              I'm good at organizing roles, projects, and tasks.
+            </li>
+            <li>
+              I consider your feedback honestly before jumping to defend myself.
+            </li>
+            <li>
+              I pick up complex stuff fast and enjoy sharing what I've learned.
+            </li>
+            <li>
+              I'm all about growth, so if you're into self-improvement, I'm here for it.
+            </li>
+            <li>
+              I can help you with direct non-violent communication.
+            </li>
+            <li>
+              I stay optimistic and focus on fixing systems, not placing blame, when things go wrong.
+            </li>
+            <li>
+              As an ex-founder, I don't need hand-holding to get things done.
+            </li>
+            <li>
+              Whether it's tech, business, or personal growth, I'm here to coach and support you.
+            </li>
+          </ul>
+        </c-resume-card>
+
+        <c-resume-card title="How you can help me">
+          <ul class="list-disc list-inside">
+            <li>
+              Tell me to "just do it" when I'm stuck in perfectionism - that's usually all it takes.
+            </li>
+            <li>
+              Give feedback, don't jump in - I want to maintain my sense of ownership.
+            </li>
+            <li>
+              Own your tasks; managing others' work drains me.
+            </li>
+            <li>
+              Meet with clear agendas so we use time well.
+            </li>
+            <li>
+              Remind me I can ask for help - I tend to tackle everything solo.
+            </li>
+          </ul>
+        </c-resume-card>
+        
+    </div>
+  </div>
+</section>
+{% endblock main %}

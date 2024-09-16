@@ -20,6 +20,9 @@ def view_resume(request):
 
     return render(request, 'resume.html', context)
 
+def view_readme(request):
+    return render(request, 'readme_md.html')
+
 def prepare_sunburst_data(skills_data):
     data = []
     def flatten(item, parent=""):
