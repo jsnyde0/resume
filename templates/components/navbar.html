@@ -1,7 +1,8 @@
 {% load static %}
 <nav class="bg-base-100">
     <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-      <a href="{% url 'home' %}" hx-get="{% url 'home' %}" hx-target="#main-content" class="flex items-center space-x-3 rtl:space-x-reverse">
+      <a href="{% url 'home' %}" hx-get="{% url 'home' %}" hx-target="#main-content" hx-push-url="true" 
+      class="flex items-center space-x-3 rtl:space-x-reverse">
           <img src="{% static 'img/avatar_jonatan_tongue.png' %}" class="h-12 w-12" alt="Flowbite Logo" />
           <span class="self-center text-2xl font-semibold whitespace-nowrap">Jonatan Snyders</span>
       </a>
@@ -17,10 +18,12 @@
             <a href="#" class="block py-2 px-3 text-primary bg-primary-focus rounded md:bg-transparent md:text-primary md:p-0" aria-current="page">Resume</a>
           </li> {% endcomment %}
           <li>
-            <a href="{% url 'resume' %}" hx-get="{% url 'resume' %}" hx-target="#main-content" class="block py-2 px-3 rounded hover:bg-base-200 md:hover:bg-transparent md:border-0 md:hover:text-primary md:p-0">Resume</a>
+            <a href="{% url 'resume' %}" hx-get="{% url 'resume' %}" hx-target="#main-content" hx-push-url="true" 
+            class="block py-2 px-3 rounded hover:bg-base-200 md:hover:bg-transparent md:border-0 md:hover:text-primary md:p-0">Resume</a>
           </li>
           <li>
-            <a href="{% url 'readme' %}" hx-get="{% url 'readme' %}" hx-target="#main-content" class="block py-2 px-3 rounded hover:bg-base-200 md:hover:bg-transparent md:border-0 md:hover:text-primary md:p-0">README</a>
+            <a href="{% url 'readme' %}" hx-get="{% url 'readme' %}" hx-target="#main-content" hx-push-url="true" 
+            class="block py-2 px-3 rounded hover:bg-base-200 md:hover:bg-transparent md:border-0 md:hover:text-primary md:p-0">README</a>
           </li>
           <li>
             <a href="#" class="block py-2 px-3 rounded hover:bg-base-200 md:hover:bg-transparent md:border-0 md:hover:text-primary md:p-0">Projects</a>
