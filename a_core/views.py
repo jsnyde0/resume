@@ -6,6 +6,8 @@ import json
 from .utils import get_skills_data, prepare_sunburst_data, create_sunburst_plot
 
 def view_home(request):
+    if request.htmx:
+        return render(request, 'partials/pages/home.html')
     return render(request, 'home.html')
 
 def view_resume(request):
@@ -18,9 +20,13 @@ def view_resume(request):
         'sunburst_plot': sunburst_plot
     }
 
+    if request.htmx:
+        return render(request, 'partials/pages/resume.html', context)
     return render(request, 'resume.html', context)
 
 def view_readme(request):
+    if request.htmx:
+        return render(request, 'partials/pages/readme_md.html')
     return render(request, 'readme_md.html')
 
 def prepare_sunburst_data(skills_data):
