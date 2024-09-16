@@ -6,8 +6,32 @@
         <!-- Sidebar -->
         {% comment %} {% include "components/sidebar.html" %} {% endcomment %}
         <main class="p-4 h-auto pt-20">
-            {% block main %}
-            {% endblock main %}
+            <section class="bg-base-100">
+                <div class="container mx-auto px-4 py-8">
+                  {% if messages %}
+                    <div id="messages" class="fixed top-0 right-0 m-4">
+                      {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} shadow-lg mb-4">
+                          <div>
+                            <span>{{ message }}</span>
+                          </div>
+                        </div>
+                      {% endfor %}
+                    </div>
+                    <script>
+                      setTimeout(function() {
+                        var messages = document.getElementById('messages');
+                        messages.style.display = 'none';
+                      }, 5000);  // Hide messages after 5 seconds
+                    </script>
+                  {% endif %}
+              
+                    <div class="space-y-4 max-w-4xl mx-auto" id="main-content">
+                        {% block main %}
+                        {% endblock main %}
+                    </div>
+                </div>
+            </section>
         </main>
         {% include "components/footer.html" %}
     </div>
