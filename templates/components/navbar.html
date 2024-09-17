@@ -29,9 +29,9 @@
             <a href="{% url 'projects' %}" hx-get="{% url 'projects' %}" hx-target="#main-content" hx-push-url="true" 
             class="block py-2 px-3 rounded hover:bg-base-200 md:hover:bg-transparent md:border-0 md:hover:text-primary md:p-0">Projects</a>
           </li>
-          <li>
+          {% comment %} <li>
             <a href="#" class="block py-2 px-3 rounded hover:bg-base-200 md:hover:bg-transparent md:border-0 md:hover:text-primary md:p-0">Blog</a>
-          </li>
+          </li> {% endcomment %}
         </ul>
       </div>
     </div>
