@@ -4,7 +4,7 @@
     <div class="container mx-auto px-4 max-w-7xl">
       <!-- Project 1 -->
       <div class="mb-24">
-        <h2 class="text-3xl font-bold mb-8 text-center">Todo App</h2>
+        <h2 class="text-3xl font-bold mb-8 text-center">Getting Tasks Done</h2>
         <div class="lg:flex lg:space-x-8">
           <!-- Gallery -->
           <c-carousel-frame>
@@ -20,23 +20,26 @@
           <div class="lg:w-1/2">
             <div class="card bg-base-200 shadow-xl">
               <div class="card-body">
-                <p class="mb-4">A simple app for managing personal tasks with categories and deadlines.</p>
+                <p class="mb-4">A 'Getting Things Done' task manager with a dynamic HTMX UI, PostgreSQL/SQLite support, and allauth authentication. Includes admin honeypot, environment-based configs, and production-ready settings for secure, scalable deployment.</p>
                 <div class="mb-4">
-                  <h3 class="text-lg font-semibold mb-2">Technology Stack</h3>
+                  <h3 class="text-lg font-semibold mb-2">Technology</h3>
                   <div class="flex flex-wrap gap-2">
-                    <span class="badge badge-primary">Django</span>
-                    <span class="badge badge-secondary">HTMX</span>
-                    <span class="badge badge-accent">TailwindCSS</span>
-                    <span class="badge badge-info">PostgreSQL</span>
+                    <span class="badge badge-neutral">Django</span>
+                    <span class="badge badge-neutral">HTMX</span>
+                    <span class="badge badge-neutral">TailwindCSS</span>
+                    <span class="badge badge-neutral">PostgreSQL</span>
+                    <span class="badge badge-neutral">python-environ</span>
+                    <span class="badge badge-neutral">django-allauth</span>
+                    <span class="badge badge-neutral">Whitenoise</span>
                   </div>
                 </div>
                 <div class="mb-4">
                   <h3 class="text-lg font-semibold mb-2">Key Learnings</h3>
-                  <p>Implementing real-time updates with HTMX.</p>
+                  <p>Full-stack development, HTMX, TailwindCSS, security practices (CSRF, honeypot, env management), user auth, deployment config</p>
                 </div>
                 <div class="card-actions justify-end">
-                  <a href="https://todoapp.com" target="_blank" rel="noopener noreferrer" class="btn btn-primary">Live Demo</a>
-                  <a href="https://github.com/username/todo-app" target="_blank" rel="noopener noreferrer" class="btn btn-outline">Source Code</a>
+                  {% comment %} <a href="https://todoapp.com" target="_blank" rel="noopener noreferrer" class="btn btn-primary">Live Demo</a> {% endcomment %}
+                  <a href="https://github.com/jsnyde0/get-todos-done/" target="_blank" rel="noopener noreferrer" class="btn btn-outline">Source Code</a>
                 </div>
               </div>
             </div>
