@@ -7,24 +7,14 @@
         <h2 class="text-3xl font-bold mb-8 text-center">Todo App</h2>
         <div class="lg:flex lg:space-x-8">
           <!-- Gallery -->
-          <div class="lg:w-1/2 mb-8 lg:mb-0">
-            <div class="carousel w-full rounded-box shadow-xl">
-              <div id="slide1" class="carousel-item relative w-full">
+          <c-carousel-frame>
+              <c-carousel-item id="slide1" prev="slide2" next="slide2">
                 <img src={% static 'img/getting_tasks_done-home.png'%} class="w-full" alt="Todo App Screenshot 1" />
-                <div class="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2">
-                  <button class="btn btn-circle carousel-nav" data-target="slide2">❮</button> 
-                  <button class="btn btn-circle carousel-nav" data-target="slide2">❯</button>
-                </div>
-              </div> 
-              <div id="slide2" class="carousel-item relative w-full hidden">
+              </c-carousel-item> 
+              <c-carousel-item id="slide2" prev="slide1" next="slide1">
                 <img src={% static 'img/getting_tasks_done-subtask.png'%} class="w-full" alt="Todo App Screenshot 2" />
-                <div class="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2">
-                  <button class="btn btn-circle carousel-nav" data-target="slide1">❮</button> 
-                  <button class="btn btn-circle carousel-nav" data-target="slide1">❯</button>
-                </div>
-              </div>
-            </div>
-          </div>
+              </c-carousel-item>
+          </c-carousel-frame>
           
           <!-- Project Information -->
           <div class="lg:w-1/2">
@@ -74,22 +64,3 @@
   
     </div>
   </section>
-
-  {% block extra_js %}
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const carouselNavs = document.querySelectorAll('.carousel-nav');
-      
-      carouselNavs.forEach(nav => {
-        nav.addEventListener('click', function() {
-          const currentSlide = this.closest('.carousel-item');
-          const targetSlideId = this.getAttribute('data-target');
-          const targetSlide = document.getElementById(targetSlideId);
-  
-          currentSlide.classList.add('hidden');
-          targetSlide.classList.remove('hidden');
-        });
-      });
-    });
-  </script>
-  {% endblock extra_js %}
