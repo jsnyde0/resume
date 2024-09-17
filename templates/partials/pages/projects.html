@@ -49,16 +49,54 @@
   
       <!-- Project 2 (reverse layout) -->
       <div class="mb-24">
-        <h2 class="text-3xl font-bold mb-8 text-center">Another Project</h2>
+        <h2 class="text-3xl font-bold mb-8 text-center">TopBottomBabes</h2>
         <div class="lg:flex lg:flex-row-reverse lg:space-x-reverse lg:space-x-8">
           <!-- Gallery -->
-          <div class="lg:w-1/2 mb-8 lg:mb-0">
-            <!-- Carousel code here (same as Project 1) -->
-          </div>
+          <c-carousel-frame>
+            <c-carousel-item id="slide1">
+              <img src={% static 'img/topbottombabes-1.png'%} class="w-full" alt="TopBottomBabes Screenshot 1" />
+            </c-carousel-item> 
+            <c-carousel-item id="slide2">
+              <img src={% static 'img/topbottombabes-2.png'%} class="w-full" alt="TopBottomBabes Screenshot 2" />
+            </c-carousel-item> 
+            <c-carousel-item id="slide3">
+              <img src={% static 'img/topbottombabes-3.png'%} class="w-full" alt="TopBottomBabes Screenshot 3" />
+            </c-carousel-item> 
+            <c-carousel-item id="slide4">
+              <img src={% static 'img/topbottombabes-4.png'%} class="w-full" alt="TopBottomBabes Screenshot 4" />
+            </c-carousel-item> 
+            <c-carousel-item id="slide5">
+              <img src={% static 'img/topbottombabes-5.png'%} class="w-full" alt="TopBottomBabes Screenshot 5" />
+            </c-carousel-item> 
+          </c-carousel-frame>
           
           <!-- Project Information -->
           <div class="lg:w-1/2">
-            <!-- Card code here (same as Project 1) -->
+            <div class="card bg-base-200 shadow-xl">
+              <div class="card-body">
+                <p class="mb-4">A naughty e-commerce store, with complex cart management and multi-step checkout process built from scratch. Uses Stripe for payments.</p>
+                <div class="mb-4">
+                  <h3 class="text-lg font-semibold mb-2">Technology</h3>
+                  <div class="flex flex-wrap gap-2">
+                    <span class="badge badge-neutral">Django</span>
+                    <span class="badge badge-neutral">HTMX</span>
+                    <span class="badge badge-neutral">TailwindCSS</span>
+                    <span class="badge badge-neutral">SQLite</span>
+                    <span class="badge badge-neutral">django-widget-tweaks</span>
+                    <span class="badge badge-neutral">Stripe</span>
+                    <span class="badge badge-neutral">django-allauth</span>
+                  </div>
+                </div>
+                <div class="mb-4">
+                  <h3 class="text-lg font-semibold mb-2">Key Learnings</h3>
+                  <p>Managing cart and checkout state between anonymous and authenticated users, Stripe payments, custom user models, signals, session handling, test-driven development</p>
+                </div>
+                <div class="card-actions justify-end">
+                  {% comment %} <a href="https://todoapp.com" target="_blank" rel="noopener noreferrer" class="btn btn-primary">Live Demo</a> {% endcomment %}
+                  <a href="https://github.com/jsnyde0/topbottombabes/" target="_blank" rel="noopener noreferrer" class="btn btn-outline">Source Code</a>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
