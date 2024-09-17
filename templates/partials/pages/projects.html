@@ -2,52 +2,60 @@
 
   <section id="projects" class="py-12">
     <div class="container mx-auto px-4 max-w-7xl">
-      <!-- Project 1 -->
+
+      <!-- Project 1: eBayes -->
       <div class="mb-24">
-        <h2 class="text-3xl font-bold mb-8 text-center">Getting Tasks Done</h2>
+        <h2 class="text-3xl font-bold mb-8 text-center">eBayes</h2>
         <div class="lg:flex lg:space-x-8">
           <!-- Gallery -->
           <c-carousel-frame>
               <c-carousel-item id="slide1">
-                <img src={% static 'img/getting_tasks_done-home.png'%} class="w-full" alt="Todo App Screenshot 1" />
+                <img src={% static 'img/ebayes-1.png'%} class="w-full" alt="eBayes App Screenshot 1" />
               </c-carousel-item> 
               <c-carousel-item id="slide2">
-                <img src={% static 'img/getting_tasks_done-subtask.png'%} class="w-full" alt="Todo App Screenshot 2" />
-              </c-carousel-item>
+                <img src={% static 'img/ebayes-2.png'%} class="w-full" alt="eBayes App Screenshot 2" />
+              </c-carousel-item> 
+              <c-carousel-item id="slide3">
+                <img src={% static 'img/ebayes-3.png'%} class="w-full" alt="eBayes App Screenshot 3" />
+              </c-carousel-item> 
+              <c-carousel-item id="slide4">
+                <img src={% static 'img/ebayes-4.png'%} class="w-full" alt="eBayes App Screenshot 4" />
+              </c-carousel-item> 
           </c-carousel-frame>
           
           <!-- Project Information -->
           <div class="lg:w-1/2">
             <div class="card bg-base-200 shadow-xl">
               <div class="card-body">
-                <p class="mb-4">A 'Getting Things Done' task manager with a dynamic HTMX UI, PostgreSQL/SQLite support, and allauth authentication. Includes admin honeypot, environment-based configs, and production-ready settings for secure, scalable deployment.</p>
+                <p class="mb-4">My favourite pet project - a Bayesian Marketing Mix Modelling app for eCommerce implemented with Django and PyMC-Marketing, fusing data science with web development. Work-in-progress.</p>
                 <div class="mb-4">
                   <h3 class="text-lg font-semibold mb-2">Technology</h3>
                   <div class="flex flex-wrap gap-2">
                     <span class="badge badge-neutral">Django</span>
+                    <span class="badge badge-neutral">PyMC</span>
+                    <span class="badge badge-neutral">PyMC-Marketing</span>
                     <span class="badge badge-neutral">HTMX</span>
                     <span class="badge badge-neutral">TailwindCSS</span>
-                    <span class="badge badge-neutral">PostgreSQL</span>
-                    <span class="badge badge-neutral">python-environ</span>
-                    <span class="badge badge-neutral">django-allauth</span>
-                    <span class="badge badge-neutral">Whitenoise</span>
+                    <span class="badge badge-neutral">Chart.js</span>
+                    <span class="badge badge-neutral">django-cotton</span>
                   </div>
                 </div>
                 <div class="mb-4">
                   <h3 class="text-lg font-semibold mb-2">Key Learnings</h3>
-                  <p>Full-stack development, HTMX, TailwindCSS, security practices (CSRF, honeypot, env management), user auth, deployment config</p>
+                  <p>Implementing Bayesian marketing mix models, processing and validating CSV uploads, creating dynamic data visualizations, combining data science with web development</p>
                 </div>
                 <div class="card-actions justify-end">
                   {% comment %} <a href="https://todoapp.com" target="_blank" rel="noopener noreferrer" class="btn btn-primary">Live Demo</a> {% endcomment %}
-                  <a href="https://github.com/jsnyde0/get-todos-done/" target="_blank" rel="noopener noreferrer" class="btn btn-outline">Source Code</a>
+                  <a href="https://github.com/jsnyde0/ebayes/" target="_blank" rel="noopener noreferrer" class="btn btn-outline">Source Code</a>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
+      
   
-      <!-- Project 2 (reverse layout) -->
+      <!-- Project 2: TopBottomBabes -->
       <div class="mb-24">
         <h2 class="text-3xl font-bold mb-8 text-center">TopBottomBabes</h2>
         <div class="lg:flex lg:flex-row-reverse lg:space-x-reverse lg:space-x-8">
@@ -100,8 +108,53 @@
           </div>
         </div>
       </div>
+
+      <!-- Project 3: Getting Tasks Done -->
+      <div class="mb-24">
+        <h2 class="text-3xl font-bold mb-8 text-center">Getting Tasks Done</h2>
+        <div class="lg:flex lg:space-x-8">
+          <!-- Gallery -->
+          <c-carousel-frame>
+              <c-carousel-item id="slide1">
+                <img src={% static 'img/getting_tasks_done-home.png'%} class="w-full" alt="Todo App Screenshot 1" />
+              </c-carousel-item> 
+              <c-carousel-item id="slide2">
+                <img src={% static 'img/getting_tasks_done-subtask.png'%} class="w-full" alt="Todo App Screenshot 2" />
+              </c-carousel-item>
+          </c-carousel-frame>
+          
+          <!-- Project Information -->
+          <div class="lg:w-1/2">
+            <div class="card bg-base-200 shadow-xl">
+              <div class="card-body">
+                <p class="mb-4">A 'Getting Things Done' task manager with a dynamic HTMX UI, PostgreSQL/SQLite support, and allauth authentication. Includes admin honeypot, environment-based configs, and production-ready settings for secure, scalable deployment.</p>
+                <div class="mb-4">
+                  <h3 class="text-lg font-semibold mb-2">Technology</h3>
+                  <div class="flex flex-wrap gap-2">
+                    <span class="badge badge-neutral">Django</span>
+                    <span class="badge badge-neutral">HTMX</span>
+                    <span class="badge badge-neutral">TailwindCSS</span>
+                    <span class="badge badge-neutral">PostgreSQL</span>
+                    <span class="badge badge-neutral">python-environ</span>
+                    <span class="badge badge-neutral">django-allauth</span>
+                    <span class="badge badge-neutral">Whitenoise</span>
+                  </div>
+                </div>
+                <div class="mb-4">
+                  <h3 class="text-lg font-semibold mb-2">Key Learnings</h3>
+                  <p>Full-stack development, HTMX, TailwindCSS, security practices (CSRF, honeypot, env management), user auth, deployment config</p>
+                </div>
+                <div class="card-actions justify-end">
+                  {% comment %} <a href="https://todoapp.com" target="_blank" rel="noopener noreferrer" class="btn btn-primary">Live Demo</a> {% endcomment %}
+                  <a href="https://github.com/jsnyde0/get-todos-done/" target="_blank" rel="noopener noreferrer" class="btn btn-outline">Source Code</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
   
-      <!-- Add more projects as needed, alternating the layout -->
+      
   
     </div>
   </section>
