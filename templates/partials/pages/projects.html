@@ -12,15 +12,15 @@
               <div id="slide1" class="carousel-item relative w-full">
                 <img src={% static 'img/getting_tasks_done-home.png'%} class="w-full" alt="Todo App Screenshot 1" />
                 <div class="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2">
-                  <a href="#slide2" class="btn btn-circle">❮</a> 
-                  <a href="#slide2" class="btn btn-circle">❯</a>
+                  <button class="btn btn-circle carousel-nav" data-target="slide2">❮</button> 
+                  <button class="btn btn-circle carousel-nav" data-target="slide2">❯</button>
                 </div>
               </div> 
-              <div id="slide2" class="carousel-item relative w-full">
+              <div id="slide2" class="carousel-item relative w-full hidden">
                 <img src={% static 'img/getting_tasks_done-subtask.png'%} class="w-full" alt="Todo App Screenshot 2" />
                 <div class="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2">
-                  <a href="#slide1" class="btn btn-circle">❮</a> 
-                  <a href="#slide1" class="btn btn-circle">❯</a>
+                  <button class="btn btn-circle carousel-nav" data-target="slide1">❮</button> 
+                  <button class="btn btn-circle carousel-nav" data-target="slide1">❯</button>
                 </div>
               </div>
             </div>
@@ -74,3 +74,22 @@
   
     </div>
   </section>
+
+  {% block extra_js %}
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const carouselNavs = document.querySelectorAll('.carousel-nav');
+      
+      carouselNavs.forEach(nav => {
+        nav.addEventListener('click', function() {
+          const currentSlide = this.closest('.carousel-item');
+          const targetSlideId = this.getAttribute('data-target');
+          const targetSlide = document.getElementById(targetSlideId);
+  
+          currentSlide.classList.add('hidden');
+          targetSlide.classList.remove('hidden');
+        });
+      });
+    });
+  </script>
+  {% endblock extra_js %}
