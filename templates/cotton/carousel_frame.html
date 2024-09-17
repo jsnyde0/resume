@@ -1,42 +1,51 @@
 <div class="lg:w-1/2 mb-8 lg:mb-0">
-  <div class="carousel w-full rounded-box shadow-xl">
-    {{slot}}
+    <div class="carousel w-full rounded-box shadow-xl">
+      {{slot}}
+    </div>
   </div>
-</div>
-
-<script>
-    function initCarousel() {
-      const carouselItems = document.querySelectorAll('.carousel-item');
-      const carouselNavs = document.querySelectorAll('.carousel-nav');
-      
-      // Hide all slides except the first one
-      carouselItems.forEach((item, index) => {
-        if (index !== 0) item.classList.add('hidden');
-      });
-
-      carouselNavs.forEach(nav => {
-        nav.addEventListener('click', function() {
-          const currentSlide = this.closest('.carousel-item');
-          const targetSlideId = this.getAttribute('data-target');
-          const targetSlide = document.getElementById(targetSlideId);
-
-          currentSlide.classList.add('hidden');
-          targetSlide.classList.remove('hidden');
+  
+  <script>
+      function initCarousel() {
+        const carousels = document.querySelectorAll('.carousel');
+        
+        carousels.forEach(carousel => {
+          const items = Array.from(carousel.querySelectorAll('.carousel-item'));
+          
+          items.forEach((item, index) => {
+            // Hide all slides except the first one
+            if (index !== 0) item.classList.add('hidden');
+            
+            const prevButton = item.querySelector('.carousel-prev');
+            const nextButton = item.querySelector('.carousel-next');
+            
+            prevButton.addEventListener('click', () => navigateCarousel(carousel, index - 1));
+            nextButton.addEventListener('click', () => navigateCarousel(carousel, index + 1));
+          });
         });
-      });
-    }
-
-    // Use a MutationObserver to detect when the carousel is fully rendered
-    const observer = new MutationObserver((mutations, obs) => {
-      const carousel = document.querySelector('.carousel');
-      if (carousel) {
-        initCarousel();
-        obs.disconnect();
       }
-    });
-
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true
-    });
-</script>
+  
+      function navigateCarousel(carousel, targetIndex) {
+        const items = Array.from(carousel.querySelectorAll('.carousel-item'));
+        const currentIndex = items.findIndex(item => !item.classList.contains('hidden'));
+        
+        // Wrap around if we go past the ends
+        if (targetIndex < 0) targetIndex = items.length - 1;
+        if (targetIndex >= items.length) targetIndex = 0;
+        
+        items[currentIndex].classList.add('hidden');
+        items[targetIndex].classList.remove('hidden');
+      }
+  
+      // Use a MutationObserver to detect when carousels are fully rendered
+      const observer = new MutationObserver((mutations, obs) => {
+        if (document.querySelector('.carousel')) {
+          initCarousel();
+          obs.disconnect();
+        }
+      });
+  
+      observer.observe(document.body, {
+        childList: true,
+        subtree: true
+      });
+  </script>
