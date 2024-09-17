@@ -2124,6 +2124,10 @@ html {
   margin-bottom: 0.25rem;
 }
 
+.mb-16 {
+  margin-bottom: 4rem;
+}
+
 .mb-2 {
   margin-bottom: 0.5rem;
 }
@@ -2170,10 +2174,6 @@ html {
 
 .mt-4 {
   margin-top: 1rem;
-}
-
-.mb-16 {
-  margin-bottom: 4rem;
 }
 
 .block {
@@ -2549,12 +2549,20 @@ html {
   padding-bottom: 2rem;
 }
 
+.pb-8 {
+  padding-bottom: 2rem;
+}
+
 .pr-4 {
   padding-right: 1rem;
 }
 
 .pt-10 {
   padding-top: 2.5rem;
+}
+
+.pb-16 {
+  padding-bottom: 4rem;
 }
 
 .text-center {
