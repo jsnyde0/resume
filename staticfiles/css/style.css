@@ -2252,6 +2252,10 @@ html {
   width: 100%;
 }
 
+.min-w-0 {
+  min-width: 0px;
+}
+
 .max-w-2xl {
   max-width: 42rem;
 }
@@ -2278,6 +2282,10 @@ html {
 
 .max-w-xs {
   max-width: 20rem;
+}
+
+.max-w-\[30\%\] {
+  max-width: 30%;
 }
 
 .flex-shrink-0 {
@@ -2353,6 +2361,14 @@ html {
   gap: 0.5rem;
 }
 
+.gap-4 {
+  gap: 1rem;
+}
+
+.gap-1 {
+  gap: 0.25rem;
+}
+
 .space-x-2 > :not([hidden]) ~ :not([hidden]) {
   --tw-space-x-reverse: 0;
   margin-right: calc(0.5rem * var(--tw-space-x-reverse));
@@ -2391,6 +2407,17 @@ html {
 
 .overflow-x-auto {
   overflow-x: auto;
+}
+
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hyphens-auto {
+  -webkit-hyphens: auto;
+          hyphens: auto;
 }
 
 .whitespace-normal {
@@ -2549,6 +2576,16 @@ html {
   padding-bottom: 2rem;
 }
 
+.px-1 {
+  padding-left: 0.25rem;
+  padding-right: 0.25rem;
+}
+
+.px-0 {
+  padding-left: 0px;
+  padding-right: 0px;
+}
+
 .pr-4 {
   padding-right: 1rem;
 }
@@ -2593,6 +2630,11 @@ html {
 .text-xl {
   font-size: 1.25rem;
   line-height: 1.75rem;
+}
+
+.text-xs {
+  font-size: 0.75rem;
+  line-height: 1rem;
 }
 
 .font-bold {
@@ -2837,8 +2879,16 @@ html {
 }
 
 @media (min-width: 640px) {
+  .sm\:inline {
+    display: inline;
+  }
+
   .sm\:max-w-\[30\%\] {
     max-width: 30%;
+  }
+
+  .sm\:max-w-\[25\%\] {
+    max-width: 25%;
   }
 
   .sm\:flex-row {
@@ -2849,6 +2899,35 @@ html {
     --tw-space-y-reverse: 0;
     margin-top: calc(0px * calc(1 - var(--tw-space-y-reverse)));
     margin-bottom: calc(0px * var(--tw-space-y-reverse));
+  }
+
+  .sm\:space-x-4 > :not([hidden]) ~ :not([hidden]) {
+    --tw-space-x-reverse: 0;
+    margin-right: calc(1rem * var(--tw-space-x-reverse));
+    margin-left: calc(1rem * calc(1 - var(--tw-space-x-reverse)));
+  }
+
+  .sm\:p-6 {
+    padding: 1.5rem;
+  }
+
+  .sm\:px-4 {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .sm\:text-xl {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+  }
+
+  .sm\:text-sm {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
+
+  .sm\:text-base {
+    font-size: 0.9375rem;
   }
 }
 
@@ -2871,6 +2950,10 @@ html {
 
   .md\:max-w-\[25\%\] {
     max-width: 25%;
+  }
+
+  .md\:max-w-\[20\%\] {
+    max-width: 20%;
   }
 
   .md\:flex-row {
@@ -2898,6 +2981,10 @@ html {
 
   .md\:p-0 {
     padding: 0px;
+  }
+
+  .md\:p-8 {
+    padding: 2rem;
   }
 
   .md\:text-5xl {
@@ -3013,6 +3100,54 @@ html {
   }
 }
 
+.\[\&_li\]\:text-sm li {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+@media (min-width: 640px) {
+  .sm\:\[\&_li\]\:text-base li {
+    font-size: 0.9375rem;
+  }
+}
+
 .\[\&_p\]\:mt-2 p {
   margin-top: 0.5rem;
+}
+
+.\[\&_p\]\:text-xs p {
+  font-size: 0.75rem;
+  line-height: 1rem;
+}
+
+.\[\&_p\]\:text-sm p {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+@media (min-width: 640px) {
+  .sm\:\[\&_p\]\:text-sm p {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
+
+  .sm\:\[\&_p\]\:text-base p {
+    font-size: 0.9375rem;
+  }
+}
+
+.\[\&_p_sm\]\:text-sm p sm {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+.\[\&_span\]\:text-sm span {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+@media (min-width: 640px) {
+  .sm\:\[\&_span\]\:text-base span {
+    font-size: 0.9375rem;
+  }
 }
