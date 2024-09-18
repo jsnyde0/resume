@@ -4,23 +4,23 @@
 
 {% load static %}
 <div class="card bg-base-200 shadow-xl hover:shadow-2xl transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:bg-base-300">
-    <div class="card-body p-8">
-        <div class="flex items-start space-x-4">
+    <div class="card-body p-4 sm:p-6 md:p-8">
+        <div class="flex flex-col sm:flex-row items-start space-y-4 sm:space-y-0 sm:space-x-4">
             <div class="w-12 h-12 flex-shrink-0">
                 <img src="{{image_url}}" alt="{{image_alt}}" class="w-full h-full object-contain">
             </div>
-            <div class="flex-grow">
-                <h3 class="card-title text-xl font-medium text-content-primary">{{ title }}</h3>
-                <div class="flex items-center space-x-2 text-sm text-base-content/70 mt-1">
-                    <span class="inline-flex items-center justify-center px-2 py-1 font-medium leading-none text-primary-content bg-{{badge_color}} rounded whitespace-normal break-words max-w-[40%] sm:max-w-[30%] md:max-w-[25%]">{{ role }}</span>
-                    <span>&bull;</span>
-                    <span>{{ company }}</span>
-                    <span>&bull;</span>
-                    <span>{{ location }}</span>
-                    <span>&bull;</span>
-                    <span>{{ date_range }}</span>
+            <div class="flex-grow min-w-0">
+                <h3 class="card-title text-lg sm:text-xl font-medium text-content-primary break-words hyphens-auto">{{ title }}</h3>
+                <div class="flex flex-wrap items-center gap-1 text-xs sm:text-sm text-base-content/70 mt-1">
+                    <span class="inline-flex items-center justify-center px-2 py-1 font-medium leading-none text-primary-content bg-{{badge_color}} rounded whitespace-normal break-words max-w-[30%] sm:max-w-[25%] md:max-w-[20%]">{{ role }}</span>
+                    <span class="hidden sm:inline">&bull;</span>
+                    <span class="truncate">{{ company }}</span>
+                    <span class="hidden sm:inline">&bull;</span>
+                    <span class="truncate">{{ location }}</span>
+                    <span class="hidden sm:inline">&bull;</span>
+                    <span class="truncate">{{ date_range }}</span>
                 </div>
-                <p class="mt-4">{{ slot }}</p>
+                <p class="mt-4 break-words hyphens-auto text-sm sm:text-base">{{ slot }}</p>
             </div>
         </div>
     </div>
