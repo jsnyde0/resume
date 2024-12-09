@@ -1,0 +1,44 @@
+[project]
+name = "resume"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "asgiref==3.8.1",
+    "beautifulsoup4==4.12.3",
+    "click==8.1.7",
+    "colorama==0.4.6",
+    "cssbeautifier==1.15.1",
+    "django-admin-honeypot-updated-2021==1.2.0",
+    "django-cotton==0.9.37",
+    "django-environ==0.11.2",
+    "django-htmx==1.19.0",
+    "django-ipware==7.0.1",
+    "django-template-partials==24.4",
+    "django==5.1.1",
+    "djlint==1.35.2",
+    "editorconfig==0.12.4",
+    "gunicorn==23.0.0",
+    "html-tag-names==0.1.2",
+    "html-void-elements==0.1.0",
+    "jsbeautifier==1.15.1",
+    "json5==0.9.25",
+    "numpy==2.1.1",
+    "packaging==24.1",
+    "pandas==2.2.2",
+    "pathspec==0.12.1",
+    "plotly==5.24.0",
+    "python-dateutil==2.9.0.post0",
+    "python-ipware==3.0.0",
+    "pytz==2024.2",
+    "pyyaml==6.0.2",
+    "regex==2024.7.24",
+    "six==1.16.0",
+    "soupsieve==2.6",
+    "sqlparse==0.5.1",
+    "tenacity==9.0.0",
+    "tqdm==4.66.5",
+    "tzdata==2024.1",
+    "whitenoise==6.7.0",
+]

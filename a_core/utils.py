@@ -12,16 +12,19 @@ def get_skills_data():
                         "name": "Back-End",
                         "children": [
                             {"name": "Django"},
-                            {"name": "PostgreSQL, SQLite"}
+                            {"name": "PostgreSQL"},
+                            {"name": "MongoDB"},
+                            {"name": "Async"},
+                            {"name": "RESTful API"}
                         ]
                     },
                     {
                         "name": "Front-end",
                         "children": [
                             {"name": "HTML, CSS"},
-                            {"name": "HTMX, Tailwind, Cotton"},
+                            {"name": "HTMX, Tailwind"},
                             {"name": "Chart.js, D3.js"},
-                            {"name": "JavaScript (basic)"}
+                            {"name": "JavaScript"}
                         ]
                     },
                     {
@@ -36,7 +39,8 @@ def get_skills_data():
                         "name": "Deployment",
                         "children": [
                             {"name": "DigitalOcean"},
-                            {"name": "Render.com"}
+                            {"name": "Docker"},
+                            {"name": "CI/CD"}
                         ]
                     },
                     {
@@ -62,11 +66,11 @@ def get_skills_data():
             {
                 "name": "Growth Engineer",
                 "children": [
-                    {"name": "Performance marketing"},
-                    {"name": "Growth Experimenting"},
+                    {"name": "PPC"},
+                    {"name": "Data-driven"},
                     {"name": "SEO"},
                     {"name": "CRO"},
-                    {"name": "Marketing Automation"}
+                    {"name": "Automation"}
                 ]
             },
             {

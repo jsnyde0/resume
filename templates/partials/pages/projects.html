@@ -5,9 +5,9 @@
 
       <!-- Introduction -->
     <div class="mb-16 text-center">
-      <h1 class="text-3xl font-bold mb-8">Web Development Projects</h1>
+      <h1 class="text-3xl font-bold mb-8">Web Development</h1>
       <p class="text-lg sm:text-xl">
-        Here is a selection of my recent web development projects, all of which I completely built from scratch.
+        Here is a selection of recent side projects in web development, all built from scratch with the purpose of learning new technologies.
       </p>
     </div>
 
@@ -55,6 +55,49 @@
                 <div class="card-actions justify-end">
                   {% comment %} <a href="https://todoapp.com" target="_blank" rel="noopener noreferrer" class="btn btn-primary">Live Demo</a> {% endcomment %}
                   <a href="https://github.com/jsnyde0/ebayes/" target="_blank" rel="noopener noreferrer" class="btn btn-outline">Source Code</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- Project: Data Pipeline -->
+      <div class="mb-24">
+        <h2 class="text-3xl font-bold mb-8 text-center">Async Data Pipeline</h2>
+        <div class="lg:flex lg:space-x-8">
+          <!-- Gallery -->
+          <c-carousel-frame>
+              <c-carousel-item id="slide1">
+                <img src={% static 'img/async-data-pipeline.png'%} class="w-full" alt="Async Data Pipeline technology stack" />
+              </c-carousel-item> 
+          </c-carousel-frame>
+          
+          <!-- Project Information -->
+          <div class="lg:w-1/2">
+            <div class="card bg-base-200 shadow-xl">
+              <div class="card-body [&_p]:text-sm sm:[&_p]:text-base">
+                <p class="mb-4">An async data pipeline with a client consuming an open API with retry mechanism, data validation with pydantic, LLM integration and async mongodb via motor.</p>
+                <div class="mb-4">
+                  <h3 class="text-lg font-semibold mb-2">Technology</h3>
+                  <div class="flex flex-wrap gap-2 [&_span]:text-sm sm:[&_span]:text-base">
+                    <span class="badge badge-neutral">Asyncio</span>
+                    <span class="badge badge-neutral">HTTPX</span>
+                    <span class="badge badge-neutral">MongoDB</span>
+                    <span class="badge badge-neutral">Motor</span>
+                    <span class="badge badge-neutral">OpenAI</span>
+                    <span class="badge badge-neutral">Pydantic</span>
+                    <span class="badge badge-neutral">Tenacity</span>
+                  </div>
+                </div>
+                <div class="mb-4">
+                  <h3 class="text-lg font-semibold mb-2">Key Learnings</h3>
+                  <p>Working with async, NoSQL, LLMs, retrying API consumption and data validation</p>
+                </div>
+                <div class="card-actions justify-end">
+                  {% comment %} <a href="https://todoapp.com" target="_blank" rel="noopener noreferrer" class="btn btn-primary">Live Demo</a> {% endcomment %}
+                  <!-- <a href="https://github.com/jsnyde0/ebayes/" target="_blank" rel="noopener noreferrer" class="btn btn-outline">Source Code</a> -->
                 </div>
               </div>
             </div>
