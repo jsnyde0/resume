@@ -11,23 +11,63 @@
       </p>
     </div>
 
+      <!-- Project: Just Show Up -->
+      <div class="mb-24">
+        <h2 class="text-3xl font-bold mb-8 text-center">Just Show Up</h2>
+        <div class="lg:flex lg:flex-row-reverse lg:space-x-reverse lg:space-x-8">
+          <!-- Gallery -->
+          <c-carousel-frame>
+            <c-carousel-item id="just-show-up-slide1">
+              <img src={% static 'img/just_show_up.png'%} width="100%" height="100%" class="w-full" alt="Just Show Up Screenshot 1" />
+            </c-carousel-item> 
+          </c-carousel-frame>
+          
+          <!-- Project Information -->
+          <div class="lg:w-1/2">
+            <div class="card bg-base-200 shadow-xl">
+              <div class="card-body [&_p]:text-sm sm:[&_p]:text-base">
+                <p class="mb-4">A personalized event scraping application using Agentic AI via ControlFlow.</p>
+                <div class="mb-4">
+                  <h3 class="text-lg font-semibold mb-2">Technology</h3>
+                  <div class="flex flex-wrap gap-2">
+                    <span class="badge badge-neutral">Django</span>
+                    <span class="badge badge-neutral">Docker</span>
+                    <span class="badge badge-neutral">Celery</span>
+                    <span class="badge badge-neutral">Agentic AI</span>
+                    <span class="badge badge-neutral">ControlFlow</span>
+                  </div>
+                </div>
+                <div class="mb-4">
+                  <h3 class="text-lg font-semibold mb-2">Key Learnings</h3>
+                  <p>How to run Agentic AI tasks with Controlflow, Django and Celery.</p>
+                </div>
+                <div class="card-actions justify-end">
+                  {% comment %} <a href="https://todoapp.com" target="_blank" rel="noopener noreferrer" class="btn btn-primary">Live Demo</a> {% endcomment %}
+                  <a href="https://github.com/jsnyde0/just-show-up/" target="_blank" rel="noopener noreferrer" class="btn btn-outline">Source Code</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Project 1: eBayes -->
       <div class="mb-24">
         <h2 class="text-3xl font-bold mb-8 text-center">eBayes</h2>
         <div class="lg:flex lg:space-x-8">
           <!-- Gallery -->
           <c-carousel-frame>
-              <c-carousel-item id="slide1">
-                <img src={% static 'img/ebayes-1.png'%} class="w-full" alt="eBayes App Screenshot 1" />
+              <c-carousel-item id="ebayes-slide1">
+                <img src={% static 'img/ebayes-1.png'%} width="100%" height="100%" class="w-full" alt="eBayes App Screenshot 1" />
               </c-carousel-item> 
-              <c-carousel-item id="slide2">
-                <img src={% static 'img/ebayes-2.png'%} class="w-full" alt="eBayes App Screenshot 2" />
+              <c-carousel-item id="ebayes-slide2">
+                <img src={% static 'img/ebayes-2.png'%} width="100%" height="100%" class="w-full" alt="eBayes App Screenshot 2" />
               </c-carousel-item> 
-              <c-carousel-item id="slide3">
-                <img src={% static 'img/ebayes-3.png'%} class="w-full" alt="eBayes App Screenshot 3" />
+              <c-carousel-item id="ebayes-slide3">
+                <img src={% static 'img/ebayes-3.png'%} width="100%" height="100%" class="w-full" alt="eBayes App Screenshot 3" />
               </c-carousel-item> 
-              <c-carousel-item id="slide4">
-                <img src={% static 'img/ebayes-4.png'%} class="w-full" alt="eBayes App Screenshot 4" />
+              <c-carousel-item id="ebayes-slide4">
+                <img src={% static 'img/ebayes-4.png'%} width="100%" height="100%" class="w-full" alt="eBayes App Screenshot 4" />
               </c-carousel-item> 
           </c-carousel-frame>
           
@@ -62,16 +102,15 @@
         </div>
       </div>
 
-
-      <!-- Project: Data Pipeline -->
+      <!-- Project: Async Data Pipeline -->
       <div class="mb-24">
         <h2 class="text-3xl font-bold mb-8 text-center">Async Data Pipeline</h2>
-        <div class="lg:flex lg:space-x-8">
+        <div class="lg:flex lg:flex-row-reverse lg:space-x-reverse lg:space-x-8">
           <!-- Gallery -->
           <c-carousel-frame>
-              <c-carousel-item id="slide1">
-                <img src={% static 'img/async-data-pipeline.png'%} class="w-full" alt="Async Data Pipeline technology stack" />
-              </c-carousel-item> 
+            <c-carousel-item id="data-pipeline-slide1">
+              <img src={% static 'img/async-data-pipeline.png'%} width="100%" height="100%" class="w-full" alt="Async Data Pipeline technology stack" />
+            </c-carousel-item> 
           </c-carousel-frame>
           
           <!-- Project Information -->
@@ -81,7 +120,7 @@
                 <p class="mb-4">An async data pipeline with a client consuming an open API with retry mechanism, data validation with pydantic, LLM integration and async mongodb via motor.</p>
                 <div class="mb-4">
                   <h3 class="text-lg font-semibold mb-2">Technology</h3>
-                  <div class="flex flex-wrap gap-2 [&_span]:text-sm sm:[&_span]:text-base">
+                  <div class="flex flex-wrap gap-2">
                     <span class="badge badge-neutral">Asyncio</span>
                     <span class="badge badge-neutral">HTTPX</span>
                     <span class="badge badge-neutral">MongoDB</span>
@@ -93,7 +132,7 @@
                 </div>
                 <div class="mb-4">
                   <h3 class="text-lg font-semibold mb-2">Key Learnings</h3>
-                  <p>Working with async, NoSQL, LLMs, retrying API consumption and data validation</p>
+                  <p>Working with async, NoSQL, LLMs, retrying API consumption and data validation.</p>
                 </div>
                 <div class="card-actions justify-end">
                   {% comment %} <a href="https://todoapp.com" target="_blank" rel="noopener noreferrer" class="btn btn-primary">Live Demo</a> {% endcomment %}
@@ -111,8 +150,8 @@
         <div class="lg:flex lg:space-x-8">
           <!-- Gallery -->
           <c-carousel-frame>
-              <c-carousel-item id="slide1">
-                <img src={% static 'img/yolo-api-apples-and-oranges.jpg'%} class="w-full" alt="Detection of apples and oranges" />
+              <c-carousel-item id="yolo-api-slide1">
+                <img src={% static 'img/yolo-api-apples-and-oranges.jpg'%} width="100%" height="100%" class="w-full" alt="Detection of apples and oranges" />
               </c-carousel-item> 
           </c-carousel-frame>
           
@@ -150,20 +189,20 @@
         <div class="lg:flex lg:flex-row-reverse lg:space-x-reverse lg:space-x-8">
           <!-- Gallery -->
           <c-carousel-frame>
-            <c-carousel-item id="slide1">
-              <img src={% static 'img/topbottombabes-1.png'%} class="w-full" alt="TopBottomBabes Screenshot 1" />
+            <c-carousel-item id="topbottombabes-slide1">
+              <img src={% static 'img/topbottombabes-1.png'%} width="100%" height="100%" class="w-full" alt="TopBottomBabes Screenshot 1" />
             </c-carousel-item> 
-            <c-carousel-item id="slide2">
-              <img src={% static 'img/topbottombabes-2.png'%} class="w-full" alt="TopBottomBabes Screenshot 2" />
+            <c-carousel-item id="topbottombabes-slide2">
+              <img src={% static 'img/topbottombabes-2.png'%} width="100%" height="100%" class="w-full" alt="TopBottomBabes Screenshot 2" />
             </c-carousel-item> 
-            <c-carousel-item id="slide3">
-              <img src={% static 'img/topbottombabes-3.png'%} class="w-full" alt="TopBottomBabes Screenshot 3" />
+            <c-carousel-item id="topbottombabes-slide3">
+              <img src={% static 'img/topbottombabes-3.png'%} width="100%" height="100%" class="w-full" alt="TopBottomBabes Screenshot 3" />
             </c-carousel-item> 
-            <c-carousel-item id="slide4">
-              <img src={% static 'img/topbottombabes-4.png'%} class="w-full" alt="TopBottomBabes Screenshot 4" />
+            <c-carousel-item id="topbottombabes-slide4">
+              <img src={% static 'img/topbottombabes-4.png'%} width="100%" height="100%" class="w-full" alt="TopBottomBabes Screenshot 4" />
             </c-carousel-item> 
-            <c-carousel-item id="slide5">
-              <img src={% static 'img/topbottombabes-5.png'%} class="w-full" alt="TopBottomBabes Screenshot 5" />
+            <c-carousel-item id="topbottombabes-slide5">
+              <img src={% static 'img/topbottombabes-5.png'%} width="100%" height="100%" class="w-full" alt="TopBottomBabes Screenshot 5" />
             </c-carousel-item> 
           </c-carousel-frame>
           
@@ -204,11 +243,11 @@
         <div class="lg:flex lg:space-x-8">
           <!-- Gallery -->
           <c-carousel-frame>
-              <c-carousel-item id="slide1">
-                <img src={% static 'img/getting_tasks_done-home.png'%} class="w-full" alt="Todo App Screenshot 1" />
+              <c-carousel-item id="gtd-slide1">
+                <img src={% static 'img/getting_tasks_done-home.png'%} width="100%" height="100%" class="w-full" alt="Todo App Screenshot 1" />
               </c-carousel-item> 
-              <c-carousel-item id="slide2">
-                <img src={% static 'img/getting_tasks_done-subtask.png'%} class="w-full" alt="Todo App Screenshot 2" />
+              <c-carousel-item id="gtd-slide2">
+                <img src={% static 'img/getting_tasks_done-subtask.png'%} width="100%" height="100%" class="w-full" alt="Todo App Screenshot 2" />
               </c-carousel-item>
           </c-carousel-frame>
           

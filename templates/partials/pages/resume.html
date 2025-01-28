@@ -7,8 +7,8 @@
     <div class="flex flex-col items-start">
       <div class="tooltip tooltip-right" data-tip='"Moaarrr data!" is all I could come up with, sorry.'>
         <div class="relative w-24 h-24 mb-3 rounded-full shadow-lg overflow-hidden group" aria-label="Interactive profile picture. Hover to see a surprise.">
-          <img class="absolute inset-0 w-full h-full object-cover transition-all duration-300 ease-in-out opacity-100 group-hover:opacity-0" src="{% static 'img/jonatan_avatar_smiling_no_bg.png' %}" alt="Jonatan Profile Picture"/>
-          <img class="absolute inset-0 w-full h-full object-cover transition-all duration-300 ease-in-out opacity-0 group-hover:opacity-100 group-hover:scale-105" src="{% static 'img/jonatan_avatar_roaring_no_bg.png' %}" alt="Jonatan Profile Picture (Roaring)"/>
+          <img class="absolute inset-0 w-full h-full object-cover transition-all duration-300 ease-in-out opacity-100 group-hover:opacity-0" src="{% static 'img/jonatan_avatar_smiling_no_bg.png' %}" alt="Jonatan Profile Picture" width="100%" height="100%"/>
+          <img class="absolute inset-0 w-full h-full object-cover transition-all duration-300 ease-in-out opacity-0 group-hover:opacity-100 group-hover:scale-105" src="{% static 'img/jonatan_avatar_roaring_no_bg.png' %}" alt="Jonatan Profile Picture (Roaring)" width="100%" height="100%"/>
           <div class="absolute inset-0 rounded-full border-2 border-primary opacity-50 group-hover:opacity-100"></div>
         </div>  
       </div>
@@ -41,8 +41,8 @@
       </div>
       <div x-data="{ showTooltip: false }" class="relative mt-4 inline-block w-full">
           <a href="{% url 'download_cv' %}" @click.prevent="showTooltip = true; setTimeout(() => showTooltip = false, 3000)" class="btn btn-outline w-full">Download CV</a>
-          <div x-show="showTooltip" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform scale-90" x-transition:enter-end="opacity-100 transform scale-100" x-transition:leave="transition ease-in duration-300" x-transition:leave-start="opacity-100 transform scale-100" x-transition:leave-end="opacity-0 transform scale-90" class="absolute z-10 p-2 bg-gray-800 text-white text-sm rounded shadow-lg" style="bottom: 100%; left: 50%; transform: translateX(20%); width: 200px;">
-            All this work on an online resume, and you want a PDF? (<span class="italic">I’ll get to it eventually!</span>)
+          <div x-show="showTooltip" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform scale-90" x-transition:enter-end="opacity-100 transform scale-100" x-transition:leave="transition ease-in duration-300" x-transition:leave-start="opacity-100 transform scale-100" x-transition:leave-end="opacity-0 transform scale-90" class="absolute z-10 p-2 bg-gray-800 text-white text-sm rounded shadow-lg -translate-x-1/2 left-1/2 bottom-full w-[200px]">
+            All this work on an online resume, and you want a PDF? (<span class="italic">I'll get to it eventually!</span>)
           </div>
       </div>
     </div>
