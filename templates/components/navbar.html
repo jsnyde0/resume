@@ -1,11 +1,15 @@
 {% load static %}
 <nav class="bg-base-100">
     <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-      <a href="{% url 'home' %}" hx-get="{% url 'home' %}" hx-target="#main-content" hx-push-url="true" 
-      class="flex items-center space-x-3 rtl:space-x-reverse">
-          <img src="{% static 'img/avatar_jonatan_tongue.png' %}" class="h-12 w-12" alt="Flowbite Logo" />
-          <span class="self-center text-2xl font-semibold whitespace-nowrap">Jonatan Snyders</span>
-      </a>
+      <div class="flex items-center space-x-4">
+        <a href="{% url 'home' %}" hx-get="{% url 'home' %}" hx-target="#main-content" hx-push-url="true" class="flex-shrink-0">
+          <img src="{% static 'img/avatar_jonatan_tongue.png' %}" width="48" height="48" class="h-12 w-12" alt="Logo" />
+        </a>
+        <form action="" hx-post="" hx-target="#agent-response" hx-swap="innerHTML" class="flex items-center space-x-2">
+          <input type="text" name="question" placeholder="Ask Jonatan..." class="input input-bordered" />
+          <button type="submit" class="btn btn-primary">Ask</button>
+        </form>
+      </div>
       <button data-collapse-toggle="navbar-default" type="button" class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-base-content rounded-lg md:hidden hover:bg-base-200 focus:outline-none focus:ring-2 focus:ring-base-300" aria-controls="navbar-default" aria-expanded="false">
           <span class="sr-only">Open main menu</span>
           <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 17 14">
@@ -18,15 +22,15 @@
             <a href="#" class="block py-2 px-3 text-primary bg-primary-focus rounded md:bg-transparent md:text-primary md:p-0" aria-current="page">Resume</a>
           </li> {% endcomment %}
           <li>
-            <a href="{% url 'resume' %}" hx-get="{% url 'resume' %}" hx-target="#main-content" hx-push-url="true" 
+            <a href="{% url 'resume' %}" hx-get="{% url 'resume' %}" hx-target="#main-content" hx-push-url="true"
             class="block py-2 px-3 rounded hover:bg-base-200 md:hover:bg-transparent md:border-0 md:hover:text-primary md:p-0">Resume</a>
           </li>
           <li>
-            <a href="{% url 'readme' %}" hx-get="{% url 'readme' %}" hx-target="#main-content" hx-push-url="true" 
+            <a href="{% url 'readme' %}" hx-get="{% url 'readme' %}" hx-target="#main-content" hx-push-url="true"
             class="block py-2 px-3 rounded hover:bg-base-200 md:hover:bg-transparent md:border-0 md:hover:text-primary md:p-0">README</a>
           </li>
           <li>
-            <a href="{% url 'projects' %}" hx-get="{% url 'projects' %}" hx-target="#main-content" hx-push-url="true" 
+            <a href="{% url 'projects' %}" hx-get="{% url 'projects' %}" hx-target="#main-content" hx-push-url="true"
             class="block py-2 px-3 rounded hover:bg-base-200 md:hover:bg-transparent md:border-0 md:hover:text-primary md:p-0">Side Projects</a>
           </li>
           {% comment %} <li>

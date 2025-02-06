@@ -22,15 +22,15 @@
     <script defer src="{% static 'js/alpine.js' %}"></script>
     <script defer src="{% static 'js/d3.v7.min.js' %}"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/flowbite@2.5.1/dist/flowbite.min.js"></script>
-    
-    
+
+
     {% django_htmx_script %}
     <link rel="stylesheet"
           href="{% if debug %}{% static 'css/style.css' %}{% else %}{% static 'css/style.min.css' %}{% endif %}">
     {% block extra_head %}
     {% endblock extra_head %}
   </head>
-  <body class="">
+  <body>
 
     <div class="container mx-auto mt-4 px-4 max-w-7xl">
       {% block content %}
