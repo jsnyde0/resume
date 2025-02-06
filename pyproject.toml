@@ -41,4 +41,37 @@ dependencies = [
     "tqdm==4.66.5",
     "tzdata==2024.1",
     "whitenoise==6.7.0",
+    "pre-commit>=4.1.0",
+    "pytest>=8.3.4",
+    "mypy>=1.15.0",
+    "ruff>=0.9.4",
+    "pytest-django>=4.9.0",
 ]
+
+[tool.ruff]
+# Basic settings
+line-length = 88
+target-version = "py312"
+
+# Essential rules for your current codebase
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "F",   # pyflakes
+    "I",   # isort
+    "B",   # bugbear
+]
+
+# Directories to ignore
+exclude = [
+    ".git",
+    ".venv",
+    "__pycache__",
+]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "a_core.settings"
