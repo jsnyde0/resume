@@ -18,7 +18,14 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 
-from .views import download_cv, view_home, view_projects, view_readme, view_resume
+from .views import (
+    download_cv,
+    view_ask,
+    view_home,
+    view_projects,
+    view_readme,
+    view_resume,
+)
 
 urlpatterns = [
     path("thebaws/", admin.site.urls),
@@ -28,4 +35,5 @@ urlpatterns = [
     path("readme/", view_readme, name="readme"),
     path("projects/", view_projects, name="projects"),
     path("download_cv/", download_cv, name="download_cv"),
+    path("ask/", view_ask, name="ask"),
 ]

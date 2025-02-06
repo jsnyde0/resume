@@ -1,6 +1,7 @@
 import json
 
 from django.contrib import messages
+from django.http import HttpResponse
 from django.shortcuts import redirect, render
 
 from .utils import create_sunburst_plot, get_skills_data, prepare_sunburst_data
@@ -43,3 +44,8 @@ def download_cv(request):
         haven't had the time yet)",
     )
     return redirect("resume")
+
+
+def view_ask(request):
+    if request.htmx:
+        return HttpResponse("Hello, world!")

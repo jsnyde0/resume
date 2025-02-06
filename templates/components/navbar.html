@@ -5,7 +5,7 @@
         <a href="{% url 'home' %}" hx-get="{% url 'home' %}" hx-target="#main-content" hx-push-url="true" class="flex-shrink-0">
           <img src="{% static 'img/avatar_jonatan_tongue.png' %}" width="48" height="48" class="h-12 w-12" alt="Logo" />
         </a>
-        <form action="" hx-post="" hx-target="#agent-response" hx-swap="innerHTML" class="flex items-center space-x-2">
+        <form action="{% url 'ask' %}" hx-post="{% url 'ask' %}" hx-target="#agent-response" hx-swap="innerHTML" class="flex items-center space-x-2">
           <input type="text" name="question" placeholder="Ask Jonatan..." class="input input-bordered" />
           <button type="submit" class="btn btn-primary">Ask</button>
         </form>
@@ -40,3 +40,8 @@
       </div>
     </div>
   </nav>
+
+  <!-- Response Container -->
+  <div id="agent-response" class="max-w-screen-xl mx-auto px-4 overflow-hidden transition-all duration-300 ease-in-out">
+    <!-- Response will be inserted here by HTMX -->
+  </div>
