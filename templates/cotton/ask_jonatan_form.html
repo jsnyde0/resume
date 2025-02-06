@@ -1,0 +1,12 @@
+<form action="{% url 'ask_jonatan' %}"
+      hx-post="{% url 'ask_jonatan' %}"
+      class="flex items-center space-x-2">
+<div class="input-group">
+    <input type="text"
+           name="question"
+           placeholder="Ask Jonatan..."
+           class="input input-bordered"
+           required />
+    <button type="submit" class="btn btn-primary">Ask</button>
+</div>
+</form>

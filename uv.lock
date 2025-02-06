@@ -2367,7 +2367,7 @@ requires-dist = [
     { name = "django-environ", specifier = "==0.11.2" },
     { name = "django-htmx", specifier = "==1.19.0" },
     { name = "django-ipware", specifier = "==7.0.1" },
-    { name = "django-template-partials", specifier = "==24.4" },
+    { name = "django-template-partials", specifier = ">=24.4" },
     { name = "djlint", specifier = "==1.35.2" },
     { name = "editorconfig", specifier = "==0.12.4" },
     { name = "gunicorn", specifier = "==23.0.0" },

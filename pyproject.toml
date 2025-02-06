@@ -14,7 +14,6 @@ dependencies = [
     "django-environ==0.11.2",
     "django-htmx==1.19.0",
     "django-ipware==7.0.1",
-    "django-template-partials==24.4",
     "django==5.1.1",
     "djlint==1.35.2",
     "editorconfig==0.12.4",
@@ -46,6 +45,7 @@ dependencies = [
     "openai>=1.61.1",
     "crewai>=0.98.0",
     "django-cotton>=1.5.2",
+    "django-template-partials>=24.4",
 ]
 
 [tool.ruff]

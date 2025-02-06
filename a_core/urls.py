@@ -19,8 +19,9 @@ from django.contrib import admin
 from django.urls import include, path
 
 from .views import (
+    ask_jonatan,
     download_cv,
-    view_ask,
+    stream_response,
     view_home,
     view_projects,
     view_readme,
@@ -35,5 +36,6 @@ urlpatterns = [
     path("readme/", view_readme, name="readme"),
     path("projects/", view_projects, name="projects"),
     path("download_cv/", download_cv, name="download_cv"),
-    path("ask/", view_ask, name="ask"),
+    path("ask/", ask_jonatan, name="ask_jonatan"),
+    path("stream-response/", stream_response, name="stream_response"),
 ]
