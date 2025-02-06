@@ -77,9 +77,10 @@ INSTALLED_APPS = [
     "whitenoise.runserver_nostatic",
     "django.contrib.staticfiles",
     # 3rd party
-    "django_htmx",
     "admin_honeypot",
-    "django_cotton",
+    "django_cotton.apps.SimpleAppConfig",
+    "django_htmx",
+    "template_partials.apps.SimpleAppConfig",
 ]
 
 MIDDLEWARE = [
@@ -99,8 +100,9 @@ ROOT_URLCONF = "a_core.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "NAME": "myname",  # need to assign name to pass to wrap_loaders
         "DIRS": [BASE_DIR / "templates"],
-        "APP_DIRS": False,
+        # "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
                 "django.template.context_processors.debug",
@@ -109,10 +111,23 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
             ],
             "loaders": [
-                "django_cotton.cotton_loader.Loader",
+                (
+                    "template_partials.loader.Loader",
+                    [
+                        (
+                            "django.template.loaders.cached.Loader",
+                            [
+                                "django_cotton.cotton_loader.Loader",
+                                "django.template.loaders.filesystem.Loader",
+                                "django.template.loaders.app_directories.Loader",
+                            ],
+                        )
+                    ],
+                )
             ],
             "builtins": [
                 "django_cotton.templatetags.cotton",
+                "template_partials.templatetags.partials",
             ],
         },
     },
@@ -178,3 +193,6 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+OPENAI_API_KEY = env("OPENAI_API_KEY")
+OPENAI_MODEL_NAME = env("OPENAI_MODEL_NAME")
