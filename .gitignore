@@ -11,6 +11,7 @@ __pycache__/
 build/
 develop-eggs/
 dist/
+.astro/
 downloads/
 eggs/
 .eggs/
@@ -170,3 +171,9 @@ static/
 
 # testing data
 .data/
+
+# Beads / Dolt files (added by bd init)
+.dolt/
+*.db
+.beads-credential-key
+.beads/proxieddb/

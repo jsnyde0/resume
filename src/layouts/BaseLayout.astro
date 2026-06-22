@@ -1,0 +1,358 @@
+---
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = "Jonatan Snyders' Resume",
+  description = "Jonatan Snyders' Resume Website",
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en" data-theme="retro">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="keywords"
+      content="Jonatan, Snyders, Resume, Website, Software, Developer, Python, Django, HTML, CSS, JavaScript, React, Machine Learning, AI, Data Science"
+    />
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/png" href="/img/avatar_jonatan_tongue.png" />
+    <title>{title}</title>
+    <style is:global>
+      :root {
+        color-scheme: dark;
+        --base-100: #101c22;
+        --base-200: #0c171d;
+        --base-300: #1a2a32;
+        --base-content: #abc4dc;
+        --muted-content: rgba(171, 196, 220, 0.72);
+        --primary: #ff7f50;
+        --primary-focus: #ff6d3a;
+        --primary-content: #0b1116;
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: var(--base-100);
+        color: var(--base-content);
+        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        line-height: 1.5;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      a { color: inherit; text-decoration: none; }
+
+      .site-shell {
+        width: min(100% - 2rem, 80rem);
+        margin: 1rem auto 0;
+      }
+
+      .navbar {
+        background: var(--base-100);
+      }
+
+      .navbar-inner {
+        max-width: 80rem;
+        margin: 0 auto;
+        padding: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        flex-wrap: wrap;
+      }
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-size: 1.5rem;
+        font-weight: 600;
+        white-space: nowrap;
+      }
+
+      .brand img {
+        width: 3rem;
+        height: 3rem;
+        object-fit: contain;
+      }
+
+      .menu-button {
+        display: none;
+        align-items: center;
+        justify-content: center;
+        width: 2.5rem;
+        height: 2.5rem;
+        padding: 0.5rem;
+        border: 0;
+        border-radius: 0.5rem;
+        color: var(--base-content);
+        background: transparent;
+      }
+
+      .menu-button svg {
+        width: 1.25rem;
+        height: 1.25rem;
+      }
+
+      .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        font-weight: 500;
+      }
+
+      .nav-links a {
+        display: block;
+        border-radius: 0.5rem;
+        padding: 0.5rem 0.75rem;
+        transition: color 160ms ease, background 160ms ease;
+      }
+
+      .nav-links a:hover {
+        color: var(--primary);
+      }
+
+      main {
+        min-height: calc(100vh - 10rem);
+        padding: 2.5rem 1rem 1rem;
+      }
+
+      .page-section {
+        background: var(--base-100);
+      }
+
+      .content-container {
+        width: min(100%, 80rem);
+        margin: 0 auto;
+        padding: 2rem 0;
+      }
+
+      .home-content {
+        max-width: 56rem;
+        margin: 0 auto;
+      }
+
+      .hero-grid {
+        display: grid;
+        max-width: 80rem;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+        gap: 2rem;
+        align-items: center;
+      }
+
+      .hero-copy h1 {
+        max-width: 42rem;
+        margin: 0 0 1rem;
+        font-size: clamp(2.25rem, 7vw, 3.75rem);
+        line-height: 1;
+        letter-spacing: -0.035em;
+        font-weight: 800;
+      }
+
+      .hero-copy p {
+        max-width: 42rem;
+        margin: 0 0 1.5rem;
+        color: var(--muted-content);
+        font-size: clamp(1rem, 2vw, 1.25rem);
+        font-weight: 300;
+      }
+
+      .hero-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        border-radius: 0.5rem;
+        padding: 0.75rem 1.25rem;
+        font-size: 1rem;
+        font-weight: 500;
+        text-align: center;
+        transition: background 160ms ease, border-color 160ms ease;
+      }
+
+      .button-primary {
+        background: var(--primary);
+        color: var(--primary-content);
+      }
+
+      .button-primary:hover { background: var(--primary-focus); }
+
+      .button-secondary {
+        background: var(--base-200);
+        border: 1px solid #071016;
+      }
+
+      .button-secondary:hover { background: var(--base-300); }
+
+      .button svg {
+        width: 1.25rem;
+        height: 1.25rem;
+      }
+
+      .hero-image {
+        display: flex;
+        justify-content: center;
+      }
+
+      .hero-image img {
+        max-width: 100%;
+        height: auto;
+        display: block;
+      }
+
+      .site-footer {
+        background: var(--base-100);
+      }
+
+      .footer-inner {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 1.5rem;
+      }
+
+      .footer-social {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .footer-social p {
+        margin: 0;
+        padding-right: 0.5rem;
+        font-size: 0.875rem;
+      }
+
+      .social-link {
+        display: inline-flex;
+        color: var(--base-content);
+        opacity: 0.95;
+        transition: color 160ms ease;
+      }
+
+      .social-link:hover { color: var(--primary); }
+
+      .social-link svg {
+        width: 1.25rem;
+        height: 1.25rem;
+        fill: currentColor;
+      }
+
+      @media (max-width: 767px) {
+        .menu-button { display: inline-flex; }
+        .nav-links { display: none; }
+        .nav-links.is-open {
+          display: flex;
+          width: 100%;
+          flex-direction: column;
+          align-items: stretch;
+          gap: 0;
+          margin-top: 1rem;
+          padding: 1rem;
+          border: 1px solid var(--base-300);
+          border-radius: 0.5rem;
+          background: var(--base-200);
+        }
+        .nav-links.is-open a:hover { background: var(--base-100); }
+      }
+
+      @media (min-width: 640px) {
+        .hero-actions { flex-direction: row; }
+        .footer-inner { flex-direction: row; }
+      }
+
+      @media (min-width: 1024px) {
+        .hero-grid {
+          grid-template-columns: repeat(12, minmax(0, 1fr));
+          padding-top: 4rem;
+          padding-bottom: 4rem;
+          gap: 2rem;
+        }
+        .hero-copy { grid-column: span 7 / span 7; }
+        .hero-image {
+          grid-column: span 5 / span 5;
+          justify-content: flex-start;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="site-shell">
+      <nav class="navbar" aria-label="Primary navigation">
+        <div class="navbar-inner">
+          <a href="/" class="brand">
+            <img src="/img/avatar_jonatan_tongue.png" alt="Jonatan Snyders avatar" />
+            <span>Jonatan Snyders</span>
+          </a>
+          <button class="menu-button" type="button" aria-label="Open main menu" aria-controls="navbar-default" aria-expanded="false" data-menu-button>
+            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 17 14">
+              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1h15M1 7h15M1 13h15"></path>
+            </svg>
+          </button>
+          <ul class="nav-links" id="navbar-default" data-nav-links>
+            <li><a href="/resume/">Resume</a></li>
+            <li><a href="/readme/">README</a></li>
+            <li><a href="/projects/">Side Projects</a></li>
+          </ul>
+        </div>
+      </nav>
+
+      <main>
+        <section class="page-section">
+          <div class="content-container">
+            <slot />
+          </div>
+        </section>
+      </main>
+
+      <footer class="site-footer">
+        <div class="footer-inner">
+          <a href="/" aria-label="Home"></a>
+          <div class="footer-social">
+            <p>© Copyright 2024. All Rights Reserved.</p>
+            <a href="https://www.linkedin.com/in/jonatan-snyders/" class="social-link" aria-label="LinkedIn">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"></path>
+              </svg>
+            </a>
+            <a href="https://github.com/jsnyde0/" class="social-link" aria-label="Github">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M12.026 2C7.13295 1.99937 2.96183 5.54799 2.17842 10.3779C1.395 15.2079 4.23061 19.893 8.87302 21.439C9.37302 21.529 9.55202 21.222 9.55202 20.958C9.55202 20.721 9.54402 20.093 9.54102 19.258C6.76602 19.858 6.18002 17.92 6.18002 17.92C5.99733 17.317 5.60459 16.7993 5.07302 16.461C4.17302 15.842 5.14202 15.856 5.14202 15.856C5.78269 15.9438 6.34657 16.3235 6.66902 16.884C6.94195 17.3803 7.40177 17.747 7.94632 17.9026C8.49087 18.0583 9.07503 17.99 9.56902 17.713C9.61544 17.207 9.84055 16.7341 10.204 16.379C7.99002 16.128 5.66202 15.272 5.66202 11.449C5.64973 10.4602 6.01691 9.5043 6.68802 8.778C6.38437 7.91731 6.42013 6.97325 6.78802 6.138C6.78802 6.138 7.62502 5.869 9.53002 7.159C11.1639 6.71101 12.8882 6.71101 14.522 7.159C16.428 5.868 17.264 6.138 17.264 6.138C17.6336 6.97286 17.6694 7.91757 17.364 8.778C18.0376 9.50423 18.4045 10.4626 18.388 11.453C18.388 15.286 16.058 16.128 13.836 16.375C14.3153 16.8651 14.5612 17.5373 14.511 18.221C14.511 19.555 14.499 20.631 14.499 20.958C14.499 21.225 14.677 21.535 15.186 21.437C19.8265 19.8884 22.6591 15.203 21.874 10.3743C21.089 5.54565 16.9181 1.99888 12.026 2Z"></path>
+              </svg>
+            </a>
+          </div>
+        </div>
+      </footer>
+    </div>
+    <script>
+      const button = document.querySelector('[data-menu-button]');
+      const navLinks = document.querySelector('[data-nav-links]');
+
+      button?.addEventListener('click', () => {
+        const isExpanded = button.getAttribute('aria-expanded') === 'true';
+        button.setAttribute('aria-expanded', String(!isExpanded));
+        navLinks?.classList.toggle('is-open', !isExpanded);
+      });
+    </script>
+  </body>
+</html>
