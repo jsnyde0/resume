@@ -1,0 +1,410 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ResumeCard from '../components/resume/ResumeCard.astro';
+import ResumeItemCard from '../components/resume/ResumeItemCard.astro';
+import { achievements, education, resumeIntro, skillsTree, workExperience } from '../data/resume';
+
+const skillBranches = skillsTree.children ?? [];
+---
+
+<BaseLayout title="Resume | Jonatan Snyders" description="Resume of Jonatan Snyders — web developer, data scientist, ex-founder, and growth engineer.">
+  <div class="resume-page">
+    <h1 class="resume-page__title">Resume</h1>
+
+    <ResumeCard>
+      <div class="resume-profile">
+        <div class="resume-avatar-tooltip" data-tooltip='"Moaarrr data!" is all I could come up with, sorry.'>
+          <div class="resume-avatar" aria-label="Interactive profile picture. Hover to see a surprise.">
+            <img class="resume-avatar__image resume-avatar__image--default" src="/img/jonatan_avatar_smiling_no_bg.png" alt="Jonatan Profile Picture" width="96" height="96" />
+            <img class="resume-avatar__image resume-avatar__image--hover" src="/img/jonatan_avatar_roaring_no_bg.png" alt="Jonatan Profile Picture (Roaring)" width="96" height="96" />
+            <div class="resume-avatar__ring"></div>
+          </div>
+        </div>
+
+        <h2 class="resume-profile__name">Jonatan Snyders <span>he/him</span></h2>
+
+        <div class="resume-badge-row">
+          {resumeIntro.headlineBadges.map((badge, index) => (
+            <span class:list={["resume-badge", `resume-badge--${['primary', 'accent', 'secondary', 'info'][index]}`]}>{badge}</span>
+          ))}
+        </div>
+
+        <div class="resume-copy">
+          {resumeIntro.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+        </div>
+
+        <div class="resume-badge-row">
+          {resumeIntro.skillBadges.map((badge) => (
+            <span class="resume-badge resume-badge--neutral" data-tooltip={badge.tooltip}>{badge.label}</span>
+          ))}
+        </div>
+
+        <details class="resume-download">
+          <summary class="resume-download__button">Download CV</summary>
+          <div class="resume-download__tooltip">
+            All this work on an online resume, and you want a PDF? (<span>I&apos;ll get to it eventually!</span>)
+          </div>
+        </details>
+      </div>
+    </ResumeCard>
+
+    <ResumeCard title="Skills">
+      <div class="resume-skills-intro">
+        <label class="resume-skills-select-label" for="skills-view">Skill views</label>
+        <div class="resume-skills-select-hint" data-tooltip="Two visualizations just for fun: D3.js vs Plotly.">
+          <select id="skills-view" class="resume-skills-select" data-skills-selector>
+            <option value="overview">Sunburst Chart</option>
+            <option value="tree">Collapsible Tree</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="resume-skills-view" data-skills-view="overview">
+        <div class="skills-overview-grid">
+          {skillBranches.map((branch) => (
+            <section class="skills-overview-branch">
+              <h3>{branch.name}</h3>
+              <div class="skills-overview-groups">
+                {(branch.children ?? []).map((group) => (
+                  <div class="skills-overview-group">
+                    <h4>{group.name}</h4>
+                    <ul>
+                      {(group.children ?? []).length > 0 ? (group.children ?? []).map((leaf) => <li>{leaf.name}</li>) : <li>{group.name}</li>}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </section>
+          ))}
+        </div>
+      </div>
+
+      <div class="resume-skills-view" data-skills-view="tree" hidden>
+        <div class="skills-tree-root">
+          {skillBranches.map((branch) => (
+            <details open class="skills-tree-branch">
+              <summary>{branch.name}</summary>
+              <div class="skills-tree-groups">
+                {(branch.children ?? []).map((group) => (
+                  <details open class="skills-tree-group">
+                    <summary>{group.name}</summary>
+                    {(group.children ?? []).length > 0 ? (
+                      <ul>
+                        {(group.children ?? []).map((leaf) => <li>{leaf.name}</li>)}
+                      </ul>
+                    ) : null}
+                  </details>
+                ))}
+              </div>
+            </details>
+          ))}
+        </div>
+      </div>
+    </ResumeCard>
+
+    <ResumeCard title="Achievements" tooltip="TLDR: lots of python and c++, lots of data science, startup success and failure and learned web dev pretty fast">
+      <div class="resume-section-stack">
+        {achievements.map((item) => <ResumeItemCard {...item} />)}
+      </div>
+    </ResumeCard>
+
+    <ResumeCard title="Work Experience" tooltip="TLDR: did algorithm research, built a c++ library, co-founded a business, consulted data science, growth engineered eComm, built web apps">
+      <div class="resume-section-stack">
+        {workExperience.map((item) => <ResumeItemCard {...item} />)}
+      </div>
+    </ResumeCard>
+
+    <ResumeCard title="Education">
+      <div class="resume-section-stack">
+        {education.map((item) => <ResumeItemCard {...item} />)}
+      </div>
+    </ResumeCard>
+  </div>
+
+  <script>
+    const selector = document.querySelector('[data-skills-selector]');
+    const views = document.querySelectorAll('[data-skills-view]');
+
+    selector?.addEventListener('change', (event) => {
+      const value = event.currentTarget instanceof HTMLSelectElement ? event.currentTarget.value : 'overview';
+      views.forEach((view) => {
+        const active = view.getAttribute('data-skills-view') === value;
+        view.toggleAttribute('hidden', !active);
+      });
+    });
+  </script>
+
+  <style>
+    .resume-page {
+      width: min(100%, 56rem);
+      margin: 0 auto;
+    }
+
+    .resume-page__title {
+      margin: 0 0 2rem;
+      font-size: clamp(2rem, 4vw, 2.5rem);
+      line-height: 1.1;
+    }
+
+    [data-tooltip] {
+      position: relative;
+      cursor: help;
+    }
+
+    [data-tooltip]::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      left: 50%;
+      bottom: calc(100% + 0.5rem);
+      transform: translateX(-50%);
+      width: max-content;
+      max-width: min(18rem, 80vw);
+      border-radius: 0.75rem;
+      background: #071016;
+      color: #f7fbff;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.875rem;
+      line-height: 1.35;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 160ms ease;
+      z-index: 2;
+      text-align: center;
+    }
+
+    [data-tooltip]:hover::after,
+    [data-tooltip]:focus-visible::after {
+      opacity: 1;
+    }
+
+    .resume-profile {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .resume-avatar {
+      position: relative;
+      width: 6rem;
+      height: 6rem;
+      margin-bottom: 0.75rem;
+      overflow: hidden;
+      border-radius: 999px;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+    }
+
+    .resume-avatar__image {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: opacity 240ms ease, transform 240ms ease;
+    }
+
+    .resume-avatar__image--hover {
+      opacity: 0;
+      transform: scale(0.98);
+    }
+
+    .resume-avatar:hover .resume-avatar__image--hover,
+    .resume-avatar:focus-within .resume-avatar__image--hover {
+      opacity: 1;
+      transform: scale(1.05);
+    }
+
+    .resume-avatar:hover .resume-avatar__image--default,
+    .resume-avatar:focus-within .resume-avatar__image--default {
+      opacity: 0;
+    }
+
+    .resume-avatar__ring {
+      position: absolute;
+      inset: 0;
+      border: 2px solid var(--primary);
+      border-radius: 999px;
+      opacity: 0.5;
+    }
+
+    .resume-profile__name {
+      margin: 0;
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+
+    .resume-profile__name span {
+      font-size: 0.875rem;
+      color: var(--muted-content);
+    }
+
+    .resume-badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.625rem;
+      margin-top: 1rem;
+    }
+
+    .resume-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      padding: 0.45rem 0.8rem;
+      font-size: 0.875rem;
+      font-weight: 700;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .resume-badge--primary { background: var(--primary); color: var(--primary-content); }
+    .resume-badge--accent { background: #8b5cf6; color: #f8f5ff; }
+    .resume-badge--secondary { background: #22c55e; color: #052e16; }
+    .resume-badge--info { background: #38bdf8; color: #082f49; }
+    .resume-badge--neutral { background: var(--base-300); color: var(--base-content); font-weight: 600; }
+
+    .resume-copy {
+      margin-top: 0.75rem;
+    }
+
+    .resume-copy p {
+      margin: 0.75rem 0 0;
+      color: var(--base-content);
+      font-size: 0.98rem;
+    }
+
+    .resume-download {
+      width: 100%;
+      margin-top: 1.25rem;
+    }
+
+    .resume-download__button {
+      list-style: none;
+      display: inline-flex;
+      width: 100%;
+      justify-content: center;
+      border: 1px solid var(--base-300);
+      border-radius: 0.9rem;
+      padding: 0.85rem 1rem;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 160ms ease, border-color 160ms ease;
+    }
+
+    .resume-download__button::-webkit-details-marker { display: none; }
+    .resume-download[open] .resume-download__button,
+    .resume-download__button:hover { background: var(--base-300); border-color: var(--primary); }
+
+    .resume-download__tooltip {
+      margin-top: 0.75rem;
+      border-radius: 0.9rem;
+      background: #1f2937;
+      color: #fff;
+      padding: 0.85rem 1rem;
+      font-size: 0.95rem;
+    }
+
+    .resume-download__tooltip span { font-style: italic; }
+
+    .resume-skills-intro {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .resume-skills-select-label {
+      font-size: 0.95rem;
+      color: var(--muted-content);
+    }
+
+    .resume-skills-select {
+      width: min(100%, 18rem);
+      border: 1px solid var(--base-300);
+      border-radius: 0.75rem;
+      background: var(--base-100);
+      color: var(--base-content);
+      padding: 0.75rem 0.9rem;
+      font: inherit;
+    }
+
+    .skills-overview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+      gap: 1rem;
+    }
+
+    .skills-overview-branch,
+    .skills-tree-branch,
+    .skills-tree-group {
+      border: 1px solid rgba(171, 196, 220, 0.12);
+      border-radius: 1rem;
+      background: rgba(255, 255, 255, 0.02);
+      padding: 1rem;
+    }
+
+    .skills-overview-branch h3,
+    .skills-tree-branch > summary {
+      margin: 0 0 0.85rem;
+      font-size: 1.05rem;
+      color: #f2f7fb;
+      font-weight: 700;
+    }
+
+    .skills-overview-groups,
+    .skills-tree-groups {
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    .skills-overview-group {
+      border-radius: 0.85rem;
+      background: rgba(255, 127, 80, 0.08);
+      padding: 0.8rem;
+    }
+
+    .skills-overview-group h4,
+    .skills-tree-group > summary {
+      margin: 0 0 0.5rem;
+      font-size: 0.95rem;
+      color: #f2f7fb;
+    }
+
+    .skills-overview-group ul,
+    .skills-tree-group ul {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .skills-overview-group li,
+    .skills-tree-group li {
+      border-radius: 999px;
+      background: var(--base-300);
+      padding: 0.4rem 0.7rem;
+      font-size: 0.84rem;
+    }
+
+    .skills-tree-root {
+      display: grid;
+      gap: 0.8rem;
+    }
+
+    .skills-tree-branch > summary,
+    .skills-tree-group > summary {
+      list-style: none;
+      cursor: pointer;
+    }
+
+    .skills-tree-branch > summary::-webkit-details-marker,
+    .skills-tree-group > summary::-webkit-details-marker { display: none; }
+
+    .resume-section-stack {
+      display: grid;
+      gap: 1rem;
+    }
+  </style>
+</BaseLayout>

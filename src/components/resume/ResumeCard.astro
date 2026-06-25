@@ -1,0 +1,75 @@
+---
+interface Props {
+  title?: string;
+  tooltip?: string;
+}
+
+const { title, tooltip } = Astro.props;
+---
+
+<section class="resume-card">
+  {title && (
+    <div class="resume-card__header">
+      <h2 class:list={["resume-card__title", tooltip && 'has-tooltip']} data-tooltip={tooltip}>{title}</h2>
+    </div>
+  )}
+  <slot />
+</section>
+
+<style>
+  .resume-card {
+    margin-bottom: 2rem;
+    border-radius: 1.25rem;
+    background: var(--base-200);
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.28);
+    padding: 1.5rem;
+  }
+
+  .resume-card__header {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 1.25rem;
+  }
+
+  .resume-card__title {
+    margin: 0;
+    font-size: 1.5rem;
+  }
+
+  .resume-card__title.has-tooltip {
+    position: relative;
+    cursor: help;
+  }
+
+  .resume-card__title.has-tooltip::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    left: 50%;
+    bottom: calc(100% + 0.5rem);
+    transform: translateX(-50%);
+    width: max-content;
+    max-width: min(18rem, 80vw);
+    border-radius: 0.75rem;
+    background: #071016;
+    color: #f7fbff;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    line-height: 1.35;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 160ms ease;
+    z-index: 2;
+    text-align: center;
+  }
+
+  .resume-card__title.has-tooltip:hover::after,
+  .resume-card__title.has-tooltip:focus-visible::after {
+    opacity: 1;
+  }
+
+  @media (max-width: 767px) {
+    .resume-card {
+      padding: 1.15rem;
+    }
+  }
+</style>

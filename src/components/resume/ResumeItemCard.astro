@@ -1,0 +1,144 @@
+---
+interface ResumeLink {
+  label: string;
+  href: string;
+}
+
+interface Props {
+  title: string;
+  role: string;
+  badgeColor: 'primary' | 'accent' | 'secondary' | 'info';
+  company: string;
+  location: string;
+  dateRange: string;
+  imageUrl: string;
+  imageAlt: string;
+  body: string;
+  links?: ResumeLink[];
+}
+
+const { title, role, badgeColor, company, location, dateRange, imageUrl, imageAlt, body, links = [] } = Astro.props;
+
+const bodyParts: (string | ResumeLink)[] = [];
+let remainingBody = body;
+
+for (const link of links) {
+  const labelIndex = remainingBody.indexOf(link.label);
+  if (labelIndex === -1) continue;
+
+  if (labelIndex > 0) bodyParts.push(remainingBody.slice(0, labelIndex));
+  bodyParts.push(link);
+  remainingBody = remainingBody.slice(labelIndex + link.label.length);
+}
+
+if (remainingBody) bodyParts.push(remainingBody);
+---
+
+<article class="resume-item-card">
+  <div class="resume-item-card__icon-wrap">
+    <img src={imageUrl} alt={imageAlt} class="resume-item-card__icon" />
+  </div>
+  <div class="resume-item-card__content">
+    <h3 class="resume-item-card__title">{title}</h3>
+    <div class="resume-item-card__meta">
+      <span class:list={["resume-badge", `resume-badge--${badgeColor}`]}>{role}</span>
+      <span>{company}</span>
+      <span>{location}</span>
+      <span>{dateRange}</span>
+    </div>
+    <p>
+      {bodyParts.map((part) => typeof part === 'string' ? part : <a href={part.href} target="_blank" rel="noreferrer" class="resume-inline-link">{part.label}</a>)}
+    </p>
+  </div>
+</article>
+
+<style>
+  .resume-item-card {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    border-radius: 1rem;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02));
+    padding: 1rem;
+    transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
+  }
+
+  .resume-item-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.22);
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  .resume-item-card__icon-wrap {
+    flex: 0 0 3rem;
+    width: 3rem;
+    height: 3rem;
+  }
+
+  .resume-item-card__icon {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .resume-item-card__content {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .resume-item-card__title {
+    margin: 0;
+    font-size: 1.1rem;
+    line-height: 1.3;
+    color: #f2f7fb;
+  }
+
+  .resume-item-card__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 0.75rem;
+    align-items: center;
+    margin-top: 0.5rem;
+    color: var(--muted-content);
+    font-size: 0.875rem;
+  }
+
+  .resume-item-card__content p {
+    margin: 1rem 0 0;
+    font-size: 0.98rem;
+  }
+
+  .resume-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    padding: 0.45rem 0.8rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .resume-badge--primary { background: var(--primary); color: var(--primary-content); }
+  .resume-badge--accent { background: #8b5cf6; color: #f8f5ff; }
+  .resume-badge--secondary { background: #22c55e; color: #052e16; }
+  .resume-badge--info { background: #38bdf8; color: #082f49; }
+
+  .resume-inline-link {
+    color: var(--primary);
+    text-decoration: underline;
+    text-underline-offset: 0.18em;
+  }
+
+  @media (max-width: 767px) {
+    .resume-item-card {
+      flex-direction: column;
+    }
+
+    .resume-item-card__icon-wrap {
+      width: 2.75rem;
+      height: 2.75rem;
+    }
+  }
+</style>
