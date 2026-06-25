@@ -8,6 +8,8 @@ const {
   title = "Jonatan Snyders' Resume",
   description = "Jonatan Snyders' Resume Website",
 } = Astro.props;
+
+const canonicalUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).toString() : undefined;
 ---
 
 <!doctype html>
@@ -20,6 +22,7 @@ const {
       content="Jonatan, Snyders, Resume, Website, Software, Developer, Python, Django, HTML, CSS, JavaScript, React, Machine Learning, AI, Data Science"
     />
     <meta name="description" content={description} />
+    {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
     <link rel="icon" type="image/png" href="/img/avatar_jonatan_tongue.png" />
     <title>{title}</title>
     <style is:global>
