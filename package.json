@@ -9,6 +9,7 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
+    "test:projects": "node scripts/verify-projects-page.mjs",
     "astro": "astro"
   },
   "dependencies": {

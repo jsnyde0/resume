@@ -1,0 +1,160 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ResumeCard from '../components/resume/ResumeCard.astro';
+---
+
+<BaseLayout title="README | Jonatan Snyders" description="README page for Jonatan Snyders with working style, values, and collaboration notes.">
+  <div class="readme-page" id="readme-md-content">
+    <h1 class="readme-page__title">README</h1>
+
+    <ResumeCard title="Quirks">
+      <ul class="readme-list">
+        <li>
+          I&apos;m prone to overthinking, but a quick "just do it" snaps me out of it.
+        </li>
+        <li>
+          I try to resist shiny new tech, sticking to <a href="https://mcfunley.com/choose-boring-technology" target="_blank" rel="noreferrer" class="readme-link">boring technology</a> until key moments.
+        </li>
+        <li>
+          I keep a running commentary to be more <a href="https://www.stevestreeting.com/2010/09/04/work-2-0/" target="_blank" rel="noreferrer" class="readme-link">interruptible</a>.
+        </li>
+        <li>
+          I struggle with being overruled when something feels like it&apos;s my responsibility.
+        </li>
+        <li>
+          I fundamentally assume everyone&apos;s doing their best, even when it doesn&apos;t seem that way.
+        </li>
+        <li>
+          I try to consider social imbalances and my own privilege, that I probably don&apos;t fully grasp.
+        </li>
+        <li>
+          I get restless in my comfort zone - I enjoy pushing boundaries and learning about myself.
+        </li>
+      </ul>
+    </ResumeCard>
+
+    <ResumeCard title="What I Value">
+      <ul class="readme-list">
+        <li>
+          Directness, especially when it&apos;s tough to say or hear.
+        </li>
+        <li>
+          Learning to set boundaries when you&apos;ve been raised to please.
+        </li>
+        <li>
+          Transparency that fosters connection and inclusion.
+        </li>
+        <li>
+          Owning your work, responsibilities, and mistakes.
+        </li>
+        <li>
+          Honestly considering feedback before reacting defensively.
+        </li>
+        <li>
+          Asynchronous communication over constant meetings.
+        </li>
+        <li>
+          Autonomously tracking work, even when you can&apos;t act on it right away.
+        </li>
+        <li>
+          Allowing non-critical mistakes to foster ownership.
+        </li>
+        <li>
+          Pointing out my blind spots, including those tied to privilege.
+        </li>
+      </ul>
+    </ResumeCard>
+
+    <ResumeCard title="How I can help you">
+      <ul class="readme-list">
+        <li>
+          I&apos;m good at organizing roles, projects, and tasks.
+        </li>
+        <li>
+          I consider your feedback honestly before jumping to defend myself.
+        </li>
+        <li>
+          I pick up complex stuff fast and enjoy sharing what I&apos;ve learned.
+        </li>
+        <li>
+          I&apos;m all about growth, so if you&apos;re into self-improvement, I&apos;m here for it.
+        </li>
+        <li>
+          I can help you with direct non-violent communication.
+        </li>
+        <li>
+          I stay optimistic and focus on fixing systems, not placing blame, when things go wrong.
+        </li>
+        <li>
+          As an ex-founder, I don&apos;t need hand-holding to get things done.
+        </li>
+        <li>
+          Whether it&apos;s tech, business, or personal growth, I&apos;m here to coach and support you.
+        </li>
+      </ul>
+    </ResumeCard>
+
+    <ResumeCard title="How you can help me">
+      <ul class="readme-list">
+        <li>
+          Tell me to "just do it" when I&apos;m stuck in perfectionism - that&apos;s usually all it takes.
+        </li>
+        <li>
+          Give feedback, don&apos;t jump in - I want to maintain my sense of ownership.
+        </li>
+        <li>
+          Own your tasks; managing others&apos; work drains me.
+        </li>
+        <li>
+          Meet with clear agendas so we use time well.
+        </li>
+        <li>
+          Remind me I can ask for help - I tend to tackle everything solo.
+        </li>
+      </ul>
+    </ResumeCard>
+  </div>
+
+  <style>
+    .readme-page {
+      width: min(100%, 56rem);
+      margin: 0 auto;
+    }
+
+    .readme-page__title {
+      margin: 0 0 2rem;
+      font-size: 1.875rem;
+      line-height: 2.25rem;
+      font-weight: 700;
+    }
+
+    .readme-list {
+      margin: 0;
+      padding-left: 0;
+      list-style-position: inside;
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    .readme-list li {
+      font-size: 0.875rem;
+      line-height: 1.65;
+    }
+
+    .readme-link {
+      color: var(--primary);
+      text-decoration: underline;
+      text-underline-offset: 0.16em;
+    }
+
+    .readme-link:hover {
+      color: var(--primary-focus);
+    }
+
+    @media (min-width: 640px) {
+      .readme-list li {
+        font-size: 1rem;
+      }
+    }
+  </style>
+</BaseLayout>

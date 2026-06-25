@@ -1,0 +1,125 @@
+---
+import type { ProjectImage } from '../../data/projects';
+
+interface Props {
+  carouselId: string;
+  title: string;
+  images: ProjectImage[];
+}
+
+const { carouselId, title, images } = Astro.props;
+const hasMultipleSlides = images.length > 1;
+---
+
+<div class="projects-carousel" data-carousel-root={carouselId} aria-label={`${title} screenshots`}>
+  <div class="projects-carousel__viewport">
+    {images.map((image, index) => (
+      <figure class="projects-carousel__slide" data-carousel-slide hidden={index !== 0}>
+        <img src={image.src} alt={image.alt} loading="lazy" />
+      </figure>
+    ))}
+
+    <div class="projects-carousel__nav">
+      <button type="button" class="projects-carousel__button" data-carousel-prev aria-label={`Previous ${title} screenshot`} disabled={!hasMultipleSlides}>
+        ❮
+      </button>
+      <button type="button" class="projects-carousel__button" data-carousel-next aria-label={`Next ${title} screenshot`} disabled={!hasMultipleSlides}>
+        ❯
+      </button>
+    </div>
+  </div>
+
+  {hasMultipleSlides && (
+    <div class="projects-carousel__dots" aria-label={`${title} slide navigation`}>
+      {images.map((_, index) => (
+        <button
+          type="button"
+          class="projects-carousel__dot"
+          data-carousel-dot={index}
+          aria-label={`Go to ${title} screenshot ${index + 1}`}
+          aria-pressed={index === 0 ? 'true' : 'false'}
+        />
+      ))}
+    </div>
+  )}
+</div>
+
+<style>
+  .projects-carousel {
+    width: 100%;
+  }
+
+  .projects-carousel__viewport {
+    position: relative;
+    overflow: hidden;
+    border-radius: 1rem;
+    background: rgba(255, 255, 255, 0.03);
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.28);
+  }
+
+  .projects-carousel__slide {
+    margin: 0;
+  }
+
+  .projects-carousel__slide img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .projects-carousel__nav {
+    position: absolute;
+    inset: 50% 1rem auto;
+    display: flex;
+    justify-content: space-between;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+
+  .projects-carousel__button {
+    pointer-events: auto;
+    width: 2.75rem;
+    height: 2.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 999px;
+    background: rgba(7, 16, 22, 0.8);
+    color: #f7fbff;
+    font-size: 1.25rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: background 160ms ease, transform 160ms ease, opacity 160ms ease;
+  }
+
+  .projects-carousel__button:hover:not(:disabled) {
+    background: var(--primary);
+    color: var(--primary-content);
+    transform: scale(1.04);
+  }
+
+  .projects-carousel__button:disabled {
+    opacity: 0.45;
+    cursor: default;
+  }
+
+  .projects-carousel__dots {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 0.85rem;
+  }
+
+  .projects-carousel__dot {
+    width: 0.65rem;
+    height: 0.65rem;
+    border: 0;
+    border-radius: 999px;
+    background: rgba(171, 196, 220, 0.35);
+    cursor: pointer;
+    transition: transform 160ms ease, background 160ms ease;
+  }
+
+  .projects-carousel__dot[aria-pressed='true'] {
+    background: var(--primary);
+    transform: scale(1.15);
+  }
+</style>
