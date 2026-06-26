@@ -18,6 +18,51 @@ const cockpitModules = [
   { label: 'Growth', status: 'active', value: '6-fig rev engine' },
 ];
 
+
+
+const repoTree = [
+  {
+    folder: 'agentic-engineering',
+    files: [
+      { name: 'harness-factory.md', selected: true, count: '6 refs' },
+      { name: 'parallel-agent-loops.md', selected: false, count: '4 refs' },
+      { name: 'codebase-design.md', selected: false, count: '5 refs' },
+    ],
+  },
+  {
+    folder: 'growth-loops',
+    files: [
+      { name: 'product-wedges.md', selected: false, count: '3 refs' },
+      { name: 'experiment-cadence.md', selected: false, count: '7 refs' },
+      { name: 'bayesian-mmm.md', selected: false, count: '4 refs' },
+    ],
+  },
+  {
+    folder: 'learning-frontier',
+    files: [
+      { name: 'rapid-skill-transfer.md', selected: false, count: '5 refs' },
+      { name: 'frontier-tools.md', selected: false, count: '8 refs' },
+    ],
+  },
+  {
+    folder: 'proof',
+    files: [
+      { name: 'meshmonk.md', selected: false, count: '140+ citations' },
+      { name: 'moonbird-revenue-engine.md', selected: false, count: '6-fig rev' },
+      { name: 'humainly-ops.md', selected: false, count: '30 people' },
+    ],
+  },
+];
+
+const repoLinks = [
+  'agentic-engineering/codebase-design.md',
+  'growth-loops/bayesian-mmm.md',
+  'growth-loops/product-wedges.md',
+  'learning-frontier/frontier-tools.md',
+  'proof/moonbird-revenue-engine.md',
+  'proof/meshmonk.md',
+];
+
 const finderItems = [
   { name: 'Agentic Engineering', type: 'folder', children: [
     { name: 'Self-built harnesses', type: 'file' },
@@ -119,6 +164,100 @@ const finderItems = [
         A composable skill system: folder-like domains containing concrete, provable outcomes. The harness itself is just another folder.
       </div>
     </section>
+
+    <!-- === CONCEPT 4: SKILLS REPOSITORY BROWSER === -->
+    <section class="proto-section proto-section--repo">
+      <div class="proto-section__header proto-section__header--repo">
+        <div>
+          <h2 class="proto-section__title">Concept 4: Skills Repository Browser</h2>
+          <p class="proto-section__blurb">A GitHub-inspired personal skills repo: composable capabilities as searchable markdown files with visible dependencies.</p>
+        </div>
+        <span class="repo-proto-pill">prototype-only · not /resume/</span>
+      </div>
+
+      <div class="repo-browser" aria-label="Prototype skills repository browser">
+        <div class="repo-browser__topbar">
+          <div class="repo-browser__crumbs">
+            <span>jonatan</span><span>/</span><strong>personal-skills</strong><span>/</span><strong>agentic-engineering</strong>
+          </div>
+          <label class="repo-browser__search">
+            <span>⌘K</span>
+            <input type="text" value="Go to file: harness-factory.md" aria-label="Prototype go to file search" readonly />
+          </label>
+        </div>
+
+        <div class="repo-browser__meta">
+          <span>main</span>
+          <span>12 skill files</span>
+          <span>4 folders</span>
+          <span>active file: <code>agentic-engineering/harness-factory.md</code></span>
+        </div>
+
+        <div class="repo-browser__body">
+          <aside class="repo-tree" aria-label="Repository file tree">
+            <div class="repo-tree__heading">Files</div>
+            {repoTree.map((group) => (
+              <div class="repo-tree__group">
+                <div class="repo-tree__folder"><span>▾</span><span>📁 {group.folder}</span></div>
+                <div class="repo-tree__files">
+                  {group.files.map((file) => (
+                    <div class:list={['repo-tree__file', file.selected && 'repo-tree__file--selected']}>
+                      <span class="repo-tree__file-icon">📄</span>
+                      <span class="repo-tree__file-name">{file.name}</span>
+                      <span class="repo-tree__file-count">{file.count}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </aside>
+
+          <article class="repo-preview" aria-label="Markdown skill preview">
+            <header class="repo-preview__header">
+              <div>
+                <div class="repo-preview__path">agentic-engineering / <strong>harness-factory.md</strong></div>
+                <h3>Harness Factory</h3>
+              </div>
+              <span class="repo-preview__badge">selected .md preview</span>
+            </header>
+
+            <div class="repo-preview__frontmatter" aria-label="Skill metadata">
+              <div><span>status</span><strong>active / compounding</strong></div>
+              <div><span>kind</span><strong>factory-building skill</strong></div>
+              <div><span>interfaces</span><strong>code · product · data · growth</strong></div>
+              <div><span>evidence</span><strong>Astro, Django, pipelines, agent substrate</strong></div>
+            </div>
+
+            <div class="repo-markdown">
+              <h4>## What this skill does</h4>
+              <p>Turns ambiguous startup work into inspectable systems: repo structure, test harnesses, agent prompts, review loops, and enough UI to let humans steer without losing velocity.</p>
+
+              <h4>## Composes with</h4>
+              <ul>
+                <li><strong>Agentic engineering</strong> — parallel agents, code review loops, and context-preserving decomposition.</li>
+                <li><strong>Codebase design / deep modules</strong> — naming, boundaries, acceptance contracts, and source-of-truth docs.</li>
+                <li><strong>Growth loops</strong> — experiment surfaces, funnel instrumentation, CRO, and revenue learning cycles.</li>
+                <li><strong>Bayesian MMM / data</strong> — pipelines, model diagnostics, dashboardable decisions.</li>
+                <li><strong>Product wedges</strong> — small credible slices that prove a market before scaling a platform.</li>
+                <li><strong>Learning frontier tools</strong> — fast adoption of new frameworks and AI workflows when the bottleneck moves.</li>
+              </ul>
+
+              <h4>## Usage notes</h4>
+              <p>Best for zero-to-one builds where the deliverable is both the product and the machine that keeps improving it. Not a static skills list — it is a repo of reusable capability modules.</p>
+            </div>
+
+            <div class="repo-preview__refs" aria-label="Cross references">
+              <span>Cross-references</span>
+              {repoLinks.map((link) => <a href="#" aria-label={`Prototype cross reference to ${link}`}>{link}</a>)}
+            </div>
+          </article>
+        </div>
+      </div>
+      <div class="repo-browser__caption">
+        Stronger than a folder metaphor alone: technical readers can scan paths, open concrete `.md` files, and see how skills import each other into a practical startup-building toolkit.
+      </div>
+    </section>
+
   </div>
 
   <style>
@@ -436,7 +575,345 @@ const finderItems = [
       line-height: 1.5;
     }
 
+
+
+    /* ========== CONCEPT 4: SKILLS REPOSITORY BROWSER ========== */
+    .proto-section--repo {
+      border-color: rgba(56, 189, 248, 0.18);
+      background:
+        radial-gradient(circle at top right, rgba(56, 189, 248, 0.08), transparent 34rem),
+        var(--base-200);
+    }
+
+    .proto-section__header--repo {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .repo-proto-pill {
+      flex: 0 0 auto;
+      padding: 0.35rem 0.65rem;
+      border: 1px solid rgba(255, 127, 80, 0.35);
+      border-radius: 999px;
+      color: #ffb199;
+      background: rgba(255, 127, 80, 0.08);
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .repo-browser {
+      overflow: hidden;
+      border: 1px solid rgba(171, 196, 220, 0.14);
+      border-radius: 0.9rem;
+      background: #0d1117;
+      color: #c9d1d9;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    }
+
+    .repo-browser__topbar,
+    .repo-browser__meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.8rem;
+      padding: 0.75rem 0.9rem;
+      border-bottom: 1px solid #30363d;
+    }
+
+    .repo-browser__crumbs {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.35rem;
+      min-width: 0;
+      color: #7d8590;
+      font-size: 0.88rem;
+    }
+
+    .repo-browser__crumbs strong { color: #58a6ff; }
+
+    .repo-browser__search {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      width: min(100%, 18rem);
+      padding: 0.35rem 0.55rem;
+      border: 1px solid #30363d;
+      border-radius: 0.45rem;
+      background: #010409;
+      color: #7d8590;
+      font-size: 0.76rem;
+    }
+
+    .repo-browser__search input {
+      min-width: 0;
+      width: 100%;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: #8b949e;
+      font: inherit;
+    }
+
+    .repo-browser__meta {
+      justify-content: flex-start;
+      flex-wrap: wrap;
+      background: #161b22;
+      color: #8b949e;
+      font-size: 0.78rem;
+    }
+
+    .repo-browser__meta span {
+      padding: 0.18rem 0.48rem;
+      border: 1px solid #30363d;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .repo-browser__meta code {
+      color: #c9d1d9;
+      font-size: 0.75rem;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+
+    .repo-browser__body {
+      display: grid;
+      grid-template-columns: minmax(13rem, 18rem) minmax(0, 1fr);
+      min-width: 0;
+    }
+
+    .repo-tree {
+      min-width: 0;
+      padding: 0.75rem;
+      border-right: 1px solid #30363d;
+      background: #0d1117;
+    }
+
+    .repo-tree__heading {
+      margin-bottom: 0.6rem;
+      color: #f0f6fc;
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+
+    .repo-tree__group + .repo-tree__group { margin-top: 0.55rem; }
+
+    .repo-tree__folder,
+    .repo-tree__file {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 0.35rem;
+      min-width: 0;
+      padding: 0.34rem 0.42rem;
+      border-radius: 0.38rem;
+      font-size: 0.78rem;
+      line-height: 1.25;
+    }
+
+    .repo-tree__folder {
+      grid-template-columns: auto minmax(0, 1fr);
+      color: #f0f6fc;
+      font-weight: 650;
+    }
+
+    .repo-tree__files { margin-left: 0.65rem; }
+
+    .repo-tree__file { color: #c9d1d9; }
+
+    .repo-tree__file--selected {
+      color: #ffffff;
+      background: rgba(56, 139, 253, 0.18);
+      outline: 1px solid rgba(56, 139, 253, 0.45);
+    }
+
+    .repo-tree__file-name {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .repo-tree__file-count {
+      color: #7d8590;
+      font-size: 0.68rem;
+      white-space: nowrap;
+    }
+
+    .repo-preview {
+      min-width: 0;
+      background: #0d1117;
+    }
+
+    .repo-preview__header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 1rem;
+      border-bottom: 1px solid #30363d;
+      background: #161b22;
+    }
+
+    .repo-preview__path {
+      margin-bottom: 0.25rem;
+      color: #8b949e;
+      font-size: 0.78rem;
+      overflow-wrap: anywhere;
+    }
+
+    .repo-preview h3 {
+      margin: 0;
+      color: #f0f6fc;
+      font-size: 1.18rem;
+    }
+
+    .repo-preview__badge {
+      flex: 0 0 auto;
+      padding: 0.28rem 0.5rem;
+      border: 1px solid #238636;
+      border-radius: 999px;
+      color: #7ee787;
+      background: rgba(35, 134, 54, 0.12);
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+
+    .repo-preview__frontmatter {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0;
+      margin: 1rem;
+      border: 1px solid #30363d;
+      border-radius: 0.55rem;
+      overflow: hidden;
+    }
+
+    .repo-preview__frontmatter div {
+      min-width: 0;
+      padding: 0.6rem 0.7rem;
+      border-bottom: 1px solid #30363d;
+      background: #010409;
+    }
+
+    .repo-preview__frontmatter div:nth-child(odd) { border-right: 1px solid #30363d; }
+    .repo-preview__frontmatter div:nth-last-child(-n+2) { border-bottom: 0; }
+
+    .repo-preview__frontmatter span {
+      display: block;
+      margin-bottom: 0.2rem;
+      color: #7d8590;
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .repo-preview__frontmatter strong {
+      color: #c9d1d9;
+      font-size: 0.78rem;
+      overflow-wrap: anywhere;
+    }
+
+    .repo-markdown {
+      padding: 0 1rem 1rem;
+      color: #c9d1d9;
+      font-size: 0.9rem;
+      line-height: 1.58;
+    }
+
+    .repo-markdown h4 {
+      margin: 1rem 0 0.4rem;
+      color: #f0f6fc;
+      font-size: 0.98rem;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    .repo-markdown p { margin: 0 0 0.65rem; }
+    .repo-markdown ul { margin: 0.35rem 0 0.8rem; padding-left: 1.1rem; }
+    .repo-markdown li + li { margin-top: 0.28rem; }
+    .repo-markdown strong { color: #f0f6fc; }
+
+    .repo-preview__refs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      padding: 0.85rem 1rem 1rem;
+      border-top: 1px solid #30363d;
+    }
+
+    .repo-preview__refs span {
+      flex-basis: 100%;
+      color: #8b949e;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .repo-preview__refs a {
+      max-width: 100%;
+      padding: 0.28rem 0.5rem;
+      border: 1px solid rgba(88, 166, 255, 0.45);
+      border-radius: 999px;
+      color: #58a6ff;
+      background: rgba(88, 166, 255, 0.08);
+      font-size: 0.72rem;
+      text-decoration: none;
+      overflow-wrap: anywhere;
+    }
+
+    .repo-browser__caption {
+      margin-top: 0.85rem;
+      color: var(--muted-content);
+      font-size: 0.92rem;
+      line-height: 1.5;
+    }
+
     /* ========== RESPONSIVE ========== */
+
+
+    @media (max-width: 760px) {
+      .proto-section__header--repo,
+      .repo-browser__topbar,
+      .repo-preview__header {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .repo-proto-pill,
+      .repo-preview__badge {
+        align-self: flex-start;
+      }
+
+      .repo-browser__search { width: 100%; }
+
+      .repo-browser__body {
+        grid-template-columns: 1fr;
+      }
+
+      .repo-tree {
+        border-right: 0;
+        border-bottom: 1px solid #30363d;
+      }
+
+      .repo-preview__frontmatter {
+        grid-template-columns: 1fr;
+      }
+
+      .repo-preview__frontmatter div,
+      .repo-preview__frontmatter div:nth-child(odd) {
+        border-right: 0;
+        border-bottom: 1px solid #30363d;
+      }
+
+      .repo-preview__frontmatter div:last-child { border-bottom: 0; }
+    }
+
     @media (max-width: 480px) {
       .flywheel { width: 18rem; }
       .flywheel__node { --r: 7.2rem; width: 4.5rem; }
