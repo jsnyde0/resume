@@ -19,29 +19,60 @@ export const projectEntries: ProjectEntry[] = [
   {
     slug: 'rip-cage',
     title: 'rip-cage',
-    description: 'Public sandboxing tool with a Homebrew tap for easy installation.',
+    description:
+      'A tool I built and ship publicly (Homebrew tap): wraps a project in a container and intercepts every shell command to limit the blast radius — the cage my always-on agents run inside. Composes with iron-proxy so agents never hold real credentials.',
     kind: 'built',
     href: 'https://github.com/jsnyde0/rip-cage',
   },
   {
+    slug: 'pi',
+    title: 'pi',
+    description: 'The coding agent my whole harness wraps.',
+    kind: 'build-on',
+    href: 'https://github.com/badlogic/pi-mono',
+    author: 'badlogic',
+  },
+  {
+    slug: 'herdr',
+    title: 'herdr',
+    description:
+      'A headless agent-supervisor: a live roster of every session — working, blocked, done — that I can attach to and steer.',
+    kind: 'build-on',
+    href: 'https://github.com/ogulcancelik/herdr',
+    author: 'Ogulcan Celik',
+  },
+  {
     slug: 'telepi',
     title: 'TelePi',
-    description: 'Part of my always-on agent infrastructure.',
+    description: 'Drives my Pi agent from Telegram: voice prompts, screenshots, session handback.',
     kind: 'build-on',
     href: 'https://github.com/benedict2310/TelePi',
     author: 'Benedict Bleimschein',
   },
   {
-    slug: 'herdr',
-    title: 'herdr',
-    description: 'Helps wrangle multiple agent processes.',
-    kind: 'build-on',
-    author: 'Ogulcan Celik',
-  },
-  {
     slug: 'cass-cm',
     title: 'cass / cm',
-    description: 'Conversation search and synthesis over agent sessions; used for compacting and querying session context.',
+    description:
+      'Full-text search and a memory layer over my past agent sessions, so the system recalls what it has already done.',
     kind: 'build-on',
+    href: 'https://github.com/Dicklesworthstone/coding_agent_session_search',
+    author: 'Jeffrey Emanuel',
+  },
+  {
+    slug: 'cmux',
+    title: 'cmux',
+    description: 'The cockpit I watch the factory from on the Mac.',
+    kind: 'build-on',
+    href: 'https://github.com/manaflow-ai/cmux',
+    author: 'Manaflow',
+  },
+  {
+    slug: 'agent-mail',
+    title: 'agent_mail',
+    description:
+      "File-reservation rails so parallel agents don't collide — adopting it now, not yet load-bearing.",
+    kind: 'build-on',
+    href: 'https://github.com/Dicklesworthstone/mcp_agent_mail',
+    author: 'Jeffrey Emanuel',
   },
 ];

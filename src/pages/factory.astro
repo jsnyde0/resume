@@ -40,7 +40,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
           <div class="ledger-label">Built / mine</div>
           <ul class="ledger-list">
             <li>
-              <strong><a href="https://github.com/jsnyde0/rip-cage" target="_blank" rel="noopener" class="factory-link">rip-cage</a></strong> — a sandboxing tool I built and ship publicly, with a Homebrew tap. It's the cage the always-on agents run inside.
+              <strong><a href="https://github.com/jsnyde0/rip-cage" target="_blank" rel="noopener" class="factory-link">rip-cage</a></strong> — a tool I built and ship publicly (Homebrew tap) that wraps a project in a container and intercepts every shell command to limit the blast radius. It's the cage the always-on agents run inside, and it composes with <a href="https://github.com/ironsh/iron-proxy" target="_blank" rel="noopener" class="factory-link">iron-proxy</a> so the agents never hold real credentials.
             </li>
             <li>
               <strong>The architecture and the methodology</strong> — substrate-thick / process-thin design, decision records with explicit firmness levels, the tiered memory architecture, beads-as-goals, the disposable-orchestrator pattern, and a set of composable orchestration primitives. This is my own system and it runs my daily work. It lives in my private tooling rather than as a public product — so I'm describing it here, not pointing you at a repo.
@@ -52,13 +52,22 @@ import BaseLayout from '../layouts/BaseLayout.astro';
           <div class="ledger-label">I build on</div>
           <ul class="ledger-list">
             <li>
-              <strong><a href="https://github.com/benedict2310/TelePi" target="_blank" rel="noopener" class="factory-link">TelePi</a></strong> — by Benedict Bleimschein. Part of my always-on agent infrastructure.
+              <strong><a href="https://github.com/badlogic/pi-mono" target="_blank" rel="noopener" class="factory-link">pi</a></strong> — by badlogic. The coding agent my whole harness wraps.
             </li>
             <li>
-              <strong>herdr</strong> — by Ogulcan Celik. Helps wrangle multiple agent processes.
+              <strong><a href="https://github.com/ogulcancelik/herdr" target="_blank" rel="noopener" class="factory-link">herdr</a></strong> — by Ogulcan Celik. A headless agent-supervisor: a live roster of every session — working, blocked, done — that I can attach to and steer.
             </li>
             <li>
-              <strong>cass / cm</strong> — search and synthesis across my past agent sessions, so the system can recall what it has already done.
+              <strong><a href="https://github.com/benedict2310/TelePi" target="_blank" rel="noopener" class="factory-link">TelePi</a></strong> — by Benedict Bleimschein. Drives my Pi agent from Telegram: voice prompts, screenshots, session handback.
+            </li>
+            <li>
+              <strong><a href="https://github.com/Dicklesworthstone/coding_agent_session_search" target="_blank" rel="noopener" class="factory-link">cass / cm</a></strong> — by Jeffrey Emanuel. Full-text search and a memory layer over my past agent sessions, so the system recalls what it has already done.
+            </li>
+            <li>
+              <strong><a href="https://github.com/manaflow-ai/cmux" target="_blank" rel="noopener" class="factory-link">cmux</a></strong> — by Manaflow. The cockpit I watch the factory from on the Mac.
+            </li>
+            <li>
+              <strong><a href="https://github.com/Dicklesworthstone/mcp_agent_mail" target="_blank" rel="noopener" class="factory-link">agent_mail</a></strong> — by Jeffrey Emanuel. File-reservation rails so parallel agents don't collide — adopting it now, not yet load-bearing.
             </li>
           </ul>
           <p class="ledger-note">These aren't mine. Each does one thing well, so I compose them instead of reinventing them.</p>
