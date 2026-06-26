@@ -19,9 +19,9 @@ const { title, tooltip } = Astro.props;
 <style>
   .resume-card {
     margin-bottom: 2rem;
-    border-radius: 1.25rem;
+    border-radius: var(--radius-xl);
     background: var(--base-200);
-    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.28);
+    box-shadow: var(--shadow-card);
     padding: 1.5rem;
   }
 
@@ -49,15 +49,15 @@ const { title, tooltip } = Astro.props;
     transform: translateX(-50%);
     width: max-content;
     max-width: min(18rem, 80vw);
-    border-radius: 0.75rem;
-    background: #071016;
-    color: #f7fbff;
+    border-radius: var(--radius-md);
+    background: var(--tooltip-bg);
+    color: var(--tooltip-text);
     padding: 0.5rem 0.75rem;
     font-size: 0.875rem;
     line-height: 1.35;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 160ms ease;
+    transition: opacity var(--transition-base);
     z-index: 2;
     text-align: center;
   }

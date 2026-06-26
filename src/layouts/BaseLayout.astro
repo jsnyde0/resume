@@ -28,6 +28,8 @@ const canonicalUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).toStri
     <style is:global>
       :root {
         color-scheme: dark;
+
+        /* ── Color palette ── */
         --base-100: #101c22;
         --base-200: #0c171d;
         --base-300: #1a2a32;
@@ -36,6 +38,46 @@ const canonicalUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).toStri
         --primary: #ff7f50;
         --primary-focus: #ff6d3a;
         --primary-content: #0b1116;
+
+        /* Semantic accent palette (badge / tag colors) */
+        --accent: #8b5cf6;
+        --accent-content: #f8f5ff;
+        --success: #22c55e;
+        --success-content: #052e16;
+        --info: #38bdf8;
+        --info-content: #082f49;
+
+        /* Bright content (headings, important labels) */
+        --content-bright: #f2f7fb;
+
+        /* Tooltip */
+        --tooltip-bg: #071016;
+        --tooltip-text: #f7fbff;
+        --tooltip-dark-bg: #1f2937;
+
+        /* Surface tints */
+        --surface-subtle: rgba(255, 255, 255, 0.02);
+        --border-subtle: rgba(171, 196, 220, 0.12);
+        --primary-tint: rgba(255, 127, 80, 0.08);
+
+        /* ── Typography ── */
+        --font-body: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        --line-height-body: 1.5;
+        --line-height-relaxed: 1.65;
+
+        /* ── Border radius ── */
+        --radius-sm: 0.5rem;
+        --radius-md: 0.75rem;
+        --radius-lg: 1rem;
+        --radius-xl: 1.25rem;
+        --radius-full: 999px;
+
+        /* ── Shadows ── */
+        --shadow-card: 0 16px 36px rgba(0, 0, 0, 0.28);
+        --shadow-avatar: 0 12px 28px rgba(0, 0, 0, 0.35);
+
+        /* ── Transitions ── */
+        --transition-base: 160ms ease;
       }
 
       * { box-sizing: border-box; }
@@ -45,8 +87,8 @@ const canonicalUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).toStri
         min-height: 100vh;
         background: var(--base-100);
         color: var(--base-content);
-        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        line-height: 1.5;
+        font-family: var(--font-body);
+        line-height: var(--line-height-body);
         -webkit-font-smoothing: antialiased;
       }
 
@@ -95,7 +137,7 @@ const canonicalUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).toStri
         height: 2.5rem;
         padding: 0.5rem;
         border: 0;
-        border-radius: 0.5rem;
+        border-radius: var(--radius-sm);
         color: var(--base-content);
         background: transparent;
       }
@@ -117,9 +159,9 @@ const canonicalUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).toStri
 
       .nav-links a {
         display: block;
-        border-radius: 0.5rem;
+        border-radius: var(--radius-sm);
         padding: 0.5rem 0.75rem;
-        transition: color 160ms ease, background 160ms ease;
+        transition: color var(--transition-base), background var(--transition-base);
       }
 
       .nav-links a:hover {
@@ -183,12 +225,12 @@ const canonicalUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).toStri
         align-items: center;
         justify-content: center;
         gap: 0.5rem;
-        border-radius: 0.5rem;
+        border-radius: var(--radius-sm);
         padding: 0.75rem 1.25rem;
         font-size: 1rem;
         font-weight: 500;
         text-align: center;
-        transition: background 160ms ease, border-color 160ms ease;
+        transition: background var(--transition-base), border-color var(--transition-base);
       }
 
       .button-primary {
@@ -200,7 +242,7 @@ const canonicalUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).toStri
 
       .button-secondary {
         background: var(--base-200);
-        border: 1px solid #071016;
+        border: 1px solid var(--tooltip-bg);
       }
 
       .button-secondary:hover { background: var(--base-300); }
@@ -250,7 +292,7 @@ const canonicalUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).toStri
         display: inline-flex;
         color: var(--base-content);
         opacity: 0.95;
-        transition: color 160ms ease;
+        transition: color var(--transition-base);
       }
 
       .social-link:hover { color: var(--primary); }
@@ -273,7 +315,7 @@ const canonicalUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).toStri
           margin-top: 1rem;
           padding: 1rem;
           border: 1px solid var(--base-300);
-          border-radius: 0.5rem;
+          border-radius: var(--radius-sm);
           background: var(--base-200);
         }
         .nav-links.is-open a:hover { background: var(--base-100); }

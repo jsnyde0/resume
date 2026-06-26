@@ -159,15 +159,15 @@ const skillBranches = skillsTree.children ?? [];
       transform: translateX(-50%);
       width: max-content;
       max-width: min(18rem, 80vw);
-      border-radius: 0.75rem;
-      background: #071016;
-      color: #f7fbff;
+      border-radius: var(--radius-md);
+      background: var(--tooltip-bg);
+      color: var(--tooltip-text);
       padding: 0.5rem 0.75rem;
       font-size: 0.875rem;
       line-height: 1.35;
       opacity: 0;
       pointer-events: none;
-      transition: opacity 160ms ease;
+      transition: opacity var(--transition-base);
       z-index: 2;
       text-align: center;
     }
@@ -189,8 +189,8 @@ const skillBranches = skillsTree.children ?? [];
       height: 6rem;
       margin-bottom: 0.75rem;
       overflow: hidden;
-      border-radius: 999px;
-      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+      border-radius: var(--radius-full);
+      box-shadow: var(--shadow-avatar);
     }
 
     .resume-avatar__image {
@@ -222,7 +222,7 @@ const skillBranches = skillsTree.children ?? [];
       position: absolute;
       inset: 0;
       border: 2px solid var(--primary);
-      border-radius: 999px;
+      border-radius: var(--radius-full);
       opacity: 0.5;
     }
 
@@ -248,7 +248,7 @@ const skillBranches = skillsTree.children ?? [];
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      border-radius: 999px;
+      border-radius: var(--radius-full);
       padding: 0.45rem 0.8rem;
       font-size: 0.875rem;
       font-weight: 700;
@@ -257,9 +257,9 @@ const skillBranches = skillsTree.children ?? [];
     }
 
     .resume-badge--primary { background: var(--primary); color: var(--primary-content); }
-    .resume-badge--accent { background: #8b5cf6; color: #f8f5ff; }
-    .resume-badge--secondary { background: #22c55e; color: #052e16; }
-    .resume-badge--info { background: #38bdf8; color: #082f49; }
+    .resume-badge--accent { background: var(--accent); color: var(--accent-content); }
+    .resume-badge--secondary { background: var(--success); color: var(--success-content); }
+    .resume-badge--info { background: var(--info); color: var(--info-content); }
     .resume-badge--neutral { background: var(--base-300); color: var(--base-content); font-weight: 600; }
 
     .resume-copy {
@@ -287,7 +287,7 @@ const skillBranches = skillsTree.children ?? [];
       padding: 0.85rem 1rem;
       cursor: pointer;
       font-weight: 600;
-      transition: background 160ms ease, border-color 160ms ease;
+      transition: background var(--transition-base), border-color var(--transition-base);
     }
 
     .resume-download__button::-webkit-details-marker { display: none; }
@@ -297,7 +297,7 @@ const skillBranches = skillsTree.children ?? [];
     .resume-download__tooltip {
       margin-top: 0.75rem;
       border-radius: 0.9rem;
-      background: #1f2937;
+      background: var(--tooltip-dark-bg);
       color: #fff;
       padding: 0.85rem 1rem;
       font-size: 0.95rem;
@@ -321,7 +321,7 @@ const skillBranches = skillsTree.children ?? [];
     .resume-skills-select {
       width: min(100%, 18rem);
       border: 1px solid var(--base-300);
-      border-radius: 0.75rem;
+      border-radius: var(--radius-md);
       background: var(--base-100);
       color: var(--base-content);
       padding: 0.75rem 0.9rem;
@@ -337,9 +337,9 @@ const skillBranches = skillsTree.children ?? [];
     .skills-overview-branch,
     .skills-tree-branch,
     .skills-tree-group {
-      border: 1px solid rgba(171, 196, 220, 0.12);
-      border-radius: 1rem;
-      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      background: var(--surface-subtle);
       padding: 1rem;
     }
 
@@ -347,7 +347,7 @@ const skillBranches = skillsTree.children ?? [];
     .skills-tree-branch > summary {
       margin: 0 0 0.85rem;
       font-size: 1.05rem;
-      color: #f2f7fb;
+      color: var(--content-bright);
       font-weight: 700;
     }
 
@@ -359,7 +359,7 @@ const skillBranches = skillsTree.children ?? [];
 
     .skills-overview-group {
       border-radius: 0.85rem;
-      background: rgba(255, 127, 80, 0.08);
+      background: var(--primary-tint);
       padding: 0.8rem;
     }
 
@@ -367,7 +367,7 @@ const skillBranches = skillsTree.children ?? [];
     .skills-tree-group > summary {
       margin: 0 0 0.5rem;
       font-size: 0.95rem;
-      color: #f2f7fb;
+      color: var(--content-bright);
     }
 
     .skills-overview-group ul,
@@ -382,7 +382,7 @@ const skillBranches = skillsTree.children ?? [];
 
     .skills-overview-group li,
     .skills-tree-group li {
-      border-radius: 999px;
+      border-radius: var(--radius-full);
       background: var(--base-300);
       padding: 0.4rem 0.7rem;
       font-size: 0.84rem;

@@ -54,7 +54,7 @@ const { project } = Astro.props;
     text-align: center;
     font-size: clamp(1.8rem, 4vw, 2rem);
     line-height: 1.15;
-    color: #f2f7fb;
+    color: var(--content-bright);
   }
 
   .project-block__content {
@@ -64,9 +64,9 @@ const { project } = Astro.props;
   }
 
   .project-panel {
-    border-radius: 1.25rem;
+    border-radius: var(--radius-xl);
     background: var(--base-200);
-    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.28);
+    box-shadow: var(--shadow-card);
     padding: 1.5rem;
   }
 
@@ -84,7 +84,7 @@ const { project } = Astro.props;
   .project-panel__section h3 {
     margin: 0 0 0.65rem;
     font-size: 1.05rem;
-    color: #f2f7fb;
+    color: var(--content-bright);
   }
 
   .project-panel__badges {
@@ -97,7 +97,7 @@ const { project } = Astro.props;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border-radius: 999px;
+    border-radius: var(--radius-full);
     background: var(--base-300);
     color: var(--base-content);
     padding: 0.45rem 0.8rem;
@@ -120,13 +120,13 @@ const { project } = Astro.props;
     border-radius: 0.8rem;
     padding: 0.75rem 1rem;
     font-weight: 600;
-    transition: background 160ms ease, border-color 160ms ease, color 160ms ease;
+    transition: background var(--transition-base), border-color var(--transition-base), color var(--transition-base);
   }
 
   .project-link-button:hover {
     border-color: var(--primary);
     color: var(--primary);
-    background: rgba(255, 127, 80, 0.08);
+    background: var(--primary-tint);
   }
 
   @media (min-width: 1024px) {

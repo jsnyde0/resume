@@ -52,9 +52,9 @@ const hasMultipleSlides = images.length > 1;
   .projects-carousel__viewport {
     position: relative;
     overflow: hidden;
-    border-radius: 1rem;
+    border-radius: var(--radius-lg);
     background: rgba(255, 255, 255, 0.03);
-    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.28);
+    box-shadow: var(--shadow-card);
   }
 
   .projects-carousel__slide {
@@ -81,13 +81,13 @@ const hasMultipleSlides = images.length > 1;
     width: 2.75rem;
     height: 2.75rem;
     border: 1px solid rgba(255, 255, 255, 0.18);
-    border-radius: 999px;
+    border-radius: var(--radius-full);
     background: rgba(7, 16, 22, 0.8);
-    color: #f7fbff;
+    color: var(--tooltip-text);
     font-size: 1.25rem;
     line-height: 1;
     cursor: pointer;
-    transition: background 160ms ease, transform 160ms ease, opacity 160ms ease;
+    transition: background var(--transition-base), transform var(--transition-base), opacity var(--transition-base);
   }
 
   .projects-carousel__button:hover:not(:disabled) {
@@ -112,10 +112,10 @@ const hasMultipleSlides = images.length > 1;
     width: 0.65rem;
     height: 0.65rem;
     border: 0;
-    border-radius: 999px;
+    border-radius: var(--radius-full);
     background: rgba(171, 196, 220, 0.35);
     cursor: pointer;
-    transition: transform 160ms ease, background 160ms ease;
+    transition: transform var(--transition-base), background var(--transition-base);
   }
 
   .projects-carousel__dot[aria-pressed='true'] {

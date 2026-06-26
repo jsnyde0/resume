@@ -57,8 +57,8 @@ if (remainingBody) bodyParts.push(remainingBody);
     display: flex;
     gap: 1rem;
     align-items: flex-start;
-    border-radius: 1rem;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02));
+    border-radius: var(--radius-lg);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), var(--surface-subtle));
     padding: 1rem;
     transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
   }
@@ -90,7 +90,7 @@ if (remainingBody) bodyParts.push(remainingBody);
     margin: 0;
     font-size: 1.1rem;
     line-height: 1.3;
-    color: #f2f7fb;
+    color: var(--content-bright);
   }
 
   .resume-item-card__meta {
@@ -112,7 +112,7 @@ if (remainingBody) bodyParts.push(remainingBody);
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border-radius: 999px;
+    border-radius: var(--radius-full);
     padding: 0.45rem 0.8rem;
     font-size: 0.875rem;
     font-weight: 700;
@@ -121,9 +121,9 @@ if (remainingBody) bodyParts.push(remainingBody);
   }
 
   .resume-badge--primary { background: var(--primary); color: var(--primary-content); }
-  .resume-badge--accent { background: #8b5cf6; color: #f8f5ff; }
-  .resume-badge--secondary { background: #22c55e; color: #052e16; }
-  .resume-badge--info { background: #38bdf8; color: #082f49; }
+  .resume-badge--accent { background: var(--accent); color: var(--accent-content); }
+  .resume-badge--secondary { background: var(--success); color: var(--success-content); }
+  .resume-badge--info { background: var(--info); color: var(--info-content); }
 
   .resume-inline-link {
     color: var(--primary);
