@@ -1,0 +1,449 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+// --- prototype-local data ---
+const agentSkills = [
+  { name: 'Product', icon: '🎯', color: '#ff7f50', desc: 'Vision → MVP → iteration loops' },
+  { name: 'Code', icon: '⚡', color: '#8b5cf6', desc: 'Full-stack + AI-assisted velocity' },
+  { name: 'Data', icon: '📊', color: '#22c55e', desc: 'Pipelines, models, decisions' },
+  { name: 'Learning', icon: '🧠', color: '#38bdf8', desc: 'Autodidact, fast skill transfer' },
+  { name: 'Growth', icon: '🚀', color: '#f472b6', desc: 'Experiments, CRO, scale' },
+];
+
+const cockpitModules = [
+  { label: 'Product', status: 'active', value: '3 MVPs shipped' },
+  { label: 'Code', status: 'active', value: 'Async/Django/HTMX' },
+  { label: 'Data', status: 'active', value: 'Bayesian MMM live' },
+  { label: 'Learning', status: 'idle', value: 'Next: Rust' },
+  { label: 'Growth', status: 'active', value: '6-fig rev engine' },
+];
+
+const finderItems = [
+  { name: 'Agentic Engineering', type: 'folder', children: [
+    { name: 'Self-built harnesses', type: 'file' },
+    { name: 'Substrate architecture', type: 'file' },
+    { name: 'Parallel agents', type: 'file' },
+  ]},
+  { name: 'Multipliers', type: 'folder', children: [
+    { name: 'Product velocity', type: 'file' },
+    { name: 'Code throughput', type: 'file' },
+    { name: 'Data leverage', type: 'file' },
+    { name: 'Learning loops', type: 'file' },
+    { name: 'Growth experiments', type: 'file' },
+  ]},
+  { name: 'Outcomes', type: 'folder', children: [
+    { name: '3 web apps in 3 months', type: 'file' },
+    { name: 'MeshMonk: 140+ citations', type: 'file' },
+    { name: 'Humainly: 30 people supported', type: 'file' },
+  ]},
+];
+---
+
+<BaseLayout title="Skills Prototype (throwaway)" description="Local prototype for Skills section concepts.">
+  <div class="proto-page">
+    <div class="proto-banner">
+      <span class="proto-badge">🚧 THROWAWAY / LOCAL PROTOTYPE ONLY</span>
+      <p class="proto-subtitle">Exploring a Skills section that communicates agentic engineering as a force-multiplier across product, code, data, learning, and growth.</p>
+    </div>
+
+    <!-- === CONCEPT 1: FLYWHEEL === -->
+    <section class="proto-section">
+      <div class="proto-section__header">
+        <h2 class="proto-section__title">Concept 1: Flywheel</h2>
+        <p class="proto-section__blurb">Each capability feeds the next. Agentic engineering accelerates the loop.</p>
+      </div>
+      <div class="flywheel">
+        <div class="flywheel__ring">
+          {agentSkills.map((skill, i) => (
+            <div class="flywheel__node" style={`--i:${i};--n:${agentSkills.length};--hue:${skill.color}`}>
+              <div class="flywheel__icon">{skill.icon}</div>
+              <div class="flywheel__name">{skill.name}</div>
+            </div>
+          ))}
+        </div>
+        <div class="flywheel__center">
+          <div class="flywheel__center-label">Agentic<br/>Engineering</div>
+        </div>
+      </div>
+      <div class="flywheel__caption">
+        Self-built agent harnesses multiply capability across every domain — not additive, <strong>multiplicative</strong>.
+      </div>
+    </section>
+
+    <!-- === CONCEPT 2: COCKPIT / CONTROL PANEL === -->
+    <section class="proto-section">
+      <div class="proto-section__header">
+        <h2 class="proto-section__title">Concept 2: Cockpit / Control Panel</h2>
+        <p class="proto-section__blurb">A live dashboard view of capability status across all domains.</p>
+      </div>
+      <div class="cockpit">
+        {cockpitModules.map((mod) => (
+          <div class:list={['cockpit__module', `cockpit__module--${mod.status}`]}>
+            <div class="cockpit__status-dot"></div>
+            <div class="cockpit__label">{mod.label}</div>
+            <div class="cockpit__value">{mod.value}</div>
+          </div>
+        ))}
+      </div>
+      <div class="cockpit__legend">
+        <span class="cockpit__legend-dot cockpit__legend-dot--active"></span> Active
+        <span class="cockpit__legend-dot cockpit__legend-dot--idle"></span> Standby
+      </div>
+      <div class="cockpit__caption">
+        Every module hot-swappable. Agent harnesses let me spin up new capabilities in days, not quarters.
+      </div>
+    </section>
+
+    <!-- === CONCEPT 3: FINDER / COMPOSABLE SKILL SYSTEM === -->
+    <section class="proto-section">
+      <div class="proto-section__header">
+        <h2 class="proto-section__title">Concept 3: Finder / Composable Skill System</h2>
+        <p class="proto-section__blurb">Skills as a hierarchical, composable system — double-click to drill in.</p>
+      </div>
+      <div class="finder">
+        <div class="finder__toolbar">
+          <span class="finder__btn">←</span>
+          <span class="finder__path">Skills / Agentic Engineering</span>
+        </div>
+        <div class="finder__grid">
+          {finderItems.map((item) => (
+            <div class="finder__item">
+              <div class="finder__icon">{item.type === 'folder' ? '📁' : '📄'}</div>
+              <div class="finder__name">{item.name}</div>
+              <div class="finder__meta">{item.children ? `${item.children.length} items` : 'skill'}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div class="finder__caption">
+        A composable skill system: folder-like domains containing concrete, provable outcomes. The harness itself is just another folder.
+      </div>
+    </section>
+  </div>
+
+  <style>
+    /* ========== SHARED PROTOTYPE SCAFFOLDING ========== */
+    .proto-page {
+      width: min(100%, 64rem);
+      margin: 0 auto;
+      padding: 0 0 3rem;
+    }
+
+    .proto-banner {
+      text-align: center;
+      margin-bottom: 2.5rem;
+      padding: 1.25rem;
+      border: 2px dashed rgba(255, 127, 80, 0.45);
+      border-radius: 1rem;
+      background: rgba(255, 127, 80, 0.06);
+    }
+
+    .proto-badge {
+      display: inline-block;
+      padding: 0.35rem 0.75rem;
+      border-radius: 999px;
+      background: #ff7f50;
+      color: #0b1116;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .proto-subtitle {
+      margin: 0.75rem 0 0;
+      color: var(--muted-content);
+      font-size: 0.95rem;
+      line-height: 1.45;
+    }
+
+    .proto-section {
+      margin-bottom: 3rem;
+      padding: 1.5rem;
+      border: 1px solid rgba(171, 196, 220, 0.10);
+      border-radius: 1.25rem;
+      background: var(--base-200);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.22);
+    }
+
+    .proto-section__header {
+      margin-bottom: 1.25rem;
+    }
+
+    .proto-section__title {
+      margin: 0 0 0.35rem;
+      font-size: 1.35rem;
+      color: #f2f7fb;
+    }
+
+    .proto-section__blurb {
+      margin: 0;
+      color: var(--muted-content);
+      font-size: 0.92rem;
+    }
+
+    /* ========== CONCEPT 1: FLYWHEEL ========== */
+    .flywheel {
+      position: relative;
+      width: min(100%, 28rem);
+      aspect-ratio: 1 / 1;
+      margin: 1.5rem auto;
+    }
+
+    .flywheel__ring {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 2px dashed rgba(255, 255, 255, 0.12);
+      animation: flywheelSpin 32s linear infinite;
+    }
+
+    @keyframes flywheelSpin {
+      to { transform: rotate(360deg); }
+    }
+
+    .flywheel__node {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      --r: 11.5rem;           /* orbit radius */
+      --angle: calc(360deg / var(--n) * var(--i) - 90deg);
+      transform:
+        translate(-50%, -50%)
+        rotate(var(--angle))
+        translateY(calc(var(--r) * -1))
+        rotate(calc(var(--angle) * -1));
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.35rem;
+      text-align: center;
+      width: 5.5rem;
+    }
+
+    .flywheel__icon {
+      width: 3rem;
+      height: 3rem;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--hue);
+      font-size: 1.25rem;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+    }
+
+    .flywheel__name {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #f2f7fb;
+    }
+
+    .flywheel__center {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      pointer-events: none;
+    }
+
+    .flywheel__center-label {
+      width: 7rem;
+      height: 7rem;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #1a2a32, #0c171d);
+      border: 2px solid rgba(255, 127, 80, 0.35);
+      color: #ff7f50;
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-align: center;
+      line-height: 1.3;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      box-shadow: 0 0 40px rgba(255, 127, 80, 0.12);
+    }
+
+    .flywheel__caption {
+      text-align: center;
+      color: var(--muted-content);
+      font-size: 0.92rem;
+      max-width: 32rem;
+      margin: 0 auto;
+      line-height: 1.5;
+    }
+
+    /* ========== CONCEPT 2: COCKPIT ========== */
+    .cockpit {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+      gap: 0.85rem;
+      margin-bottom: 1rem;
+    }
+
+    .cockpit__module {
+      position: relative;
+      padding: 1rem;
+      border-radius: 0.9rem;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(171, 196, 220, 0.10);
+      transition: transform 160ms ease, border-color 160ms ease;
+    }
+
+    .cockpit__module:hover {
+      transform: translateY(-2px);
+      border-color: rgba(255, 127, 80, 0.35);
+    }
+
+    .cockpit__status-dot {
+      position: absolute;
+      top: 0.75rem;
+      right: 0.75rem;
+      width: 0.55rem;
+      height: 0.55rem;
+      border-radius: 50%;
+      background: #64748b;
+    }
+
+    .cockpit__module--active .cockpit__status-dot {
+      background: #22c55e;
+      box-shadow: 0 0 8px rgba(34, 197, 94, 0.45);
+    }
+
+    .cockpit__module--idle .cockpit__status-dot {
+      background: #f59e0b;
+      box-shadow: 0 0 8px rgba(245, 158, 11, 0.35);
+    }
+
+    .cockpit__label {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted-content);
+      margin-bottom: 0.35rem;
+    }
+
+    .cockpit__value {
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: #f2f7fb;
+      line-height: 1.35;
+    }
+
+    .cockpit__legend {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.82rem;
+      color: var(--muted-content);
+      margin-bottom: 0.85rem;
+    }
+
+    .cockpit__legend-dot {
+      display: inline-block;
+      width: 0.5rem;
+      height: 0.5rem;
+      border-radius: 50%;
+      margin-left: 0.5rem;
+    }
+
+    .cockpit__legend-dot--active { background: #22c55e; }
+    .cockpit__legend-dot--idle { background: #f59e0b; }
+
+    .cockpit__caption {
+      color: var(--muted-content);
+      font-size: 0.92rem;
+      line-height: 1.5;
+    }
+
+    /* ========== CONCEPT 3: FINDER ========== */
+    .finder {
+      border-radius: 0.9rem;
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(171, 196, 220, 0.10);
+      overflow: hidden;
+    }
+
+    .finder__toolbar {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.65rem 1rem;
+      background: rgba(255, 255, 255, 0.04);
+      border-bottom: 1px solid rgba(171, 196, 220, 0.08);
+      font-size: 0.85rem;
+    }
+
+    .finder__btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 1.5rem;
+      height: 1.5rem;
+      border-radius: 0.35rem;
+      background: rgba(255, 255, 255, 0.06);
+      font-size: 0.75rem;
+    }
+
+    .finder__path {
+      color: var(--muted-content);
+    }
+
+    .finder__grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr));
+      gap: 1rem;
+      padding: 1rem;
+    }
+
+    .finder__item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 1rem 0.5rem;
+      border-radius: 0.65rem;
+      transition: background 160ms ease;
+      cursor: default;
+    }
+
+    .finder__item:hover {
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .finder__icon {
+      font-size: 2rem;
+      line-height: 1;
+    }
+
+    .finder__name {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #f2f7fb;
+      text-align: center;
+      line-height: 1.25;
+    }
+
+    .finder__meta {
+      font-size: 0.72rem;
+      color: var(--muted-content);
+    }
+
+    .finder__caption {
+      margin-top: 0.85rem;
+      color: var(--muted-content);
+      font-size: 0.92rem;
+      line-height: 1.5;
+    }
+
+    /* ========== RESPONSIVE ========== */
+    @media (max-width: 480px) {
+      .flywheel { width: 18rem; }
+      .flywheel__node { --r: 7.2rem; width: 4.5rem; }
+      .flywheel__icon { width: 2.25rem; height: 2.25rem; font-size: 1rem; }
+      .flywheel__center-label { width: 5.5rem; height: 5.5rem; font-size: 0.7rem; }
+      .cockpit { grid-template-columns: repeat(2, 1fr); }
+      .finder__grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</BaseLayout>
