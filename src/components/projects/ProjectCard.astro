@@ -1,146 +1,101 @@
 ---
 import type { ProjectEntry } from '../../data/projects';
-import ProjectsCarousel from './ProjectsCarousel.astro';
 
 interface Props {
   project: ProjectEntry;
 }
 
 const { project } = Astro.props;
+const tagLabel = project.kind === 'built' ? 'built' : 'build on';
+const tagClass = project.kind === 'built' ? 'project-tag--built' : 'project-tag--build-on';
 ---
 
-<section class="project-block">
-  <h2 class="project-block__title">{project.title}</h2>
-  <div class:list={['project-block__content', project.reverseOnDesktop && 'project-block__content--reverse']}>
-    <div class="project-block__carousel">
-      <ProjectsCarousel carouselId={project.slug} title={project.title} images={project.images} />
-    </div>
-
-    <article class="project-panel">
-      <p class="project-panel__description">{project.description}</p>
-
-      <div class="project-panel__section">
-        <h3>Technology</h3>
-        <div class="project-panel__badges">
-          {project.technologies.map((technology) => <span class="project-badge">{technology}</span>)}
-        </div>
-      </div>
-
-      <div class="project-panel__section">
-        <h3>Key Learnings</h3>
-        <p>{project.learnings}</p>
-      </div>
-
-      {project.sourceCodeHref && (
-        <div class="project-panel__actions">
-          <a href={project.sourceCodeHref} target="_blank" rel="noreferrer" class="project-link-button">Source Code</a>
-        </div>
-      )}
-    </article>
+<div class="project-row">
+  <div class="project-row__main">
+    {project.href ? (
+      <a href={project.href} target="_blank" rel="noreferrer" class="project-row__title">{project.title}</a>
+    ) : (
+      <span class="project-row__title project-row__title--no-link">{project.title}</span>
+    )}
+    {project.author && (
+      <span class="project-row__author">by {project.author}</span>
+    )}
+    <p class="project-row__description">{project.description}</p>
   </div>
-</section>
+  <span class:list={['project-tag', tagClass]}>{tagLabel}</span>
+</div>
 
 <style>
-  .project-block {
-    margin-top: 3.5rem;
-  }
-
-  .project-block:first-of-type {
-    margin-top: 0;
-  }
-
-  .project-block__title {
-    margin: 0 0 1.5rem;
-    text-align: center;
-    font-size: clamp(1.8rem, 4vw, 2rem);
-    line-height: 1.15;
-    color: var(--content-bright);
-  }
-
-  .project-block__content {
-    display: grid;
-    gap: 1.5rem;
-    align-items: start;
-  }
-
-  .project-panel {
+  .project-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.25rem 1.5rem;
     border-radius: var(--radius-xl);
     background: var(--base-200);
     box-shadow: var(--shadow-card);
-    padding: 1.5rem;
   }
 
-  .project-panel__description,
-  .project-panel__section p {
+  .project-row__main {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    min-width: 0;
+  }
+
+  .project-row__title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--content-bright);
+    text-decoration: none;
+    line-height: 1.2;
+  }
+
+  .project-row__title:hover {
+    color: var(--primary);
+    text-decoration: underline;
+  }
+
+  .project-row__title--no-link {
+    cursor: default;
+  }
+
+  .project-row__author {
+    font-size: 0.85rem;
+    color: var(--base-content);
+    opacity: 0.7;
+  }
+
+  .project-row__description {
     margin: 0;
     font-size: 0.95rem;
-    line-height: 1.65;
+    line-height: 1.6;
+    color: var(--base-content);
   }
 
-  .project-panel__section {
-    margin-top: 1.25rem;
-  }
-
-  .project-panel__section h3 {
-    margin: 0 0 0.65rem;
-    font-size: 1.05rem;
-    color: var(--content-bright);
-  }
-
-  .project-panel__badges {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.6rem;
-  }
-
-  .project-badge {
+  .project-tag {
+    flex-shrink: 0;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     border-radius: var(--radius-full);
-    background: var(--base-300);
-    color: var(--base-content);
-    padding: 0.45rem 0.8rem;
-    font-size: 0.9rem;
+    padding: 0.3rem 0.75rem;
+    font-size: 0.8rem;
     font-weight: 600;
     line-height: 1;
+    white-space: nowrap;
   }
 
-  .project-panel__actions {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 1.5rem;
-  }
-
-  .project-link-button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid var(--base-300);
-    border-radius: 0.8rem;
-    padding: 0.75rem 1rem;
-    font-weight: 600;
-    transition: background var(--transition-base), border-color var(--transition-base), color var(--transition-base);
-  }
-
-  .project-link-button:hover {
-    border-color: var(--primary);
+  .project-tag--built {
+    background: var(--primary-tint, rgba(var(--primary-rgb, 99 102 241) / 0.15));
     color: var(--primary);
-    background: var(--primary-tint);
+    border: 1px solid var(--primary);
   }
 
-  @media (min-width: 1024px) {
-    .project-block__content {
-      grid-template-columns: minmax(0, 1fr) minmax(20rem, 1fr);
-      gap: 2rem;
-    }
-
-    .project-block__content--reverse .project-block__carousel {
-      order: 2;
-    }
-
-    .project-block__content--reverse .project-panel {
-      order: 1;
-    }
+  .project-tag--build-on {
+    background: var(--base-300);
+    color: var(--base-content);
+    border: 1px solid transparent;
   }
 </style>
