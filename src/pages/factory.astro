@@ -2,116 +2,145 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
-<BaseLayout title="Building a self-driving software factory | Jonatan Snyders" description="State lives in the substrate, not the agent — an honest look at the autonomous software factory I'm building toward.">
+<BaseLayout title="The software factory | Jonatan Snyders" description="An always-on software factory: agents that pick up goals, do the work caged and unattended. State lives in the substrate, not the agent.">
   <div class="factory-page">
 
+    <!-- 1. Hero -->
     <header class="factory-hero">
       <p class="factory-kicker">what excites me</p>
-      <h1>I'm building a self-driving software factory.</h1>
+      <h1>The software factory I'm building.</h1>
       <p class="factory-lede">
-        Not a product pitch — a direction I'm moving in, and a real system I run and learn from as it grows. The short version of what I believe: <strong>state lives in the substrate, not the agent.</strong> Autonomy without a ringleader.
+        An always-on software factory: agents that pick up goals, do the work caged and unattended, and that I'm steadily teaching to run themselves. The idea underneath it: state lives in the substrate, not the agent — so the agents are disposable and the whole system is crash-resumable. Here are the pieces, and where I am on the way there.
       </p>
     </header>
 
-    <section class="factory-section">
-      <h2>The idea: state in the substrate, not the agent</h2>
-      <p>
-        Most agent setups put the intelligence in one long-lived, ever-growing context window and hope it holds. I do the opposite. The load-bearing state — goals, decisions, memory — lives <em>outside</em> any single agent, in a structured substrate the agents read from and write back to:
-      </p>
-      <ul class="factory-list">
-        <li><strong>Goals live in a graph, not a chat log.</strong> Work is nodes with dependencies, acceptance contracts, and design notes — a bead graph the system plans over, not a conversation it has to remember.</li>
-        <li><strong>Memory is tiered by lifecycle.</strong> Decaying observations, durable lessons, and canonical decisions each live in their own layer — so nothing load-bearing is trapped in a context window that's about to be compacted away.</li>
-        <li><strong>Orchestrators are disposable.</strong> An orchestrator reads the graph, makes one move, and writes its decision back. Kill it mid-flight and re-spawn it — it re-reads the substrate and continues where the graph says to. No agent is precious; the substrate is.</li>
-      </ul>
-      <p>
-        Because the state was never inside the agent, the whole thing is crash-resumable by construction, and it runs caged and always-on.
-      </p>
-    </section>
+    <!-- 2. System map diagram -->
+    <section class="factory-map" aria-label="System map">
+      <div class="map-wrap">
+        <div class="map-hub-row">
+          <!-- Center node — hub (first in DOM for mobile; reordered at desktop) -->
+          <div class="map-center">
+            <div class="map-center-label">MY HARNESS</div>
+            <div class="map-center-sub">built on <a href="https://github.com/badlogic/pi-mono" target="_blank" rel="noopener" class="map-link">pi</a></div>
+            <div class="map-center-tags">substrate · tiered memory<br>orchestration · methodology</div>
+          </div>
 
-    <section class="factory-section">
-      <h2>What's mine, what I build on, what's still open</h2>
-      <p>
-        I design the whole system and build the parts where I have an edge or a better idea — and I refuse to rebuild what already works well. Knowing what <em>not</em> to build is half the craft. Here's the honest ledger.
-      </p>
+          <!-- Running-now nodes (solid) — left column at desktop -->
+          <div class="map-spokes map-spokes--running">
+            <div class="map-node map-node--running">
+              <a href="https://github.com/jsnyde0/rip-cage" target="_blank" rel="noopener" class="map-node-name map-link">rip-cage</a>
+              <span class="map-node-role">the cage</span>
+            </div>
+            <div class="map-node map-node--running">
+              <span class="map-node-name">always-on host</span>
+              <span class="map-node-role">Mac mini / VPS</span>
+            </div>
+            <div class="map-node map-node--running">
+              <span class="map-node-name">the cockpit</span>
+              <span class="map-node-role">herdr / cmux</span>
+            </div>
+            <div class="map-node map-node--running">
+              <span class="map-node-name">disposable orchestrators</span>
+              <span class="map-node-role">read → act → die</span>
+            </div>
+            <div class="map-node map-node--running">
+              <span class="map-node-name">the drover</span>
+              <span class="map-node-role">suggest-mode</span>
+            </div>
+          </div>
 
-      <div class="factory-ledger">
-
-        <div class="ledger-column ledger-mine">
-          <div class="ledger-label">Built / mine</div>
-          <ul class="ledger-list">
-            <li>
-              <strong><a href="https://github.com/jsnyde0/rip-cage" target="_blank" rel="noopener" class="factory-link">rip-cage</a></strong> — a tool I built and ship publicly (Homebrew tap) that wraps a project in a container and intercepts every shell command to limit the blast radius. It's the cage the always-on agents run inside, and it composes with <a href="https://github.com/ironsh/iron-proxy" target="_blank" rel="noopener" class="factory-link">iron-proxy</a> so the agents never hold real credentials.
-            </li>
-            <li>
-              <strong>The architecture and the methodology</strong> — substrate-thick / process-thin design, decision records with explicit firmness levels, the tiered memory architecture, beads-as-goals, the disposable-orchestrator pattern, and a set of composable orchestration primitives. This is my own system and it runs my daily work. It lives in my private tooling rather than as a public product — so I'm describing it here, not pointing you at a repo.
-            </li>
-          </ul>
+          <!-- Frontier zone (dashed / lighter) — right column at desktop -->
+          <div class="map-frontier-zone">
+            <div class="map-frontier-label">frontier</div>
+            <div class="map-spokes map-spokes--frontier">
+              <div class="map-node map-node--frontier">
+                <span class="map-node-name">full self-driving</span>
+                <span class="map-node-role">drover off-leash</span>
+              </div>
+              <div class="map-node map-node--frontier">
+                <span class="map-node-name">agent_mail</span>
+                <span class="map-node-role">collision avoidance</span>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div class="ledger-column ledger-buildon">
-          <div class="ledger-label">I build on</div>
-          <ul class="ledger-list">
-            <li>
-              <strong><a href="https://github.com/badlogic/pi-mono" target="_blank" rel="noopener" class="factory-link">pi</a></strong> — by badlogic. The coding agent my whole harness wraps.
-            </li>
-            <li>
-              <strong><a href="https://github.com/ogulcancelik/herdr" target="_blank" rel="noopener" class="factory-link">herdr</a></strong> — by Ogulcan Celik. A headless agent-supervisor: a live roster of every session — working, blocked, done — that I can attach to and steer.
-            </li>
-            <li>
-              <strong><a href="https://github.com/benedict2310/TelePi" target="_blank" rel="noopener" class="factory-link">TelePi</a></strong> — by Benedict Bleimschein. Drives my Pi agent from Telegram: voice prompts, screenshots, session handback.
-            </li>
-            <li>
-              <strong><a href="https://github.com/Dicklesworthstone/coding_agent_session_search" target="_blank" rel="noopener" class="factory-link">cass / cm</a></strong> — by Jeffrey Emanuel. Full-text search and a memory layer over my past agent sessions, so the system recalls what it has already done.
-            </li>
-            <li>
-              <strong><a href="https://github.com/manaflow-ai/cmux" target="_blank" rel="noopener" class="factory-link">cmux</a></strong> — by Manaflow. The cockpit I watch the factory from on the Mac.
-            </li>
-            <li>
-              <strong><a href="https://github.com/Dicklesworthstone/mcp_agent_mail" target="_blank" rel="noopener" class="factory-link">agent_mail</a></strong> — by Jeffrey Emanuel. File-reservation rails so parallel agents don't collide — adopting it now, not yet load-bearing.
-            </li>
-          </ul>
-          <p class="ledger-note">These aren't mine. Each does one thing well, so I compose them instead of reinventing them.</p>
+        <!-- Legend -->
+        <div class="map-legend">
+          <span class="legend-item legend-item--running">running now</span>
+          <span class="legend-item legend-item--frontier">exploring / frontier</span>
         </div>
-
-        <div class="ledger-column ledger-exploring">
-          <div class="ledger-label">Exploring / not yet real</div>
-          <ul class="ledger-list">
-            <li>
-              <strong>The "self-driving" part isn't solved yet.</strong> The hardest open problem is the auto-trigger: what wakes the factory and decides what to pick up next with no human in the loop. Today, I'm still the trigger.
-            </li>
-            <li>
-              <strong>The drover</strong> — a graph-level planner that would schedule work across the bead graph on top of the orchestration layer — is the north-star I'm building toward, not something I'm claiming to have.
-            </li>
-          </ul>
-        </div>
-
       </div>
     </section>
 
-    <section class="factory-closing">
-      <p>That gap is the point. I'd rather show you a real system I'm honestly still building than a finished story that doesn't run.</p>
-      <a href="/projects/" class="factory-cta-link">See the pieces I've built and build on →</a>
+    <!-- 3. The pieces -->
+    <section class="factory-pieces">
+      <h2>The pieces</h2>
+
+      <div class="pieces-group">
+        <h3 class="pieces-group-label">Running now</h3>
+        <ul class="pieces-list">
+          <li>
+            <strong>My harness, built on <a href="https://github.com/badlogic/pi-mono" target="_blank" rel="noopener" class="factory-link">pi</a></strong> — I design the whole system and build the parts where I have an edge. It runs on pi because pi is hackable all the way down — closed harnesses like Claude Code only let you bolt on hooks and skills, but parts of my system only exist because I can change the agent itself. The LLM behind it is swappable; the harness is the moat.
+          </li>
+          <li>
+            <strong>The substrate — state lives here</strong> — goals are nodes in a bead graph, not a chat log; memory is tiered by lifecycle so nothing load-bearing is trapped in a context window that's about to be compacted. (session search &amp; memory via cass/cm, by Jeffrey Emanuel)
+          </li>
+          <li>
+            <strong><a href="https://github.com/jsnyde0/rip-cage" target="_blank" rel="noopener" class="factory-link">rip-cage</a> — the cage</strong> — wraps the work in a container and intercepts every shell command to limit the blast radius; composes with iron-proxy so the agents never hold real credentials.
+          </li>
+          <li>
+            <strong>Always-on host</strong> — it runs on a box that's always on — a Mac mini now, a VPS next — not my laptop. I close the lid and the agents keep going. With the crash-resumable substrate, that's what makes "unattended" actually true.
+          </li>
+          <li>
+            <strong>The cockpit</strong> — herdr gives me a live roster of every session — working, blocked, done — that I can attach to and steer; cmux is the view on the Mac. (herdr by Ogulcan Celik · cmux by Manaflow)
+          </li>
+          <li>
+            <strong>Disposable orchestrators</strong> — each one reads the graph, makes a single move, writes its decision back, and dies; re-spawn it and it picks up from the substrate. No agent is precious; the substrate is. (my /send-it + composable primitives)
+          </li>
+          <li>
+            <strong>The drover — running, in suggest-mode</strong> — a planner over the whole bead graph. It already runs: it gets an event whenever a piece of work closes and proposes what to pick up next. For now I stay in the loop, approving its moves while I sharpen its judgment — then I give it more rope.
+          </li>
+        </ul>
+      </div>
+
+      <div class="pieces-group pieces-group--frontier">
+        <h3 class="pieces-group-label pieces-group-label--frontier">Exploring / the frontier</h3>
+        <ul class="pieces-list">
+          <li>
+            <strong>Full self-driving</strong> — the drover acting on its own, no human in the loop (the auto-trigger that decides what to wake up for). That's exactly the edge I'm working at right now.
+          </li>
+          <li>
+            <strong>agent_mail</strong> — collision-avoidance rails so parallel agents don't step on each other. I'm planning to adopt it — honestly, not battle-tested yet. (by Jeffrey Emanuel)
+          </li>
+        </ul>
+      </div>
     </section>
+
+    <!-- 4. Closing -->
+    <footer class="factory-closing">
+      <p>That gap — between "proposes what to do next" and "just does it" — is the whole game right now. I'd rather show you a system I'm honestly still building than a finished story that doesn't run.</p>
+    </footer>
 
   </div>
 </BaseLayout>
 
 <style>
   .factory-page {
-    width: min(100%, 72rem);
+    width: min(100%, 64rem);
     margin: 0 auto;
   }
 
   /* ── Hero ── */
   .factory-hero {
     max-width: 52rem;
-    margin: 0 0 4rem;
+    margin: 0 0 3.5rem;
     padding-bottom: 2.5rem;
     border-bottom: 1px solid var(--border-subtle);
   }
 
   .factory-kicker {
-    margin: 0 0 1rem;
+    margin: 0 0 0.875rem;
     font-size: 0.8125rem;
     font-weight: 600;
     letter-spacing: 0.1em;
@@ -121,7 +150,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
   .factory-hero h1 {
     margin: 0 0 1.25rem;
-    font-size: clamp(2.25rem, 7vw, 3.75rem);
+    font-size: clamp(2.25rem, 7vw, 3.5rem);
     line-height: 1.05;
     letter-spacing: -0.035em;
     font-weight: 800;
@@ -130,135 +159,314 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
   .factory-lede {
     margin: 0;
-    font-size: clamp(1rem, 2vw, 1.2rem);
+    max-width: 50rem;
+    font-size: clamp(1rem, 2vw, 1.15rem);
     line-height: var(--line-height-relaxed);
     color: var(--muted-content);
   }
 
-  .factory-lede strong {
+  /* ── System Map ── */
+  .factory-map {
+    margin-bottom: 3.5rem;
+  }
+
+  .map-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .map-hub-row {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .map-center {
+    padding: 1.5rem 2rem;
+    border-radius: var(--radius-lg);
+    background: var(--primary-tint);
+    border: 2px solid rgba(255, 127, 80, 0.35);
+    text-align: center;
+  }
+
+  .map-center-label {
+    font-size: 1rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--primary);
+    margin-bottom: 0.25rem;
+  }
+
+  .map-center-sub {
+    font-size: 0.875rem;
+    color: var(--muted-content);
+    margin-bottom: 0.625rem;
+  }
+
+  .map-center-tags {
+    font-size: 0.75rem;
+    color: var(--muted-content);
+    opacity: 0.8;
+    letter-spacing: 0.02em;
+  }
+
+  .map-link {
+    color: var(--primary);
+    text-decoration: underline;
+    text-decoration-color: rgba(255, 127, 80, 0.4);
+    text-underline-offset: 2px;
+    transition: color var(--transition-base), text-decoration-color var(--transition-base);
+  }
+
+  .map-link:hover {
+    color: var(--primary-focus);
+    text-decoration-color: var(--primary-focus);
+  }
+
+  /* Running-now spokes */
+  .map-spokes--running {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+    gap: 0.75rem;
+  }
+
+  .map-node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 0.875rem 0.75rem;
+    border-radius: var(--radius-md);
+    gap: 0.25rem;
+  }
+
+  .map-node--running {
+    background: var(--surface-subtle);
+    border: 1px solid var(--border-subtle);
+  }
+
+  .map-node-name {
+    font-size: 0.8125rem;
+    font-weight: 700;
     color: var(--content-bright);
+    line-height: 1.3;
+  }
+
+  a.map-node-name {
+    color: var(--primary);
+    text-decoration: underline;
+    text-decoration-color: rgba(255, 127, 80, 0.4);
+    text-underline-offset: 2px;
+    transition: color var(--transition-base);
+  }
+
+  a.map-node-name:hover {
+    color: var(--primary-focus);
+  }
+
+  .map-node-role {
+    font-size: 0.6875rem;
+    color: var(--muted-content);
+    letter-spacing: 0.02em;
+  }
+
+  /* Legend */
+  .map-legend {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 0 0.25rem;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    color: var(--muted-content);
+    letter-spacing: 0.03em;
+  }
+
+  .legend-item::before {
+    content: "";
+    display: inline-block;
+    width: 1rem;
+    height: 0.625rem;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  .legend-item--running::before {
+    background: var(--surface-subtle);
+    border: 1px solid var(--border-subtle);
+  }
+
+  .legend-item--frontier::before {
+    background: transparent;
+    border: 1.5px dashed rgba(171, 196, 220, 0.3);
+  }
+
+  /* Frontier zone */
+  .map-frontier-zone {
+    padding: 1rem 1rem 1.25rem;
+    border: 1.5px dashed rgba(171, 196, 220, 0.25);
+    border-radius: var(--radius-lg);
+    position: relative;
+  }
+
+  .map-frontier-label {
+    position: absolute;
+    top: -0.625rem;
+    left: 1rem;
+    padding: 0 0.5rem;
+    background: var(--base-100);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted-content);
+    opacity: 0.7;
+  }
+
+  .map-spokes--frontier {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+    gap: 0.75rem;
+  }
+
+  .map-node--frontier {
+    background: transparent;
+    border: 1.5px dashed rgba(171, 196, 220, 0.22);
+    opacity: 0.75;
+  }
+
+  .map-node--frontier .map-node-name {
+    color: var(--base-content);
     font-weight: 600;
   }
 
-  /* ── Sections ── */
-  .factory-section {
-    margin-bottom: 3.5rem;
-    padding-bottom: 3.5rem;
-    border-bottom: 1px solid var(--border-subtle);
+  /* Tablet: 2-col running nodes */
+  @media (min-width: 640px) {
+    .map-spokes--running {
+      grid-template-columns: 1fr 1fr;
+    }
   }
 
-  .factory-section h2 {
-    margin: 0 0 1.25rem;
-    font-size: clamp(1.25rem, 3vw, 1.75rem);
+  /* Desktop: 3-column hub layout via flexbox row */
+  @media (min-width: 1024px) {
+    .map-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .map-hub-row {
+      display: flex;
+      flex-direction: row;
+      gap: 2rem;
+      align-items: stretch;
+    }
+
+    .map-spokes--running {
+      flex: 1;
+      grid-template-columns: 1fr;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 0.625rem;
+      order: 1;
+    }
+
+    .map-center {
+      flex: 0 0 15rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      text-align: center;
+      order: 2;
+    }
+
+    .map-frontier-zone {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      order: 3;
+    }
+
+    .map-spokes--frontier {
+      grid-template-columns: 1fr;
+      display: flex;
+      flex-direction: column;
+      gap: 0.625rem;
+    }
+
+    .map-legend {
+      justify-content: center;
+    }
+  }
+
+  /* ── The pieces list ── */
+  .factory-pieces {
+    margin-bottom: 3rem;
+    padding-top: 2.5rem;
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  .factory-pieces h2 {
+    margin: 0 0 2rem;
+    font-size: clamp(1.25rem, 3vw, 1.625rem);
     font-weight: 700;
     letter-spacing: -0.02em;
     color: var(--content-bright);
   }
 
-  .factory-section p {
-    margin: 0 0 1.25rem;
-    max-width: 52rem;
-    line-height: var(--line-height-relaxed);
-    color: var(--base-content);
+  .pieces-group {
+    margin-bottom: 2rem;
   }
 
-  .factory-section p:last-child {
-    margin-bottom: 0;
-  }
-
-  .factory-list {
-    margin: 0 0 1.25rem;
-    padding: 0 0 0 1.25rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.875rem;
-    max-width: 52rem;
-    line-height: var(--line-height-relaxed);
-    color: var(--base-content);
-  }
-
-  .factory-list li {
-    padding-left: 0.25rem;
-  }
-
-  .factory-list strong {
-    color: var(--content-bright);
-  }
-
-  /* ── Ledger columns ── */
-  .factory-ledger {
-    display: grid;
-    gap: 1.5rem;
-    margin-top: 2rem;
-  }
-
-  @media (min-width: 768px) {
-    .factory-ledger {
-      grid-template-columns: repeat(3, 1fr);
-    }
-  }
-
-  .ledger-column {
-    padding: 1.5rem;
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-card);
-  }
-
-  .ledger-mine {
-    background: var(--surface-subtle);
-    border: 1px solid var(--border-subtle);
-  }
-
-  .ledger-buildon {
-    background: var(--primary-tint);
-    border: 1px solid rgba(255, 127, 80, 0.15);
-  }
-
-  .ledger-exploring {
-    background: var(--surface-subtle);
-    border: 1px solid var(--border-subtle);
-  }
-
-  .ledger-label {
-    margin-bottom: 1rem;
-    padding-bottom: 0.625rem;
-    border-bottom: 1px solid var(--border-subtle);
+  .pieces-group-label {
+    margin: 0 0 0.875rem;
     font-size: 0.75rem;
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--muted-content);
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-subtle);
   }
 
-  .ledger-mine .ledger-label {
-    color: var(--primary);
-    border-bottom-color: rgba(255, 127, 80, 0.25);
+  .pieces-group--frontier .pieces-group-label {
+    border-bottom-style: dashed;
+    opacity: 0.8;
   }
 
-  .ledger-list {
+  .pieces-list {
     margin: 0;
-    padding: 0 0 0 1rem;
+    padding: 0;
+    list-style: none;
     display: flex;
     flex-direction: column;
     gap: 0.875rem;
+  }
+
+  .pieces-list li {
     font-size: 0.9375rem;
     line-height: var(--line-height-relaxed);
     color: var(--base-content);
+    max-width: 60ch;
   }
 
-  .ledger-list strong {
+  .pieces-group--frontier .pieces-list li {
+    opacity: 0.8;
+  }
+
+  .pieces-list strong {
     color: var(--content-bright);
   }
 
-  .ledger-note {
-    margin: 1rem 0 0;
-    font-size: 0.875rem;
-    line-height: var(--line-height-relaxed);
-    color: var(--muted-content);
-    font-style: italic;
-  }
-
-  /* ── Links ── */
   .factory-link {
     color: var(--primary);
     text-decoration: underline;
@@ -276,23 +484,16 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   .factory-closing {
     max-width: 52rem;
     margin-bottom: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border-subtle);
   }
 
   .factory-closing p {
-    margin: 0 0 1.25rem;
-    font-size: clamp(1rem, 2vw, 1.15rem);
+    margin: 0;
+    font-size: clamp(1rem, 2vw, 1.1rem);
     line-height: var(--line-height-relaxed);
     color: var(--muted-content);
     font-style: italic;
-  }
-
-  .factory-cta-link {
-    font-size: 0.9375rem;
-    color: var(--muted-content);
-    transition: color var(--transition-base);
-  }
-
-  .factory-cta-link:hover {
-    color: var(--primary);
+    max-width: 60ch;
   }
 </style>
