@@ -2,7 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
-<BaseLayout title="The software factory | Jonatan Snyders" description="An always-on software factory: agents that pick up goals, do the work caged and unattended. State lives in the substrate, not the agent.">
+<BaseLayout title="The software factory | Jonatan Snyders" description="An always-on software factory: agents that pick up goals, do the work in a sandbox, unattended. State lives in the substrate, not the agent.">
   <div class="factory-page">
 
     <!-- 1. Hero -->
@@ -10,7 +10,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       <p class="factory-kicker">what excites me</p>
       <h1>The software factory I'm building.</h1>
       <p class="factory-lede">
-        An always-on software factory: agents that pick up goals, do the work caged and unattended, and that I'm steadily teaching to run themselves. The idea underneath it: state lives in the substrate, not the agent — so the agents are disposable and the whole system is crash-resumable. Here are the pieces, and where I am on the way there.
+        An always-on software factory: agents that pick up goals, do the work in a sandbox, unattended, and that I'm steadily teaching to run themselves. The idea underneath it: state lives in the substrate, not the agent — so the agents are disposable and the whole system is crash-resumable. Here are the pieces, and where I am on the way there.
       </p>
     </header>
 
@@ -29,14 +29,14 @@ import BaseLayout from '../layouts/BaseLayout.astro';
           <div class="map-spokes map-spokes--running">
             <div class="map-node map-node--running">
               <a href="https://github.com/jsnyde0/rip-cage" target="_blank" rel="noopener" class="map-node-name map-link">rip-cage</a>
-              <span class="map-node-role">the cage</span>
+              <span class="map-node-role">container sandbox</span>
             </div>
             <div class="map-node map-node--running">
               <span class="map-node-name">always-on host</span>
               <span class="map-node-role">Mac mini / VPS</span>
             </div>
             <div class="map-node map-node--running">
-              <span class="map-node-name">the cockpit</span>
+              <span class="map-node-name">watch &amp; steer</span>
               <span class="map-node-role">herdr / cmux</span>
             </div>
             <div class="map-node map-node--running">
@@ -55,7 +55,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
             <div class="map-spokes map-spokes--frontier">
               <div class="map-node map-node--frontier">
                 <span class="map-node-name">full self-driving</span>
-                <span class="map-node-role">drover off-leash</span>
+                <span class="map-node-role">runs on its own</span>
               </div>
               <div class="map-node map-node--frontier">
                 <span class="map-node-name">agent_mail</span>
@@ -81,25 +81,25 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         <h3 class="pieces-group-label">Running now</h3>
         <ul class="pieces-list">
           <li>
-            <strong>My harness, built on <a href="https://github.com/badlogic/pi-mono" target="_blank" rel="noopener" class="factory-link">pi</a></strong> — I design the whole system and build the parts where I have an edge. It runs on pi because pi is hackable all the way down — closed harnesses like Claude Code only let you bolt on hooks and skills, but parts of my system only exist because I can change the agent itself. The LLM behind it is swappable; the harness is the moat.
+            <strong>My harness, built on <a href="https://github.com/badlogic/pi-mono" target="_blank" rel="noopener" class="factory-link">pi</a></strong> — I design the whole system and build the parts where I have an edge. It runs on pi because pi is changeable all the way down — closed harnesses like Claude Code only let you bolt on hooks and skills, but parts of my system only exist because I can change the agent itself. The model behind it is swappable; the harness is the part I build and own.
           </li>
           <li>
             <strong>The substrate — state lives here</strong> — goals are nodes in a bead graph, not a chat log; memory is tiered by lifecycle so nothing load-bearing is trapped in a context window that's about to be compacted. (session search &amp; memory via cass/cm, by Jeffrey Emanuel)
           </li>
           <li>
-            <strong><a href="https://github.com/jsnyde0/rip-cage" target="_blank" rel="noopener" class="factory-link">rip-cage</a> — the cage</strong> — wraps the work in a container and intercepts every shell command to limit the blast radius; composes with iron-proxy so the agents never hold real credentials.
+            <strong><a href="https://github.com/jsnyde0/rip-cage" target="_blank" rel="noopener" class="factory-link">rip-cage</a> — the sandbox</strong> — wraps the work in a container and checks every shell command before it runs, so a mistake can't reach far; it composes with iron-proxy so the agents never hold real credentials.
           </li>
           <li>
             <strong>Always-on host</strong> — it runs on a box that's always on — a Mac mini now, a VPS next — not my laptop. I close the lid and the agents keep going. With the crash-resumable substrate, that's what makes "unattended" actually true.
           </li>
           <li>
-            <strong>The cockpit</strong> — herdr gives me a live roster of every session — working, blocked, done — that I can attach to and steer; cmux is the view on the Mac. (herdr by Ogulcan Celik · cmux by Manaflow)
+            <strong>Watch &amp; steer</strong> — herdr gives me a live roster of every session — working, blocked, done — that I can attach to and steer; cmux is the view on the Mac. (herdr by Ogulcan Celik · cmux by Manaflow)
           </li>
           <li>
-            <strong>Disposable orchestrators</strong> — each one reads the graph, makes a single move, writes its decision back, and dies; re-spawn it and it picks up from the substrate. No agent is precious; the substrate is. (my /send-it + composable primitives)
+            <strong>Disposable orchestrators</strong> — each one reads the graph, makes a single move, writes its decision back, and dies; re-spawn it and it picks up from the substrate. The agents are disposable; only the substrate persists. (my /send-it + composable primitives)
           </li>
           <li>
-            <strong>The drover — running, in suggest-mode</strong> — a planner over the whole bead graph. It already runs: it gets an event whenever a piece of work closes and proposes what to pick up next. For now I stay in the loop, approving its moves while I sharpen its judgment — then I give it more rope.
+            <strong>The drover — running, in suggest-mode</strong> — a planner over the whole bead graph. It already runs: it gets an event whenever a piece of work closes and proposes what to pick up next. For now I stay in the loop, approving its moves while I improve its judgment — then I hand it more autonomy.
           </li>
         </ul>
       </div>
@@ -119,7 +119,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
     <!-- 4. Closing -->
     <footer class="factory-closing">
-      <p>That gap — between "proposes what to do next" and "just does it" — is the whole game right now. I'd rather show you a system I'm honestly still building than a finished story that doesn't run.</p>
+      <p>That gap — between "proposes what to do next" and "does it on its own" — is the main thing I'm working on right now. I'd rather show you a system I'm honestly still building than a finished story that doesn't run.</p>
     </footer>
 
   </div>
