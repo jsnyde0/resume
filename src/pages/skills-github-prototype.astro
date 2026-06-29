@@ -18,15 +18,16 @@ const folders: TreeFolder[] = [
   {
     name: 'agentic-engineering',
     files: [
-      { name: 'harness-factory.md',       path: 'agentic-engineering/harness-factory.md' },
-      { name: 'parallel-agent-loops.md',  path: 'agentic-engineering/parallel-agent-loops.md' },
-      { name: 'codebase-navigation.md',   path: 'agentic-engineering/codebase-navigation.md' },
+      { name: 'harness-factory.md',          path: 'agentic-engineering/harness-factory.md' },
+      { name: 'disposable-orchestrators.md', path: 'agentic-engineering/disposable-orchestrators.md' },
+      { name: 'sandboxed-autonomy.md',       path: 'agentic-engineering/sandboxed-autonomy.md' },
+      { name: 'llm-app-engineering.md',      path: 'agentic-engineering/llm-app-engineering.md' },
     ],
   },
   {
     name: 'web-development',
     files: [
-      { name: 'django-htmx.md',              path: 'web-development/django-htmx.md' },
+      { name: 'full-stack-web.md',           path: 'web-development/full-stack-web.md' },
       { name: 'apis-and-deployment.md',      path: 'web-development/apis-and-deployment.md' },
       { name: 'analytics-instrumentation.md',path: 'web-development/analytics-instrumentation.md' },
     ],
@@ -65,7 +66,7 @@ const fileContents: Record<string, string> = {
 <p>I use it to move quickly across web apps, data systems, growth loops, and operations.</p>
 <h2>Technologies</h2>
 <ul>
-  <li>Django, HTMX, Astro, Tailwind</li>
+  <li>Django, HTMX, React, Astro, Tailwind</li>
   <li>Python, PyMC, pandas, NumPy</li>
   <li>PostgreSQL, BigQuery, Dataform</li>
   <li>PostHog, GA4, server-side tracking</li>
@@ -73,8 +74,8 @@ const fileContents: Record<string, string> = {
 </ul>
 <h2>Skill folders</h2>
 <ul>
-  <li><strong>agentic-engineering/</strong> — harnesses, tools, review loops</li>
-  <li><strong>web-development/</strong> — server-rendered product engineering</li>
+  <li><strong>agentic-engineering/</strong> — how I build and run agents</li>
+  <li><strong>web-development/</strong> — full-stack product engineering</li>
   <li><strong>data-science/</strong> — Bayesian models, pipelines, computer vision</li>
   <li><strong>growth-engineering/</strong> — acquisition, tracking, modelling</li>
   <li><strong>founder-operator/</strong> — strategy, teams, hard-earned judgment</li>
@@ -82,52 +83,65 @@ const fileContents: Record<string, string> = {
 `,
   'agentic-engineering/harness-factory.md': `
 <h1>harness-factory.md</h1>
-<p>I build agent harnesses that turn prompts, tools, context, and review loops into repeatable workflows.</p>
+<p>I build and own my agent harness — the prompts, tools, context routing, and review loops that turn an LLM into a system that does real work, unattended.</p>
 <h2>Technologies</h2>
 <ul>
-  <li>Pi / Claude Code</li>
+  <li>pi — a harness I can change all the way down</li>
   <li>Custom skills, roles, and tools</li>
-  <li>Subagents and review loops</li>
+  <li>Subagents and fresh-context review loops</li>
   <li>Prompt templates and context routing</li>
 </ul>
 <h2>Proof</h2>
-<p>Live system: <a href="/factory/" class="ghv-link">/factory</a>.</p>
+<p>The whole system runs: <a href="/factory/" class="ghv-link">/factory</a>.</p>
 `,
-  'agentic-engineering/parallel-agent-loops.md': `
-<h1>parallel-agent-loops.md</h1>
-<p>I split larger builds into clear, isolated tasks so multiple agents can work at once.</p>
+  'agentic-engineering/disposable-orchestrators.md': `
+<h1>disposable-orchestrators.md</h1>
+<p>I architect agent work so state lives in the substrate, not the agent. Each orchestrator reads a graph of goals, makes one move, writes its decision back, and dies — so any agent can crash and the work picks up where it left off.</p>
 <h2>Technologies</h2>
 <ul>
-  <li>Task decomposition</li>
-  <li>Explicit acceptance contracts</li>
-  <li>Parallel subagents</li>
-  <li>Fresh-context review</li>
+  <li>Work as a dependency graph, not a chat log</li>
+  <li>Tiered memory kept by lifecycle</li>
+  <li>Disposable orchestrators over shared substrate</li>
+  <li>Crash-resumable, parallel-safe workflows</li>
 </ul>
 <h2>Proof</h2>
-<p>Used in the workflow that built this site and the harness factory.</p>
+<p>The work loop behind <a href="/factory/" class="ghv-link">/factory</a>, including a planner that proposes the next move.</p>
 `,
-  'agentic-engineering/codebase-navigation.md': `
-<h1>codebase-navigation.md</h1>
-<p>I map unfamiliar codebases quickly before changing them.</p>
+  'agentic-engineering/sandboxed-autonomy.md': `
+<h1>sandboxed-autonomy.md</h1>
+<p>I run agents unattended by putting hard limits around them: containerized execution, every shell command checked before it runs, and credentials the agent never holds directly.</p>
 <h2>Technologies</h2>
 <ul>
-  <li>Structural code search</li>
-  <li>Entry-point mapping</li>
-  <li>Data-flow tracing</li>
-  <li>Implementation-readiness review</li>
+  <li>rip-cage — container plus command-gating I built</li>
+  <li>Credential isolation through a proxy</li>
+  <li>Always-on host, not a laptop</li>
+  <li>Safe-to-run-unattended execution</li>
 </ul>
+<h2>Proof</h2>
+<p>Open source: <a href="https://github.com/jsnyde0/rip-cage" class="ghv-link">rip-cage</a>.</p>
 `,
-  'web-development/django-htmx.md': `
-<h1>django-htmx.md</h1>
-<p>I build server-rendered apps with focused interactivity and little client-side state.</p>
+  'agentic-engineering/llm-app-engineering.md': `
+<h1>llm-app-engineering.md</h1>
+<p>Beyond tooling my own workflow, I build agentic apps — LLM calls wrapped in tools, structured output, and guardrails meant to hold up in production.</p>
 <h2>Technologies</h2>
 <ul>
-  <li>Django</li>
-  <li>HTMX</li>
-  <li>Tailwind</li>
-  <li>PostgreSQL</li>
-  <li>Astro</li>
+  <li>LLM-powered features and agents</li>
+  <li>Tool use and structured output</li>
+  <li>Retrieval and context design</li>
+  <li>Evaluation and guardrails</li>
 </ul>
+`,
+  'web-development/full-stack-web.md': `
+<h1>full-stack-web.md</h1>
+<p>I build full-stack web apps — backend, frontend, and the data layer behind them. I default to hypermedia-driven apps: server-rendered HTML with focused interactivity and little client-side state. I build with React too, but reach for it when an app genuinely needs a rich client.</p>
+<h2>Technologies</h2>
+<ul>
+  <li>Django, PostgreSQL, MongoDB</li>
+  <li>HTMX, Tailwind, Astro</li>
+  <li>React, JavaScript</li>
+</ul>
+<h2>Approach</h2>
+<p>Why hypermedia-driven: <a href="https://htmx.org/essays/hypermedia-driven-applications/" class="ghv-link">htmx.org/essays/hypermedia-driven-applications</a>.</p>
 `,
   'web-development/apis-and-deployment.md': `
 <h1>apis-and-deployment.md</h1>
@@ -784,7 +798,7 @@ const fileContents: Record<string, string> = {
         main
       </span>
       <span class="ghv-subheader-sep">·</span>
-      <span>15 files</span>
+      <span>16 files</span>
       <span class="ghv-subheader-sep">·</span>
       <span>5 folders</span>
     </div>
