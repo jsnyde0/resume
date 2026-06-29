@@ -61,90 +61,219 @@ const folders: TreeFolder[] = [
 const fileContents: Record<string, string> = {
   'SKILLS.md': `
 <h1>SKILLS.md</h1>
-<p>Agentic engineering is the skill that makes the rest compound. It lets me move across domains — web, data, growth, operations — without switching context or hiring for every gap.</p>
-<p>Skill areas in this repo:</p>
+<p><strong>Agentic engineering is the skill that makes the rest compound.</strong></p>
+<p>I use it to move quickly across web apps, data systems, growth loops, and operations.</p>
+<h2>Technologies</h2>
 <ul>
-  <li><strong>agentic-engineering/</strong> — building and running agent harnesses; running at <a href="/factory/" class="ghv-link">/factory</a></li>
-  <li><strong>web-development/</strong> — Django, HTMX, PostgreSQL, Docker, CI/CD, BigQuery/Dataform</li>
-  <li><strong>data-science/</strong> — Bayesian modelling, computer vision (MeshMonk, KULeuven), data pipelines</li>
-  <li><strong>growth-engineering/</strong> — performance marketing, server-side tracking, Bayesian MMM (Moonbird 2020–2024)</li>
-  <li><strong>founder-operator/</strong> — Humainly 2015–2020: strategy, Holacracy, 30 people supported</li>
+  <li>Django, HTMX, Astro, Tailwind</li>
+  <li>Python, PyMC, pandas, NumPy</li>
+  <li>PostgreSQL, BigQuery, Dataform</li>
+  <li>PostHog, GA4, server-side tracking</li>
+  <li>Docker, DigitalOcean, GitHub Actions</li>
+</ul>
+<h2>Skill folders</h2>
+<ul>
+  <li><strong>agentic-engineering/</strong> — harnesses, tools, review loops</li>
+  <li><strong>web-development/</strong> — server-rendered product engineering</li>
+  <li><strong>data-science/</strong> — Bayesian models, pipelines, computer vision</li>
+  <li><strong>growth-engineering/</strong> — acquisition, tracking, modelling</li>
+  <li><strong>founder-operator/</strong> — strategy, teams, hard-earned judgment</li>
 </ul>
 `,
   'agentic-engineering/harness-factory.md': `
 <h1>harness-factory.md</h1>
-<p>Building agent harnesses: structured prompts, tool configs, review loops, and enough scaffolding to run parallel agents without losing coherence.</p>
-<p>Running at <a href="/factory/" class="ghv-link">/factory</a> — a working harness-on-Pi system built and documented as it ran.</p>
-<p>Covers: prompt design, context management, agent decomposition, output verification loops.</p>
+<p>I build agent harnesses that turn prompts, tools, context, and review loops into repeatable workflows.</p>
+<h2>Technologies</h2>
+<ul>
+  <li>Pi / Claude Code</li>
+  <li>Custom skills, roles, and tools</li>
+  <li>Subagents and review loops</li>
+  <li>Prompt templates and context routing</li>
+</ul>
+<h2>Proof</h2>
+<p>Live system: <a href="/factory/" class="ghv-link">/factory</a>.</p>
 `,
   'agentic-engineering/parallel-agent-loops.md': `
 <h1>parallel-agent-loops.md</h1>
-<p>Running multiple agents in parallel on independent subtasks, then merging results. Reduces wall-clock time on large builds; requires careful decomposition so agents don't collide on shared state.</p>
-<p>Patterns used: fan-out with explicit contracts per sub-task, synchronisation checkpoints, result review before integration.</p>
+<p>I split larger builds into clear, isolated tasks so multiple agents can work at once.</p>
+<h2>Technologies</h2>
+<ul>
+  <li>Task decomposition</li>
+  <li>Explicit acceptance contracts</li>
+  <li>Parallel subagents</li>
+  <li>Fresh-context review</li>
+</ul>
+<h2>Proof</h2>
+<p>Used in the workflow that built this site and the harness factory.</p>
 `,
   'agentic-engineering/codebase-navigation.md': `
 <h1>codebase-navigation.md</h1>
-<p>Reading and understanding an unfamiliar codebase quickly: structural mapping, finding the right entry points, tracing data flow without running the whole app.</p>
-<p>Used before every agent task to avoid thrashing. Pairs with harness-factory to keep agents grounded in real code rather than hallucinated structure.</p>
+<p>I map unfamiliar codebases quickly before changing them.</p>
+<h2>Technologies</h2>
+<ul>
+  <li>Structural code search</li>
+  <li>Entry-point mapping</li>
+  <li>Data-flow tracing</li>
+  <li>Implementation-readiness review</li>
+</ul>
 `,
   'web-development/django-htmx.md': `
 <h1>django-htmx.md</h1>
-<p>Current primary build stack. Django handles routing, ORM, auth, and server-rendered HTML. HTMX adds interactivity without a JS framework — partial updates via HTTP, no client state management.</p>
-<p>Tailwind for styling. PostgreSQL for the database. This site is built on Astro 6 — same pattern, different framework.</p>
+<p>I build server-rendered apps with focused interactivity and little client-side state.</p>
+<h2>Technologies</h2>
+<ul>
+  <li>Django</li>
+  <li>HTMX</li>
+  <li>Tailwind</li>
+  <li>PostgreSQL</li>
+  <li>Astro</li>
+</ul>
 `,
   'web-development/apis-and-deployment.md': `
 <h1>apis-and-deployment.md</h1>
-<p>REST API design with Django REST Framework. Containerised with Docker, deployed to DigitalOcean (App Platform and Droplets), CI/CD via GitHub Actions.</p>
-<p>Pydantic for validation, async Django views where throughput matters.</p>
+<p>I build APIs, containerize apps, and deploy them with practical CI/CD.</p>
+<h2>Technologies</h2>
+<ul>
+  <li>Django REST Framework</li>
+  <li>Pydantic</li>
+  <li>Docker</li>
+  <li>DigitalOcean</li>
+  <li>GitHub Actions</li>
+</ul>
 `,
   'web-development/analytics-instrumentation.md': `
 <h1>analytics-instrumentation.md</h1>
-<p>Event instrumentation, data warehousing in BigQuery, transformations via Dataform. PostHog and GA4 for product analytics. Looker Studio for dashboards.</p>
-<p>Server-side tracking to preserve accuracy when browser-side signals degrade — see growth-engineering/server-side-tracking.md.</p>
+<p>I instrument product and marketing data so teams can trust what they measure.</p>
+<h2>Technologies</h2>
+<ul>
+  <li>PostHog</li>
+  <li>GA4</li>
+  <li>BigQuery</li>
+  <li>Dataform</li>
+  <li>Looker Studio</li>
+</ul>
 `,
   'data-science/bayesian-modeling.md': `
 <h1>bayesian-modeling.md</h1>
-<p>Bayesian statistical modelling for decision-making under uncertainty. Used primarily in marketing mix modelling (see growth-engineering/bayesian-mmm.md) and for parameter estimation where frequentist point estimates aren't enough.</p>
-<p>Python stack: PyMC, NumPy, pandas.</p>
+<p>I use Bayesian modelling when signals are noisy and decisions still need to be made.</p>
+<h2>Technologies</h2>
+<ul>
+  <li>Python</li>
+  <li>PyMC</li>
+  <li>pandas</li>
+  <li>NumPy</li>
+  <li>Marketing Mix Models</li>
+</ul>
+<h2>Proof</h2>
+<p>Built a Bayesian MMM at Moonbird.</p>
 `,
   'data-science/computer-vision.md': `
 <h1>computer-vision.md</h1>
-<p>MeshMonk: a C++ computer vision and medical imaging library developed at KULeuven (2012–2014). Open-sourced. Cited in 140+ research projects.</p>
-<p>Also covers deep learning–based vision work and consulting done through WebMonks (2015–2017).</p>
+<p>I worked on medical image processing, 3D meshes, and computer vision systems.</p>
+<h2>Technologies</h2>
+<ul>
+  <li>C++</li>
+  <li>Computer vision</li>
+  <li>Medical image processing</li>
+  <li>3D mesh processing</li>
+  <li>Deep learning consulting</li>
+</ul>
+<h2>Proof</h2>
+<p>Created MeshMonk; used or cited in 140+ research projects.</p>
 `,
   'data-science/data-pipelines.md': `
 <h1>data-pipelines.md</h1>
-<p>ELT pipelines: extraction from APIs and databases, loading to BigQuery, transformation with Dataform (SQL-based, version-controlled). Built a bespoke pipeline at Moonbird that underpinned all growth decisions.</p>
+<p>I build ELT pipelines that turn source data into models, dashboards, and decisions.</p>
+<h2>Technologies</h2>
+<ul>
+  <li>Python</li>
+  <li>SQL</li>
+  <li>BigQuery</li>
+  <li>Dataform</li>
+  <li>API and database extraction</li>
+</ul>
+<h2>Proof</h2>
+<p>Built the Moonbird pipeline behind growth reporting and modelling.</p>
 `,
   'growth-engineering/performance-marketing.md': `
 <h1>performance-marketing.md</h1>
-<p>At Moonbird (2020–2024): took monthly revenue from four to six figures over about 3.5 years. Channels: paid search, paid social, email. Data-driven — every campaign tied to the Bayesian MMM and the ELT pipeline.</p>
-<p>CRO, SEO, and marketing automation were part of the same loop.</p>
+<p>I combine acquisition, experiments, automation, and measurement into one growth loop.</p>
+<h2>Technologies</h2>
+<ul>
+  <li>Paid search</li>
+  <li>Paid social</li>
+  <li>Email marketing</li>
+  <li>SEO and CRO</li>
+  <li>Marketing automation</li>
+</ul>
+<h2>Proof</h2>
+<p>At Moonbird, grew monthly revenue from four to six figures in 3.5 years.</p>
 `,
   'growth-engineering/server-side-tracking.md': `
 <h1>server-side-tracking.md</h1>
-<p>Browser tracking degrades with ad blockers and iOS privacy restrictions. Server-side tracking — sending conversion events directly from the backend to ad platforms — preserves signal accuracy.</p>
-<p>Built and maintained server-side tracking for Moonbird's full ad stack. Improved ROAS measurement and budget-allocation decisions by restoring conversion signal lost to ad blockers and iOS restrictions.</p>
+<p>I preserve attribution signal by sending conversion events from the backend.</p>
+<h2>Technologies</h2>
+<ul>
+  <li>Server-side tracking</li>
+  <li>Conversion APIs</li>
+  <li>Backend event forwarding</li>
+  <li>Ad-platform measurement</li>
+</ul>
+<h2>Proof</h2>
+<p>Built and maintained server-side tracking for Moonbird's ad stack.</p>
 `,
   'growth-engineering/bayesian-mmm.md': `
 <h1>bayesian-mmm.md</h1>
-<p>Marketing Mix Model built in Python (PyMC). Estimates the marginal contribution of each marketing channel to revenue, accounting for diminishing returns and lagged effects.</p>
-<p>Used at Moonbird to allocate budget across channels when last-click attribution was unreliable. Self-developed — not an off-the-shelf tool.</p>
+<p>I model channel contribution when last-click attribution is too noisy to trust.</p>
+<h2>Technologies</h2>
+<ul>
+  <li>Python</li>
+  <li>PyMC</li>
+  <li>Bayesian modelling</li>
+  <li>Marketing Mix Modelling</li>
+  <li>Diminishing-return and lag effects</li>
+</ul>
+<h2>Proof</h2>
+<p>Used at Moonbird to guide marketing budget allocation.</p>
 `,
   'founder-operator/strategy.md': `
 <h1>strategy.md</h1>
-<p>At Humainly (2015–2020): defined vision and direction for an impact-first non-profit providing digital jobs and training in Venezuela and Nigeria. Scaled to supporting ~30 people through local NGO partnerships.</p>
-<p>Strategy included market selection, partnership model, funding approach, and the tension between financial sustainability and mission.</p>
+<p>I founded and ran an impact-first organization focused on digital jobs and training.</p>
+<h2>Methods</h2>
+<ul>
+  <li>Vision and strategy</li>
+  <li>Market selection</li>
+  <li>Partnership design</li>
+  <li>Funding approach</li>
+</ul>
+<h2>Proof</h2>
+<p>Humainly supported 30 people through NGO partnerships in Venezuela and Nigeria.</p>
 `,
   'founder-operator/teams-and-ops.md': `
 <h1>teams-and-ops.md</h1>
-<p>Ran Humainly on Holacracy: distributed authority, explicit role structures, no traditional management hierarchy. Useful for a small team across multiple time zones.</p>
-<p>Covers hiring, onboarding, role design, and the operational overhead of running a small international organisation.</p>
+<p>I ran small international teams with explicit roles and distributed authority.</p>
+<h2>Methods</h2>
+<ul>
+  <li>Holacracy</li>
+  <li>Hiring and onboarding</li>
+  <li>Role design</li>
+  <li>Remote operations</li>
+</ul>
+<h2>Proof</h2>
+<p>Humainly operated across Belgium, Venezuela, and Nigeria.</p>
 `,
   'founder-operator/learning-from-failures.md': `
 <h1>learning-from-failures.md</h1>
-<p>Humainly didn't scale before I burned out. Honest retrospective: what worked (the model, the partnerships, the mission clarity), what didn't (growth rate, founder sustainability, lack of local decision-making authority).</p>
-<p>The failure informed how I think about scope, pace, and what "impact" actually requires operationally.</p>
+<p>Humainly did not scale before founder burnout; that changed how I think about pace and sustainability.</p>
+<h2>Methods</h2>
+<ul>
+  <li>Retrospective practice</li>
+  <li>Scope control</li>
+  <li>Founder sustainability</li>
+  <li>Impact-model evaluation</li>
+</ul>
+<h2>Proof</h2>
+<p>The mission worked; the growth rate and operating model did not.</p>
 `,
 };
 ---
