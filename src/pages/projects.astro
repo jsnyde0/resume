@@ -4,7 +4,7 @@ import ProjectCard from '../components/projects/ProjectCard.astro';
 import { projectEntries, projectsIntro } from '../data/projects';
 ---
 
-<BaseLayout title="Building | Jonatan Snyders" description="Things Jonatan Snyders has built and tools he builds on — a reference list linking real repos.">
+<BaseLayout title="Building | Jonatan Snyders" description="Things Jonatan Snyders has built — products, tools, and research software, from a sandboxing CLI to a cited academic toolbox and a location-intelligence platform.">
   <div class="projects-page" id="projects">
     <header class="projects-page__intro">
       <h1>{projectsIntro.title}</h1>
@@ -43,7 +43,7 @@ import { projectEntries, projectsIntro } from '../data/projects';
     .projects-page__list {
       display: flex;
       flex-direction: column;
-      gap: 1rem;
+      gap: 1.25rem;
     }
   </style>
 </BaseLayout>

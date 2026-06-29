@@ -15,23 +15,41 @@ const inventory = readFileSync(inventoryPath, 'utf8');
 assert.match(html, /Building \| Jonatan Snyders/, 'Page title must use "Building | Jonatan Snyders"');
 assert.match(html, /<h1[^>]*>Building<\/h1>/, 'On-page h1 must be "Building"');
 
-// --- New entry titles are present ---
-const expectedTitles = ['rip-cage', 'TelePi', 'herdr', 'cass / cm'];
+// --- All 6 own-build entry titles are present ---
+const expectedTitles = [
+  'rip-cage',
+  'switch-berlin',
+  'harness',
+  'meshmonk',
+  'Mapular',
+  'self-driving factory',
+];
 for (const title of expectedTitles) {
   assert.match(html, new RegExp(title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')), `Missing entry title: ${title}`);
 }
 
-// --- Real repo links are present for entries that have them ---
-assert.match(html, /https:\/\/github\.com\/jsnyde0\/rip-cage/, 'Missing rip-cage repo link');
-assert.match(html, /https:\/\/github\.com\/benedict2310\/TelePi/, 'Missing TelePi repo link');
+// --- Tag chips present (all three variants) ---
+assert.match(html, /\bbuilt\b/, 'Missing "built" tag chip');
+assert.match(html, /\bcompany\b/, 'Missing "company" tag chip');
+assert.match(html, /in progress/, 'Missing "in progress" tag chip');
 
-// --- kind tags: at least one 'built' and at least one 'build on' are rendered ---
-assert.match(html, /\bbuild on\b/, 'Missing "build on" kind tag');
-assert.match(html, /\bbuilt\b/, 'Missing "built" kind tag');
+// --- Required links present ---
+assert.match(html, /https:\/\/github\.com\/jsnyde0\/rip-cage/, 'Missing rip-cage GitHub link');
+assert.match(html, /https:\/\/github\.com\/jsnyde0\/switch-berlin/, 'Missing switch-berlin GitHub link');
+assert.match(html, /https:\/\/switch\.berlin/, 'Missing switch.berlin link');
+assert.match(html, /https:\/\/github\.com\/jsnyde0\/harness/, 'Missing harness GitHub link');
+assert.match(html, /https:\/\/github\.com\/jsnyde0\/meshmonk/, 'Missing meshmonk GitHub link');
+assert.match(html, /https:\/\/mapular\.com\/solutions\/site-selection/, 'Missing mapular.com link');
+assert.match(html, /\/factory\//, 'Missing /factory/ internal link');
 
-// --- Author credits present for build-on entries ---
-assert.match(html, /Benedict Bleimschein/, 'Missing author credit: Benedict Bleimschein');
-assert.match(html, /Ogulcan Celik/, 'Missing author credit: Ogulcan Celik');
+// --- meshmonk logo image referenced ---
+assert.match(html, /meshmonk-logo-white\.png/, 'Missing meshmonk logo image');
+
+// --- Third-party tools that belong ONLY to /factory must NOT appear ---
+const forbiddenThirdParty = ['TelePi', 'herdr', 'cmux', 'agent_mail', 'cass'];
+for (const name of forbiddenThirdParty) {
+  assert.equal(html.includes(name), false, `Third-party tool must not appear on /projects: ${name}`);
+}
 
 // --- Legacy project titles must NOT appear ---
 const legacyTitles = [
@@ -59,7 +77,7 @@ for (const asset of legacyAssets) {
   assert.equal(html.includes(asset), false, `Legacy image asset still referenced in HTML: ${asset}`);
 }
 
-// --- No carousel markup left over ---
+// --- No carousel markup ---
 assert.equal(html.includes('data-carousel-root'), false, 'Carousel markup still present (data-carousel-root)');
 assert.equal(html.includes('data-carousel-slide'), false, 'Carousel markup still present (data-carousel-slide)');
 

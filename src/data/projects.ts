@@ -1,78 +1,81 @@
-export type ProjectKind = 'built' | 'build-on';
+export type ProjectTag = 'built' | 'company' | 'in-progress';
+
+export interface ProjectLink {
+  label: string;
+  href: string;
+  external?: boolean; // true = new tab + rel=noopener; false/undefined = same tab
+}
 
 export interface ProjectEntry {
   slug: string;
   title: string;
   description: string;
-  kind: ProjectKind;
-  href?: string;
-  author?: string; // credit for build-on entries
+  tag: ProjectTag;           // shown as a small chip
+  technologies?: string[];   // optional tech badges
+  image?: { src: string; alt: string };
+  links: ProjectLink[];
 }
 
 export const projectsIntro = {
   title: 'Building',
   description:
-    'Things I have built and tools I build on — a reference list of repos and composed tools that back the work.',
+    "Things I've built — products, tools, and research software, from a sandboxing CLI to a cited academic toolbox and a location-intelligence platform.",
 };
 
 export const projectEntries: ProjectEntry[] = [
   {
     slug: 'rip-cage',
     title: 'rip-cage',
+    tag: 'built',
+    technologies: ['Docker'],
     description:
-      'A tool I built and ship publicly (Homebrew tap): wraps a project in a container and intercepts every shell command to limit the blast radius — the cage my always-on agents run inside. Composes with iron-proxy so agents never hold real credentials.',
-    kind: 'built',
-    href: 'https://github.com/jsnyde0/rip-cage',
+      'A CLI that wraps your project in a Docker container with a command-intercepting safety stack, so you can run coding agents with --dangerously-skip-permissions and keep the blast radius small.',
+    links: [{ label: 'GitHub', href: 'https://github.com/jsnyde0/rip-cage', external: true }],
   },
   {
-    slug: 'pi',
-    title: 'pi',
-    description: 'The coding agent my whole harness wraps.',
-    kind: 'build-on',
-    href: 'https://github.com/badlogic/pi-mono',
-    author: 'badlogic',
-  },
-  {
-    slug: 'herdr',
-    title: 'herdr',
+    slug: 'switch-berlin',
+    title: 'switch-berlin',
+    tag: 'built',
+    technologies: ['Django', 'HTMX', 'React', 'LLM'],
     description:
-      'A headless agent-supervisor: a live roster of every session — working, blocked, done — that I can attach to and steer.',
-    kind: 'build-on',
-    href: 'https://github.com/ogulcancelik/herdr',
-    author: 'Ogulcan Celik',
+      "A trust-first, organizer-centric events aggregator for Berlin's queer & alternative scene — Django + HTMX with a React island and LLM-powered scraping and ingestion.",
+    links: [
+      { label: 'switch.berlin', href: 'https://switch.berlin', external: true },
+      { label: 'GitHub', href: 'https://github.com/jsnyde0/switch-berlin', external: true },
+    ],
   },
   {
-    slug: 'telepi',
-    title: 'TelePi',
-    description: 'Drives my Pi agent from Telegram: voice prompts, screenshots, session handback.',
-    kind: 'build-on',
-    href: 'https://github.com/benedict2310/TelePi',
-    author: 'Benedict Bleimschein',
-  },
-  {
-    slug: 'cass-cm',
-    title: 'cass / cm',
+    slug: 'harness',
+    title: 'harness',
+    tag: 'built',
+    technologies: ['Claude Code', 'pi', 'Codex'],
     description:
-      'Full-text search and a memory layer over my past agent sessions, so the system recalls what it has already done.',
-    kind: 'build-on',
-    href: 'https://github.com/Dicklesworthstone/coding_agent_session_search',
-    author: 'Jeffrey Emanuel',
+      'A clone-and-adapt agentic-engineering substrate — workflow & methodology skills, hooks, subagent roles, and ADRs that install into Claude Code, pi, and Codex from one script. A public slice of the system behind my factory.',
+    links: [{ label: 'GitHub', href: 'https://github.com/jsnyde0/harness', external: true }],
   },
   {
-    slug: 'cmux',
-    title: 'cmux',
-    description: 'The cockpit I watch the factory from on the Mac.',
-    kind: 'build-on',
-    href: 'https://github.com/manaflow-ai/cmux',
-    author: 'Manaflow',
-  },
-  {
-    slug: 'agent-mail',
-    title: 'agent_mail',
+    slug: 'meshmonk',
+    title: 'meshmonk',
+    tag: 'built',
+    technologies: ['C++20', 'Python'],
+    image: { src: '/img/meshmonk-logo-white.png', alt: 'MeshMonk' },
     description:
-      "File-reservation rails so parallel agents don't collide — adopting it now, not yet load-bearing.",
-    kind: 'build-on',
-    href: 'https://github.com/Dicklesworthstone/mcp_agent_mail',
-    author: 'Jeffrey Emanuel',
+      'The open-source 3D mesh-registration toolbox I built, used in KU Leuven craniofacial research and widely cited. In 2026 I rewrote it Python-first (C++20, clean API, Python bindings, PyPI).',
+    links: [{ label: 'GitHub', href: 'https://github.com/jsnyde0/meshmonk', external: true }],
+  },
+  {
+    slug: 'mapular',
+    title: 'Mapular',
+    tag: 'company',
+    description:
+      'Location-intelligence software for retail expansion — 20M+ competitive data points combined with demographics and travel-time catchments to analyze markets, score candidate sites, and produce ranked, decision-ready shortlists, no GIS expertise needed.',
+    links: [{ label: 'mapular.com', href: 'https://mapular.com/solutions/site-selection', external: true }],
+  },
+  {
+    slug: 'self-driving-factory',
+    title: 'self-driving factory',
+    tag: 'in-progress',
+    description: "The agentic software factory I'm building — the system behind how I work.",
+    links: [{ label: 'See the breakdown →', href: '/factory/', external: false }],
   },
 ];
