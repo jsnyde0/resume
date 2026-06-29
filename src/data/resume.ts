@@ -110,7 +110,7 @@ export const achievements: ResumeItem[] = [
     badgeColor: 'info',
     company: 'Moonbird',
     location: 'Antwerp, Belgium',
-    dateRange: '2018 - 2022',
+    dateRange: '2020 - 2024',
     imageUrl: '/img/moonbird_logo_blue.png',
     imageAlt: 'Moonbird icon',
     body: 'Drove data-driven decision-making at eComm startup with a bespoke ELT pipeline, advanced server-side tracking, and self-developed Bayesian Marketing Mix Model.',
