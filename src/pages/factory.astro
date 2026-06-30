@@ -2,338 +2,80 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
-<BaseLayout title="The software factory | Jonatan Snyders" description="An always-on software factory: agents that pick up goals and do the work in a sandbox, unattended. State lives in the substrate, not the agent.">
-  <div class="factory-page">
+<BaseLayout
+  title="The software factory | Jonatan Snyders"
+  description="An always-on software factory: agents that pick up goals and do the work in a sandbox, unattended. State lives in the substrate, not the agent."
+>
+<div class="factory-page">
 
-    <!-- 1. Hero -->
-    <header class="factory-hero">
-      <p class="factory-kicker">what excites me</p>
-      <h1>The software factory I'm building.</h1>
-      <p class="factory-lede">
-        An always-on software factory: agents that pick up goals and do the work in a sandbox, unattended. The idea underneath it: state lives in the substrate, not the agent — so the agents are disposable and the whole system is crash-resumable. The direction I'm building toward is self-driving; here's the system so far, and where I honestly am on the way there.
-      </p>
-    </header>
+  <!-- 1. Hero -->
+  <header class="factory-hero">
+    <p class="factory-kicker">what excites me</p>
+    <h1>The software factory I'm building.</h1>
+    <p class="factory-lede">
+      An always-on software factory: agents that pick up goals and do the work in a sandbox, unattended. State lives in the substrate, not the agent — so the agents are disposable and the whole system is crash-resumable. The direction I'm building toward is self-driving; here's the system so far, and where I honestly am on the way there.
+    </p>
+  </header>
 
-    <!-- 2. Interactive Component Graph -->
-    <section class="factory-graph" aria-label="Interactive component graph">
-      <div class="graph-header">
-        <h2 class="graph-title">How the pieces connect</h2>
-        <button class="graph-reset" id="graph-reset" aria-label="Reset graph — show all nodes" hidden>
-          show all
-        </button>
-      </div>
-      <p class="graph-hint">Select a node to trace its connections.</p>
+  <!-- 2. Two-column: graph + detail panel -->
+  <section class="factory-main" aria-label="Software factory graph and component detail">
+    <div class="factory-columns">
 
-      <!-- Desktop graph (CSS positioned layout) -->
-      <div class="graph-wrap" id="graph-wrap" role="application" aria-label="Software factory component graph">
+      <!-- LEFT: concentric orbit graph -->
+      <div class="graph-col">
+        <div class="graph-header">
+          <h2 class="graph-title">How the pieces connect</h2>
+          <button class="reset-btn" id="graph-reset" hidden aria-label="Show all — reset selection">show all</button>
+        </div>
+        <p class="graph-hint">Select a node to trace its connections. <kbd>Enter</kbd> or <kbd>Space</kbd> to activate.</p>
 
-        <!-- Connection lines drawn by JS after layout -->
-        <svg class="graph-svg-overlay" id="graph-svg-overlay" aria-hidden="true" focusable="false"></svg>
-
-        <!--
-          Layout columns (desktop):
-          col A (left): Cockpit section + Building toward section
-          col B (center): pi + always-on host (foundation)
-          col C (right): Substrate section + Sandbox section
-          row bottom: The work loop
-        -->
-
-        <!-- Column A: Cockpit -->
-        <div class="graph-section" id="section-cockpit" data-section="cockpit" style="grid-area: cockpit">
-          <div class="section-header">
-            <span class="section-name">Cockpit</span>
-            <span class="section-sub">watch &amp; steer</span>
-          </div>
-          <div class="section-nodes">
-            <button
-              class="node node--running"
-              id="node-herdr"
-              data-node="herdr"
-              data-connects="node-pi,node-orch,node-cmux"
-              aria-pressed="false"
-            >
-              <span class="node-name">herdr</span>
-              <span class="node-badge node-badge--running">running</span>
-            </button>
-            <button
-              class="node node--running"
-              id="node-cmux"
-              data-node="cmux"
-              data-connects="node-pi,node-herdr"
-              aria-pressed="false"
-            >
-              <span class="node-name">cmux</span>
-              <span class="node-badge node-badge--running">running</span>
-            </button>
-          </div>
+        <div class="graph-legend" aria-label="Legend">
+          <span class="legend-item"><span class="legend-dot legend-dot--running" aria-hidden="true"></span>running</span>
+          <span class="legend-item"><span class="legend-dot legend-dot--building" aria-hidden="true"></span>building toward</span>
         </div>
 
-        <!-- Column B: pi center + always-on host -->
-        <div class="graph-center-col" style="grid-area: center-col">
-          <button
-            class="node node--center node--running"
-            id="node-pi"
-            data-node="pi"
-            data-connects="node-host,node-beads,node-memory,node-ripcage,node-ironproxy,node-herdr,node-cmux,node-orch,node-drover"
-            aria-pressed="false"
-          >
-            <a href="https://github.com/badlogic/pi-mono" target="_blank" rel="noopener" class="node-link" tabindex="-1" aria-label="pi on GitHub (opens new tab)">
-              <span class="node-name">pi</span>
-            </a>
-            <span class="node-sub">my harness</span>
-            <span class="node-badge node-badge--running">running</span>
-          </button>
-
-          <button
-            class="node node--running node--host"
-            id="node-host"
-            data-node="host"
-            data-connects="node-pi"
-            aria-pressed="false"
-          >
-            <span class="node-name">always-on host</span>
-            <span class="node-badge node-badge--running">running</span>
-          </button>
+        <div class="graph-scene" id="graph-scene" role="application" aria-label="Concentric orbit graph — select a node to see details">
+          <svg class="graph-svg" id="graph-svg" aria-hidden="true" focusable="false"></svg>
+          <div class="graph-nodes" id="graph-nodes"></div>
         </div>
+      </div>
 
-        <!-- Column A bottom: Building toward -->
-        <div class="graph-section graph-section--building-toward" id="section-building" data-section="building" style="grid-area: building">
-          <div class="section-header">
-            <span class="section-name section-name--building-toward">Building toward</span>
-            <span class="section-sub section-sub--building-toward">not done yet</span>
-          </div>
-          <div class="section-nodes">
-            <button
-              class="node node--building-toward"
-              id="node-selfdriving"
-              data-node="selfdriving"
-              data-connects=""
-              aria-pressed="false"
-            >
-              <span class="node-name">self-driving</span>
-              <span class="node-badge node-badge--building-toward">building toward</span>
-            </button>
-            <button
-              class="node node--building-toward"
-              id="node-mail"
-              data-node="mail"
-              data-connects="node-orch"
-              aria-pressed="false"
-            >
-              <span class="node-name">agent_mail</span>
-              <span class="node-badge node-badge--building-toward">building toward</span>
-            </button>
-          </div>
+      <!-- RIGHT: detail panel (aria-live, updates on node select) -->
+      <div class="detail-col">
+        <div
+          class="detail-panel"
+          id="detail-panel"
+          role="region"
+          aria-label="Selected component detail"
+          aria-live="polite"
+          aria-atomic="true"
+        >
+          <!-- Populated by JS — default = pi -->
         </div>
-
-        <!-- Column C: Substrate -->
-        <div class="graph-section" id="section-substrate" data-section="substrate" style="grid-area: substrate">
-          <div class="section-header">
-            <span class="section-name">Substrate</span>
-            <span class="section-sub">state lives here</span>
-          </div>
-          <div class="section-nodes">
-            <button
-              class="node node--running"
-              id="node-beads"
-              data-node="beads"
-              data-connects="node-pi,node-orch,node-drover"
-              aria-pressed="false"
-            >
-              <span class="node-name">beads</span>
-              <span class="node-badge node-badge--running">running</span>
-            </button>
-            <button
-              class="node node--running"
-              id="node-memory"
-              data-node="memory"
-              data-connects="node-pi,node-orch"
-              aria-pressed="false"
-            >
-              <span class="node-name">tiered memory</span>
-              <span class="node-badge node-badge--running">running</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Column C bottom: Sandbox -->
-        <div class="graph-section" id="section-sandbox" data-section="sandbox" style="grid-area: sandbox">
-          <div class="section-header">
-            <span class="section-name">Sandbox</span>
-            <span class="section-sub">safe to run unattended</span>
-          </div>
-          <div class="section-nodes">
-            <button
-              class="node node--running"
-              id="node-ripcage"
-              data-node="ripcage"
-              data-connects="node-pi,node-orch,node-ironproxy"
-              aria-pressed="false"
-            >
-              <a href="https://github.com/jsnyde0/rip-cage" target="_blank" rel="noopener" class="node-link" tabindex="-1" aria-label="rip-cage on GitHub (opens new tab)">
-                <span class="node-name">rip-cage</span>
-              </a>
-              <span class="node-badge node-badge--running">running</span>
-            </button>
-            <button
-              class="node node--running"
-              id="node-ironproxy"
-              data-node="ironproxy"
-              data-connects="node-pi,node-ripcage"
-              aria-pressed="false"
-            >
-              <span class="node-name">iron-proxy</span>
-              <span class="node-badge node-badge--running">running</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Bottom row: The work loop -->
-        <div class="graph-section graph-section--workloop" id="section-workloop" data-section="workloop" style="grid-area: workloop">
-          <div class="section-header">
-            <span class="section-name">The work loop</span>
-          </div>
-          <div class="section-nodes section-nodes--row">
-            <button
-              class="node node--running"
-              id="node-orch"
-              data-node="orch"
-              data-connects="node-pi,node-beads,node-memory,node-ripcage,node-herdr,node-drover,node-mail"
-              aria-pressed="false"
-            >
-              <span class="node-name">disposable orchestrators</span>
-              <span class="node-badge node-badge--running">running</span>
-            </button>
-            <button
-              class="node node--running"
-              id="node-drover"
-              data-node="drover"
-              data-connects="node-pi,node-beads,node-orch"
-              aria-pressed="false"
-            >
-              <span class="node-name">the drover</span>
-              <span class="node-sub">suggest-mode</span>
-              <span class="node-badge node-badge--running">running</span>
-            </button>
-          </div>
-        </div>
-
       </div>
 
-      <!-- Legend -->
-      <div class="graph-legend" aria-label="Legend">
-        <span class="legend-item">
-          <span class="legend-swatch legend-swatch--running" aria-hidden="true"></span>
-          running
-        </span>
-        <span class="legend-item">
-          <span class="legend-swatch legend-swatch--building-toward" aria-hidden="true"></span>
-          building toward
-        </span>
-      </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- 3. The components list -->
-    <section class="factory-components" aria-label="Component descriptions" id="components-list">
-      <h2 class="components-title">The components</h2>
+  <!-- 3. Honest closing -->
+  <footer class="factory-closing">
+    <p>Right now the planner proposes the next move and I approve it. Closing the gap between "proposes what to do" and "just does it" is what I'm building toward. I'd rather show you a system I'm honestly still building than a finished story that doesn't run.</p>
+  </footer>
 
-      <!-- Foundation -->
-      <div class="comp-group">
-        <h3 class="comp-group-label">Foundation</h3>
-        <ul class="comp-list">
-          <li class="comp-item" id="comp-pi" data-comp="pi">
-            <strong class="comp-name">pi — my harness</strong> — The foundation. I build on <a href="https://github.com/badlogic/pi-mono" target="_blank" rel="noopener" class="factory-link">pi</a> because it's changeable all the way down — closed harnesses like Claude Code only let you bolt on hooks and skills, but parts of my system only exist because I can change the agent itself. The model behind it is swappable; the harness is the part I build and own.
-          </li>
-          <li class="comp-item" id="comp-host" data-comp="host">
-            <strong class="comp-name">Always-on host</strong> — It runs on a box that's always on — a Mac mini now, a VPS next — not my laptop. I close the lid and the agents keep going. With the crash-resumable substrate, that's what makes "unattended" actually true.
-          </li>
-        </ul>
-      </div>
-
-      <!-- Substrate -->
-      <div class="comp-group">
-        <h3 class="comp-group-label">Substrate <span class="comp-group-sub">state lives here</span></h3>
-        <ul class="comp-list">
-          <li class="comp-item" id="comp-beads" data-comp="beads">
-            <strong class="comp-name">beads</strong> — Work is a graph of goals, not a chat log: every task is a node with its dependencies, so the plan survives any single agent dying.
-          </li>
-          <li class="comp-item" id="comp-memory" data-comp="memory">
-            <strong class="comp-name">tiered memory</strong> — Memory kept by lifecycle, so nothing load-bearing is trapped in a context window that's about to be compacted. (session search &amp; memory via cass/cm, by Jeffrey Emanuel)
-          </li>
-        </ul>
-      </div>
-
-      <!-- Sandbox -->
-      <div class="comp-group">
-        <h3 class="comp-group-label">Sandbox <span class="comp-group-sub">safe to run unattended</span></h3>
-        <ul class="comp-list">
-          <li class="comp-item" id="comp-ripcage" data-comp="ripcage">
-            <strong class="comp-name"><a href="https://github.com/jsnyde0/rip-cage" target="_blank" rel="noopener" class="factory-link">rip-cage</a></strong> — Wraps the work in a container and checks every shell command before it runs, so a mistake can't reach far.
-          </li>
-          <li class="comp-item" id="comp-ironproxy" data-comp="ironproxy">
-            <strong class="comp-name">iron-proxy</strong> — Holds the real credentials so the agents never do — they reach the outside world through it. (by ironsh)
-          </li>
-        </ul>
-      </div>
-
-      <!-- Cockpit -->
-      <div class="comp-group">
-        <h3 class="comp-group-label">Cockpit <span class="comp-group-sub">watch &amp; steer</span></h3>
-        <ul class="comp-list">
-          <li class="comp-item" id="comp-herdr" data-comp="herdr">
-            <strong class="comp-name">herdr</strong> — A live roster of every session — working, blocked, done — that I can attach to and steer. (by Ogulcan Celik)
-          </li>
-          <li class="comp-item" id="comp-cmux" data-comp="cmux">
-            <strong class="comp-name">cmux</strong> — The session view on my Mac. (by Manaflow)
-          </li>
-        </ul>
-      </div>
-
-      <!-- Work loop -->
-      <div class="comp-group">
-        <h3 class="comp-group-label">The work loop</h3>
-        <ul class="comp-list">
-          <li class="comp-item" id="comp-orch" data-comp="orch">
-            <strong class="comp-name">Disposable orchestrators</strong> — Each one reads the graph, makes a single move, writes its decision back, and dies; re-spawn it and it picks up from the substrate. The agents are disposable; only the substrate persists. (my /send-it + composable primitives)
-          </li>
-          <li class="comp-item" id="comp-drover" data-comp="drover">
-            <strong class="comp-name">The drover — running, in suggest-mode</strong> — A planner over the whole bead graph. It already runs: it gets an event whenever a piece of work closes and proposes what to pick up next. For now I stay in the loop, approving its moves while I sharpen its judgment.
-          </li>
-        </ul>
-      </div>
-
-      <!-- Building toward -->
-      <div class="comp-group comp-group--building-toward">
-        <h3 class="comp-group-label comp-group-label--building-toward">Building toward <span class="comp-group-sub">not done yet</span></h3>
-        <ul class="comp-list">
-          <li class="comp-item comp-item--building-toward" id="comp-selfdriving" data-comp="selfdriving">
-            <strong class="comp-name">Self-driving</strong> — The drover acting on its own: deciding what to wake up for, with no human approving each move. That's the edge I'm working at right now — building toward it, not there yet.
-          </li>
-          <li class="comp-item comp-item--building-toward" id="comp-mail" data-comp="mail">
-            <strong class="comp-name">agent_mail</strong> — Collision-avoidance rails so parallel agents don't step on each other. I'm planning to adopt it — honestly, not battle-tested yet. (by Jeffrey Emanuel)
-          </li>
-        </ul>
-      </div>
-    </section>
-
-    <!-- 4. Closing -->
-    <footer class="factory-closing">
-      <p>Right now the planner proposes the next move and I approve it. Closing the gap between "proposes what to do" and "just does it" is what I'm building toward. I'd rather show you a system I'm honestly still building than a finished story that doesn't run.</p>
-    </footer>
-
-  </div>
+</div>
 </BaseLayout>
 
 <style>
+  /* ── Page shell ── */
   .factory-page {
-    width: min(100%, 64rem);
+    width: min(100%, 72rem);
     margin: 0 auto;
   }
 
   /* ── Hero ── */
   .factory-hero {
     max-width: 52rem;
-    margin: 0 0 3.5rem;
+    margin: 0 0 3rem;
     padding-bottom: 2.5rem;
     border-bottom: 1px solid var(--border-subtle);
   }
@@ -349,8 +91,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
   .factory-hero h1 {
     margin: 0 0 1.25rem;
-    font-size: clamp(2.25rem, 7vw, 3.5rem);
-    line-height: 1.05;
+    font-size: clamp(2rem, 6vw, 3.25rem);
+    line-height: 1.08;
     letter-spacing: -0.035em;
     font-weight: 800;
     color: var(--content-bright);
@@ -358,40 +100,67 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
   .factory-lede {
     margin: 0;
-    max-width: 50rem;
-    font-size: clamp(1rem, 2vw, 1.15rem);
+    font-size: clamp(0.9375rem, 2vw, 1.0625rem);
     line-height: var(--line-height-relaxed);
     color: var(--muted-content);
+    max-width: 56ch;
   }
 
-  /* ── Graph section ── */
-  .factory-graph {
-    margin-bottom: 3.5rem;
+  /* ── Two-column layout ── */
+  .factory-main {
+    margin-bottom: 3rem;
   }
 
+  .factory-columns {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  /* Desktop: side by side */
+  @media (min-width: 768px) {
+    .factory-columns {
+      flex-direction: row;
+      align-items: flex-start;
+      gap: 3rem;
+    }
+
+    .graph-col {
+      flex: 0 0 auto;
+      width: 420px;
+      position: sticky;
+      top: 1.5rem;
+    }
+
+    .detail-col {
+      flex: 1 1 0;
+      min-width: 0;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .graph-col {
+      width: 440px;
+    }
+  }
+
+  /* ── Graph column ── */
   .graph-header {
     display: flex;
     align-items: baseline;
-    gap: 1.5rem;
+    gap: 1rem;
     margin-bottom: 0.375rem;
   }
 
   .graph-title {
     margin: 0;
-    font-size: clamp(1.25rem, 3vw, 1.5rem);
+    font-size: clamp(1.0625rem, 2.5vw, 1.25rem);
     font-weight: 700;
     letter-spacing: -0.02em;
     color: var(--content-bright);
   }
 
-  .graph-hint {
-    margin: 0 0 1.25rem;
-    font-size: 0.8125rem;
-    color: var(--muted-content);
-    letter-spacing: 0.01em;
-  }
-
-  .graph-reset {
+  .reset-btn {
     padding: 0.25rem 0.75rem;
     border-radius: var(--radius-full);
     border: 1px solid var(--border-subtle);
@@ -404,31 +173,82 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     white-space: nowrap;
   }
 
-  .graph-reset:hover {
+  .reset-btn:hover {
     color: var(--content-bright);
     border-color: rgba(171, 196, 220, 0.3);
   }
 
-  .graph-reset:focus-visible {
+  .reset-btn:focus-visible {
     outline: 2px solid var(--primary);
     outline-offset: 2px;
   }
 
-  /* ── Graph wrap: CSS grid layout ── */
-  .graph-wrap {
-    position: relative;
-    border-radius: var(--radius-lg);
-    border: 1px solid var(--border-subtle);
-    background: var(--base-200);
-    padding: 1.5rem;
-    /* Mobile: single column stack */
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
+  .graph-hint {
+    margin: 0 0 0.75rem;
+    font-size: 0.75rem;
+    color: rgba(171, 196, 220, 0.4);
   }
 
-  /* SVG overlay for connection lines */
-  .graph-svg-overlay {
+  .graph-hint kbd {
+    display: inline-block;
+    padding: 0.05rem 0.3rem;
+    border-radius: 3px;
+    border: 1px solid rgba(171, 196, 220, 0.18);
+    font-size: 0.68rem;
+    font-family: inherit;
+    color: rgba(171, 196, 220, 0.45);
+  }
+
+  .graph-legend {
+    display: flex;
+    gap: 1.25rem;
+    margin-bottom: 0.875rem;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.6875rem;
+    color: var(--muted-content);
+    letter-spacing: 0.02em;
+  }
+
+  .legend-dot {
+    display: inline-block;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .legend-dot--running {
+    background: var(--primary);
+    opacity: 0.65;
+  }
+
+  .legend-dot--building {
+    border: 1.5px dashed rgba(171, 196, 220, 0.4);
+    background: transparent;
+  }
+
+  /* ── Graph scene (SVG + node overlay) ── */
+  .graph-scene {
+    position: relative;
+    width: 100%;
+    /* Fallback: square on mobile */
+    aspect-ratio: 1 / 1;
+    max-height: 360px;
+  }
+
+  @media (min-width: 768px) {
+    /* On desktop: JS overrides height dynamically to fit the viewport */
+    .graph-scene {
+      max-height: none;
+    }
+  }
+
+  .graph-svg {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -437,374 +257,271 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     overflow: visible;
   }
 
-  /* ── Section styles ── */
-  .graph-section {
-    border: 1px solid rgba(171, 196, 220, 0.1);
-    border-radius: var(--radius-md);
-    padding: 0.875rem 1rem;
-    background: rgba(255, 255, 255, 0.015);
+  .graph-nodes {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
   }
 
-  .graph-section--building-toward {
-    border-style: dashed;
-    border-color: rgba(171, 196, 220, 0.08);
-    background: rgba(171, 196, 220, 0.01);
-  }
-
-  .graph-section--workloop {
-    /* work loop sits at bottom spanning full width on desktop */
-  }
-
-  .section-header {
-    display: flex;
-    align-items: baseline;
-    gap: 0.5rem;
-    margin-bottom: 0.75rem;
-  }
-
-  .section-name {
-    font-size: 0.6875rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: rgba(171, 196, 220, 0.5);
-  }
-
-  .section-name--building-toward {
-    color: rgba(171, 196, 220, 0.35);
-  }
-
-  .section-sub {
-    font-size: 0.625rem;
-    color: rgba(171, 196, 220, 0.3);
-    letter-spacing: 0.03em;
-  }
-
-  .section-sub--building-toward {
-    color: rgba(171, 196, 220, 0.22);
-  }
-
-  .section-nodes {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .section-nodes--row {
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 0.625rem;
-  }
-
-  /* Center column on mobile: just stacked */
-  .graph-center-col {
+  /* ── Node base styles (applied globally from JS) ── */
+  :global(.g-node) {
+    position: absolute;
+    transform: translate(-50%, -50%);
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.75rem;
-    padding: 0.875rem;
-    order: -1; /* pi first on mobile */
-  }
-
-  /* ── Node styles ── */
-  .node {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    text-align: left;
-    padding: 0.625rem 0.75rem;
-    border-radius: var(--radius-md);
-    gap: 0.125rem;
-    cursor: pointer;
-    width: 100%;
-    min-height: 44px;
     justify-content: center;
-    transition: opacity 240ms ease, box-shadow 240ms ease, border-color 240ms ease;
+    gap: 0.1rem;
+    text-align: center;
+    cursor: pointer;
+    border: 0;
+    padding: 0;
+    background: transparent;
+    transition: opacity 200ms ease-out;
+    min-width: 44px;
+    min-height: 44px;
+    border-radius: var(--radius-full);
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .node { transition: none; }
+    :global(.g-node) { transition: none; }
   }
 
-  .node:focus-visible {
+  :global(.g-node:focus-visible) {
     outline: 2px solid var(--primary);
-    outline-offset: 2px;
+    outline-offset: 3px;
+    border-radius: var(--radius-md);
   }
 
-  .node--running {
-    background: var(--base-300);
-    border: 1px solid rgba(171, 196, 220, 0.16);
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
-  }
-
-  .node--center {
+  /* Pi center disc */
+  :global(.g-disc) {
+    width: 3.25rem;
+    height: 3.25rem;
+    border-radius: 50%;
     background: var(--primary-tint);
-    border: 2px solid rgba(255, 127, 80, 0.35);
+    border: 2px solid rgba(255, 127, 80, 0.45);
+    display: flex;
+    flex-direction: column;
     align-items: center;
-    text-align: center;
-    padding: 1rem 1.5rem;
-    width: auto;
-    min-width: 8rem;
+    justify-content: center;
+    gap: 0.05rem;
   }
 
-  .node--host {
-    align-items: center;
-    text-align: center;
-  }
-
-  .node--building-toward {
-    background: rgba(171, 196, 220, 0.03);
-    border: 1.5px dashed rgba(171, 196, 220, 0.16);
-    opacity: 0.75;
-  }
-
-  .node.is-selected {
-    border-color: var(--primary) !important;
-    box-shadow: 0 0 0 3px rgba(255, 127, 80, 0.18), 0 2px 12px rgba(0, 0, 0, 0.3) !important;
-    opacity: 1 !important;
-  }
-
-  .node.is-connected {
-    opacity: 1;
-    border-color: rgba(171, 196, 220, 0.3);
-  }
-
-  .node.is-dimmed {
-    opacity: 0.18;
-  }
-
-  .node-link {
-    display: contents;
-    color: inherit;
-  }
-
-  .node-name {
-    font-size: 0.8125rem;
-    font-weight: 700;
-    color: var(--content-bright);
-    line-height: 1.3;
-  }
-
-  .node--center .node-name {
-    font-size: 1rem;
+  :global(.g-disc-name) {
+    font-size: 0.875rem;
+    font-weight: 800;
     color: var(--primary);
+    letter-spacing: -0.01em;
+    line-height: 1;
   }
 
-  .node--building-toward .node-name {
-    color: var(--base-content);
+  :global(.g-disc-sub) {
+    font-size: 0.45rem;
     font-weight: 600;
+    color: rgba(255, 127, 80, 0.55);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
   }
 
-  .node-sub {
-    font-size: 0.6875rem;
-    color: var(--muted-content);
-    letter-spacing: 0.02em;
-  }
-
-  .node-badge {
-    display: inline-block;
-    font-size: 0.5625rem;
-    font-weight: 600;
-    letter-spacing: 0.04em;
-    padding: 0.0625rem 0.3rem;
+  /* Chips for orbit nodes */
+  :global(.g-chip) {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.15rem;
+    padding: 0.375rem 0.6rem;
     border-radius: var(--radius-full);
-    margin-top: 0.25rem;
+    border: 1px solid rgba(171, 196, 220, 0.18);
+    background: var(--base-300);
     white-space: nowrap;
   }
 
-  .node-badge--running {
-    background: rgba(34, 197, 94, 0.1);
-    color: #4ade80;
+  :global(.g-chip--building) {
+    border-style: dashed;
+    border-color: rgba(171, 196, 220, 0.15);
+    background: rgba(171, 196, 220, 0.03);
+    opacity: 0.68;
   }
 
-  .node-badge--building-toward {
-    background: rgba(171, 196, 220, 0.07);
-    color: rgba(171, 196, 220, 0.55);
+  :global(.g-chip-name) {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--content-bright);
+    letter-spacing: 0.01em;
+    line-height: 1.2;
   }
 
-  /* SVG edges — set via JS attributes, these classes add transitions + state */
-  :global(.graph-edge) {
-    fill: none;
-    transition: opacity 240ms ease;
+  :global(.g-chip--building .g-chip-name) {
+    color: var(--muted-content);
+    font-weight: 600;
+  }
+
+  :global(.g-chip-badge) {
+    font-size: 0.48rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: rgba(34, 197, 94, 0.75);
+    text-transform: uppercase;
+  }
+
+  :global(.g-chip-badge--building) {
+    color: rgba(171, 196, 220, 0.38);
+  }
+
+  /* Ring labels (inside SVG via foreignObject or positioned divs) */
+  :global(.g-ring-label) {
+    position: absolute;
+    font-size: 0.5rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: rgba(171, 196, 220, 0.32);
+    pointer-events: none;
+    user-select: none;
+    white-space: nowrap;
+    transform: translate(-50%, -50%);
+  }
+
+  /* ── Graph interaction states ── */
+  :global(.g-node.is-dimmed) {
+    opacity: 0.12;
+  }
+
+  :global(.g-node.is-selected .g-disc),
+  :global(.g-node.is-selected .g-chip) {
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 0 3px rgba(255, 127, 80, 0.2);
+  }
+
+  :global(.g-node.is-connected .g-disc),
+  :global(.g-node.is-connected .g-chip) {
+    border-color: rgba(255, 127, 80, 0.4);
+  }
+
+  :global(.g-edge) {
+    transition: opacity 200ms ease-out, stroke 200ms ease-out;
   }
 
   @media (prefers-reduced-motion: reduce) {
-    :global(.graph-edge) { transition: none; }
+    :global(.g-edge) { transition: none; }
   }
 
-  :global(.graph-edge.is-dimmed) {
-    opacity: 0.15;
+  :global(.g-edge.is-dimmed) {
+    opacity: 0.06;
   }
 
-  /* Legend */
-  .graph-legend {
+  :global(.g-edge.is-active) {
+    stroke: rgba(255, 127, 80, 0.65) !important;
+    opacity: 1;
+  }
+
+  /* ── Detail panel ── */
+  .detail-col {
+    /* On mobile, detail panel sits directly below graph */
+  }
+
+  .detail-panel {
+    /* Populated by JS */
+    min-height: 200px;
+  }
+
+  /* Detail card styles (injected by JS) */
+  :global(.detail-card) {
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-subtle);
+    background: var(--base-200);
+    padding: 1.75rem;
+  }
+
+  :global(.detail-card-header) {
     display: flex;
-    gap: 1.5rem;
-    margin-top: 0.875rem;
-    padding: 0 0.25rem;
-  }
-
-  .legend-item {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.75rem;
-    color: var(--muted-content);
-  }
-
-  .legend-swatch {
-    display: inline-block;
-    width: 1.25rem;
-    height: 0.5rem;
-    border-radius: 2px;
-    flex-shrink: 0;
-  }
-
-  .legend-swatch--running {
-    background: var(--base-300);
-    border: 1px solid rgba(171, 196, 220, 0.16);
-  }
-
-  .legend-swatch--building-toward {
-    background: rgba(171, 196, 220, 0.03);
-    border: 1.5px dashed rgba(171, 196, 220, 0.16);
-  }
-
-  /* ── Desktop: CSS grid layout ── */
-  @media (min-width: 768px) {
-    .graph-wrap {
-      display: grid;
-      grid-template-columns: 1fr 10rem 1fr;
-      grid-template-rows: auto auto auto;
-      grid-template-areas:
-        "cockpit  center-col  substrate"
-        "building center-col  sandbox"
-        "workloop workloop    workloop";
-      gap: 1rem;
-      align-items: start;
-    }
-
-    .graph-center-col {
-      grid-area: center-col;
-      order: 0;
-      padding: 1rem 0.5rem;
-      justify-content: center;
-      align-items: center;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-
-    .node--center {
-      width: 100%;
-    }
-
-    .node--host {
-      width: 100%;
-    }
-
-    .section-nodes--row {
-      gap: 0.75rem;
-    }
-
-    .section-nodes--row .node {
-      flex: 1;
-      min-width: 8rem;
-    }
-  }
-
-  /* ── Components list ── */
-  .factory-components {
-    margin-bottom: 3rem;
-    padding-top: 2.5rem;
-    border-top: 1px solid var(--border-subtle);
-  }
-
-  .components-title {
-    margin: 0 0 2rem;
-    font-size: clamp(1.25rem, 3vw, 1.625rem);
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    color: var(--content-bright);
-  }
-
-  .comp-group {
-    margin-bottom: 2.25rem;
-  }
-
-  .comp-group-label {
-    margin: 0 0 1rem;
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--muted-content);
-    padding-bottom: 0.5rem;
-    border-bottom: 1px solid var(--border-subtle);
-    display: flex;
-    align-items: baseline;
-    gap: 0.5rem;
-  }
-
-  .comp-group-sub {
-    font-weight: 400;
-    letter-spacing: 0.03em;
-    text-transform: none;
-    font-size: 0.6875rem;
-    color: rgba(171, 196, 220, 0.4);
-  }
-
-  .comp-group-label--building-toward {
-    border-bottom-style: dashed;
-    color: rgba(171, 196, 220, 0.5);
-  }
-
-  .comp-group--building-toward .comp-list {
-    opacity: 0.8;
-  }
-
-  .comp-list {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    display: flex;
-    flex-direction: column;
+    align-items: flex-start;
     gap: 1rem;
+    margin-bottom: 1.125rem;
+    flex-wrap: wrap;
   }
 
-  .comp-item {
+  :global(.detail-card-name) {
+    margin: 0;
+    font-size: clamp(1.125rem, 3vw, 1.375rem);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    color: var(--content-bright);
+    line-height: 1.15;
+    flex: 1 1 auto;
+  }
+
+  :global(.detail-card-chip) {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.625rem;
+    border-radius: var(--radius-full);
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    flex-shrink: 0;
+    margin-top: 0.25rem;
+  }
+
+  :global(.detail-card-chip--running) {
+    background: rgba(34, 197, 94, 0.1);
+    color: rgba(34, 197, 94, 0.85);
+    border: 1px solid rgba(34, 197, 94, 0.18);
+  }
+
+  :global(.detail-card-chip--building) {
+    background: rgba(171, 196, 220, 0.07);
+    color: rgba(171, 196, 220, 0.55);
+    border: 1.5px dashed rgba(171, 196, 220, 0.2);
+  }
+
+  :global(.detail-card-body) {
+    margin: 0 0 1.125rem;
     font-size: 0.9375rem;
     line-height: var(--line-height-relaxed);
     color: var(--base-content);
-    max-width: 62ch;
-    transition: color 200ms ease;
-    scroll-margin-top: 2rem;
+    max-width: 58ch;
   }
 
-  .comp-item--building-toward {
+  :global(.detail-card-connects) {
+    margin: 0 0 1rem;
+    font-size: 0.8125rem;
     color: var(--muted-content);
   }
 
-  .comp-name {
-    color: var(--content-bright);
+  :global(.detail-card-connects strong) {
+    color: rgba(171, 196, 220, 0.6);
+    font-weight: 600;
+    font-size: 0.6875rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
   }
 
-  .comp-item.is-emphasized .comp-name {
-    color: var(--primary);
-  }
-
-  .factory-link {
+  :global(.detail-card-link) {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
     color: var(--primary);
     text-decoration: underline;
-    text-decoration-color: rgba(255, 127, 80, 0.4);
+    text-decoration-color: rgba(255, 127, 80, 0.35);
     text-underline-offset: 2px;
     transition: color var(--transition-base), text-decoration-color var(--transition-base);
+    margin-top: 0.25rem;
   }
 
-  .factory-link:hover {
+  :global(.detail-card-link:hover) {
     color: var(--primary-focus);
     text-decoration-color: var(--primary-focus);
+  }
+
+  :global(.detail-card-link-icon) {
+    font-size: 0.75rem;
+    color: rgba(255, 127, 80, 0.5);
   }
 
   /* ── Closing ── */
@@ -817,7 +534,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
   .factory-closing p {
     margin: 0;
-    font-size: clamp(1rem, 2vw, 1.1rem);
+    font-size: clamp(0.9375rem, 2vw, 1.0625rem);
     line-height: var(--line-height-relaxed);
     color: var(--muted-content);
     font-style: italic;
@@ -829,217 +546,565 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 (function () {
   'use strict';
 
+  /* ══════════════════════════════════════════
+     DATA — 9 nodes, verbatim spec copy
+  ══════════════════════════════════════════ */
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const resetBtn = document.getElementById('graph-reset') as HTMLButtonElement | null;
-  const graphWrap = document.getElementById('graph-wrap') as HTMLElement | null;
-  const svgOverlay = document.getElementById('graph-svg-overlay') as SVGElement | null;
 
-  if (!graphWrap || !svgOverlay) return;
+  type NodeDef = {
+    id: string;
+    label: string;
+    sub?: string;
+    status: 'running' | 'building';
+    description: string;
+    href?: string;
+    hrefLabel?: string;
+  };
 
-  // ── Edge definition ──
-  // Each edge: [fromNodeId, toNodeId, edgeId, isBuilding]
-  const EDGE_DEFS: [string, string, string, boolean][] = [
-    ['node-pi',    'node-host',    'edge-pi-host',       false],
-    ['node-pi',    'node-beads',   'edge-pi-beads',      false],
-    ['node-pi',    'node-memory',  'edge-pi-memory',     false],
-    ['node-pi',    'node-ripcage', 'edge-pi-ripcage',    false],
-    ['node-pi',    'node-ironproxy','edge-pi-ironproxy', false],
-    ['node-pi',    'node-herdr',   'edge-pi-herdr',      false],
-    ['node-pi',    'node-cmux',    'edge-pi-cmux',       false],
-    ['node-pi',    'node-orch',    'edge-pi-orch',       false],
-    ['node-pi',    'node-drover',  'edge-pi-drover',     false],
-    ['node-orch',  'node-beads',   'edge-orch-beads',    false],
-    ['node-orch',  'node-memory',  'edge-orch-memory',   false],
-    ['node-orch',  'node-ripcage', 'edge-orch-ripcage',  false],
-    ['node-herdr', 'node-orch',    'edge-herdr-orch',    false],
-    ['node-herdr', 'node-cmux',    'edge-herdr-cmux',    false],
-    ['node-ripcage','node-ironproxy','edge-rc-ip',       false],
-    ['node-drover','node-beads',   'edge-drover-beads',  false],
-    ['node-drover','node-orch',    'edge-drover-orch',   false],
-    // self-driving has no explicit edge in the spec (it's a direction, not a wired component yet)
-    ['node-mail',  'node-orch',    'edge-mail-orch',     true],
+  const NODES: NodeDef[] = [
+    {
+      id: 'pi',
+      label: 'pi',
+      sub: 'my harness',
+      status: 'running',
+      description: 'The agent harness I build on and own — changeable all the way down; the model behind it is swappable.',
+      href: 'https://github.com/badlogic/pi-mono',
+      hrefLabel: 'pi on GitHub',
+    },
+    {
+      id: 'ripcage',
+      label: 'rip-cage',
+      status: 'running',
+      description: 'Wraps the work in a container and checks every shell command before it runs, so an unattended run can\'t reach far.',
+      href: 'https://github.com/jsnyde0/rip-cage',
+      hrefLabel: 'rip-cage on GitHub',
+    },
+    {
+      id: 'host',
+      label: 'always-on host',
+      status: 'running',
+      description: 'Runs on a box that\'s always on — a Mac mini now, a VPS next — not my laptop. Close the lid and the agents keep going.',
+    },
+    {
+      id: 'tracker',
+      label: 'graph-based issue tracker',
+      status: 'running',
+      description: 'Work is a graph of goals with dependencies, not a chat log, so the plan survives any single agent dying. (beads today.)',
+    },
+    {
+      id: 'memory',
+      label: 'tiered memory',
+      status: 'running',
+      description: 'Memory kept by lifecycle — session, working, durable — so nothing load-bearing dies in a context window that\'s about to be compacted.',
+    },
+    {
+      id: 'cockpit',
+      label: 'cockpit',
+      status: 'running',
+      description: 'Watch and steer every session: a live roster of what\'s working, blocked, or done, and the session view on my Mac. (herdr by Ogulcan Celik · cmux by Manaflow)',
+    },
+    {
+      id: 'orch',
+      label: 'agent orchestration',
+      status: 'running',
+      description: 'How I dispatch and coordinate agents: a planner over the work graph plus composable primitives. Each orchestrator makes one move, writes its decision back, and dies — the agents are disposable, the substrate persists.',
+    },
+    {
+      id: 'selfdriving',
+      label: 'self-driving',
+      sub: 'building toward',
+      status: 'building',
+      description: 'The planner acting on its own, with no human approving each move. The direction I\'m building toward, not there yet.',
+    },
+    {
+      id: 'substrate',
+      label: 'substrate over process',
+      status: 'running',
+      description: 'I want to scale with compute and intelligence, so I build tools and skills that act as levers, not checklists.',
+    },
   ];
 
-  // Node → which edges involve it
-  const nodeEdgeMap = new Map<string, Set<string>>();
-  // Edge → which nodes it connects
-  const edgeNodeMap = new Map<string, [string, string]>();
+  // Edge list — [nodeA, nodeB, isBuilding]
+  type EdgeDef = [string, string, boolean];
+  const EDGES: EdgeDef[] = [
+    ['pi', 'ripcage',    false],
+    ['pi', 'host',       false],
+    ['pi', 'tracker',    false],
+    ['pi', 'memory',     false],
+    ['pi', 'cockpit',    false],
+    ['pi', 'orch',       false],
+    ['pi', 'selfdriving', true],
+    ['pi', 'substrate',  false],
+    ['orch', 'tracker',  false],
+    ['orch', 'memory',   false],
+    ['orch', 'ripcage',  false],
+    ['cockpit', 'orch',  false],
+    ['selfdriving', 'orch', true],
+    ['substrate', 'tracker', false],
+    ['substrate', 'memory',  false],
+  ];
 
-  EDGE_DEFS.forEach(([a, b, id]) => {
-    edgeNodeMap.set(id, [a, b]);
-    if (!nodeEdgeMap.has(a)) nodeEdgeMap.set(a, new Set());
-    if (!nodeEdgeMap.has(b)) nodeEdgeMap.set(b, new Set());
-    nodeEdgeMap.get(a)!.add(id);
-    nodeEdgeMap.get(b)!.add(id);
+  const edgeKey = (a: string, b: string) => [a, b].sort().join('--');
+
+  // Build neighbor sets
+  const neighbors = new Map<string, Set<string>>();
+  const edgeMeta = new Map<string, boolean>(); // key -> isBuilding
+  NODES.forEach(n => neighbors.set(n.id, new Set()));
+  EDGES.forEach(([a, b, isBuilding]) => {
+    neighbors.get(a)!.add(b);
+    neighbors.get(b)!.add(a);
+    edgeMeta.set(edgeKey(a, b), isBuilding);
   });
 
-  // SVG line elements
-  const edgeEls = new Map<string, SVGLineElement>();
+  // Build human-readable neighbor labels for detail card
+  const nodeById = new Map<string, NodeDef>(NODES.map(n => [n.id, n]));
 
-  function getNodeCenter(nodeId: string): { x: number; y: number } | null {
-    const el = document.getElementById(nodeId);
-    if (!el || !graphWrap) return null;
-    const wrapRect = graphWrap.getBoundingClientRect();
-    const nodeRect = el.getBoundingClientRect();
-    return {
-      x: nodeRect.left - wrapRect.left + nodeRect.width / 2,
-      y: nodeRect.top - wrapRect.top + nodeRect.height / 2,
-    };
+  function getNeighborLabels(id: string): string {
+    const nbs = neighbors.get(id);
+    if (!nbs || nbs.size === 0) return '';
+    return Array.from(nbs)
+      .map(nid => nodeById.get(nid)?.label ?? nid)
+      .join(', ');
   }
 
-  function drawEdges() {
-    if (!svgOverlay) return;
-    // Clear existing
-    while (svgOverlay.firstChild) svgOverlay.removeChild(svgOverlay.firstChild);
+  /* ══════════════════════════════════════════
+     DETAIL PANEL
+  ══════════════════════════════════════════ */
+  const detailPanel = document.getElementById('detail-panel')!;
+
+  function renderDetailCard(node: NodeDef): void {
+    const isBuilding = node.status === 'building';
+    const neighborLabels = getNeighborLabels(node.id);
+
+    const card = document.createElement('div');
+    card.className = 'detail-card';
+
+    // Header row: name + status chip
+    const header = document.createElement('div');
+    header.className = 'detail-card-header';
+
+    const nameEl = document.createElement('h3');
+    nameEl.className = 'detail-card-name';
+    nameEl.textContent = node.label;
+    header.appendChild(nameEl);
+
+    const chip = document.createElement('span');
+    chip.className = 'detail-card-chip ' + (isBuilding ? 'detail-card-chip--building' : 'detail-card-chip--running');
+    chip.textContent = isBuilding ? 'building toward' : 'running';
+    header.appendChild(chip);
+
+    card.appendChild(header);
+
+    // Body: description
+    const body = document.createElement('p');
+    body.className = 'detail-card-body';
+    body.textContent = node.description;
+    card.appendChild(body);
+
+    // Connects to
+    if (neighborLabels) {
+      const connects = document.createElement('p');
+      connects.className = 'detail-card-connects';
+      const label = document.createElement('strong');
+      label.textContent = 'Connects to: ';
+      connects.appendChild(label);
+      connects.appendChild(document.createTextNode(neighborLabels));
+      card.appendChild(connects);
+    }
+
+    // Real link (only pi + rip-cage)
+    if (node.href) {
+      const link = document.createElement('a');
+      link.className = 'detail-card-link';
+      link.href = node.href;
+      link.target = '_blank';
+      link.rel = 'noopener';
+      link.textContent = node.hrefLabel ?? node.href;
+      const icon = document.createElement('span');
+      icon.className = 'detail-card-link-icon';
+      icon.setAttribute('aria-hidden', 'true');
+      icon.textContent = '↗';
+      link.appendChild(icon);
+      card.appendChild(link);
+    }
+
+    // Swap content without layout shift
+    detailPanel.innerHTML = '';
+    detailPanel.appendChild(card);
+  }
+
+  /* ══════════════════════════════════════════
+     GRAPH DRAWING
+  ══════════════════════════════════════════ */
+  const scene = document.getElementById('graph-scene')!;
+  const nodesC = document.getElementById('graph-nodes')!;
+  const svgEl = document.getElementById('graph-svg') as unknown as SVGSVGElement;
+  const resetBtn = document.getElementById('graph-reset') as HTMLButtonElement;
+  const NS = 'http://www.w3.org/2000/svg';
+
+  // Track elements for interaction
+  let nodeEls = new Map<string, HTMLElement>();
+  let edgeEls = new Map<string, SVGElement>();
+  let selectedId: string | null = null;
+
+  function calcRadii(w: number, h: number) {
+    // Use smaller dimension; leave generous margin so orbit chips stay in-bounds.
+    // Chips are roughly 70px wide × 30px tall at most; centered at orbitR they
+    // need at least ~50px of clearance from the scene edge.
+    const base = Math.min(w, h);
+    const margin = 52; // px — chip half-width clearance from edge
+    const usable = base / 2 - margin; // max radius where chip center can sit
+
+    // Three evenly nested zones with equal visual gaps:
+    // gap1 = ripcageR - piVisualEdge (~12px)
+    // gap2 = hostR - ripcageR
+    // gap3 = orbitR - hostR
+    // We want gap1 ≈ gap2 ≈ gap3 roughly equal.
+    // Divide usable into: ripcageR at 34%, hostR at 58%, orbitR at 100%
+    const orbitR   = usable;
+    const hostR    = usable * 0.58;
+    const ripcageR = usable * 0.34;
+    return { ripcageR, hostR, orbitR };
+  }
+
+  function drawGraph() {
+    // Clear
+    nodesC.innerHTML = '';
+    while (svgEl.firstChild) svgEl.removeChild(svgEl.firstChild);
+    nodeEls.clear();
     edgeEls.clear();
 
-    const SVG_NS = 'http://www.w3.org/2000/svg';
+    const rect = scene.getBoundingClientRect();
+    const w = rect.width;
+    const h = rect.height;
+    if (w === 0 || h === 0) return;
 
-    EDGE_DEFS.forEach(([a, b, id, isBuilding]) => {
-      const ca = getNodeCenter(a);
-      const cb = getNodeCenter(b);
-      if (!ca || !cb) return;
+    const cx = w / 2;
+    const cy = h / 2;
+    const { ripcageR, hostR, orbitR } = calcRadii(w, h);
 
-      const line = document.createElementNS(SVG_NS, 'line');
-      line.setAttribute('x1', String(ca.x));
-      line.setAttribute('y1', String(ca.y));
-      line.setAttribute('x2', String(cb.x));
-      line.setAttribute('y2', String(cb.y));
-      line.setAttribute('id', id);
-      line.setAttribute('fill', 'none');
-      line.setAttribute('stroke-width', '1.5');
-      if (isBuilding) {
-        line.setAttribute('stroke', 'rgba(171, 196, 220, 0.14)');
-        line.setAttribute('stroke-dasharray', '5 4');
-      } else {
-        line.setAttribute('stroke', 'rgba(171, 196, 220, 0.28)');
-      }
-      line.classList.add('graph-edge');
-      if (isBuilding) line.classList.add('graph-edge--building-toward');
-      svgOverlay.appendChild(line);
-      edgeEls.set(id, line);
-    });
-  }
+    // ── SVG rings ──
 
-  // Draw on load and resize
-  drawEdges();
-  window.addEventListener('resize', () => {
-    drawEdges();
-    // Re-apply selection state after redraw if a node is selected
-    if (selectedNodeId) {
-      applySelection(selectedNodeId);
-    }
-  });
+    // rip-cage ring fill + stroke
+    const ringRipcage = document.createElementNS(NS, 'circle');
+    ringRipcage.setAttribute('cx', String(cx));
+    ringRipcage.setAttribute('cy', String(cy));
+    ringRipcage.setAttribute('r', String(ripcageR));
+    ringRipcage.setAttribute('fill', 'rgba(255,127,80,0.04)');
+    ringRipcage.setAttribute('stroke', 'rgba(255,127,80,0.2)');
+    ringRipcage.setAttribute('stroke-width', '1.5');
+    svgEl.appendChild(ringRipcage);
 
-  // ── Interaction ──
-  const allNodes = Array.from(document.querySelectorAll<HTMLElement>('.node'));
-  let selectedNodeId: string | null = null;
+    // always-on host ring
+    const ringHost = document.createElementNS(NS, 'circle');
+    ringHost.setAttribute('cx', String(cx));
+    ringHost.setAttribute('cy', String(cy));
+    ringHost.setAttribute('r', String(hostR));
+    ringHost.setAttribute('fill', 'none');
+    ringHost.setAttribute('stroke', 'rgba(171,196,220,0.12)');
+    ringHost.setAttribute('stroke-width', '1.5');
+    svgEl.appendChild(ringHost);
 
-  function clearAll() {
-    allNodes.forEach(n => {
-      n.classList.remove('is-selected', 'is-connected', 'is-dimmed');
-      n.setAttribute('aria-pressed', 'false');
-    });
-    edgeEls.forEach((e) => {
-      e.classList.remove('is-highlighted', 'is-dimmed');
-      // Restore original stroke
-      const isBuilding = e.classList.contains('graph-edge--building-toward');
-      e.setAttribute('stroke', isBuilding ? 'rgba(171, 196, 220, 0.14)' : 'rgba(171, 196, 220, 0.28)');
-      if (isBuilding) {
-        e.setAttribute('stroke-dasharray', '5 4');
-      } else {
-        e.removeAttribute('stroke-dasharray');
-      }
-    });
-    document.querySelectorAll('.comp-item').forEach(c => c.classList.remove('is-emphasized'));
-    selectedNodeId = null;
-    if (resetBtn) resetBtn.hidden = true;
-  }
+    // Orbit track (dashed)
+    const orbitTrack = document.createElementNS(NS, 'circle');
+    orbitTrack.setAttribute('cx', String(cx));
+    orbitTrack.setAttribute('cy', String(cy));
+    orbitTrack.setAttribute('r', String(orbitR));
+    orbitTrack.setAttribute('fill', 'none');
+    orbitTrack.setAttribute('stroke', 'rgba(171,196,220,0.06)');
+    orbitTrack.setAttribute('stroke-width', '1');
+    orbitTrack.setAttribute('stroke-dasharray', '4 6');
+    svgEl.appendChild(orbitTrack);
 
-  function applySelection(nodeId: string) {
-    const nodeEl = document.getElementById(nodeId);
-    if (!nodeEl) return;
+    // Ring labels — place on the bottom-right arc of each ring, away from nodes
+    // rip-cage node sits at top (cy - ripcageR), so label goes bottom-right
+    const labelRipcage = document.createElement('div');
+    labelRipcage.className = 'g-ring-label';
+    labelRipcage.textContent = 'rip-cage';
+    // Position at 45° (bottom-right) of the ring
+    const rcLabelAngle = Math.PI * 0.22; // ~40° from 3 o'clock = bottom-right
+    labelRipcage.style.left = (cx + ripcageR * Math.cos(rcLabelAngle)) + 'px';
+    labelRipcage.style.top  = (cy + ripcageR * Math.sin(rcLabelAngle)) + 'px';
+    nodesC.appendChild(labelRipcage);
 
-    const connectsAttr = nodeEl.dataset.connects || '';
-    const connectedIds = connectsAttr ? connectsAttr.split(',').map(s => s.trim()) : [];
-    const activeNodeIds = new Set([nodeId, ...connectedIds]);
+    const labelHost = document.createElement('div');
+    labelHost.className = 'g-ring-label';
+    labelHost.textContent = 'always-on host';
+    const hostLabelAngle = Math.PI * 0.22;
+    labelHost.style.left = (cx + hostR * Math.cos(hostLabelAngle)) + 'px';
+    labelHost.style.top  = (cy + hostR * Math.sin(hostLabelAngle)) + 'px';
+    nodesC.appendChild(labelHost);
 
-    // Determine active edges
-    const activeEdgeIds = new Set<string>();
-    nodeEdgeMap.get(nodeId)?.forEach(edgeId => {
-      const [a, b] = edgeNodeMap.get(edgeId) || [];
-      if (activeNodeIds.has(a) && activeNodeIds.has(b)) {
-        activeEdgeIds.add(edgeId);
-      }
+    // ── Connector lines from orbit to core ──
+    const orbitIds = ['tracker', 'memory', 'cockpit', 'orch', 'selfdriving', 'substrate'];
+    const orbitPositions = new Map<string, {x:number,y:number}>();
+    orbitIds.forEach((id, i) => {
+      const angle = (i / orbitIds.length) * Math.PI * 2 - Math.PI / 2;
+      const x = cx + orbitR * Math.cos(angle);
+      const y = cy + orbitR * Math.sin(angle);
+      orbitPositions.set(id, { x, y });
     });
 
-    // Apply node states
-    allNodes.forEach(n => {
-      if (activeNodeIds.has(n.id)) {
-        if (n.id === nodeId) {
-          n.classList.add('is-selected');
-          n.setAttribute('aria-pressed', 'true');
-        } else {
-          n.classList.add('is-connected');
+    // Positions for pi, ripcage, host (they sit on their rings)
+    // ripcage: place at top of its ring
+    const ripcagePos = { x: cx, y: cy - ripcageR };
+    // host: place at bottom of its ring
+    const hostPos = { x: cx, y: cy + hostR };
+    // pi: center
+    const piPos = { x: cx, y: cy };
+
+    const allPositions = new Map<string, {x:number,y:number}>([
+      ['pi', piPos],
+      ['ripcage', ripcagePos],
+      ['host', hostPos],
+      ...orbitPositions,
+    ]);
+
+    // Draw connector lines (edges)
+    EDGES.forEach(([a, b, isBuilding]) => {
+      const pa = allPositions.get(a);
+      const pb = allPositions.get(b);
+      if (!pa || !pb) return;
+
+      const line = document.createElementNS(NS, 'line');
+      line.setAttribute('x1', String(pa.x));
+      line.setAttribute('y1', String(pa.y));
+      line.setAttribute('x2', String(pb.x));
+      line.setAttribute('y2', String(pb.y));
+      line.setAttribute('stroke', isBuilding ? 'rgba(171,196,220,0.09)' : 'rgba(171,196,220,0.2)');
+      line.setAttribute('stroke-width', '1');
+      if (isBuilding) line.setAttribute('stroke-dasharray', '5 4');
+      line.classList.add('g-edge');
+      const key = edgeKey(a, b);
+      line.dataset.edge = key;
+      svgEl.appendChild(line);
+      edgeEls.set(key, line);
+    });
+
+    // ── Nodes ──
+
+    // Pi (center disc)
+    const piBtn = document.createElement('button');
+    piBtn.className = 'g-node';
+    piBtn.id = 'gn-pi';
+    piBtn.setAttribute('aria-pressed', selectedId === 'pi' ? 'true' : 'false');
+    piBtn.setAttribute('aria-label', 'pi — my harness');
+    piBtn.style.left = cx + 'px';
+    piBtn.style.top = cy + 'px';
+    piBtn.style.zIndex = '3';
+
+    const disc = document.createElement('div');
+    disc.className = 'g-disc';
+    const piName = document.createElement('span');
+    piName.className = 'g-disc-name';
+    piName.textContent = 'pi';
+    const piSub = document.createElement('span');
+    piSub.className = 'g-disc-sub';
+    piSub.textContent = 'my harness';
+    disc.appendChild(piName);
+    disc.appendChild(piSub);
+    piBtn.appendChild(disc);
+    nodesC.appendChild(piBtn);
+    nodeEls.set('pi', piBtn);
+
+    // rip-cage (on its ring)
+    const rcBtn = document.createElement('button');
+    rcBtn.className = 'g-node';
+    rcBtn.id = 'gn-ripcage';
+    rcBtn.setAttribute('aria-pressed', selectedId === 'ripcage' ? 'true' : 'false');
+    rcBtn.setAttribute('aria-label', 'rip-cage');
+    rcBtn.style.left = ripcagePos.x + 'px';
+    rcBtn.style.top = ripcagePos.y + 'px';
+    rcBtn.style.zIndex = '2';
+
+    const rcChip = document.createElement('div');
+    rcChip.className = 'g-chip';
+    const rcName = document.createElement('span');
+    rcName.className = 'g-chip-name';
+    rcName.textContent = 'rip-cage';
+    const rcBadge = document.createElement('span');
+    rcBadge.className = 'g-chip-badge';
+    rcBadge.textContent = 'running';
+    rcChip.appendChild(rcName);
+    rcChip.appendChild(rcBadge);
+    rcBtn.appendChild(rcChip);
+    nodesC.appendChild(rcBtn);
+    nodeEls.set('ripcage', rcBtn);
+
+    // always-on host (on its ring)
+    const hostBtn = document.createElement('button');
+    hostBtn.className = 'g-node';
+    hostBtn.id = 'gn-host';
+    hostBtn.setAttribute('aria-pressed', selectedId === 'host' ? 'true' : 'false');
+    hostBtn.setAttribute('aria-label', 'always-on host');
+    hostBtn.style.left = hostPos.x + 'px';
+    hostBtn.style.top = hostPos.y + 'px';
+    hostBtn.style.zIndex = '2';
+
+    const hostChip = document.createElement('div');
+    hostChip.className = 'g-chip';
+    const hostName = document.createElement('span');
+    hostName.className = 'g-chip-name';
+    hostName.textContent = 'always-on host';
+    const hostBadge = document.createElement('span');
+    hostBadge.className = 'g-chip-badge';
+    hostBadge.textContent = 'running';
+    hostChip.appendChild(hostName);
+    hostChip.appendChild(hostBadge);
+    hostBtn.appendChild(hostChip);
+    nodesC.appendChild(hostBtn);
+    nodeEls.set('host', hostBtn);
+
+    // Orbit nodes (6 chips)
+    orbitIds.forEach((id) => {
+      const nd = NODES.find(n => n.id === id)!;
+      const pos = orbitPositions.get(id)!;
+      const isBuilding = nd.status === 'building';
+
+      const btn = document.createElement('button');
+      btn.className = 'g-node';
+      btn.id = 'gn-' + id;
+      btn.setAttribute('aria-pressed', selectedId === id ? 'true' : 'false');
+      btn.setAttribute('aria-label', nd.label + (isBuilding ? ' — building toward' : ''));
+      btn.style.left = pos.x + 'px';
+      btn.style.top = pos.y + 'px';
+
+      const chip = document.createElement('div');
+      chip.className = 'g-chip' + (isBuilding ? ' g-chip--building' : '');
+
+      const nameSpan = document.createElement('span');
+      nameSpan.className = 'g-chip-name';
+      nameSpan.textContent = nd.label;
+      chip.appendChild(nameSpan);
+
+      const badge = document.createElement('span');
+      badge.className = 'g-chip-badge' + (isBuilding ? ' g-chip-badge--building' : '');
+      badge.textContent = isBuilding ? 'building toward' : 'running';
+      chip.appendChild(badge);
+
+      btn.appendChild(chip);
+      nodesC.appendChild(btn);
+      nodeEls.set(id, btn);
+    });
+
+    // Attach event listeners
+    nodeEls.forEach((el, id) => {
+      el.addEventListener('click', () => selectNode(id));
+      el.addEventListener('keydown', (e: KeyboardEvent) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          selectNode(id);
         }
-      } else {
-        n.classList.add('is-dimmed');
-      }
+      });
     });
 
-    // Apply edge states
-    const isBuilding = (el: SVGLineElement) => el.classList.contains('graph-edge--building-toward');
-    edgeEls.forEach((el, id) => {
-      if (activeEdgeIds.has(id)) {
-        el.classList.add('is-highlighted');
-        el.setAttribute('stroke', 'rgba(255, 127, 80, 0.7)');
-        el.setAttribute('stroke-dasharray', 'none');
+    // Re-apply selection state if something was already selected
+    if (selectedId) {
+      applySelection(selectedId, false);
+    }
+  }
+
+  /* ══════════════════════════════════════════
+     INTERACTION
+  ══════════════════════════════════════════ */
+  function clearSelection(updatePanel: boolean = true) {
+    nodeEls.forEach((el, _id) => {
+      el.classList.remove('is-selected', 'is-connected', 'is-dimmed');
+      el.setAttribute('aria-pressed', 'false');
+    });
+    edgeEls.forEach(el => {
+      el.classList.remove('is-active', 'is-dimmed');
+    });
+    selectedId = null;
+    resetBtn.hidden = true;
+  }
+
+  function applySelection(id: string, updatePanel: boolean = true) {
+    const nbs = neighbors.get(id) ?? new Set<string>();
+    const active = new Set([id, ...nbs]);
+
+    nodeEls.forEach((el, nid) => {
+      el.classList.remove('is-selected', 'is-connected', 'is-dimmed');
+      if (nid === id) {
+        el.classList.add('is-selected');
+        el.setAttribute('aria-pressed', 'true');
+      } else if (active.has(nid)) {
+        el.classList.add('is-connected');
+        el.setAttribute('aria-pressed', 'false');
       } else {
         el.classList.add('is-dimmed');
-        // opacity handled by CSS class
+        el.setAttribute('aria-pressed', 'false');
       }
     });
 
-    // Emphasize component list entry
-    const dataNode = nodeEl.dataset.node || '';
-    const compEl = document.getElementById('comp-' + dataNode);
-    if (compEl) {
-      compEl.classList.add('is-emphasized');
-      if (!prefersReducedMotion) {
-        compEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    edgeEls.forEach((el, key) => {
+      el.classList.remove('is-active', 'is-dimmed');
+      const [a, b] = key.split('--');
+      if ((a === id || b === id) && active.has(a) && active.has(b)) {
+        el.classList.add('is-active');
+      } else {
+        el.classList.add('is-dimmed');
       }
+    });
+
+    if (updatePanel) {
+      const nd = nodeById.get(id);
+      if (nd) renderDetailCard(nd);
     }
   }
 
-  function selectNode(nodeEl: HTMLElement) {
-    const nodeId = nodeEl.id;
-    if (selectedNodeId === nodeId) {
-      clearAll();
+  function selectNode(id: string) {
+    if (selectedId === id) {
+      // Toggle off — restore pi as default
+      clearSelection(false);
+      selectedId = 'pi';
+      applySelection('pi');
+      resetBtn.hidden = true;
       return;
     }
-    clearAll();
-    selectedNodeId = nodeId;
-    applySelection(nodeId);
-    if (resetBtn) resetBtn.hidden = false;
+    clearSelection(false);
+    selectedId = id;
+    resetBtn.hidden = id === 'pi';
+    applySelection(id);
   }
 
-  allNodes.forEach(nodeEl => {
-    nodeEl.addEventListener('click', (e) => {
-      const target = e.target as HTMLElement;
-      if (target.closest('a')) return;
-      selectNode(nodeEl);
-    });
-
-    nodeEl.addEventListener('keydown', (e: KeyboardEvent) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        selectNode(nodeEl);
-      }
-    });
+  resetBtn.addEventListener('click', () => {
+    clearSelection(false);
+    selectedId = 'pi';
+    applySelection('pi');
+    resetBtn.hidden = true;
   });
 
-  if (resetBtn) {
-    resetBtn.addEventListener('click', clearAll);
+  // On desktop, size the scene to fit within the viewport height.
+  // We target a size that will sit comfortably when the user scrolls to the
+  // graph section (sticky: top: 1.5rem). Nav + padding-top ≈ 80px.
+  function sizeSceneToViewport() {
+    if (window.innerWidth < 768) return; // mobile uses CSS aspect-ratio
+    const colWidth = scene.offsetWidth;
+    // Leave 80px for nav (sticky) + some breathing room
+    const maxByViewport = window.innerHeight - 80;
+    const size = Math.min(colWidth, Math.max(280, maxByViewport));
+    scene.style.height = size + 'px';
   }
+
+  sizeSceneToViewport();
+
+  // Initial draw
+  drawGraph();
+
+  // Default selection = pi
+  selectedId = 'pi';
+  applySelection('pi');
+
+  // Redraw on resize (preserves selection)
+  let resizeTimer: ReturnType<typeof setTimeout>;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      sizeSceneToViewport();
+      drawGraph();
+    }, 60);
+  });
+
 })();
 </script>
