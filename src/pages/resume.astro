@@ -1,10 +1,23 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ResumeCard from '../components/resume/ResumeCard.astro';
-import ResumeItemCard from '../components/resume/ResumeItemCard.astro';
 import { achievements, education, resumeIntro, workExperience } from '../data/resume';
 
-// File tree taxonomy — FIRM
+// ─── Slug helpers ────────────────────────────────────────────────────────────
+
+function slugify(str: string): string {
+  return str
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+function itemSlug(item: { company: string; title: string }): string {
+  return slugify(item.company || item.title);
+}
+
+// ─── File tree taxonomy ───────────────────────────────────────────────────────
+
 interface TreeFile {
   name: string;
   path: string;
@@ -13,68 +26,181 @@ interface TreeFile {
 interface TreeFolder {
   name: string;
   files: TreeFile[];
+  subfolders?: TreeFolder[];
 }
 
-const folders: TreeFolder[] = [
+// Build experience folder from workExperience data
+const experienceFiles: TreeFile[] = workExperience.map((item) => {
+  const slug = itemSlug(item);
+  return { name: `${slug}.md`, path: `experience/${slug}.md` };
+});
+
+// Build achievements folder
+const achievementFiles: TreeFile[] = achievements.map((item) => {
+  const slug = itemSlug(item);
+  return { name: `${slug}.md`, path: `achievements/${slug}.md` };
+});
+
+// Build education folder
+const educationFiles: TreeFile[] = education.map((item) => {
+  const slug = itemSlug(item);
+  return { name: `${slug}.md`, path: `education/${slug}.md` };
+});
+
+// Skills subfolders (existing content, re-parented under skills/)
+const skillsSubfolders: TreeFolder[] = [
   {
     name: 'agentic-engineering',
     files: [
-      { name: 'harness-factory.md',          path: 'agentic-engineering/harness-factory.md' },
-      { name: 'disposable-orchestrators.md', path: 'agentic-engineering/disposable-orchestrators.md' },
-      { name: 'sandboxed-autonomy.md',       path: 'agentic-engineering/sandboxed-autonomy.md' },
-      { name: 'llm-app-engineering.md',      path: 'agentic-engineering/llm-app-engineering.md' },
+      { name: 'harness-factory.md',          path: 'skills/agentic-engineering/harness-factory.md' },
+      { name: 'disposable-orchestrators.md', path: 'skills/agentic-engineering/disposable-orchestrators.md' },
+      { name: 'sandboxed-autonomy.md',       path: 'skills/agentic-engineering/sandboxed-autonomy.md' },
+      { name: 'llm-app-engineering.md',      path: 'skills/agentic-engineering/llm-app-engineering.md' },
     ],
   },
   {
     name: 'web-development',
     files: [
-      { name: 'full-stack-web.md',           path: 'web-development/full-stack-web.md' },
-      { name: 'apis-and-deployment.md',      path: 'web-development/apis-and-deployment.md' },
-      { name: 'analytics-instrumentation.md',path: 'web-development/analytics-instrumentation.md' },
+      { name: 'full-stack-web.md',           path: 'skills/web-development/full-stack-web.md' },
+      { name: 'apis-and-deployment.md',      path: 'skills/web-development/apis-and-deployment.md' },
+      { name: 'analytics-instrumentation.md',path: 'skills/web-development/analytics-instrumentation.md' },
     ],
   },
   {
     name: 'data-science',
     files: [
-      { name: 'bayesian-modeling.md',  path: 'data-science/bayesian-modeling.md' },
-      { name: 'computer-vision.md',    path: 'data-science/computer-vision.md' },
-      { name: 'data-pipelines.md',     path: 'data-science/data-pipelines.md' },
+      { name: 'bayesian-modeling.md',  path: 'skills/data-science/bayesian-modeling.md' },
+      { name: 'computer-vision.md',    path: 'skills/data-science/computer-vision.md' },
+      { name: 'data-pipelines.md',     path: 'skills/data-science/data-pipelines.md' },
     ],
   },
   {
     name: 'growth-engineering',
     files: [
-      { name: 'performance-marketing.md', path: 'growth-engineering/performance-marketing.md' },
-      { name: 'server-side-tracking.md',  path: 'growth-engineering/server-side-tracking.md' },
-      { name: 'bayesian-mmm.md',          path: 'growth-engineering/bayesian-mmm.md' },
+      { name: 'performance-marketing.md', path: 'skills/growth-engineering/performance-marketing.md' },
+      { name: 'server-side-tracking.md',  path: 'skills/growth-engineering/server-side-tracking.md' },
+      { name: 'bayesian-mmm.md',          path: 'skills/growth-engineering/bayesian-mmm.md' },
     ],
   },
   {
     name: 'founder-operator',
     files: [
-      { name: 'strategy.md',             path: 'founder-operator/strategy.md' },
-      { name: 'teams-and-ops.md',        path: 'founder-operator/teams-and-ops.md' },
-      { name: 'learning-from-failures.md',path: 'founder-operator/learning-from-failures.md' },
+      { name: 'strategy.md',             path: 'skills/founder-operator/strategy.md' },
+      { name: 'teams-and-ops.md',        path: 'skills/founder-operator/teams-and-ops.md' },
+      { name: 'learning-from-failures.md',path: 'skills/founder-operator/learning-from-failures.md' },
     ],
   },
 ];
 
-// File content map — keyed by path
+const folders: TreeFolder[] = [
+  { name: 'experience',    files: experienceFiles },
+  { name: 'achievements',  files: achievementFiles },
+  { name: 'education',     files: educationFiles },
+  { name: 'skills',        files: [], subfolders: skillsSubfolders },
+];
+
+// ─── File content builders ────────────────────────────────────────────────────
+
+function buildItemHtml(item: {
+  title: string;
+  role: string;
+  badgeColor: string;
+  company: string;
+  location: string;
+  dateRange: string;
+  imageUrl: string;
+  imageAlt: string;
+  body: string;
+  links?: { label: string; href: string }[];
+}): string {
+  const badgeColors: Record<string, string> = {
+    primary: 'ghv-badge--primary',
+    accent: 'ghv-badge--accent',
+    secondary: 'ghv-badge--secondary',
+    info: 'ghv-badge--info',
+  };
+  const badgeClass = badgeColors[item.badgeColor] ?? 'ghv-badge--primary';
+
+  const linksHtml = item.links && item.links.length > 0
+    ? `<div class="ghv-item-links">${item.links.map((l) => `<a href="${l.href}" class="ghv-link" target="_blank" rel="noreferrer">${l.label}</a>`).join('')}</div>`
+    : '';
+
+  return `
+<article class="resume-item-card ghv-item-card">
+  <div class="ghv-item-logo">
+    <img src="${item.imageUrl}" alt="${item.imageAlt}" class="ghv-item-logo__img" />
+  </div>
+  <div class="ghv-item-body ghv-md">
+    <h1>${item.title}</h1>
+    <p class="ghv-item-meta">
+      <span class="ghv-badge ${badgeClass}">${item.role}</span>
+      <span>${item.company}</span>
+      <span>·</span>
+      <span>${item.location}</span>
+      <span>·</span>
+      <span>${item.dateRange}</span>
+    </p>
+    <p>${item.body}</p>
+    ${linksHtml}
+  </div>
+</article>`;
+}
+
+// Build README content
+const readmeHtml = `
+<div class="ghv-md ghv-readme">
+  <div class="ghv-readme-profile">
+    <div class="ghv-readme-avatar">
+      <img src="/img/jonatan_avatar_smiling_no_bg.png" alt="Jonatan Snyders profile photo" class="ghv-readme-avatar__img" />
+    </div>
+    <div class="ghv-readme-intro">
+      <h1>Jonatan Snyders</h1>
+      <div class="ghv-readme-badges">
+        ${resumeIntro.headlineBadges.map((badge, i) => {
+          const cls = ['ghv-badge--primary', 'ghv-badge--accent', 'ghv-badge--secondary', 'ghv-badge--info'][i] ?? 'ghv-badge--primary';
+          return `<span class="ghv-badge ${cls}">${badge}</span>`;
+        }).join('')}
+      </div>
+      ${resumeIntro.paragraphs.map((p) => `<p>${p}</p>`).join('')}
+    </div>
+  </div>
+  <h2>Repository</h2>
+  <p>This résumé is a Git repo. Browse the folders to explore experience, achievements, education, and skills.</p>
+  <ul>
+    <li><strong>experience/</strong> — work history</li>
+    <li><strong>achievements/</strong> — notable projects and milestones</li>
+    <li><strong>education/</strong> — degrees and self-study</li>
+    <li><strong>skills/</strong> — technical and operational skills</li>
+  </ul>
+</div>`;
+
+// Build all file contents map
 const fileContents: Record<string, string> = {
-  'SKILLS.md': `
-<h1>SKILLS.md</h1>
-<p><strong>Agentic engineering is the skill that makes the rest compound.</strong></p>
-<p>I use it to move quickly across web apps, data systems, growth loops, and operations.</p>
-<h2>Skill folders</h2>
-<ul>
-  <li><strong>agentic-engineering/</strong> how I build and run agents</li>
-  <li><strong>web-development/</strong> full-stack product engineering</li>
-  <li><strong>data-science/</strong> Bayesian models, pipelines, computer vision</li>
-  <li><strong>growth-engineering/</strong> acquisition, tracking, modelling</li>
-  <li><strong>founder-operator/</strong> strategy, teams, hard-earned judgment</li>
-</ul>
-`,
-  'agentic-engineering/harness-factory.md': `
+  'README.md': readmeHtml,
+};
+
+// Experience files
+workExperience.forEach((item) => {
+  const slug = itemSlug(item);
+  fileContents[`experience/${slug}.md`] = buildItemHtml(item);
+});
+
+// Achievement files
+achievements.forEach((item) => {
+  const slug = itemSlug(item);
+  fileContents[`achievements/${slug}.md`] = buildItemHtml(item);
+});
+
+// Education files
+education.forEach((item) => {
+  const slug = itemSlug(item);
+  fileContents[`education/${slug}.md`] = buildItemHtml(item);
+});
+
+// Skills files (re-parented under skills/)
+const skillsContents: Record<string, string> = {
+  'skills/agentic-engineering/harness-factory.md': `
+<div class="ghv-md">
 <h1>harness-factory.md</h1>
 <p>I build and own my agent harness: the prompts, tools, context routing, and review loops that turn an LLM into a system that does real work, unattended.</p>
 <h2>Technologies</h2>
@@ -86,8 +212,9 @@ const fileContents: Record<string, string> = {
 </ul>
 <h2>Proof</h2>
 <p>The whole system runs: <a href="/factory/" class="ghv-link">/factory</a>.</p>
-`,
-  'agentic-engineering/disposable-orchestrators.md': `
+</div>`,
+  'skills/agentic-engineering/disposable-orchestrators.md': `
+<div class="ghv-md">
 <h1>disposable-orchestrators.md</h1>
 <p>I architect agent work so state lives in the substrate, not the agent. Each orchestrator reads a graph of goals, makes one move, writes its decision back, and dies, so any agent can crash and the work picks up where it left off.</p>
 <h2>Technologies</h2>
@@ -99,8 +226,9 @@ const fileContents: Record<string, string> = {
 </ul>
 <h2>Proof</h2>
 <p>The work loop behind <a href="/factory/" class="ghv-link">/factory</a>, including a planner that proposes the next move.</p>
-`,
-  'agentic-engineering/sandboxed-autonomy.md': `
+</div>`,
+  'skills/agentic-engineering/sandboxed-autonomy.md': `
+<div class="ghv-md">
 <h1>sandboxed-autonomy.md</h1>
 <p>I run agents unattended by putting hard limits around them: containerized execution, every shell command checked before it runs, and credentials the agent never holds directly.</p>
 <h2>Technologies</h2>
@@ -112,8 +240,9 @@ const fileContents: Record<string, string> = {
 </ul>
 <h2>Proof</h2>
 <p>Open source: <a href="https://github.com/jsnyde0/rip-cage" class="ghv-link">rip-cage</a>.</p>
-`,
-  'agentic-engineering/llm-app-engineering.md': `
+</div>`,
+  'skills/agentic-engineering/llm-app-engineering.md': `
+<div class="ghv-md">
 <h1>llm-app-engineering.md</h1>
 <p>Beyond tooling my own workflow, I build agentic apps: LLM calls wrapped in tools, structured output, and guardrails meant to hold up in production.</p>
 <h2>Technologies</h2>
@@ -123,8 +252,9 @@ const fileContents: Record<string, string> = {
   <li>Retrieval and context design</li>
   <li>Evaluation and guardrails</li>
 </ul>
-`,
-  'web-development/full-stack-web.md': `
+</div>`,
+  'skills/web-development/full-stack-web.md': `
+<div class="ghv-md">
 <h1>full-stack-web.md</h1>
 <p>I build full-stack web apps across backend, frontend, and the data layer behind them. I default to hypermedia-driven apps: server-rendered HTML with focused interactivity and little client-side state. I build with React too, but reach for it when an app genuinely needs a rich client.</p>
 <h2>Technologies</h2>
@@ -135,8 +265,9 @@ const fileContents: Record<string, string> = {
 </ul>
 <h2>Approach</h2>
 <p>Why hypermedia-driven: <a href="https://htmx.org/essays/hypermedia-driven-applications/" class="ghv-link">htmx.org/essays/hypermedia-driven-applications</a>.</p>
-`,
-  'web-development/apis-and-deployment.md': `
+</div>`,
+  'skills/web-development/apis-and-deployment.md': `
+<div class="ghv-md">
 <h1>apis-and-deployment.md</h1>
 <p>I build APIs, containerize apps, and deploy them with practical CI/CD.</p>
 <h2>Technologies</h2>
@@ -147,8 +278,9 @@ const fileContents: Record<string, string> = {
   <li>DigitalOcean</li>
   <li>GitHub Actions</li>
 </ul>
-`,
-  'web-development/analytics-instrumentation.md': `
+</div>`,
+  'skills/web-development/analytics-instrumentation.md': `
+<div class="ghv-md">
 <h1>analytics-instrumentation.md</h1>
 <p>I instrument product and marketing data so teams can trust what they measure.</p>
 <h2>Technologies</h2>
@@ -159,8 +291,9 @@ const fileContents: Record<string, string> = {
   <li>Dataform</li>
   <li>Looker Studio</li>
 </ul>
-`,
-  'data-science/bayesian-modeling.md': `
+</div>`,
+  'skills/data-science/bayesian-modeling.md': `
+<div class="ghv-md">
 <h1>bayesian-modeling.md</h1>
 <p>I use Bayesian modelling when signals are noisy and decisions still need to be made.</p>
 <h2>Technologies</h2>
@@ -173,8 +306,9 @@ const fileContents: Record<string, string> = {
 </ul>
 <h2>Proof</h2>
 <p>Built a Bayesian MMM at Moonbird.</p>
-`,
-  'data-science/computer-vision.md': `
+</div>`,
+  'skills/data-science/computer-vision.md': `
+<div class="ghv-md">
 <h1>computer-vision.md</h1>
 <p>I worked on medical image processing, 3D meshes, and computer vision systems.</p>
 <h2>Technologies</h2>
@@ -187,8 +321,9 @@ const fileContents: Record<string, string> = {
 </ul>
 <h2>Proof</h2>
 <p>Created <a href="https://github.com/TheWebMonks/meshmonk" class="ghv-link">MeshMonk</a>; used or cited in 140+ research projects.</p>
-`,
-  'data-science/data-pipelines.md': `
+</div>`,
+  'skills/data-science/data-pipelines.md': `
+<div class="ghv-md">
 <h1>data-pipelines.md</h1>
 <p>I build ELT pipelines that turn source data into models, dashboards, and decisions.</p>
 <h2>Technologies</h2>
@@ -201,8 +336,9 @@ const fileContents: Record<string, string> = {
 </ul>
 <h2>Proof</h2>
 <p>Built the Moonbird pipeline behind growth reporting and modelling.</p>
-`,
-  'growth-engineering/performance-marketing.md': `
+</div>`,
+  'skills/growth-engineering/performance-marketing.md': `
+<div class="ghv-md">
 <h1>performance-marketing.md</h1>
 <p>I combine acquisition, experiments, automation, and measurement into one growth loop.</p>
 <h2>Technologies</h2>
@@ -215,8 +351,9 @@ const fileContents: Record<string, string> = {
 </ul>
 <h2>Proof</h2>
 <p>At Moonbird, grew monthly revenue from four to six figures in 3.5 years.</p>
-`,
-  'growth-engineering/server-side-tracking.md': `
+</div>`,
+  'skills/growth-engineering/server-side-tracking.md': `
+<div class="ghv-md">
 <h1>server-side-tracking.md</h1>
 <p>I preserve attribution signal by sending conversion events from the backend.</p>
 <h2>Technologies</h2>
@@ -228,8 +365,9 @@ const fileContents: Record<string, string> = {
 </ul>
 <h2>Proof</h2>
 <p>Built and maintained server-side tracking for Moonbird's ad stack.</p>
-`,
-  'growth-engineering/bayesian-mmm.md': `
+</div>`,
+  'skills/growth-engineering/bayesian-mmm.md': `
+<div class="ghv-md">
 <h1>bayesian-mmm.md</h1>
 <p>I model channel contribution when last-click attribution is too noisy to trust.</p>
 <h2>Technologies</h2>
@@ -242,8 +380,9 @@ const fileContents: Record<string, string> = {
 </ul>
 <h2>Proof</h2>
 <p>Used at Moonbird to guide marketing budget allocation.</p>
-`,
-  'founder-operator/strategy.md': `
+</div>`,
+  'skills/founder-operator/strategy.md': `
+<div class="ghv-md">
 <h1>strategy.md</h1>
 <p>I founded and ran an impact-first organization focused on digital jobs and training.</p>
 <h2>Methods</h2>
@@ -255,8 +394,9 @@ const fileContents: Record<string, string> = {
 </ul>
 <h2>Proof</h2>
 <p>Humainly supported 30 people through NGO partnerships in Venezuela and Nigeria.</p>
-`,
-  'founder-operator/teams-and-ops.md': `
+</div>`,
+  'skills/founder-operator/teams-and-ops.md': `
+<div class="ghv-md">
 <h1>teams-and-ops.md</h1>
 <p>I ran small international teams with explicit roles and distributed authority.</p>
 <h2>Methods</h2>
@@ -268,8 +408,9 @@ const fileContents: Record<string, string> = {
 </ul>
 <h2>Proof</h2>
 <p>Humainly operated across Belgium, Venezuela, and Nigeria.</p>
-`,
-  'founder-operator/learning-from-failures.md': `
+</div>`,
+  'skills/founder-operator/learning-from-failures.md': `
+<div class="ghv-md">
 <h1>learning-from-failures.md</h1>
 <p>Humainly did not scale before founder burnout; that changed how I think about pace and sustainability.</p>
 <h2>Methods</h2>
@@ -281,8 +422,31 @@ const fileContents: Record<string, string> = {
 </ul>
 <h2>Proof</h2>
 <p>The mission worked; the growth rate and operating model did not.</p>
-`,
+</div>`,
 };
+
+Object.assign(fileContents, skillsContents);
+
+const DEFAULT_PATH = 'README.md';
+
+// Count total files for subheader
+const countFiles = (foldersArr: TreeFolder[]): number => {
+  let count = 1; // README.md
+  for (const f of foldersArr) {
+    count += f.files.length;
+    if (f.subfolders) count += countFiles(f.subfolders) - 1; // -1 to not double-count the offset
+  }
+  return count;
+};
+
+// Simple flat count
+const totalFiles = 1 + // README.md
+  workExperience.length +
+  achievements.length +
+  education.length +
+  Object.keys(skillsContents).length;
+
+const totalFolders = 4 + skillsSubfolders.length; // experience, achievements, education, skills + skill subfolders
 ---
 
 <BaseLayout title="Resume | Jonatan Snyders" description="Resume of Jonatan Snyders — web developer, data scientist, ex-founder, and growth engineer.">
@@ -290,51 +454,14 @@ const fileContents: Record<string, string> = {
     <h1 class="resume-page__title">Resume</h1>
 
     <ResumeCard>
-      <div class="resume-profile">
-        <div class="resume-avatar-tooltip" data-tooltip='"Moaarrr data!" is all I could come up with, sorry.'>
-          <div class="resume-avatar" aria-label="Interactive profile picture. Hover to see a surprise.">
-            <img class="resume-avatar__image resume-avatar__image--default" src="/img/jonatan_avatar_smiling_no_bg.png" alt="Jonatan Profile Picture" width="96" height="96" />
-            <img class="resume-avatar__image resume-avatar__image--hover" src="/img/jonatan_avatar_roaring_no_bg.png" alt="Jonatan Profile Picture (Roaring)" width="96" height="96" />
-            <div class="resume-avatar__ring"></div>
-          </div>
-        </div>
-
-        <h2 class="resume-profile__name">Jonatan Snyders <span>he/him</span></h2>
-
-        <div class="resume-badge-row">
-          {resumeIntro.headlineBadges.map((badge, index) => (
-            <span class:list={["resume-badge", `resume-badge--${['primary', 'accent', 'secondary', 'info'][index]}`]}>{badge}</span>
-          ))}
-        </div>
-
-        <div class="resume-copy">
-          {resumeIntro.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
-        </div>
-
-        <div class="resume-badge-row">
-          {resumeIntro.skillBadges.map((badge) => (
-            <span class="resume-badge resume-badge--neutral" data-tooltip={badge.tooltip}>{badge.label}</span>
-          ))}
-        </div>
-
-        <details class="resume-download">
-          <summary class="resume-download__button">Download CV</summary>
-          <div class="resume-download__tooltip">
-            All this work on an online resume, and you want a PDF? (<span>I&apos;ll get to it eventually!</span>)
-          </div>
-        </details>
-      </div>
-    </ResumeCard>
-
-    <ResumeCard title="Skills">
-      <div class="ghv-shell" role="main" aria-label="Skills repository browser">
+      <div class="ghv-shell" role="main" aria-label="Resume repository browser">
 
         <!-- Repo header / breadcrumb -->
         <div class="ghv-header">
           <div class="ghv-crumb">
             <span class="ghv-crumb-owner">jsnyde0</span>
             <span class="ghv-crumb-sep">/</span>
-            <span class="ghv-crumb-repo">personal-skills</span>
+            <span class="ghv-crumb-repo">resume</span>
           </div>
           <div class="ghv-header-pills">
             <span class="ghv-pill">
@@ -355,9 +482,9 @@ const fileContents: Record<string, string> = {
             main
           </span>
           <span class="ghv-subheader-sep">·</span>
-          <span>16 files</span>
+          <span>{totalFiles} files</span>
           <span class="ghv-subheader-sep">·</span>
-          <span>5 folders</span>
+          <span>{totalFolders} folders</span>
         </div>
 
         <!-- Mobile: tree toggle -->
@@ -383,39 +510,40 @@ const fileContents: Record<string, string> = {
             </div>
 
             <div class="ghv-tree-root">
-              <!-- Root SKILLS.md -->
+              <!-- README.md — default selected -->
               <div
                 class="ghv-file ghv-file--selected"
                 role="button"
                 tabindex="0"
-                data-ghv-path="SKILLS.md"
-                aria-label="SKILLS.md"
+                data-ghv-path="README.md"
+                aria-label="README.md"
                 aria-current="true"
               >
                 <span class="ghv-file-icon" aria-hidden="true">
                   <svg viewBox="0 0 16 16"><path d="M2 1.75C2 .784 2.784 0 3.75 0h6.586c.464 0 .909.184 1.237.513l2.914 2.914c.329.328.513.773.513 1.237v9.586A1.75 1.75 0 0 1 13.25 16h-9.5A1.75 1.75 0 0 1 2 14.25Zm1.75-.25a.25.25 0 0 0-.25.25v12.5c0 .138.112.25.25.25h9.5a.25.25 0 0 0 .25-.25V6h-2.75A1.75 1.75 0 0 1 9 4.25V1.5Zm6.75.062V4.25c0 .138.112.25.25.25h2.688l-.011-.013-2.914-2.914-.013-.011Z"/></svg>
                 </span>
-                <span>SKILLS.md</span>
+                <span>README.md</span>
               </div>
 
-              <!-- Folders -->
+              <!-- Top-level folders: experience, achievements, education, skills -->
               {folders.map((folder, folderIdx) => (
                 <div class="ghv-folder" data-ghv-folder={folder.name}>
                   <div
                     class="ghv-folder-row"
                     role="button"
                     tabindex="0"
-                    aria-expanded="true"
+                    aria-expanded="false"
                     aria-controls={`ghv-folder-files-${folderIdx}`}
                     data-ghv-folder-toggle={folder.name}
                   >
-                    <span class="ghv-folder-caret is-open" aria-hidden="true">▶</span>
+                    <span class="ghv-folder-caret" aria-hidden="true">▶</span>
                     <span class="ghv-folder-icon" aria-hidden="true">
                       <svg viewBox="0 0 16 16"><path d="M1.75 1A1.75 1.75 0 0 0 0 2.75v10.5C0 14.216.784 15 1.75 15h12.5A1.75 1.75 0 0 0 16 13.25v-8.5A1.75 1.75 0 0 0 14.25 3H7.5a.25.25 0 0 1-.2-.1l-.9-1.2C6.07 1.26 5.55 1 5 1H1.75Z"/></svg>
                     </span>
-                    <span>{folder.name}</span>
+                    <span>{folder.name}/</span>
                   </div>
-                  <div class="ghv-folder-files" id={`ghv-folder-files-${folderIdx}`}>
+                  <div class="ghv-folder-files" id={`ghv-folder-files-${folderIdx}`} style="display:none">
+                    {/* Direct files in this folder */}
                     {folder.files.map((file) => (
                       <div
                         class="ghv-file"
@@ -431,6 +559,43 @@ const fileContents: Record<string, string> = {
                         <span>{file.name}</span>
                       </div>
                     ))}
+                    {/* Skill subfolders */}
+                    {folder.subfolders && folder.subfolders.map((sub, subIdx) => (
+                      <div class="ghv-folder" data-ghv-folder={`${folder.name}/${sub.name}`}>
+                        <div
+                          class="ghv-folder-row ghv-folder-row--sub"
+                          role="button"
+                          tabindex="0"
+                          aria-expanded="false"
+                          aria-controls={`ghv-subfolder-files-${folderIdx}-${subIdx}`}
+                          data-ghv-subfolder-toggle={`${folder.name}/${sub.name}`}
+                          data-ghv-subfolder-panel={`ghv-subfolder-files-${folderIdx}-${subIdx}`}
+                        >
+                          <span class="ghv-folder-caret" aria-hidden="true">▶</span>
+                          <span class="ghv-folder-icon" aria-hidden="true">
+                            <svg viewBox="0 0 16 16"><path d="M1.75 1A1.75 1.75 0 0 0 0 2.75v10.5C0 14.216.784 15 1.75 15h12.5A1.75 1.75 0 0 0 16 13.25v-8.5A1.75 1.75 0 0 0 14.25 3H7.5a.25.25 0 0 1-.2-.1l-.9-1.2C6.07 1.26 5.55 1 5 1H1.75Z"/></svg>
+                          </span>
+                          <span>{sub.name}/</span>
+                        </div>
+                        <div class="ghv-folder-files" id={`ghv-subfolder-files-${folderIdx}-${subIdx}`} style="display:none">
+                          {sub.files.map((file) => (
+                            <div
+                              class="ghv-file"
+                              role="button"
+                              tabindex="0"
+                              data-ghv-path={file.path}
+                              aria-label={file.name}
+                              aria-current="false"
+                            >
+                              <span class="ghv-file-icon" aria-hidden="true">
+                                <svg viewBox="0 0 16 16"><path d="M2 1.75C2 .784 2.784 0 3.75 0h6.586c.464 0 .909.184 1.237.513l2.914 2.914c.329.328.513.773.513 1.237v9.586A1.75 1.75 0 0 1 13.25 16h-9.5A1.75 1.75 0 0 1 2 14.25Zm1.75-.25a.25.25 0 0 0-.25.25v12.5c0 .138.112.25.25.25h9.5a.25.25 0 0 0 .25-.25V6h-2.75A1.75 1.75 0 0 1 9 4.25V1.5Zm6.75.062V4.25c0 .138.112.25.25.25h2.688l-.011-.013-2.914-2.914-.013-.011Z"/></svg>
+                              </span>
+                              <span>{file.name}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               ))}
@@ -443,7 +608,7 @@ const fileContents: Record<string, string> = {
             <!-- Preview header bar -->
             <div class="ghv-preview-header">
               <div class="ghv-preview-path" id="ghv-preview-path" aria-live="polite">
-                <span>SKILLS.md</span>
+                <span>README.md</span>
               </div>
               <div class="ghv-preview-actions">
                 <span class="ghv-preview-btn">Raw</span>
@@ -451,53 +616,44 @@ const fileContents: Record<string, string> = {
               </div>
             </div>
 
-            <!-- Rendered markdown content -->
+            <!-- Rendered content — all panels rendered server-side, JS toggles visibility -->
             <div class="ghv-preview-content">
-              <div class="ghv-md" id="ghv-preview-body" aria-live="polite">
-                <!-- content swapped by JS -->
-              </div>
+              {Object.entries(fileContents).map(([path, html]) => (
+                <div
+                  class="ghv-file-panel"
+                  data-ghv-panel={path}
+                  style={path === DEFAULT_PATH ? '' : 'display:none'}
+                  aria-hidden={path === DEFAULT_PATH ? 'false' : 'true'}
+                  set:html={html}
+                />
+              ))}
             </div>
 
           </div>
         </div>
       </div>
     </ResumeCard>
-
-    <ResumeCard title="Achievements" tooltip="TLDR: lots of python and c++, lots of data science, startup success and failure and learned web dev pretty fast">
-      <div class="resume-section-stack">
-        {achievements.map((item) => <ResumeItemCard {...item} />)}
-      </div>
-    </ResumeCard>
-
-    <ResumeCard title="Work Experience" tooltip="TLDR: did algorithm research, built a c++ library, co-founded a business, consulted data science, growth engineered eComm, built web apps">
-      <div class="resume-section-stack">
-        {workExperience.map((item) => <ResumeItemCard {...item} />)}
-      </div>
-    </ResumeCard>
-
-    <ResumeCard title="Education">
-      <div class="resume-section-stack">
-        {education.map((item) => <ResumeItemCard {...item} />)}
-      </div>
-    </ResumeCard>
   </div>
 
-  <script define:vars={{ fileContents }}>
+  <script>
     // Inline vanilla JS — no framework islands, no URL/hash changes.
 
-    const contentMap = fileContents;
-    const DEFAULT_PATH = 'SKILLS.md';
+    const DEFAULT_PATH = 'README.md';
 
-    const previewBody = document.getElementById('ghv-preview-body');
     const previewPath = document.getElementById('ghv-preview-path');
     const mobileToggleBtn = document.getElementById('ghv-mobile-toggle-btn');
     const mobileCaret = document.getElementById('ghv-mobile-caret');
     const treePanel = document.getElementById('ghv-tree-panel');
 
-    function setPreview(path) {
-      const html = contentMap[path];
-      if (!html || !previewBody) return;
-      previewBody.innerHTML = html;
+    function setPreview(path: string) {
+      // Hide all panels
+      document.querySelectorAll<HTMLElement>('[data-ghv-panel]').forEach((panel) => {
+        const isActive = panel.getAttribute('data-ghv-panel') === path;
+        panel.style.display = isActive ? '' : 'none';
+        panel.setAttribute('aria-hidden', isActive ? 'false' : 'true');
+      });
+
+      // Update breadcrumb
       if (previewPath) {
         const parts = path.split('/');
         if (parts.length === 1) {
@@ -508,15 +664,15 @@ const fileContents: Record<string, string> = {
       }
     }
 
-    function setSelected(path) {
-      document.querySelectorAll('[data-ghv-path]').forEach(el => {
+    function setSelected(path: string) {
+      document.querySelectorAll<HTMLElement>('[data-ghv-path]').forEach((el) => {
         const isSelected = el.getAttribute('data-ghv-path') === path;
         el.classList.toggle('ghv-file--selected', isSelected);
         el.setAttribute('aria-current', isSelected ? 'true' : 'false');
       });
     }
 
-    function handleFileClick(el) {
+    function handleFileClick(el: HTMLElement) {
       const path = el.getAttribute('data-ghv-path');
       if (!path) return;
       setSelected(path);
@@ -530,9 +686,9 @@ const fileContents: Record<string, string> = {
     }
 
     // Wire up file click / keyboard
-    document.querySelectorAll('[data-ghv-path]').forEach(el => {
+    document.querySelectorAll<HTMLElement>('[data-ghv-path]').forEach((el) => {
       el.addEventListener('click', () => handleFileClick(el));
-      el.addEventListener('keydown', (e) => {
+      el.addEventListener('keydown', (e: KeyboardEvent) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
           handleFileClick(el);
@@ -540,12 +696,13 @@ const fileContents: Record<string, string> = {
       });
     });
 
-    // Folder toggle
-    document.querySelectorAll('[data-ghv-folder-toggle]').forEach(toggleEl => {
+    // Top-level folder toggle
+    document.querySelectorAll<HTMLElement>('[data-ghv-folder-toggle]').forEach((toggleEl) => {
       toggleEl.addEventListener('click', () => {
         const folderName = toggleEl.getAttribute('data-ghv-folder-toggle');
-        const idx = Array.from(document.querySelectorAll('[data-ghv-folder-toggle]')).indexOf(toggleEl);
-        const filesPanel = document.getElementById('ghv-folder-files-' + idx);
+        const panelId = toggleEl.getAttribute('aria-controls');
+        if (!panelId) return;
+        const filesPanel = document.getElementById(panelId);
         const caret = toggleEl.querySelector('.ghv-folder-caret');
         if (!filesPanel) return;
         const isOpen = filesPanel.style.display !== 'none';
@@ -553,7 +710,29 @@ const fileContents: Record<string, string> = {
         toggleEl.setAttribute('aria-expanded', String(!isOpen));
         caret?.classList.toggle('is-open', !isOpen);
       });
-      toggleEl.addEventListener('keydown', (e) => {
+      toggleEl.addEventListener('keydown', (e: KeyboardEvent) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          toggleEl.click();
+        }
+      });
+    });
+
+    // Sub-folder toggle
+    document.querySelectorAll<HTMLElement>('[data-ghv-subfolder-toggle]').forEach((toggleEl) => {
+      toggleEl.addEventListener('click', (e: Event) => {
+        e.stopPropagation(); // don't trigger parent folder toggle
+        const panelId = toggleEl.getAttribute('data-ghv-subfolder-panel');
+        if (!panelId) return;
+        const filesPanel = document.getElementById(panelId);
+        const caret = toggleEl.querySelector('.ghv-folder-caret');
+        if (!filesPanel) return;
+        const isOpen = filesPanel.style.display !== 'none';
+        filesPanel.style.display = isOpen ? 'none' : '';
+        toggleEl.setAttribute('aria-expanded', String(!isOpen));
+        caret?.classList.toggle('is-open', !isOpen);
+      });
+      toggleEl.addEventListener('keydown', (e: KeyboardEvent) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
           toggleEl.click();
@@ -584,170 +763,6 @@ const fileContents: Record<string, string> = {
       margin: 0 0 2rem;
       font-size: clamp(2rem, 4vw, 2.5rem);
       line-height: 1.1;
-    }
-
-    [data-tooltip] {
-      position: relative;
-      cursor: help;
-    }
-
-    [data-tooltip]::after {
-      content: attr(data-tooltip);
-      position: absolute;
-      left: 50%;
-      bottom: calc(100% + 0.5rem);
-      transform: translateX(-50%);
-      width: max-content;
-      max-width: min(18rem, 80vw);
-      border-radius: var(--radius-md);
-      background: var(--tooltip-bg);
-      color: var(--tooltip-text);
-      padding: 0.5rem 0.75rem;
-      font-size: 0.875rem;
-      line-height: 1.35;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity var(--transition-base);
-      z-index: 2;
-      text-align: center;
-    }
-
-    [data-tooltip]:hover::after,
-    [data-tooltip]:focus-visible::after {
-      opacity: 1;
-    }
-
-    .resume-profile {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-    }
-
-    .resume-avatar {
-      position: relative;
-      width: 6rem;
-      height: 6rem;
-      margin-bottom: 0.75rem;
-      overflow: hidden;
-      border-radius: var(--radius-full);
-      box-shadow: var(--shadow-avatar);
-    }
-
-    .resume-avatar__image {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transition: opacity 240ms ease, transform 240ms ease;
-    }
-
-    .resume-avatar__image--hover {
-      opacity: 0;
-      transform: scale(0.98);
-    }
-
-    .resume-avatar:hover .resume-avatar__image--hover,
-    .resume-avatar:focus-within .resume-avatar__image--hover {
-      opacity: 1;
-      transform: scale(1.05);
-    }
-
-    .resume-avatar:hover .resume-avatar__image--default,
-    .resume-avatar:focus-within .resume-avatar__image--default {
-      opacity: 0;
-    }
-
-    .resume-avatar__ring {
-      position: absolute;
-      inset: 0;
-      border: 2px solid var(--primary);
-      border-radius: var(--radius-full);
-      opacity: 0.5;
-    }
-
-    .resume-profile__name {
-      margin: 0;
-      font-size: 1.25rem;
-      font-weight: 600;
-    }
-
-    .resume-profile__name span {
-      font-size: 0.875rem;
-      color: var(--muted-content);
-    }
-
-    .resume-badge-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.625rem;
-      margin-top: 1rem;
-    }
-
-    .resume-badge {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: var(--radius-full);
-      padding: 0.45rem 0.8rem;
-      font-size: 0.875rem;
-      font-weight: 700;
-      line-height: 1;
-      white-space: nowrap;
-    }
-
-    .resume-badge--primary { background: var(--primary); color: var(--primary-content); }
-    .resume-badge--accent { background: var(--accent); color: var(--accent-content); }
-    .resume-badge--secondary { background: var(--success); color: var(--success-content); }
-    .resume-badge--info { background: var(--info); color: var(--info-content); }
-    .resume-badge--neutral { background: var(--base-300); color: var(--base-content); font-weight: 600; }
-
-    .resume-copy {
-      margin-top: 0.75rem;
-    }
-
-    .resume-copy p {
-      margin: 0.75rem 0 0;
-      color: var(--base-content);
-      font-size: 0.98rem;
-    }
-
-    .resume-download {
-      width: 100%;
-      margin-top: 1.25rem;
-    }
-
-    .resume-download__button {
-      list-style: none;
-      display: inline-flex;
-      width: 100%;
-      justify-content: center;
-      border: 1px solid var(--base-300);
-      border-radius: 0.9rem;
-      padding: 0.85rem 1rem;
-      cursor: pointer;
-      font-weight: 600;
-      transition: background var(--transition-base), border-color var(--transition-base);
-    }
-
-    .resume-download__button::-webkit-details-marker { display: none; }
-    .resume-download[open] .resume-download__button,
-    .resume-download__button:hover { background: var(--base-300); border-color: var(--primary); }
-
-    .resume-download__tooltip {
-      margin-top: 0.75rem;
-      border-radius: 0.9rem;
-      background: var(--tooltip-dark-bg);
-      color: #fff;
-      padding: 0.85rem 1rem;
-      font-size: 0.95rem;
-    }
-
-    .resume-download__tooltip span { font-style: italic; }
-
-    .resume-section-stack {
-      display: grid;
-      gap: 1rem;
     }
 
     /* === GITHUB-DARK SHELL === */
@@ -890,7 +905,7 @@ const fileContents: Record<string, string> = {
       padding: 0 4px;
     }
 
-    /* root SKILLS.md file */
+    /* root README.md file */
     .ghv-file {
       display: flex;
       align-items: center;
@@ -972,6 +987,12 @@ const fileContents: Record<string, string> = {
       background: rgba(177, 186, 196, 0.08);
     }
 
+    /* Subfolder rows get extra indent */
+    .ghv-folder-row--sub {
+      padding-left: 24px;
+      font-weight: 500;
+    }
+
     .ghv-folder-icon {
       flex-shrink: 0;
       color: #58a6ff;
@@ -1006,6 +1027,11 @@ const fileContents: Record<string, string> = {
 
     .ghv-folder-files .ghv-file {
       padding-left: 10px;
+    }
+
+    /* Nested subfolder files get extra indent */
+    .ghv-folder-files .ghv-folder-files .ghv-file {
+      padding-left: 18px;
     }
 
     /* === PREVIEW PANE === */
@@ -1067,8 +1093,105 @@ const fileContents: Record<string, string> = {
       flex: 1;
     }
 
-    /* Markdown-style content rendering */
-    .ghv-md h1 {
+    /* === RESUME ITEM CARD & GHV PANEL CONTENT (global — targets set:html injected content) === */
+    :global(.resume-item-card) {
+      display: flex;
+      gap: 1.25rem;
+      align-items: flex-start;
+    }
+
+    :global(.ghv-item-logo) {
+      flex: 0 0 3rem;
+      width: 3rem;
+      height: 3rem;
+    }
+
+    :global(.ghv-item-logo__img) {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      /* Lighten dark logos on dark background */
+      filter: brightness(1.1);
+    }
+
+    :global(.ghv-item-body) {
+      flex: 1;
+      min-width: 0;
+    }
+
+    :global(.ghv-item-meta) {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem 0.6rem;
+      align-items: center;
+      color: #8b949e;
+      font-size: 0.875rem;
+      margin: 0.5rem 0 1rem !important;
+    }
+
+    :global(.ghv-item-links) {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+    }
+
+    /* === BADGES (inside ghv panels — global) === */
+    :global(.ghv-badge) {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      padding: 0.25rem 0.65rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    :global(.ghv-badge--primary)   { background: #388bfd; color: #ffffff; }
+    :global(.ghv-badge--accent)    { background: #3fb950; color: #0d1117; }
+    :global(.ghv-badge--secondary) { background: #58a6ff; color: #0d1117; }
+    :global(.ghv-badge--info)      { background: #79c0ff; color: #0d1117; }
+
+    /* === README PROFILE (global) === */
+    :global(.ghv-readme-profile) {
+      display: flex;
+      gap: 1.5rem;
+      align-items: flex-start;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+
+    :global(.ghv-readme-avatar) {
+      flex: 0 0 5rem;
+      width: 5rem;
+      height: 5rem;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 2px solid #30363d;
+    }
+
+    :global(.ghv-readme-avatar__img) {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    :global(.ghv-readme-intro) {
+      flex: 1;
+      min-width: 0;
+    }
+
+    :global(.ghv-readme-badges) {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin: 0.5rem 0 0.75rem;
+    }
+
+    /* === Markdown-style content rendering (global — targets set:html content) === */
+    :global(.ghv-md) h1 {
       font-size: 1.5em;
       font-weight: 600;
       color: #f0f6fc;
@@ -1078,7 +1201,7 @@ const fileContents: Record<string, string> = {
       line-height: 1.25;
     }
 
-    .ghv-md h2 {
+    :global(.ghv-md) h2 {
       font-size: 1.25em;
       font-weight: 600;
       color: #f0f6fc;
@@ -1088,31 +1211,31 @@ const fileContents: Record<string, string> = {
       line-height: 1.25;
     }
 
-    .ghv-md p {
+    :global(.ghv-md) p {
       color: #c9d1d9;
       margin: 0 0 1em;
       line-height: 1.6;
       max-width: 72ch;
     }
 
-    .ghv-md ul {
+    :global(.ghv-md) ul {
       color: #c9d1d9;
       margin: 0 0 1em;
       padding-left: 1.5em;
       line-height: 1.6;
     }
 
-    .ghv-md li {
+    :global(.ghv-md) li {
       margin-bottom: 0.35em;
       max-width: 72ch;
     }
 
-    .ghv-md strong {
+    :global(.ghv-md) strong {
       color: #f0f6fc;
       font-weight: 600;
     }
 
-    .ghv-md code {
+    :global(.ghv-md) code {
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
       font-size: 0.875em;
       background: rgba(110, 118, 129, 0.4);
@@ -1120,12 +1243,12 @@ const fileContents: Record<string, string> = {
       padding: 0.1em 0.35em;
     }
 
-    .ghv-link {
+    :global(.ghv-link) {
       color: #58a6ff !important;
       text-decoration: none;
     }
 
-    .ghv-link:hover {
+    :global(.ghv-link):hover {
       text-decoration: underline;
     }
 
@@ -1160,6 +1283,12 @@ const fileContents: Record<string, string> = {
 
     .ghv-mobile-toggle-caret.is-open {
       transform: rotate(180deg);
+    }
+
+    @media (max-width: 767px) {
+      :global(.resume-item-card) {
+        flex-direction: column;
+      }
     }
 
     @media (max-width: 640px) {
