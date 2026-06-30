@@ -64,29 +64,21 @@ const fileContents: Record<string, string> = {
 <h1>SKILLS.md</h1>
 <p><strong>Agentic engineering is the skill that makes the rest compound.</strong></p>
 <p>I use it to move quickly across web apps, data systems, growth loops, and operations.</p>
-<h2>Technologies</h2>
-<ul>
-  <li>Django, HTMX, React, Astro, Tailwind</li>
-  <li>Python, PyMC, pandas, NumPy</li>
-  <li>PostgreSQL, BigQuery, Dataform</li>
-  <li>PostHog, GA4, server-side tracking</li>
-  <li>Docker, DigitalOcean, GitHub Actions</li>
-</ul>
 <h2>Skill folders</h2>
 <ul>
-  <li><strong>agentic-engineering/</strong> — how I build and run agents</li>
-  <li><strong>web-development/</strong> — full-stack product engineering</li>
-  <li><strong>data-science/</strong> — Bayesian models, pipelines, computer vision</li>
-  <li><strong>growth-engineering/</strong> — acquisition, tracking, modelling</li>
-  <li><strong>founder-operator/</strong> — strategy, teams, hard-earned judgment</li>
+  <li><strong>agentic-engineering/</strong> how I build and run agents</li>
+  <li><strong>web-development/</strong> full-stack product engineering</li>
+  <li><strong>data-science/</strong> Bayesian models, pipelines, computer vision</li>
+  <li><strong>growth-engineering/</strong> acquisition, tracking, modelling</li>
+  <li><strong>founder-operator/</strong> strategy, teams, hard-earned judgment</li>
 </ul>
 `,
   'agentic-engineering/harness-factory.md': `
 <h1>harness-factory.md</h1>
-<p>I build and own my agent harness — the prompts, tools, context routing, and review loops that turn an LLM into a system that does real work, unattended.</p>
+<p>I build and own my agent harness: the prompts, tools, context routing, and review loops that turn an LLM into a system that does real work, unattended.</p>
 <h2>Technologies</h2>
 <ul>
-  <li>pi — a harness I can change all the way down</li>
+  <li>pi, a harness I can change all the way down</li>
   <li>Custom skills, roles, and tools</li>
   <li>Subagents and fresh-context review loops</li>
   <li>Prompt templates and context routing</li>
@@ -96,7 +88,7 @@ const fileContents: Record<string, string> = {
 `,
   'agentic-engineering/disposable-orchestrators.md': `
 <h1>disposable-orchestrators.md</h1>
-<p>I architect agent work so state lives in the substrate, not the agent. Each orchestrator reads a graph of goals, makes one move, writes its decision back, and dies — so any agent can crash and the work picks up where it left off.</p>
+<p>I architect agent work so state lives in the substrate, not the agent. Each orchestrator reads a graph of goals, makes one move, writes its decision back, and dies, so any agent can crash and the work picks up where it left off.</p>
 <h2>Technologies</h2>
 <ul>
   <li>Work as a dependency graph, not a chat log</li>
@@ -112,7 +104,7 @@ const fileContents: Record<string, string> = {
 <p>I run agents unattended by putting hard limits around them: containerized execution, every shell command checked before it runs, and credentials the agent never holds directly.</p>
 <h2>Technologies</h2>
 <ul>
-  <li>rip-cage — container plus command-gating I built</li>
+  <li>rip-cage, a container plus command-gating I built</li>
   <li>Credential isolation through a proxy</li>
   <li>Always-on host, not a laptop</li>
   <li>Safe-to-run-unattended execution</li>
@@ -122,7 +114,7 @@ const fileContents: Record<string, string> = {
 `,
   'agentic-engineering/llm-app-engineering.md': `
 <h1>llm-app-engineering.md</h1>
-<p>Beyond tooling my own workflow, I build agentic apps — LLM calls wrapped in tools, structured output, and guardrails meant to hold up in production.</p>
+<p>Beyond tooling my own workflow, I build agentic apps: LLM calls wrapped in tools, structured output, and guardrails meant to hold up in production.</p>
 <h2>Technologies</h2>
 <ul>
   <li>LLM-powered features and agents</li>
@@ -133,7 +125,7 @@ const fileContents: Record<string, string> = {
 `,
   'web-development/full-stack-web.md': `
 <h1>full-stack-web.md</h1>
-<p>I build full-stack web apps — backend, frontend, and the data layer behind them. I default to hypermedia-driven apps: server-rendered HTML with focused interactivity and little client-side state. I build with React too, but reach for it when an app genuinely needs a rich client.</p>
+<p>I build full-stack web apps across backend, frontend, and the data layer behind them. I default to hypermedia-driven apps: server-rendered HTML with focused interactivity and little client-side state. I build with React too, but reach for it when an app genuinely needs a rich client.</p>
 <h2>Technologies</h2>
 <ul>
   <li>Django, PostgreSQL, MongoDB</li>
@@ -292,7 +284,7 @@ const fileContents: Record<string, string> = {
 };
 ---
 
-<BaseLayout title="Skills (GitHub prototype)" description="Throwaway prototype — GitHub-style skills file browser.">
+<BaseLayout title="Skills (GitHub prototype)" description="Throwaway prototype, GitHub-style skills file browser.">
   <style>
     /* Override the content-container max-width for this page only */
     .content-container {
@@ -767,7 +759,7 @@ const fileContents: Record<string, string> = {
 
   <div class="ghv-banner">
     <strong>Throwaway prototype</strong>
-    <span>GitHub-style file-view concept — not production UI.</span>
+    <span>GitHub-style file-view concept, not production UI.</span>
   </div>
 
   <div class="ghv-shell" role="main" aria-label="Skills repository browser">
