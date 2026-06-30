@@ -17,11 +17,6 @@ export interface ResumeItem {
   links?: { label: string; href: string }[];
 }
 
-export interface SkillNode {
-  name: string;
-  children?: SkillNode[];
-}
-
 export const resumeIntro: ResumeIntro = {
   paragraphs: [
     "I'm from Belgium, lived in Venezuela and Nigeria, and moving to Berlin in November 2024.",
@@ -37,34 +32,6 @@ export const resumeIntro: ResumeIntro = {
     { label: 'Django' },
     { label: 'SQL' },
     { label: 'Fashion Icon', tooltip: "You've seen the crocs. You know it." },
-  ],
-};
-
-export const skillsTree: SkillNode = {
-  name: 'Role',
-  children: [
-    {
-      name: 'Web Developer',
-      children: [
-        { name: 'Back-End', children: [{ name: 'Django' }, { name: 'PostgreSQL' }, { name: 'MongoDB' }, { name: 'Async' }, { name: 'RESTful API' }] },
-        { name: 'Front-end', children: [{ name: 'HTML, CSS' }, { name: 'HTMX, Tailwind' }, { name: 'Chart.js, D3.js' }, { name: 'JavaScript' }] },
-        { name: 'Analytics', children: [{ name: 'Posthog, GA4' }, { name: 'Looker Studio' }, { name: 'Server-side Tracking' }] },
-        { name: 'Deployment', children: [{ name: 'DigitalOcean' }, { name: 'Docker' }, { name: 'CI/CD' }] },
-        { name: 'Data Pipelines', children: [{ name: 'BigQuery' }, { name: 'Dataform' }] },
-      ],
-    },
-    {
-      name: 'Data Scientist',
-      children: [{ name: 'Python, C++' }, { name: 'Algorithm development' }, { name: 'Machine Learning' }, { name: 'Bayesian Modelling' }, { name: 'Computer vision' }, { name: 'Dashboarding' }],
-    },
-    {
-      name: 'Growth Engineer',
-      children: [{ name: 'PPC' }, { name: 'Data-driven' }, { name: 'SEO' }, { name: 'CRO' }, { name: 'Automation' }],
-    },
-    {
-      name: 'Ex-Founder',
-      children: [{ name: 'Vision & Strategy' }, { name: 'HR & Team (Holacracy)' }, { name: 'Finance' }, { name: 'Sales' }, { name: 'Project Management' }, { name: 'Learning from failures' }],
-    },
   ],
 };
 

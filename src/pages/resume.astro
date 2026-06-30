@@ -2,9 +2,287 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ResumeCard from '../components/resume/ResumeCard.astro';
 import ResumeItemCard from '../components/resume/ResumeItemCard.astro';
-import { achievements, education, resumeIntro, skillsTree, workExperience } from '../data/resume';
+import { achievements, education, resumeIntro, workExperience } from '../data/resume';
 
-const skillBranches = skillsTree.children ?? [];
+// File tree taxonomy — FIRM
+interface TreeFile {
+  name: string;
+  path: string;
+}
+
+interface TreeFolder {
+  name: string;
+  files: TreeFile[];
+}
+
+const folders: TreeFolder[] = [
+  {
+    name: 'agentic-engineering',
+    files: [
+      { name: 'harness-factory.md',          path: 'agentic-engineering/harness-factory.md' },
+      { name: 'disposable-orchestrators.md', path: 'agentic-engineering/disposable-orchestrators.md' },
+      { name: 'sandboxed-autonomy.md',       path: 'agentic-engineering/sandboxed-autonomy.md' },
+      { name: 'llm-app-engineering.md',      path: 'agentic-engineering/llm-app-engineering.md' },
+    ],
+  },
+  {
+    name: 'web-development',
+    files: [
+      { name: 'full-stack-web.md',           path: 'web-development/full-stack-web.md' },
+      { name: 'apis-and-deployment.md',      path: 'web-development/apis-and-deployment.md' },
+      { name: 'analytics-instrumentation.md',path: 'web-development/analytics-instrumentation.md' },
+    ],
+  },
+  {
+    name: 'data-science',
+    files: [
+      { name: 'bayesian-modeling.md',  path: 'data-science/bayesian-modeling.md' },
+      { name: 'computer-vision.md',    path: 'data-science/computer-vision.md' },
+      { name: 'data-pipelines.md',     path: 'data-science/data-pipelines.md' },
+    ],
+  },
+  {
+    name: 'growth-engineering',
+    files: [
+      { name: 'performance-marketing.md', path: 'growth-engineering/performance-marketing.md' },
+      { name: 'server-side-tracking.md',  path: 'growth-engineering/server-side-tracking.md' },
+      { name: 'bayesian-mmm.md',          path: 'growth-engineering/bayesian-mmm.md' },
+    ],
+  },
+  {
+    name: 'founder-operator',
+    files: [
+      { name: 'strategy.md',             path: 'founder-operator/strategy.md' },
+      { name: 'teams-and-ops.md',        path: 'founder-operator/teams-and-ops.md' },
+      { name: 'learning-from-failures.md',path: 'founder-operator/learning-from-failures.md' },
+    ],
+  },
+];
+
+// File content map — keyed by path
+const fileContents: Record<string, string> = {
+  'SKILLS.md': `
+<h1>SKILLS.md</h1>
+<p><strong>Agentic engineering is the skill that makes the rest compound.</strong></p>
+<p>I use it to move quickly across web apps, data systems, growth loops, and operations.</p>
+<h2>Skill folders</h2>
+<ul>
+  <li><strong>agentic-engineering/</strong> how I build and run agents</li>
+  <li><strong>web-development/</strong> full-stack product engineering</li>
+  <li><strong>data-science/</strong> Bayesian models, pipelines, computer vision</li>
+  <li><strong>growth-engineering/</strong> acquisition, tracking, modelling</li>
+  <li><strong>founder-operator/</strong> strategy, teams, hard-earned judgment</li>
+</ul>
+`,
+  'agentic-engineering/harness-factory.md': `
+<h1>harness-factory.md</h1>
+<p>I build and own my agent harness: the prompts, tools, context routing, and review loops that turn an LLM into a system that does real work, unattended.</p>
+<h2>Technologies</h2>
+<ul>
+  <li>pi, a harness I can change all the way down</li>
+  <li>Custom skills, roles, and tools</li>
+  <li>Subagents and fresh-context review loops</li>
+  <li>Prompt templates and context routing</li>
+</ul>
+<h2>Proof</h2>
+<p>The whole system runs: <a href="/factory/" class="ghv-link">/factory</a>.</p>
+`,
+  'agentic-engineering/disposable-orchestrators.md': `
+<h1>disposable-orchestrators.md</h1>
+<p>I architect agent work so state lives in the substrate, not the agent. Each orchestrator reads a graph of goals, makes one move, writes its decision back, and dies, so any agent can crash and the work picks up where it left off.</p>
+<h2>Technologies</h2>
+<ul>
+  <li>Work as a dependency graph, not a chat log</li>
+  <li>Tiered memory kept by lifecycle</li>
+  <li>Disposable orchestrators over shared substrate</li>
+  <li>Crash-resumable, parallel-safe workflows</li>
+</ul>
+<h2>Proof</h2>
+<p>The work loop behind <a href="/factory/" class="ghv-link">/factory</a>, including a planner that proposes the next move.</p>
+`,
+  'agentic-engineering/sandboxed-autonomy.md': `
+<h1>sandboxed-autonomy.md</h1>
+<p>I run agents unattended by putting hard limits around them: containerized execution, every shell command checked before it runs, and credentials the agent never holds directly.</p>
+<h2>Technologies</h2>
+<ul>
+  <li>rip-cage, a container plus command-gating I built</li>
+  <li>Credential isolation through a proxy</li>
+  <li>Always-on host, not a laptop</li>
+  <li>Safe-to-run-unattended execution</li>
+</ul>
+<h2>Proof</h2>
+<p>Open source: <a href="https://github.com/jsnyde0/rip-cage" class="ghv-link">rip-cage</a>.</p>
+`,
+  'agentic-engineering/llm-app-engineering.md': `
+<h1>llm-app-engineering.md</h1>
+<p>Beyond tooling my own workflow, I build agentic apps: LLM calls wrapped in tools, structured output, and guardrails meant to hold up in production.</p>
+<h2>Technologies</h2>
+<ul>
+  <li>LLM-powered features and agents</li>
+  <li>Tool use and structured output</li>
+  <li>Retrieval and context design</li>
+  <li>Evaluation and guardrails</li>
+</ul>
+`,
+  'web-development/full-stack-web.md': `
+<h1>full-stack-web.md</h1>
+<p>I build full-stack web apps across backend, frontend, and the data layer behind them. I default to hypermedia-driven apps: server-rendered HTML with focused interactivity and little client-side state. I build with React too, but reach for it when an app genuinely needs a rich client.</p>
+<h2>Technologies</h2>
+<ul>
+  <li>Django, PostgreSQL, MongoDB</li>
+  <li>HTMX, Tailwind, Astro</li>
+  <li>React, JavaScript</li>
+</ul>
+<h2>Approach</h2>
+<p>Why hypermedia-driven: <a href="https://htmx.org/essays/hypermedia-driven-applications/" class="ghv-link">htmx.org/essays/hypermedia-driven-applications</a>.</p>
+`,
+  'web-development/apis-and-deployment.md': `
+<h1>apis-and-deployment.md</h1>
+<p>I build APIs, containerize apps, and deploy them with practical CI/CD.</p>
+<h2>Technologies</h2>
+<ul>
+  <li>Django REST Framework</li>
+  <li>Pydantic</li>
+  <li>Docker</li>
+  <li>DigitalOcean</li>
+  <li>GitHub Actions</li>
+</ul>
+`,
+  'web-development/analytics-instrumentation.md': `
+<h1>analytics-instrumentation.md</h1>
+<p>I instrument product and marketing data so teams can trust what they measure.</p>
+<h2>Technologies</h2>
+<ul>
+  <li>PostHog</li>
+  <li>GA4</li>
+  <li>BigQuery</li>
+  <li>Dataform</li>
+  <li>Looker Studio</li>
+</ul>
+`,
+  'data-science/bayesian-modeling.md': `
+<h1>bayesian-modeling.md</h1>
+<p>I use Bayesian modelling when signals are noisy and decisions still need to be made.</p>
+<h2>Technologies</h2>
+<ul>
+  <li>Python</li>
+  <li>PyMC</li>
+  <li>pandas</li>
+  <li>NumPy</li>
+  <li>Marketing Mix Models</li>
+</ul>
+<h2>Proof</h2>
+<p>Built a Bayesian MMM at Moonbird.</p>
+`,
+  'data-science/computer-vision.md': `
+<h1>computer-vision.md</h1>
+<p>I worked on medical image processing, 3D meshes, and computer vision systems.</p>
+<h2>Technologies</h2>
+<ul>
+  <li>C++</li>
+  <li>Computer vision</li>
+  <li>Medical image processing</li>
+  <li>3D mesh processing</li>
+  <li>Deep learning consulting</li>
+</ul>
+<h2>Proof</h2>
+<p>Created <a href="https://github.com/TheWebMonks/meshmonk" class="ghv-link">MeshMonk</a>; used or cited in 140+ research projects.</p>
+`,
+  'data-science/data-pipelines.md': `
+<h1>data-pipelines.md</h1>
+<p>I build ELT pipelines that turn source data into models, dashboards, and decisions.</p>
+<h2>Technologies</h2>
+<ul>
+  <li>Python</li>
+  <li>SQL</li>
+  <li>BigQuery</li>
+  <li>Dataform</li>
+  <li>API and database extraction</li>
+</ul>
+<h2>Proof</h2>
+<p>Built the Moonbird pipeline behind growth reporting and modelling.</p>
+`,
+  'growth-engineering/performance-marketing.md': `
+<h1>performance-marketing.md</h1>
+<p>I combine acquisition, experiments, automation, and measurement into one growth loop.</p>
+<h2>Technologies</h2>
+<ul>
+  <li>Paid search</li>
+  <li>Paid social</li>
+  <li>Email marketing</li>
+  <li>SEO and CRO</li>
+  <li>Marketing automation</li>
+</ul>
+<h2>Proof</h2>
+<p>At Moonbird, grew monthly revenue from four to six figures in 3.5 years.</p>
+`,
+  'growth-engineering/server-side-tracking.md': `
+<h1>server-side-tracking.md</h1>
+<p>I preserve attribution signal by sending conversion events from the backend.</p>
+<h2>Technologies</h2>
+<ul>
+  <li>Server-side tracking</li>
+  <li>Conversion APIs</li>
+  <li>Backend event forwarding</li>
+  <li>Ad-platform measurement</li>
+</ul>
+<h2>Proof</h2>
+<p>Built and maintained server-side tracking for Moonbird's ad stack.</p>
+`,
+  'growth-engineering/bayesian-mmm.md': `
+<h1>bayesian-mmm.md</h1>
+<p>I model channel contribution when last-click attribution is too noisy to trust.</p>
+<h2>Technologies</h2>
+<ul>
+  <li>Python</li>
+  <li>PyMC</li>
+  <li>Bayesian modelling</li>
+  <li>Marketing Mix Modelling</li>
+  <li>Diminishing-return and lag effects</li>
+</ul>
+<h2>Proof</h2>
+<p>Used at Moonbird to guide marketing budget allocation.</p>
+`,
+  'founder-operator/strategy.md': `
+<h1>strategy.md</h1>
+<p>I founded and ran an impact-first organization focused on digital jobs and training.</p>
+<h2>Methods</h2>
+<ul>
+  <li>Vision and strategy</li>
+  <li>Market selection</li>
+  <li>Partnership design</li>
+  <li>Funding approach</li>
+</ul>
+<h2>Proof</h2>
+<p>Humainly supported 30 people through NGO partnerships in Venezuela and Nigeria.</p>
+`,
+  'founder-operator/teams-and-ops.md': `
+<h1>teams-and-ops.md</h1>
+<p>I ran small international teams with explicit roles and distributed authority.</p>
+<h2>Methods</h2>
+<ul>
+  <li>Holacracy</li>
+  <li>Hiring and onboarding</li>
+  <li>Role design</li>
+  <li>Remote operations</li>
+</ul>
+<h2>Proof</h2>
+<p>Humainly operated across Belgium, Venezuela, and Nigeria.</p>
+`,
+  'founder-operator/learning-from-failures.md': `
+<h1>learning-from-failures.md</h1>
+<p>Humainly did not scale before founder burnout; that changed how I think about pace and sustainability.</p>
+<h2>Methods</h2>
+<ul>
+  <li>Retrospective practice</li>
+  <li>Scope control</li>
+  <li>Founder sustainability</li>
+  <li>Impact-model evaluation</li>
+</ul>
+<h2>Proof</h2>
+<p>The mission worked; the growth rate and operating model did not.</p>
+`,
+};
 ---
 
 <BaseLayout title="Resume | Jonatan Snyders" description="Resume of Jonatan Snyders — web developer, data scientist, ex-founder, and growth engineer.">
@@ -49,55 +327,138 @@ const skillBranches = skillsTree.children ?? [];
     </ResumeCard>
 
     <ResumeCard title="Skills">
-      <div class="resume-skills-intro">
-        <label class="resume-skills-select-label" for="skills-view">Skill views</label>
-        <div class="resume-skills-select-hint" data-tooltip="Two visualizations just for fun: D3.js vs Plotly.">
-          <select id="skills-view" class="resume-skills-select" data-skills-selector>
-            <option value="overview">Sunburst Chart</option>
-            <option value="tree">Collapsible Tree</option>
-          </select>
-        </div>
-      </div>
+      <div class="ghv-shell" role="main" aria-label="Skills repository browser">
 
-      <div class="resume-skills-view" data-skills-view="overview">
-        <div class="skills-overview-grid">
-          {skillBranches.map((branch) => (
-            <section class="skills-overview-branch">
-              <h3>{branch.name}</h3>
-              <div class="skills-overview-groups">
-                {(branch.children ?? []).map((group) => (
-                  <div class="skills-overview-group">
-                    <h4>{group.name}</h4>
-                    <ul>
-                      {(group.children ?? []).length > 0 ? (group.children ?? []).map((leaf) => <li>{leaf.name}</li>) : <li>{group.name}</li>}
-                    </ul>
+        <!-- Repo header / breadcrumb -->
+        <div class="ghv-header">
+          <div class="ghv-crumb">
+            <span class="ghv-crumb-owner">jsnyde0</span>
+            <span class="ghv-crumb-sep">/</span>
+            <span class="ghv-crumb-repo">personal-skills</span>
+          </div>
+          <div class="ghv-header-pills">
+            <span class="ghv-pill">
+              <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.751.751 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z"/></svg>
+              Star
+            </span>
+            <span class="ghv-pill">
+              <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 5.372v.878c0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75v-.878a2.25 2.25 0 1 1 1.5 0v.878a2.25 2.25 0 0 1-2.25 2.25h-1.5v2.128a2.251 2.251 0 1 1-1.5 0V8.5h-1.5A2.25 2.25 0 0 1 3.5 6.25v-.878a2.25 2.25 0 1 1 1.5 0ZM5 3.25a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Zm6.75.75a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm-3 8.75a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Z"/></svg>
+              Fork
+            </span>
+          </div>
+        </div>
+
+        <!-- Branch + stats bar -->
+        <div class="ghv-subheader">
+          <span class="ghv-branch-badge">
+            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M9.5 3.25a2.25 2.25 0 1 1 3 2.122V6A2.5 2.5 0 0 1 10 8.5H6a1 1 0 0 0-1 1v1.128a2.251 2.251 0 1 1-1.5 0V5.372a2.25 2.25 0 1 1 1.5 0v1.836A2.493 2.493 0 0 1 6 7h4a1 1 0 0 0 1-1v-.628A2.25 2.25 0 0 1 9.5 3.25Zm-6 0a.75.75 0 1 0 1.5 0 .75.75 0 0 0-1.5 0Zm8.25-.75a.75.75 0 1 0 0 1.5.75.75 0 0 0 0-1.5ZM4.25 12a.75.75 0 1 0 0 1.5.75.75 0 0 0 0-1.5Z"/></svg>
+            main
+          </span>
+          <span class="ghv-subheader-sep">·</span>
+          <span>16 files</span>
+          <span class="ghv-subheader-sep">·</span>
+          <span>5 folders</span>
+        </div>
+
+        <!-- Mobile: tree toggle -->
+        <button
+          class="ghv-mobile-toggle"
+          aria-controls="ghv-tree-panel"
+          aria-expanded="false"
+          id="ghv-mobile-toggle-btn"
+          type="button"
+        >
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1.75 2.5a.75.75 0 0 0 0 1.5h12.5a.75.75 0 0 0 0-1.5H1.75Zm0 4a.75.75 0 0 0 0 1.5h12.5a.75.75 0 0 0 0-1.5H1.75Zm0 4a.75.75 0 0 0 0 1.5h12.5a.75.75 0 0 0 0-1.5H1.75Z"/></svg>
+          Files
+          <span class="ghv-mobile-toggle-caret" id="ghv-mobile-caret" aria-hidden="true">▼</span>
+        </button>
+
+        <!-- Two-pane body -->
+        <div class="ghv-body">
+
+          <!-- File tree sidebar -->
+          <nav class="ghv-tree" id="ghv-tree-panel" aria-label="Repository file tree">
+            <div class="ghv-tree-header">
+              <span>Files</span>
+            </div>
+
+            <div class="ghv-tree-root">
+              <!-- Root SKILLS.md -->
+              <div
+                class="ghv-file ghv-file--selected"
+                role="button"
+                tabindex="0"
+                data-ghv-path="SKILLS.md"
+                aria-label="SKILLS.md"
+                aria-current="true"
+              >
+                <span class="ghv-file-icon" aria-hidden="true">
+                  <svg viewBox="0 0 16 16"><path d="M2 1.75C2 .784 2.784 0 3.75 0h6.586c.464 0 .909.184 1.237.513l2.914 2.914c.329.328.513.773.513 1.237v9.586A1.75 1.75 0 0 1 13.25 16h-9.5A1.75 1.75 0 0 1 2 14.25Zm1.75-.25a.25.25 0 0 0-.25.25v12.5c0 .138.112.25.25.25h9.5a.25.25 0 0 0 .25-.25V6h-2.75A1.75 1.75 0 0 1 9 4.25V1.5Zm6.75.062V4.25c0 .138.112.25.25.25h2.688l-.011-.013-2.914-2.914-.013-.011Z"/></svg>
+                </span>
+                <span>SKILLS.md</span>
+              </div>
+
+              <!-- Folders -->
+              {folders.map((folder, folderIdx) => (
+                <div class="ghv-folder" data-ghv-folder={folder.name}>
+                  <div
+                    class="ghv-folder-row"
+                    role="button"
+                    tabindex="0"
+                    aria-expanded="true"
+                    aria-controls={`ghv-folder-files-${folderIdx}`}
+                    data-ghv-folder-toggle={folder.name}
+                  >
+                    <span class="ghv-folder-caret is-open" aria-hidden="true">▶</span>
+                    <span class="ghv-folder-icon" aria-hidden="true">
+                      <svg viewBox="0 0 16 16"><path d="M1.75 1A1.75 1.75 0 0 0 0 2.75v10.5C0 14.216.784 15 1.75 15h12.5A1.75 1.75 0 0 0 16 13.25v-8.5A1.75 1.75 0 0 0 14.25 3H7.5a.25.25 0 0 1-.2-.1l-.9-1.2C6.07 1.26 5.55 1 5 1H1.75Z"/></svg>
+                    </span>
+                    <span>{folder.name}</span>
                   </div>
-                ))}
-              </div>
-            </section>
-          ))}
-        </div>
-      </div>
+                  <div class="ghv-folder-files" id={`ghv-folder-files-${folderIdx}`}>
+                    {folder.files.map((file) => (
+                      <div
+                        class="ghv-file"
+                        role="button"
+                        tabindex="0"
+                        data-ghv-path={file.path}
+                        aria-label={file.name}
+                        aria-current="false"
+                      >
+                        <span class="ghv-file-icon" aria-hidden="true">
+                          <svg viewBox="0 0 16 16"><path d="M2 1.75C2 .784 2.784 0 3.75 0h6.586c.464 0 .909.184 1.237.513l2.914 2.914c.329.328.513.773.513 1.237v9.586A1.75 1.75 0 0 1 13.25 16h-9.5A1.75 1.75 0 0 1 2 14.25Zm1.75-.25a.25.25 0 0 0-.25.25v12.5c0 .138.112.25.25.25h9.5a.25.25 0 0 0 .25-.25V6h-2.75A1.75 1.75 0 0 1 9 4.25V1.5Zm6.75.062V4.25c0 .138.112.25.25.25h2.688l-.011-.013-2.914-2.914-.013-.011Z"/></svg>
+                        </span>
+                        <span>{file.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </nav>
 
-      <div class="resume-skills-view" data-skills-view="tree" hidden>
-        <div class="skills-tree-root">
-          {skillBranches.map((branch) => (
-            <details open class="skills-tree-branch">
-              <summary>{branch.name}</summary>
-              <div class="skills-tree-groups">
-                {(branch.children ?? []).map((group) => (
-                  <details open class="skills-tree-group">
-                    <summary>{group.name}</summary>
-                    {(group.children ?? []).length > 0 ? (
-                      <ul>
-                        {(group.children ?? []).map((leaf) => <li>{leaf.name}</li>)}
-                      </ul>
-                    ) : null}
-                  </details>
-                ))}
+          <!-- Preview pane -->
+          <div class="ghv-preview" id="ghv-preview-pane" role="region" aria-label="File preview">
+
+            <!-- Preview header bar -->
+            <div class="ghv-preview-header">
+              <div class="ghv-preview-path" id="ghv-preview-path" aria-live="polite">
+                <span>SKILLS.md</span>
               </div>
-            </details>
-          ))}
+              <div class="ghv-preview-actions">
+                <span class="ghv-preview-btn">Raw</span>
+                <span class="ghv-preview-btn">Blame</span>
+              </div>
+            </div>
+
+            <!-- Rendered markdown content -->
+            <div class="ghv-preview-content">
+              <div class="ghv-md" id="ghv-preview-body" aria-live="polite">
+                <!-- content swapped by JS -->
+              </div>
+            </div>
+
+          </div>
         </div>
       </div>
     </ResumeCard>
@@ -121,17 +482,96 @@ const skillBranches = skillsTree.children ?? [];
     </ResumeCard>
   </div>
 
-  <script>
-    const selector = document.querySelector('[data-skills-selector]');
-    const views = document.querySelectorAll('[data-skills-view]');
+  <script define:vars={{ fileContents }}>
+    // Inline vanilla JS — no framework islands, no URL/hash changes.
 
-    selector?.addEventListener('change', (event) => {
-      const value = event.currentTarget instanceof HTMLSelectElement ? event.currentTarget.value : 'overview';
-      views.forEach((view) => {
-        const active = view.getAttribute('data-skills-view') === value;
-        view.toggleAttribute('hidden', !active);
+    const contentMap = fileContents;
+    const DEFAULT_PATH = 'SKILLS.md';
+
+    const previewBody = document.getElementById('ghv-preview-body');
+    const previewPath = document.getElementById('ghv-preview-path');
+    const mobileToggleBtn = document.getElementById('ghv-mobile-toggle-btn');
+    const mobileCaret = document.getElementById('ghv-mobile-caret');
+    const treePanel = document.getElementById('ghv-tree-panel');
+
+    function setPreview(path) {
+      const html = contentMap[path];
+      if (!html || !previewBody) return;
+      previewBody.innerHTML = html;
+      if (previewPath) {
+        const parts = path.split('/');
+        if (parts.length === 1) {
+          previewPath.innerHTML = '<span>' + path + '</span>';
+        } else {
+          previewPath.innerHTML = parts.slice(0, -1).join('/') + ' / <span>' + parts[parts.length - 1] + '</span>';
+        }
+      }
+    }
+
+    function setSelected(path) {
+      document.querySelectorAll('[data-ghv-path]').forEach(el => {
+        const isSelected = el.getAttribute('data-ghv-path') === path;
+        el.classList.toggle('ghv-file--selected', isSelected);
+        el.setAttribute('aria-current', isSelected ? 'true' : 'false');
+      });
+    }
+
+    function handleFileClick(el) {
+      const path = el.getAttribute('data-ghv-path');
+      if (!path) return;
+      setSelected(path);
+      setPreview(path);
+      // On mobile, collapse tree after selection
+      if (window.innerWidth <= 640 && treePanel && mobileToggleBtn && mobileCaret) {
+        treePanel.classList.remove('is-mobile-open');
+        mobileToggleBtn.setAttribute('aria-expanded', 'false');
+        mobileCaret.classList.remove('is-open');
+      }
+    }
+
+    // Wire up file click / keyboard
+    document.querySelectorAll('[data-ghv-path]').forEach(el => {
+      el.addEventListener('click', () => handleFileClick(el));
+      el.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          handleFileClick(el);
+        }
       });
     });
+
+    // Folder toggle
+    document.querySelectorAll('[data-ghv-folder-toggle]').forEach(toggleEl => {
+      toggleEl.addEventListener('click', () => {
+        const folderName = toggleEl.getAttribute('data-ghv-folder-toggle');
+        const idx = Array.from(document.querySelectorAll('[data-ghv-folder-toggle]')).indexOf(toggleEl);
+        const filesPanel = document.getElementById('ghv-folder-files-' + idx);
+        const caret = toggleEl.querySelector('.ghv-folder-caret');
+        if (!filesPanel) return;
+        const isOpen = filesPanel.style.display !== 'none';
+        filesPanel.style.display = isOpen ? 'none' : '';
+        toggleEl.setAttribute('aria-expanded', String(!isOpen));
+        caret?.classList.toggle('is-open', !isOpen);
+      });
+      toggleEl.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          toggleEl.click();
+        }
+      });
+    });
+
+    // Mobile tree toggle
+    mobileToggleBtn?.addEventListener('click', () => {
+      const isOpen = treePanel?.classList.contains('is-mobile-open');
+      treePanel?.classList.toggle('is-mobile-open', !isOpen);
+      mobileToggleBtn.setAttribute('aria-expanded', String(!isOpen));
+      mobileCaret?.classList.toggle('is-open', !isOpen);
+    });
+
+    // Set initial state
+    setSelected(DEFAULT_PATH);
+    setPreview(DEFAULT_PATH);
   </script>
 
   <style>
@@ -305,106 +745,452 @@ const skillBranches = skillsTree.children ?? [];
 
     .resume-download__tooltip span { font-style: italic; }
 
-    .resume-skills-intro {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.75rem;
-      align-items: center;
-      margin-bottom: 1rem;
-    }
-
-    .resume-skills-select-label {
-      font-size: 0.95rem;
-      color: var(--muted-content);
-    }
-
-    .resume-skills-select {
-      width: min(100%, 18rem);
-      border: 1px solid var(--base-300);
-      border-radius: var(--radius-md);
-      background: var(--base-100);
-      color: var(--base-content);
-      padding: 0.75rem 0.9rem;
-      font: inherit;
-    }
-
-    .skills-overview-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
-      gap: 1rem;
-    }
-
-    .skills-overview-branch,
-    .skills-tree-branch,
-    .skills-tree-group {
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-lg);
-      background: var(--surface-subtle);
-      padding: 1rem;
-    }
-
-    .skills-overview-branch h3,
-    .skills-tree-branch > summary {
-      margin: 0 0 0.85rem;
-      font-size: 1.05rem;
-      color: var(--content-bright);
-      font-weight: 700;
-    }
-
-    .skills-overview-groups,
-    .skills-tree-groups {
-      display: grid;
-      gap: 0.75rem;
-    }
-
-    .skills-overview-group {
-      border-radius: 0.85rem;
-      background: var(--primary-tint);
-      padding: 0.8rem;
-    }
-
-    .skills-overview-group h4,
-    .skills-tree-group > summary {
-      margin: 0 0 0.5rem;
-      font-size: 0.95rem;
-      color: var(--content-bright);
-    }
-
-    .skills-overview-group ul,
-    .skills-tree-group ul {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      margin: 0;
-      padding: 0;
-      list-style: none;
-    }
-
-    .skills-overview-group li,
-    .skills-tree-group li {
-      border-radius: var(--radius-full);
-      background: var(--base-300);
-      padding: 0.4rem 0.7rem;
-      font-size: 0.84rem;
-    }
-
-    .skills-tree-root {
-      display: grid;
-      gap: 0.8rem;
-    }
-
-    .skills-tree-branch > summary,
-    .skills-tree-group > summary {
-      list-style: none;
-      cursor: pointer;
-    }
-
-    .skills-tree-branch > summary::-webkit-details-marker,
-    .skills-tree-group > summary::-webkit-details-marker { display: none; }
-
     .resume-section-stack {
       display: grid;
       gap: 1rem;
+    }
+
+    /* === GITHUB-DARK SHELL === */
+    .ghv-shell {
+      background: #0d1117;
+      color: #c9d1d9;
+      border: 1px solid #30363d;
+      border-radius: 6px;
+      overflow: hidden;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    /* === REPO HEADER / BREADCRUMB === */
+    .ghv-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 12px 16px;
+      background: #161b22;
+      border-bottom: 1px solid #30363d;
+      flex-wrap: wrap;
+    }
+
+    .ghv-crumb {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 14px;
+      flex-wrap: wrap;
+    }
+
+    .ghv-crumb-owner {
+      color: #8b949e;
+    }
+
+    .ghv-crumb-sep {
+      color: #30363d;
+      font-size: 1.1em;
+    }
+
+    .ghv-crumb-repo {
+      color: #58a6ff;
+      font-weight: 600;
+    }
+
+    .ghv-header-pills {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-left: auto;
+      flex-shrink: 0;
+    }
+
+    .ghv-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 3px 10px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid #30363d;
+      border-radius: 999px;
+      font-size: 12px;
+      color: #8b949e;
+    }
+
+    .ghv-pill svg {
+      width: 14px;
+      height: 14px;
+      fill: currentColor;
+      opacity: 0.7;
+    }
+
+    /* === SUB-HEADER (branch + stats bar) === */
+    .ghv-subheader {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 8px 16px;
+      background: #161b22;
+      border-bottom: 1px solid #30363d;
+      font-size: 12px;
+      color: #8b949e;
+      flex-wrap: wrap;
+    }
+
+    .ghv-branch-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 3px 8px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid #30363d;
+      border-radius: 6px;
+      color: #c9d1d9;
+      font-size: 12px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+
+    .ghv-branch-badge svg {
+      width: 14px;
+      height: 14px;
+      fill: currentColor;
+    }
+
+    .ghv-subheader-sep {
+      color: #30363d;
+    }
+
+    /* === MAIN TWO-PANE === */
+    .ghv-body {
+      display: grid;
+      grid-template-columns: 260px minmax(0, 1fr);
+      min-height: 520px;
+    }
+
+    /* === FILE TREE === */
+    .ghv-tree {
+      background: #0d1117;
+      border-right: 1px solid #30363d;
+      overflow-y: auto;
+      padding: 8px 0;
+    }
+
+    .ghv-tree-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 12px 8px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #8b949e;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      border-bottom: 1px solid #21262d;
+      margin-bottom: 4px;
+    }
+
+    .ghv-tree-root {
+      padding: 0 4px;
+    }
+
+    /* root SKILLS.md file */
+    .ghv-file {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 4px;
+      font-size: 13px;
+      color: #c9d1d9;
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      position: relative;
+      transition: background 80ms ease-out, color 80ms ease-out;
+    }
+
+    .ghv-file:hover {
+      background: rgba(177, 186, 196, 0.08);
+      color: #f0f6fc;
+    }
+
+    .ghv-file--selected {
+      background: rgba(56, 139, 253, 0.15);
+      color: #ffffff;
+    }
+
+    .ghv-file--selected::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: #58a6ff;
+      border-radius: 0 2px 2px 0;
+    }
+
+    .ghv-file--selected:hover {
+      background: rgba(56, 139, 253, 0.2);
+    }
+
+    .ghv-file-icon {
+      flex-shrink: 0;
+      width: 16px;
+      height: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0.7;
+    }
+
+    .ghv-file-icon svg {
+      width: 14px;
+      height: 14px;
+      fill: currentColor;
+    }
+
+    /* folder section */
+    .ghv-folder {
+      margin-top: 2px;
+    }
+
+    .ghv-folder-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #c9d1d9;
+      cursor: pointer;
+      user-select: none;
+      border-radius: 4px;
+      transition: background 80ms ease-out;
+    }
+
+    .ghv-folder-row:hover {
+      background: rgba(177, 186, 196, 0.08);
+    }
+
+    .ghv-folder-icon {
+      flex-shrink: 0;
+      color: #58a6ff;
+      width: 16px;
+      height: 16px;
+      display: flex;
+      align-items: center;
+    }
+
+    .ghv-folder-icon svg {
+      width: 14px;
+      height: 14px;
+      fill: currentColor;
+    }
+
+    .ghv-folder-caret {
+      flex-shrink: 0;
+      color: #8b949e;
+      font-size: 10px;
+      width: 12px;
+      text-align: center;
+      transition: transform 140ms ease-out;
+    }
+
+    .ghv-folder-caret.is-open {
+      transform: rotate(90deg);
+    }
+
+    .ghv-folder-files {
+      padding-left: 20px;
+    }
+
+    .ghv-folder-files .ghv-file {
+      padding-left: 10px;
+    }
+
+    /* === PREVIEW PANE === */
+    .ghv-preview {
+      background: #0d1117;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .ghv-preview-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 10px 16px;
+      background: #161b22;
+      border-bottom: 1px solid #30363d;
+      flex-wrap: wrap;
+    }
+
+    .ghv-preview-path {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 12px;
+      color: #8b949e;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .ghv-preview-path span {
+      color: #58a6ff;
+    }
+
+    .ghv-preview-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-shrink: 0;
+    }
+
+    .ghv-preview-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid #30363d;
+      border-radius: 6px;
+      font-size: 12px;
+      color: #c9d1d9;
+      cursor: default;
+    }
+
+    .ghv-preview-content {
+      padding: 24px 32px 32px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    /* Markdown-style content rendering */
+    .ghv-md h1 {
+      font-size: 1.5em;
+      font-weight: 600;
+      color: #f0f6fc;
+      border-bottom: 1px solid #21262d;
+      padding-bottom: 0.4em;
+      margin: 0 0 1em;
+      line-height: 1.25;
+    }
+
+    .ghv-md h2 {
+      font-size: 1.25em;
+      font-weight: 600;
+      color: #f0f6fc;
+      border-bottom: 1px solid #21262d;
+      padding-bottom: 0.3em;
+      margin: 1.5em 0 0.75em;
+      line-height: 1.25;
+    }
+
+    .ghv-md p {
+      color: #c9d1d9;
+      margin: 0 0 1em;
+      line-height: 1.6;
+      max-width: 72ch;
+    }
+
+    .ghv-md ul {
+      color: #c9d1d9;
+      margin: 0 0 1em;
+      padding-left: 1.5em;
+      line-height: 1.6;
+    }
+
+    .ghv-md li {
+      margin-bottom: 0.35em;
+      max-width: 72ch;
+    }
+
+    .ghv-md strong {
+      color: #f0f6fc;
+      font-weight: 600;
+    }
+
+    .ghv-md code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 0.875em;
+      background: rgba(110, 118, 129, 0.4);
+      border-radius: 3px;
+      padding: 0.1em 0.35em;
+    }
+
+    .ghv-link {
+      color: #58a6ff !important;
+      text-decoration: none;
+    }
+
+    .ghv-link:hover {
+      text-decoration: underline;
+    }
+
+    /* === MOBILE: drawer toggle === */
+    .ghv-mobile-toggle {
+      display: none;
+      align-items: center;
+      gap: 6px;
+      width: 100%;
+      padding: 10px 16px;
+      background: #161b22;
+      border-bottom: 1px solid #30363d;
+      font-size: 13px;
+      color: #c9d1d9;
+      cursor: pointer;
+      text-align: left;
+      border-radius: 0;
+    }
+
+    .ghv-mobile-toggle svg {
+      width: 14px;
+      height: 14px;
+      fill: currentColor;
+    }
+
+    .ghv-mobile-toggle-caret {
+      margin-left: auto;
+      font-size: 11px;
+      color: #8b949e;
+      transition: transform 140ms ease-out;
+    }
+
+    .ghv-mobile-toggle-caret.is-open {
+      transform: rotate(180deg);
+    }
+
+    @media (max-width: 640px) {
+      .ghv-body {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
+      }
+
+      .ghv-tree {
+        border-right: none;
+        border-bottom: 1px solid #30363d;
+        /* collapsed by default on mobile */
+        display: none;
+        padding: 8px 0;
+      }
+
+      .ghv-tree.is-mobile-open {
+        display: block;
+      }
+
+      .ghv-mobile-toggle {
+        display: flex;
+      }
+
+      .ghv-preview-content {
+        padding: 16px;
+      }
+
+      .ghv-header-pills {
+        display: none;
+      }
     }
   </style>
 </BaseLayout>

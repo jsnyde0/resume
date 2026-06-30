@@ -13,8 +13,8 @@ if (!fs.existsSync(htmlPath)) {
 }
 
 const html = fs.readFileSync(htmlPath, 'utf8');
-if (!html.includes('Sunburst Chart')) {
-  console.error('FAIL source-faithfulness: expected "Sunburst Chart" in built HTML');
+if (!html.includes('ghv-shell')) {
+  console.error('FAIL source-faithfulness: expected "ghv-shell" (GitHub browser) in built HTML');
   process.exit(1);
 }
 
