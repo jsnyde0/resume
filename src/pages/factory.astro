@@ -19,16 +19,11 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
   <!-- 2. Two-column: graph + detail panel -->
   <section class="factory-main" aria-label="Software factory graph and component detail">
+    <h2 class="factory-main-title">How the pieces connect</h2>
     <div class="factory-columns">
 
       <!-- LEFT: concentric orbit graph -->
       <div class="graph-col">
-        <div class="graph-header">
-          <h2 class="graph-title">How the pieces connect</h2>
-          <button class="reset-btn" id="graph-reset" hidden aria-label="Show all — reset selection">show all</button>
-        </div>
-        <p class="graph-hint">Select a node to trace its connections. <kbd>Enter</kbd> or <kbd>Space</kbd> to activate.</p>
-
         <div class="graph-legend" aria-label="Legend">
           <span class="legend-item"><span class="legend-dot legend-dot--running" aria-hidden="true"></span>running</span>
           <span class="legend-item"><span class="legend-dot legend-dot--building" aria-hidden="true"></span>building toward</span>
@@ -56,11 +51,6 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
     </div>
   </section>
-
-  <!-- 3. Honest closing -->
-  <footer class="factory-closing">
-    <p>Right now the planner proposes the next move and I approve it. Closing the gap between "proposes what to do" and "just does it" is what I'm building toward. I'd rather show you a system I'm honestly still building than a finished story that doesn't run.</p>
-  </footer>
 
 </div>
 </BaseLayout>
@@ -144,61 +134,16 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     }
   }
 
-  /* ── Graph column ── */
-  .graph-header {
-    display: flex;
-    align-items: baseline;
-    gap: 1rem;
-    margin-bottom: 0.375rem;
-  }
-
-  .graph-title {
-    margin: 0;
+  /* ── Section title ── */
+  .factory-main-title {
+    margin: 0 0 1.5rem;
     font-size: clamp(1.0625rem, 2.5vw, 1.25rem);
     font-weight: 700;
     letter-spacing: -0.02em;
     color: var(--content-bright);
   }
 
-  .reset-btn {
-    padding: 0.25rem 0.75rem;
-    border-radius: var(--radius-full);
-    border: 1px solid var(--border-subtle);
-    background: var(--surface-subtle);
-    color: var(--muted-content);
-    font-size: 0.75rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: color var(--transition-base), border-color var(--transition-base);
-    white-space: nowrap;
-  }
-
-  .reset-btn:hover {
-    color: var(--content-bright);
-    border-color: rgba(171, 196, 220, 0.3);
-  }
-
-  .reset-btn:focus-visible {
-    outline: 2px solid var(--primary);
-    outline-offset: 2px;
-  }
-
-  .graph-hint {
-    margin: 0 0 0.75rem;
-    font-size: 0.75rem;
-    color: rgba(171, 196, 220, 0.4);
-  }
-
-  .graph-hint kbd {
-    display: inline-block;
-    padding: 0.05rem 0.3rem;
-    border-radius: 3px;
-    border: 1px solid rgba(171, 196, 220, 0.18);
-    font-size: 0.68rem;
-    font-family: inherit;
-    color: rgba(171, 196, 220, 0.45);
-  }
-
+  /* ── Graph column ── */
   .graph-legend {
     display: flex;
     gap: 1.25rem;
@@ -524,22 +469,6 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     color: rgba(255, 127, 80, 0.5);
   }
 
-  /* ── Closing ── */
-  .factory-closing {
-    max-width: 52rem;
-    margin-bottom: 3rem;
-    padding-top: 2rem;
-    border-top: 1px solid var(--border-subtle);
-  }
-
-  .factory-closing p {
-    margin: 0;
-    font-size: clamp(0.9375rem, 2vw, 1.0625rem);
-    line-height: var(--line-height-relaxed);
-    color: var(--muted-content);
-    font-style: italic;
-    max-width: 60ch;
-  }
 </style>
 
 <script>
@@ -739,7 +668,6 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   const scene = document.getElementById('graph-scene')!;
   const nodesC = document.getElementById('graph-nodes')!;
   const svgEl = document.getElementById('graph-svg') as unknown as SVGSVGElement;
-  const resetBtn = document.getElementById('graph-reset') as HTMLButtonElement;
   const NS = 'http://www.w3.org/2000/svg';
 
   // Track elements for interaction
@@ -1016,7 +944,6 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       el.classList.remove('is-active', 'is-dimmed');
     });
     selectedId = null;
-    resetBtn.hidden = true;
   }
 
   function applySelection(id: string, updatePanel: boolean = true) {
@@ -1059,21 +986,12 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       clearSelection(false);
       selectedId = 'pi';
       applySelection('pi');
-      resetBtn.hidden = true;
       return;
     }
     clearSelection(false);
     selectedId = id;
-    resetBtn.hidden = id === 'pi';
     applySelection(id);
   }
-
-  resetBtn.addEventListener('click', () => {
-    clearSelection(false);
-    selectedId = 'pi';
-    applySelection('pi');
-    resetBtn.hidden = true;
-  });
 
   // On desktop, size the scene to fit within the viewport height.
   // We target a size that will sit comfortably when the user scrolls to the
