@@ -556,6 +556,12 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       description: "The issue graph decides what gets done next and what can run at the same time. A planner agent watches it, and whenever something finishes it figures out what's actually worth doing next and kicks it off as its own session. Each session then drives its one task to done and pulls in its own helpers. The whole aim is to let the agents run the orchestration wherever they can, instead of me.",
     },
     {
+      id: 'verify',
+      label: 'verifiable targets',
+      status: 'running',
+      description: "Before an agent starts, I care more about the loop than the prompt. What can it touch, what counts as done, which checks run, and what happens when one fails. If the target is something the work can actually be tested against, the agent can try, check, and fix on its own instead of me watching over its shoulder. That's the thing that lets me hand work off and trust it.",
+    },
+    {
       id: 'selfdriving',
       label: 'self-driving',
       sub: 'building toward',
@@ -579,6 +585,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     ['pi', 'memory',     false],
     ['pi', 'cockpit',    false],
     ['pi', 'orch',       false],
+    ['pi', 'verify',     false],
     ['pi', 'selfdriving', true],
     ['pi', 'substrate',  false],
     ['orch', 'tracker',  false],
@@ -588,6 +595,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     ['selfdriving', 'orch', true],
     ['substrate', 'tracker', false],
     ['substrate', 'memory',  false],
+    ['verify', 'orch',   false],
+    ['verify', 'tracker', false],
   ];
 
   const edgeKey = (a: string, b: string) => [a, b].sort().join('--');
@@ -781,7 +790,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     nodesC.appendChild(labelHost);
 
     // ── Connector lines from orbit to core ──
-    const orbitIds = ['tracker', 'memory', 'cockpit', 'orch', 'selfdriving', 'substrate'];
+    const orbitIds = ['tracker', 'memory', 'cockpit', 'orch', 'verify', 'selfdriving', 'substrate'];
     const orbitPositions = new Map<string, {x:number,y:number}>();
     orbitIds.forEach((id, i) => {
       const angle = (i / orbitIds.length) * Math.PI * 2 - Math.PI / 2;
