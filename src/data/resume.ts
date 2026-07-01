@@ -21,10 +21,10 @@ export interface ResumeItem {
 
 export const resumeIntro: ResumeIntro = {
   paragraphs: [
-    "I'm from Belgium, lived in Venezuela and Nigeria, and moving to Berlin in November 2024.",
+    "I'm from Belgium, lived in Venezuela and Nigeria, and moved to Berlin in 2024.",
     "I want to launch startups that make a social impact—climate change, inequality, that sort of thing. I ran a 5-person non-profit for 4-5 years and loved it, but we didn’t scale before I burned out.",
-    "I chase skills that excite me. Took a marketing job with zero experience just to learn. Following what gives me energy, not rigid plans. Right now, that’s data engineering and web development.",
-    "With years of programming and data science behind me, learning web dev has been a blast.",
+    "I chase skills that excite me. Took a marketing job with zero experience just to learn. Following what gives me energy, not rigid plans. Right now, that’s agentic engineering and going 10x on everything I'm experienced at already.",
+    "With years of being a generalist, building my own agentic systems has been a blast.",
     "I work late so I can take a long lunch for my workout.",
     "Transparency is my top value.",
   ],
