@@ -1487,9 +1487,11 @@ const totalFolders = 4 + skillsSubfolders.length; // experience, achievements, e
       min-width: 0;
     }
 
-    /* Paragraphs in the intro extend full width (wrap under avatar) */
+    /* Paragraphs in the intro extend full width and start below the avatar
+       (name + badges stay beside it; the bio text does not wrap around it) */
     :global(.ghv-readme-intro p) {
       max-width: none;
+      clear: left;
     }
 
     /* Clear the float after profile block */

@@ -89,6 +89,17 @@ export const achievements: ResumeItem[] = [
 
 export const workExperience: ResumeItem[] = [
   {
+    title: 'End-to-end product engineering at Mapular',
+    role: 'Product Engineer',
+    badgeColor: 'primary',
+    company: 'Mapular',
+    location: 'Berlin, Germany',
+    dateRange: 'July 2025 - ...',
+    imageUrl: '/img/mapular-logo.png',
+    imageAlt: 'Mapular logo',
+    body: 'I work end to end across product management, development, and engineering.',
+  },
+  {
     title: 'Freelance Web Development & Data Engineering',
     role: 'Web Developer',
     badgeColor: 'primary',
