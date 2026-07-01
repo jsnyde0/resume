@@ -4,16 +4,16 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
 <BaseLayout
   title="The software factory | Jonatan Snyders"
-  description="An always-on software factory: agents that pick up goals and do the work in a sandbox, unattended. State lives in the substrate, not the agent."
+  description="A software factory I'm teaching to run itself: composed from open tools, with agents that pick up work and increasingly drive themselves. I'm open-sourcing all of it."
 >
 <div class="factory-page">
 
   <!-- 1. Hero -->
   <header class="factory-hero">
     <p class="factory-kicker">what excites me</p>
-    <h1>The software factory I'm building.</h1>
+    <h1>The software factory I'm teaching to run itself.</h1>
     <p class="factory-lede">
-      An always-on software factory: agents that pick up goals and do the work in a sandbox, unattended. State lives in the substrate, not the agent — so the agents are disposable and the whole system is crash-resumable. The direction I'm building toward is self-driving; here's the system so far, and where I honestly am on the way there.
+      I'm composing tools that already exist, adding the harness and the few pieces still missing, and teaching the whole thing to drive itself one layer at a time. I'm open-sourcing all of it, so anyone can reuse any piece.
     </p>
   </header>
 
@@ -567,7 +567,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       label: 'pi',
       sub: 'my harness',
       status: 'running',
-      description: 'The agent harness I build on and own — changeable all the way down; the model behind it is swappable.',
+      description: "The agent harness I build on, where I can change any part of it instead of just bolting things on the side. For example, an extension that wakes up my planner the moment a piece of work finishes.",
       href: 'https://github.com/badlogic/pi-mono',
       hrefLabel: 'pi on GitHub',
     },
@@ -575,7 +575,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       id: 'ripcage',
       label: 'rip-cage',
       status: 'running',
-      description: 'Wraps the work in a container and checks every shell command before it runs, so an unattended run can\'t reach far.',
+      description: "Put your agent in a cage and let it rip. It runs everything in a container and checks each command before it executes, so I can leave an agent going on its own without it doing real damage. It also snaps together with other tools (e.g. a proxy that holds my credentials so the agent never touches them).",
       href: 'https://github.com/jsnyde0/rip-cage',
       hrefLabel: 'rip-cage on GitHub',
     },
@@ -583,44 +583,44 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       id: 'host',
       label: 'always-on host',
       status: 'running',
-      description: 'Runs on a box that\'s always on — a Mac mini now, a VPS next — not my laptop. Close the lid and the agents keep going.',
+      description: "It all runs on a little Mac mini right now, and a VPS before long. The point is that it isn't my laptop, so I can close the lid and the agents keep working.",
     },
     {
       id: 'tracker',
       label: 'graph-based issue tracker',
       status: 'running',
-      description: 'Work is a graph of goals with dependencies, not a chat log, so the plan survives any single agent dying. (beads today.)',
+      description: "The state of the work lives in an issue graph, not in chat logs. Every task is a node with its dependencies, so if an agent dies halfway through, the plan is still there and the next one picks it up. (I use beads for this today.)",
     },
     {
       id: 'memory',
       label: 'tiered memory',
       status: 'running',
-      description: 'Memory kept by lifecycle — session, working, durable — so nothing load-bearing dies in a context window that\'s about to be compacted.',
+      description: "Memory in a pyramid. Raw logs at the bottom, then notes that fade when they stop being useful, then memory that sticks around, then the foundational decisions everything has to respect at the top. Things climb the pyramid as they prove they matter, so nothing important gets buried in a context window that's about to be wiped.",
     },
     {
       id: 'cockpit',
       label: 'cockpit',
       status: 'running',
-      description: 'Watch and steer every session: a live roster of what\'s working, blocked, or done, and the session view on my Mac. (herdr by Ogulcan Celik · cmux by Manaflow)',
+      description: "I built a cockpit around herdr so I can see all my agents at once and jump in whenever I want. It also lets my main agent run other agents for me, not just quiet subagents but full interactive sessions I can watch. (herdr by Ogulcan Celik)",
     },
     {
       id: 'orch',
       label: 'agent orchestration',
       status: 'running',
-      description: 'How I dispatch and coordinate agents: a planner over the work graph plus composable primitives. Each orchestrator makes one move, writes its decision back, and dies — the agents are disposable, the substrate persists.',
+      description: "The issue graph decides what gets done next and what can run at the same time. A planner agent watches it, and whenever something finishes it figures out what's actually worth doing next and kicks it off as its own session. Each session then drives its one task to done and pulls in its own helpers. The whole aim is to let the agents run the orchestration wherever they can, instead of me.",
     },
     {
       id: 'selfdriving',
       label: 'self-driving',
       sub: 'building toward',
       status: 'building',
-      description: 'The planner acting on its own, with no human approving each move. The direction I\'m building toward, not there yet.',
+      description: "The goal isn't to take myself out completely. It's to keep handing over whole layers, so the planner decides and acts more on its own while I move up to the architecture and product thinking that actually needs me. Right now it proposes the next move and I approve it. Every move I stop having to approve is a layer I've handed off.",
     },
     {
       id: 'substrate',
       label: 'substrate over process',
       status: 'running',
-      description: 'I want to scale with compute and intelligence, so I build tools and skills that act as levers, not checklists.',
+      description: "I don't tell my agents how to do the work. I give them the context and the things worth weighing, and let their own intelligence pick the how. I'd rather ride a smarter model than maintain a pile of rigid checklists, so the system keeps getting better as the models do.",
     },
   ];
 
