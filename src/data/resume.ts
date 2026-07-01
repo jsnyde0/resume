@@ -14,6 +14,8 @@ export interface ResumeItem {
   imageUrl: string;
   imageAlt: string;
   body: string;
+  /** Optional override for the generated file name; falls back to company/title. */
+  slug?: string;
   links?: { label: string; href: string }[];
 }
 
@@ -37,15 +39,15 @@ export const resumeIntro: ResumeIntro = {
 
 export const achievements: ResumeItem[] = [
   {
-    title: 'Launched 3 Web Apps Within 3 Months of Learning',
-    role: 'Web Developer',
+    title: 'Moved Mapular from LLM chat to integrated agentic workflows',
+    role: 'Agentic Engineer',
     badgeColor: 'primary',
-    company: 'Autodidact',
-    location: 'Antwerp, Belgium',
-    dateRange: 'Q2 2024',
-    imageUrl: '/img/django-logo.png',
-    imageAlt: 'Django Logo',
-    body: 'Built an ecommerce platform and marketing mix modeling app in just 3 months of self-study, accelerated by my programming and data science experience.',
+    company: 'Mapular',
+    location: '', // TODO: owner to provide
+    dateRange: '', // TODO: owner to provide
+    imageUrl: '/img/icons8-laptop-coding-64.png', // TODO: replace with Mapular logo
+    imageAlt: 'Mapular',
+    body: 'Shifted Mapular from using LLMs as a chat tool to fully integrated agentic workflows, embedding agents across product, engineering, sales, and marketing instead of treating AI as a side conversation.',
   },
   {
     title: 'Created MeshMonk - a medical image processing library',
@@ -57,6 +59,7 @@ export const achievements: ResumeItem[] = [
     imageUrl: '/img/meshmonk-logo-white.png',
     imageAlt: 'MeshMonk Logo',
     body: 'Developed and open-sourced MeshMonk in C++, a high-performance medical image processing library used or cited in 140+ research projects.',
+    slug: 'meshmonk',
     links: [{ label: 'MeshMonk', href: 'https://github.com/TheWebMonks/meshmonk' }],
   },
   {

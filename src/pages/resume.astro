@@ -12,8 +12,8 @@ function slugify(str: string): string {
     .replace(/^-+|-+$/g, '');
 }
 
-function itemSlug(item: { company: string; title: string }): string {
-  return slugify(item.company || item.title);
+function itemSlug(item: { company: string; title: string; slug?: string }): string {
+  return item.slug ?? slugify(item.company || item.title);
 }
 
 // ─── File tree taxonomy ───────────────────────────────────────────────────────
@@ -93,10 +93,10 @@ const skillsSubfolders: TreeFolder[] = [
 ];
 
 const folders: TreeFolder[] = [
-  { name: 'experience',    files: experienceFiles },
-  { name: 'achievements',  files: achievementFiles },
-  { name: 'education',     files: educationFiles },
   { name: 'skills',        files: [], subfolders: skillsSubfolders },
+  { name: 'achievements',  files: achievementFiles },
+  { name: 'experience',    files: experienceFiles },
+  { name: 'education',     files: educationFiles },
 ];
 
 // ─── File content builders ────────────────────────────────────────────────────
@@ -125,6 +125,12 @@ function buildItemHtml(item: {
     ? `<div class="ghv-item-links">${item.links.map((l) => `<a href="${l.href}" class="ghv-link" target="_blank" rel="noreferrer">${l.label}</a>`).join('')}</div>`
     : '';
 
+  // Only render meta parts that are present (a current-job item may omit location/date).
+  const metaTextHtml = [item.company, item.location, item.dateRange]
+    .filter(Boolean)
+    .map((part) => `<span>${part}</span>`)
+    .join('<span>·</span>');
+
   return `
 <article class="resume-item-card ghv-item-card">
   <div class="ghv-item-logo">
@@ -134,11 +140,7 @@ function buildItemHtml(item: {
     <h1>${item.title}</h1>
     <p class="ghv-item-meta">
       <span class="ghv-badge ${badgeClass}">${item.role}</span>
-      <span>${item.company}</span>
-      <span>·</span>
-      <span>${item.location}</span>
-      <span>·</span>
-      <span>${item.dateRange}</span>
+      ${metaTextHtml}
     </p>
     <p>${item.body}</p>
     ${linksHtml}
@@ -164,14 +166,6 @@ const readmeHtml = `
       ${resumeIntro.paragraphs.map((p) => `<p>${p}</p>`).join('')}
     </div>
   </div>
-  <h2>Repository</h2>
-  <p>This résumé is a Git repo. Browse the folders to explore experience, achievements, education, and skills.</p>
-  <ul>
-    <li><strong>experience/</strong> — work history</li>
-    <li><strong>achievements/</strong> — notable projects and milestones</li>
-    <li><strong>education/</strong> — degrees and self-study</li>
-    <li><strong>skills/</strong> — technical and operational skills</li>
-  </ul>
 </div>`;
 
 // Build all file contents map
