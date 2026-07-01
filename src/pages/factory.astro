@@ -24,11 +24,6 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
       <!-- LEFT: concentric orbit graph -->
       <div class="graph-col">
-        <div class="graph-legend" aria-label="Legend">
-          <span class="legend-item"><span class="legend-dot legend-dot--running" aria-hidden="true"></span>running</span>
-          <span class="legend-item"><span class="legend-dot legend-dot--building" aria-hidden="true"></span>building toward</span>
-        </div>
-
         <div class="graph-scene" id="graph-scene" role="application" aria-label="Concentric orbit graph — select a node to see details">
           <svg class="graph-svg" id="graph-svg" aria-hidden="true" focusable="false"></svg>
           <div class="graph-nodes" id="graph-nodes"></div>
@@ -51,6 +46,20 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
     </div>
   </section>
+
+  <!-- 3. CTA -->
+  <footer class="factory-cta">
+    <p class="factory-cta-text">Want to talk about any of this? I'd love to hear from you.</p>
+    <a
+      class="button button-secondary"
+      href="https://www.linkedin.com/in/jonatan-snyders/"
+      target="_blank"
+      rel="noopener"
+    >
+      Reach out on LinkedIn
+      <span class="factory-cta-icon" aria-hidden="true">↗</span>
+    </a>
+  </footer>
 
 </div>
 </BaseLayout>
@@ -144,39 +153,6 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   }
 
   /* ── Graph column ── */
-  .graph-legend {
-    display: flex;
-    gap: 1.25rem;
-    margin-bottom: 0.875rem;
-  }
-
-  .legend-item {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    font-size: 0.6875rem;
-    color: var(--muted-content);
-    letter-spacing: 0.02em;
-  }
-
-  .legend-dot {
-    display: inline-block;
-    width: 0.5rem;
-    height: 0.5rem;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
-
-  .legend-dot--running {
-    background: var(--primary);
-    opacity: 0.65;
-  }
-
-  .legend-dot--building {
-    border: 1.5px dashed rgba(171, 196, 220, 0.4);
-    background: transparent;
-  }
-
   /* ── Graph scene (SVG + node overlay) ── */
   .graph-scene {
     position: relative;
@@ -467,6 +443,30 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   :global(.detail-card-link-icon) {
     font-size: 0.75rem;
     color: rgba(255, 127, 80, 0.5);
+  }
+
+  /* ── CTA ── */
+  .factory-cta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    max-width: 52rem;
+    margin-bottom: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  .factory-cta-text {
+    margin: 0;
+    font-size: clamp(0.9375rem, 2vw, 1.0625rem);
+    line-height: var(--line-height-relaxed);
+    color: var(--muted-content);
+  }
+
+  .factory-cta-icon {
+    font-size: 0.8em;
+    opacity: 0.7;
   }
 
 </style>
