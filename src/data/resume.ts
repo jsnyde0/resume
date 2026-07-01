@@ -43,10 +43,10 @@ export const achievements: ResumeItem[] = [
     role: 'Agentic Engineer',
     badgeColor: 'primary',
     company: 'Mapular',
-    location: '', // TODO: owner to provide
-    dateRange: '', // TODO: owner to provide
-    imageUrl: '/img/icons8-laptop-coding-64.png', // TODO: replace with Mapular logo
-    imageAlt: 'Mapular',
+    location: 'Berlin, Germany',
+    dateRange: 'July 2025 - ...',
+    imageUrl: '/img/mapular-logo.png',
+    imageAlt: 'Mapular logo',
     body: 'Shifted Mapular from using LLMs as a chat tool to fully integrated agentic workflows, embedding agents across product, engineering, sales, and marketing instead of treating AI as a side conversation.',
   },
   {
