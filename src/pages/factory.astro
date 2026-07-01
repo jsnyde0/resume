@@ -48,10 +48,11 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   </section>
 
   <!-- 3. CTA -->
-  <footer class="factory-cta">
-    <p class="factory-cta-text">Want to talk about any of this? I'd love to hear from you.</p>
+  <section class="factory-cta" aria-label="Get in touch">
+    <h2 class="factory-cta-title">Let's build something.</h2>
+    <p class="factory-cta-text">If any of this resonates, or you're figuring out how to put agents to work on real problems, I'd love to trade notes. Come say hi.</p>
     <a
-      class="button button-secondary"
+      class="button button-primary factory-cta-btn"
       href="https://www.linkedin.com/in/jonatan-snyders/"
       target="_blank"
       rel="noopener"
@@ -59,7 +60,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       Reach out on LinkedIn
       <span class="factory-cta-icon" aria-hidden="true">↗</span>
     </a>
-  </footer>
+  </section>
 
 </div>
 </BaseLayout>
@@ -129,11 +130,13 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       width: 420px;
       position: sticky;
       top: 1.5rem;
+      order: 2;
     }
 
     .detail-col {
       flex: 1 1 0;
       min-width: 0;
+      order: 1;
     }
   }
 
@@ -449,24 +452,40 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   .factory-cta {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    gap: 1rem;
-    max-width: 52rem;
-    margin-bottom: 3rem;
-    padding-top: 2rem;
-    border-top: 1px solid var(--border-subtle);
+    align-items: center;
+    text-align: center;
+    gap: 1.125rem;
+    margin: 1rem 0 3.5rem;
+    padding: clamp(2.5rem, 6vw, 3.75rem) 1.5rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-subtle);
+    background: var(--surface-subtle);
+  }
+
+  .factory-cta-title {
+    margin: 0;
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    color: var(--content-bright);
   }
 
   .factory-cta-text {
     margin: 0;
+    max-width: 48ch;
     font-size: clamp(0.9375rem, 2vw, 1.0625rem);
     line-height: var(--line-height-relaxed);
     color: var(--muted-content);
   }
 
+  .factory-cta-btn {
+    margin-top: 0.5rem;
+  }
+
   .factory-cta-icon {
-    font-size: 0.8em;
-    opacity: 0.7;
+    font-size: 0.85em;
+    opacity: 0.75;
   }
 
 </style>
