@@ -126,23 +126,23 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     }
 
     .graph-col {
-      flex: 0 0 auto;
-      width: 420px;
+      flex: 1 1 0;
+      min-width: 0;
       position: sticky;
       top: 1.5rem;
       order: 2;
     }
 
     .detail-col {
-      flex: 1 1 0;
-      min-width: 0;
+      flex: 0 0 auto;
+      width: 340px;
       order: 1;
     }
   }
 
   @media (min-width: 1024px) {
-    .graph-col {
-      width: 440px;
+    .detail-col {
+      width: 380px;
     }
   }
 
