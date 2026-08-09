@@ -27,3 +27,12 @@ Per-repo inventory of verification mechanisms and their fit profiles. Consult wh
 **Work surface:** "Hold the look constant" refactors — extracting literals into tokens, centralizing CSS — where intent is to change implementation, not appearance.
 
 **Recommended harness:** For a pure value-preserving rename, analytical value-equality (every token equals the literal it replaced → computed styles identical by construction) is a STRONGER signal than noisy before/after screenshot diffing. Pair with a grep for remaining un-tokenized literals (centralization check). Both required. Validated on resume-x1g; a fresh reviewer caught one real value drift (`#fff` → off-white) the value-equality check surfaced.
+
+## Refactoring fit profile (gate manifest — dotpi-aut6.8, 2026-08-09)
+
+RIDER (FIRM): non-visual refactoring only (build scripts, data plumbing, utilities); visual/copy/styling work parks for the human. NOTE 2026-08-09: www.jonatansnyders.com is still served by the LEGACY DJANGO stack living in this repo (`a_core/`, `templates/`, `node/` Tailwind pipeline) — the Astro site is the unfinished migration target. The Django app is LIVE: not a deletion candidate; migration completion is attended work (parked proposal bead).
+
+- **Gate command:** `npm run build && npm run test:projects` (ran green 2026-08-09, offline with existing node_modules; build ~1s). NOTE: no `npm test` script exists — an earlier fleet inventory claimed one; wrong.
+- **Gate files (fail-closed):** `scripts/verify-*.mjs`, `package.json` script definitions, `docs/projects-source-inventory.md` (asserted-against), plus any future test files. `scripts/verify-resume-layout.mjs` is visual + non-hermetic (headless Chrome) — never part of the dispatch gate.
+- **D3 conformance:** partial — the build catches syntax/import breakage at a stable boundary and `test:projects` pins built-HTML content, but NOTHING type-checks (`@astrojs/check` not installed — typecheck gate bead filed; type-incompatible props currently build green).
+- **Green-at-dispatch:** checked by the dispatching brain; result recorded on the dispatched bead.
