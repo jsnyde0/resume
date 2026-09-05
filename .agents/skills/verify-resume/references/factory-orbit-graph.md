@@ -12,7 +12,9 @@ Navigate to `/factory/`. Linked from the homepage as "what excites me". No login
 
 **Not yet mapped — this is the largest known gap in the feature map.**
 
-The shape a drive should take, when it is written: navigate, wait for `#graph-scene`, capture which node carries `is-selected` and which carry `is-connected`, read the `#detail-panel` text, click a different node (ids look like `gn-pi`, `gn-orch`), wait for the selection to move, and capture again.
+The shape a drive should take, when it is written: navigate, wait for `#graph-scene`, capture which node carries `is-selected` and which carry `is-connected`, read the `#detail-panel` text, click a different node, wait for the selection to move, and capture again.
+
+The node ids are assigned in the page's inline script (`src/pages/factory.astro`, around the `piBtn.id = 'gn-pi'` assignments): **`gn-pi`, `gn-ripcage`, `gn-host`**. Discover them from the live DOM rather than hardcoding this list — it is written from the source today and the source is what moves.
 
 ## What observable end state proves it works
 

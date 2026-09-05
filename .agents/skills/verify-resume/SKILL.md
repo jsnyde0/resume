@@ -69,6 +69,8 @@ These are the bar for any drive added to this skill. The first one is a family-w
 - **Compare whole identifiers, not fragments.** The breadcrumb check resolves the rendered text back to a full path and compares that. A basename-only check would pass on a wrong directory prefix — and this tree has four basenames that each live in two directories (`mapular.md`, `moonbird.md`, `humainly.md`, `kuleuven.md`), so that is a live weakness, not a theoretical one.
 - **Count the checks, never announce a number.** The run prints how many checks it ran, derived from the checks themselves. A hardcoded count is a lie waiting for the next edit, inside the very output whose job is honesty.
 - **Route-specific observables only.** Never assert on something the homepage also has; a misrouted server would pass.
+- **Verify side effects, not only the visible surface.** Today this site has none to verify: no page writes `localStorage`, `sessionStorage` or a cookie, and the file tree changes no URL or hash, so the DOM *is* the whole effect — checked, not assumed. That is why the drives assert on the DOM alone, and it stops being true the moment a feature persists anything (a remembered theme, a saved filter, a visited-file list). When one does, asserting the rendered surface is no longer enough: read the stored value back. The skill's own side effect counts too — the evidence directory must exist after `cleanup` has run.
+- **A "dry-run" flag must be proven to skip.** No script here takes one today. If one is ever added, a run with the flag has to be shown to leave the thing it names untouched — a dry-run that quietly does the work anyway is worse than having no flag, because it is trusted.
 
 ## Maintaining this skill
 
