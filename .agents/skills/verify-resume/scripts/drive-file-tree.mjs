@@ -219,7 +219,7 @@ try {
     checks,
     crashed,
     failures: failed,
-    verdict: crashed || failed.length ? "fail" : "pass",
+    result: crashed || failed.length ? "fail" : "pass",
   };
   const evidencePath = join(outDir, "evidence.json");
   writeFileSync(evidencePath, JSON.stringify(evidence, null, 2) + "\n");

@@ -78,9 +78,11 @@ These are the bar for any drive added to this skill. The first one is a family-w
 
 Whoever invokes this skill and hits friction — `doctor` fails, a selector is dead, a feature is missing from the map — **fixes it inline when it is documentation or map drift**, and otherwise **files the maintenance work then and there**. Do not work around a broken drive silently; a drive that has been quietly bypassed is worse than one that is red, because it still reads as coverage.
 
-The heavier full pass — re-read every feature source, **drive every feature that has a drive and list the rest as documented-not-driven**, then sort what breaks into documentation drift, harness gap, coverage gap, or a real product regression — runs on **named triggers only**: filed drift has accumulated, an audit flags it, **the pane-verb / drive-engine surface changes**, or the human asks. **There is no cadence.** Product code is never edited by a maintenance pass.
+The heavier full pass — re-read every feature source, **drive every feature that has a drive; list the rest as documented-not-driven**, then sort what breaks into documentation drift, harness gap, coverage gap, or a real product regression, and report exactly one of clean / changed / blocked — runs on **named triggers only**: filed drift has accumulated, an audit flags it, **the pane-verb / drive-engine surface changes**, or the human asks. **There is no cadence.** Product code is never edited by a maintenance pass.
 
-On this site that phrasing is load-bearing rather than pedantic: four of the five mapped features have no drive, so "drive every mapped feature" would describe a pass nobody can run.
+On this site that phrasing is load-bearing rather than pedantic: four of the five mapped features have no drive, so "drive every mapped feature" would describe a pass nobody can run. The phrase is also fixed wording — it reads byte-for-byte the same here as in `/verify maintain` and in the scaffold template, so one grep finds all three.
+
+**`changed` covers every completed pass that found something**, including the findings this skill is forbidden to fix: a product regression is reported, not patched, and the pass is still `changed`. `clean` means the pass completed and found nothing; `blocked` means it could not complete.
 
 ## Pointers
 

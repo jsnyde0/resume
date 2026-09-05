@@ -25,9 +25,13 @@ capture the state  →  perform the real user action  →  wait for the change  
 - **Assert every observable the behaviour moves, and make them agree with each other.** Four half-checks that each pass independently are not one real check.
 - **Assert the before-state differed.** Without it, a drive on a page where nothing happened still passes.
 
-## 4. Print the population, not just a verdict
+## 4. Print the population, not just a pass/fail
 
-Print how many elements were discovered, which ones, and the observed values before and after. A run that found nothing and asserted nothing exits 0 exactly like a real one; the printed population is the only thing that tells them apart.
+Print how many elements were discovered, which ones, and the observed values before and after. A run that found nothing and asserted nothing exits 0 exactly like a real one, and the printed population is what tells them apart.
+
+**Population is necessary and not sufficient.** It rules out the empty run and nothing else — it says whether the drive found things, never whether the things it found are the right ones. Precision is the other half: of what the drive reported, how much is real. The two fail in opposite directions, and a drive that discovers every element on the page can still assert against the wrong ones.
+
+For a drive, precision is bought at step 2 — assert against something the page itself supplies, never a list copied out of it. A check comparing the page to a copy of itself prints a full population and passes forever.
 
 ## 5. Wire it into `scripts/drive`
 
