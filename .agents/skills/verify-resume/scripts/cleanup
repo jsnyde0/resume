@@ -1,9 +1,34 @@
 #!/usr/bin/env bash
 # cleanup — stop only what launch started. Evidence survives.
 #
-# Nothing here deletes $VR_EVIDENCE. A cleanup that removes the artifact
-# defeats the point of capturing it: the run's whole claim is that the evidence
-# is still at its named path afterwards.
+# Nothing here deletes $VR_EVIDENCE. A cleanup that removes the artifact defeats
+# the point of capturing it: the run's whole claim is that the evidence is still
+# at its named path afterwards.
+#
+# "ONLY WHAT LAUNCH STARTED" IS CHECKED, NOT INFERRED. An earlier version killed
+# every process holding the port, reasoning that a non-default port must be ours.
+# That is an inference, and it is wrong whenever someone has their own server on
+# 4329 -- a manual `npm run preview -- --port 4329`, a leftover whose state file
+# was deleted, or a VERIFY_RESUME_PORT pointed at an occupied port. It would have
+# stopped a stranger's process while claiming it only stopped its own.
+#
+# THIS IS NOT HYPOTHETICAL. On the very first run of this guard, the port holder
+# it refused to touch turned out to be Chrome's OWN network service, which holds
+# a client connection to the port because the automation tab still has the page
+# open. `lsof -ti tcp:<port>` returns every process with the port open in any
+# sense, not just the listener. The old code would have killed the shared
+# browser's networking out from under every other agent using it.
+#
+# So the descendants of the recorded pid are collected FIRST (once the parent
+# dies its children are reparented and the ancestry is unrecoverable), and a port
+# holder is stopped only if it is in that set. Anything else is reported loudly
+# and left alone.
+#
+# WHAT THIS DOES NOT STOP, deliberately: the automation Chrome on :9222. It is a
+# SHARED, idempotent instance that other skills and other agents reuse -- ending
+# it here would break a concurrent session. The drive reuses one labelled tab
+# rather than opening a new one per run, so it does not accumulate tabs either.
+# Stop it by hand when you want it gone.
 
 source "$(dirname "${BASH_SOURCE[0]}")/_common"
 
@@ -12,9 +37,30 @@ if [ ! -f "$VR_STATE" ]; then
   exit 0
 fi
 
-# shellcheck disable=SC1090
 pid="$(sed -n 's/^pid=//p' "$VR_STATE")"
 port="$(sed -n 's/^port=//p' "$VR_STATE")"
+
+# Collect the descendant set BEFORE stopping anything.
+descendants=""
+collect_descendants() {
+  local parent="$1" child
+  for child in $(pgrep -P "$parent" 2>/dev/null || true); do
+    descendants="$descendants $child"
+    collect_descendants "$child"
+  done
+}
+if [ -n "${pid:-}" ]; then
+  descendants="$pid"
+  collect_descendants "$pid"
+fi
+
+is_ours() {
+  local candidate="$1" p
+  for p in $descendants; do
+    [ "$p" = "$candidate" ] && return 0
+  done
+  return 1
+}
 
 if [ -n "${pid:-}" ] && kill -0 "$pid" 2>/dev/null; then
   kill "$pid" 2>/dev/null || true
@@ -23,15 +69,20 @@ else
   echo "cleanup: pid ${pid:-unknown} was not running"
 fi
 
-# Backstop: npm spawns a child node process, so killing the npm pid can orphan
-# the actual listener. The port is this skill's own (non-default, recorded at
-# launch), so whatever still holds it is ours.
+# npm spawns a child node process, so stopping the npm pid can orphan the actual
+# listener. Stop it only if the ancestry says it was ours.
 if [ -n "${port:-}" ] && command -v lsof >/dev/null 2>&1; then
   for p in $(lsof -ti "tcp:$port" 2>/dev/null || true); do
-    kill "$p" 2>/dev/null || true
-    echo "cleanup: stopped orphaned listener pid $p on port $port"
+    if is_ours "$p"; then
+      kill "$p" 2>/dev/null || true
+      echo "cleanup: stopped orphaned listener pid $p on port $port (descendant of $pid)"
+    else
+      echo "cleanup: WARNING — pid $p holds port $port but is NOT a descendant of $pid." >&2
+      echo "cleanup:           Leaving it alone. It is not ours to stop." >&2
+    fi
   done
 fi
 
 rm -f "$VR_STATE"
 echo "cleanup: done. Evidence left in place at $VR_EVIDENCE"
+echo "cleanup: the shared automation Chrome on :9222 is left running on purpose (see this script's header)."

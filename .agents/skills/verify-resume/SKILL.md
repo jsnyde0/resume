@@ -39,7 +39,9 @@ Answered from the codebase on 2026-09-05. Recorded so the next reader can check 
 
 The shared `browser-automation` skill, **wrapped by path, never copied**. `scripts/_common` resolves it by trying, in order: `$VERIFY_RESUME_BROWSER_SKILL`, `$SKILL`, `~/.claude/skills/browser-automation`, `~/code/personal/dotpi/agent/skills/browser-automation`. A candidate counts only if it holds both `nav.js` and an installed `node_modules`.
 
-**Resolution is by trying, on purpose.** `$SKILL` is the engine's documented entry point, but nothing guarantees it is exported in every host or in a spawned child process. A generated skill that assumed `$SKILL` would fail in a way that looks like a broken feature. `scripts/doctor` prints the path that won, and refuses to drive when none does.
+**Resolution is by trying, on purpose.** `$SKILL` is how the engine documents its *own* invocation, but it is a per-skill variable: when `verify-resume` is the skill being invoked, `$SKILL` points at `verify-resume`, which has no `nav.js`. It is in the list as a courtesy for a caller who exported it deliberately, and the both-files guard is what makes a wrong value fall through instead of being used. Nothing guarantees `$SKILL` is set at all in a spawned child. `scripts/doctor` prints the path that won and refuses to drive when none does.
+
+The last candidate is a `$HOME`-relative path into the dotpi checkout. That is a machine-specific assumption shipped in this repo, and it is the fallback rather than the first choice for exactly that reason — set `VERIFY_RESUME_BROWSER_SKILL` on any machine where it does not hold.
 
 ## Running it
 
@@ -47,21 +49,25 @@ The shared `browser-automation` skill, **wrapped by path, never copied**. `scrip
 scripts/doctor              # read-only: is this worth driving? (run it first)
 scripts/launch              # build, then serve dist/ on 127.0.0.1:4329
 scripts/seed                # nothing to seed here; says so and exits 0
-scripts/drive file-tree     # drive one mapped feature, capture evidence
+scripts/drive file-tree     # expand a folder, open a file, capture evidence
 scripts/cleanup             # stop only what launch started; evidence survives
 ```
 
-Evidence lands in `.verify-evidence/<feature>-<timestamp>/` at the repo root: two screenshots and an `evidence.json` holding the before state, the after state, what was clicked, and every check's result. `cleanup` never deletes it.
+Evidence lands in `.verify-evidence/<feature>-<timestamp>/` at the repo root: three screenshots (before, expanded, after) and an `evidence.json` holding every check with its result, the discovered file list, what was expanded, and what was clicked. `cleanup` never deletes it.
+
+`cleanup` stops the preview server and **only** processes it can prove are that server's descendants — it collects the ancestry before stopping anything and leaves anything else alone, loudly. It deliberately leaves the shared automation Chrome on `:9222` running, because other skills and other agents reuse it; the drive reuses one labelled tab rather than opening one per run, so nothing accumulates.
 
 ## Evidence standards
 
 These are the bar for any drive added to this skill.
 
 - **Check what came out, not the exit code.** A drive that exits 0 having discovered zero files and asserted nothing is green and worthless. Every drive prints its population — how many elements it found, which ones, what it observed before and after — so a reader can tell a real run from a vacuous one. `drive-file-tree.mjs` prints the discovered file list for exactly this reason.
-- **Exercise the real user path.** Click the thing a visitor clicks. Do not call the page's internal function directly; that tests the function, not the feature.
+- **Exercise the real user path, and prove the target was reachable.** Click the thing a visitor clicks — and first check a visitor could have clicked it. Every file in this tree except `README.md` starts inside a collapsed folder, so an earlier version of the drive clicked a hidden node and passed while the entire folder-expand feature could have been dead, leaving a visitor able to open nothing. The drive now picks a *hidden* file on purpose, expands its folder chain the way a visitor does, and **refuses to click a target that is still invisible**. Do not call the page's internal function directly either; that tests the function, not the feature.
 - **Capture the action and the resulting state, not just a final screenshot.** A screenshot of the end state cannot distinguish "the click worked" from "it already looked like that". Capture before, act, capture after, and require the difference.
 - **Assert every observable the behaviour is supposed to move, and make them agree.** The file-tree click moves four things — selected class, `aria-current`, panel visibility, breadcrumb text — and the drive requires all four to move *and to name the same path*. Any one alone would pass while the feature was half broken.
 - **Discover selectors from the live DOM where the markup is data-generated.** The file tree is built from repo data. A hardcoded path list would rot on the next data change and would fail as though the feature broke.
+- **Compare whole identifiers, not fragments.** The breadcrumb check resolves the rendered text back to a full path and compares that. A basename-only check would pass on a wrong directory prefix — and this tree has four basenames that each live in two directories (`mapular.md`, `moonbird.md`, `humainly.md`, `kuleuven.md`), so that is a live weakness, not a theoretical one.
+- **Count the checks, never announce a number.** The run prints how many checks it ran, derived from the checks themselves. A hardcoded count is a lie waiting for the next edit, inside the very output whose job is honesty.
 - **Route-specific observables only.** Never assert on something the homepage also has; a misrouted server would pass.
 
 ## Maintaining this skill

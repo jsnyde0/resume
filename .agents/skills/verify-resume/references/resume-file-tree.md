@@ -17,21 +17,31 @@ scripts/drive file-tree
 scripts/cleanup
 ```
 
-`scripts/drive file-tree` runs `drive-file-tree.mjs`, which navigates a real Chrome to `/resume/`, waits for `.ghv-shell`, captures the tree's full state, clicks the first file that is **not** currently selected, waits for the selection to actually move, and captures the state again.
+`scripts/drive file-tree` runs `drive-file-tree.mjs`, which navigates a real Chrome to `/resume/`, waits for `.ghv-shell`, captures the tree's full state, then walks the **real user path**: it deliberately picks a file that is currently *hidden*, clicks the folder toggles that reveal it — outermost first, each found from the panel it controls — checks it actually became visible, and only then clicks it.
 
 The file list is **discovered from the live DOM**, never hardcoded — the tree is generated from repo data, so a fixed list would rot on the next data change and would report as a broken feature.
 
 ## What observable end state proves it works
 
-A click must move **four** things, and they must all name the same file:
+Two behaviours, in order.
+
+**Expanding a folder** must make the file reachable:
+
+1. every collapsed container in the chain has a toggle that controls it;
+2. each toggle's `aria-expanded` becomes `true`;
+3. the file is genuinely visible afterwards (`offsetParent` is no longer null).
+
+Point 3 is the one that matters. `aria-expanded` can flip to `true` while the panel stays `display: none` — that exact half-broken state was produced deliberately and only the visibility check caught it.
+
+**Clicking the file** must then move four things, all naming the same path:
 
 1. the clicked entry gains the `ghv-file--selected` class, and it is the only entry with it;
 2. that entry's `aria-current` becomes `true`, and it is the only one;
-3. the matching `[data-ghv-panel]` becomes the only visible panel (the others get `display: none`);
-4. the breadcrumb `#ghv-preview-path` names that file.
+3. the matching `[data-ghv-panel]` becomes the only visible panel;
+4. the breadcrumb `#ghv-preview-path`, resolved back to a path, equals the **full** clicked path — directory prefix included. Basename alone is not enough: four basenames in this tree each live in two directories.
 
-Plus: the selection must have actually left the previously selected file. That last check is what stops the drive passing on a page where nothing happened.
+## Why the reachability half is not optional
 
-All four matter separately. The handler sets them in separate statements, so a half-broken feature — panel swaps, breadcrumb does not — passes any single-observable check while looking obviously wrong to a visitor.
+An earlier version of this drive clicked the first unselected entry in DOM order. Every file except `README.md` starts inside a collapsed folder, so it was clicking a node no visitor could see. It passed every check while the folder-expand handlers could have been completely dead — a visitor able to open nothing at all. **That is the exact "green while broken" failure this whole skill exists to catch**, and it survived in the skill's own drive until an adversarial review found it.
 
-**None of this is visible to a static-HTML check.** The markup is byte-identical whether the click handlers are wired or not, which is exactly why this feature needs a browser and `npm run test:projects` cannot help.
+**None of this is visible to a static-HTML check.** The markup is byte-identical whether the handlers are wired or not, which is why this feature needs a browser and `npm run test:projects` cannot help.

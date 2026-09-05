@@ -41,7 +41,7 @@ RIDER (FIRM): non-visual refactoring only (build scripts, data plumbing, utiliti
 
 - **`.agents/skills/verify-resume/`** — a per-project verification skill that drives the **real Astro site in a real browser** and keeps the evidence. Reached from Claude Code through the relative symlink `.claude/skills/verify-resume`; pi reads `.agents/skills/` directly, gated on project trust.
 
-  **Commands:** `scripts/doctor` (read-only, is this worth driving), `scripts/launch` (build, then serve `dist/` on 127.0.0.1:4329), `scripts/seed` (nothing to seed — hermetic), `scripts/drive file-tree`, `scripts/cleanup` (stops only what launch started; evidence survives).
+  **Commands:** `scripts/doctor` (read-only, is this worth driving), `scripts/launch` (build, then serve `dist/` on 127.0.0.1:4329), `scripts/seed` (nothing to seed — hermetic), `scripts/drive file-tree`, `scripts/cleanup` (stops the server and only processes it can prove are its descendants — ancestry is checked, not inferred from port ownership; evidence survives; the shared automation Chrome on :9222 is deliberately left running).
 
   **Speed:** ~4s for the full launch→drive→cleanup cycle, measured 2026-09-05 (launch incl. build 2s, doctor+drive 2s, cleanup <1s). Cheap enough to run on any change to a page's inline script.
 
@@ -53,4 +53,4 @@ RIDER (FIRM): non-visual refactoring only (build scripts, data plumbing, utiliti
 
   **Coverage today, stated honestly:** one mapped drive (`file-tree`). The `/factory/` orbit graph is the largest uncovered interactive surface and has no drive at all. See `.agents/skills/verify-resume/references/README.md`.
 
-  **Evidence:** `.verify-evidence/<feature>-<timestamp>/` — two screenshots plus `evidence.json` holding the before state, after state, what was clicked, and every check's result. Gitignored; `cleanup` never deletes it.
+  **Evidence:** `.verify-evidence/<feature>-<timestamp>/` — three screenshots (before / expanded / after) plus `evidence.json` holding every check with its result, the discovered file list, what was expanded and what was clicked. Written on every path including a crash. Gitignored; `cleanup` never deletes it.
