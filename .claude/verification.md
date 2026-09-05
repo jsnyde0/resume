@@ -43,7 +43,7 @@ RIDER (FIRM): non-visual refactoring only (build scripts, data plumbing, utiliti
 
   **Commands:** `scripts/doctor` (read-only, is this worth driving), `scripts/launch` (build, then serve `dist/` on 127.0.0.1:4329), `scripts/seed` (nothing to seed — hermetic), `scripts/drive file-tree`, `scripts/cleanup` (stops only what launch started; evidence survives).
 
-  **Speed:** ~15s for the full launch→drive→cleanup cycle, of which the build is about a second.
+  **Speed:** ~4s for the full launch→drive→cleanup cycle, measured 2026-09-05 (launch incl. build 2s, doctor+drive 2s, cleanup <1s). Cheap enough to run on any change to a page's inline script.
 
   **Catches:** client-side behaviour that no static check can see. The `/resume/` file tree and the `/factory/` orbit graph are inline vanilla JS that rewrite the DOM on click with no URL or hash change — the served markup is byte-identical whether the handlers are wired or not. `npm run build` and `npm run test:projects` both pass on a page whose interactivity is completely dead.
 
