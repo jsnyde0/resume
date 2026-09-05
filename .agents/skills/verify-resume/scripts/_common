@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+# Shared resolution for the verify-resume scripts. Sourced, never run.
+#
+# Paths resolve from THIS script's own physical location, so the skill works
+# whether it is invoked at .agents/skills/verify-resume/ or through the
+# .claude/skills/verify-resume symlink. `pwd -P` is what resolves the symlinked
+# parent directory; a logical `pwd` would walk out of the wrong tree.
+
+set -euo pipefail
+
+VR_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+VR_SKILL_DIR="$(cd "$VR_SCRIPT_DIR/.." && pwd -P)"
+VR_REPO_ROOT="$(cd "$VR_SKILL_DIR/../../.." && pwd -P)"
+
+VR_PORT="${VERIFY_RESUME_PORT:-4329}"
+VR_URL="http://127.0.0.1:${VR_PORT}"
+VR_EVIDENCE="${VERIFY_RESUME_EVIDENCE:-$VR_REPO_ROOT/.verify-evidence}"
+VR_STATE="$VR_EVIDENCE/.launch-state"
+VR_LOG="$VR_EVIDENCE/preview-server.log"
+
+# Resolve the SHARED browser-automation engine. This skill wraps that engine;
+# it never copies it. Resolution is by trying, because $SKILL is not asserted
+# to be set in every host or in a spawned child — a generated skill that
+# assumed $SKILL would fail silently on the hosts where it is unset.
+vr_resolve_engine() {
+  local c
+  for c in \
+      "${VERIFY_RESUME_BROWSER_SKILL:-}" \
+      "${SKILL:-}" \
+      "$HOME/.claude/skills/browser-automation" \
+      "$HOME/code/personal/dotpi/agent/skills/browser-automation"; do
+    [ -n "$c" ] || continue
+    if [ -f "$c/nav.js" ] && [ -d "$c/node_modules" ]; then
+      (cd "$c" && pwd -P)
+      return 0
+    fi
+  done
+  return 1
+}
+
+vr_engine_or_die() {
+  local e
+  if ! e="$(vr_resolve_engine)"; then
+    cat >&2 <<'MSG'
+FAIL: the shared browser-automation engine did not resolve.
+
+Tried, in order:
+  $VERIFY_RESUME_BROWSER_SKILL
+  $SKILL
+  ~/.claude/skills/browser-automation
+  ~/code/personal/dotpi/agent/skills/browser-automation
+
+A candidate counts only when it holds BOTH nav.js and an installed
+node_modules -- the engine needs puppeteer-core present, and a directory
+that merely exists would drive nothing.
+
+Fix: install it once with `npm --prefix "<engine-dir>" install`, or point
+VERIFY_RESUME_BROWSER_SKILL at a directory that has it.
+MSG
+    return 1
+  fi
+  printf '%s\n' "$e"
+}

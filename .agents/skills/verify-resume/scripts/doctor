@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+# doctor — read-only: is this instance worth driving?
+#
+# Changes nothing. Starts nothing. Its whole job is to fail fast and loudly
+# BEFORE a drive, so a broken setup reports as broken rather than as a failing
+# feature.
+
+source "$(dirname "${BASH_SOURCE[0]}")/_common"
+
+fail=0
+note() { printf '  %-6s %s\n' "$1" "$2"; }
+
+echo "doctor: verify-resume"
+echo
+echo "paths"
+note "ok" "skill      $VR_SKILL_DIR"
+note "ok" "repo root  $VR_REPO_ROOT"
+note "ok" "evidence   $VR_EVIDENCE"
+echo
+
+echo "drive engine (shared, wrapped — never copied into this skill)"
+if engine="$(vr_engine_or_die)"; then
+  note "ok" "browser-automation -> $engine"
+else
+  fail=1
+fi
+echo
+
+echo "instance"
+if [ -f "$VR_STATE" ]; then
+  note "ok" "launch state present ($VR_STATE)"
+else
+  note "warn" "no launch state — run scripts/launch first"
+fi
+if curl -sf -o /dev/null "$VR_URL/"; then
+  note "ok" "serving at $VR_URL"
+else
+  note "FAIL" "nothing answering at $VR_URL — run scripts/launch"
+  fail=1
+fi
+
+# Route-specific, not just HTTP 200. A homepage answering 200 for every path is
+# the failure this check exists to catch.
+if body="$(curl -sf "$VR_URL/resume/" 2>/dev/null)"; then
+  if printf '%s' "$body" | grep -q 'ghv-shell'; then
+    note "ok" "/resume/ serves its own content (ghv-shell present)"
+  else
+    note "FAIL" "/resume/ answered but without ghv-shell — wrong route or stale build"
+    fail=1
+  fi
+else
+  note "FAIL" "/resume/ did not answer"
+  fail=1
+fi
+echo
+
+echo "state"
+note "ok" "hermetic — no DB, cache, external API or auth session to check"
+echo
+
+echo "caveats"
+note "note" "pi gates repo-local skills on project trust. On an UNTRUSTED"
+note "" "checkout this skill silently does not load — no error, it is"
+note "" "just absent from the skill list. If pi cannot see it, check"
+note "" "trust before debugging the skill."
+note "note" "Claude Code reaches this skill through the relative symlink"
+note "" ".claude/skills/verify-resume. If the skill is missing there,"
+note "" "check that the symlink resolves before suspecting the skill."
+echo
+
+if [ "$fail" -ne 0 ]; then
+  echo "doctor: NOT worth driving — fix the FAIL lines above."
+  exit 1
+fi
+echo "doctor: worth driving."

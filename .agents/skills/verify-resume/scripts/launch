@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+# launch — build the Astro site and serve the built output for driving.
+#
+# Builds first, deliberately: `astro preview` serves whatever is already in
+# dist/, so previewing without building can serve a stale site and report green
+# on code that is not the code under test. The build is about a second.
+#
+# Prints the URL and the pid it started. `cleanup` kills only that.
+
+source "$(dirname "${BASH_SOURCE[0]}")/_common"
+
+mkdir -p "$VR_EVIDENCE"
+
+if [ ! -d "$VR_REPO_ROOT/node_modules" ]; then
+  echo "FAIL: node_modules missing at $VR_REPO_ROOT. Run 'npm install' first." >&2
+  exit 1
+fi
+
+echo "==> building (npm run build)"
+( cd "$VR_REPO_ROOT" && npm run build ) >"$VR_EVIDENCE/build.log" 2>&1 || {
+  echo "FAIL: build failed. Tail of $VR_EVIDENCE/build.log:" >&2
+  tail -20 "$VR_EVIDENCE/build.log" >&2
+  exit 1
+}
+echo "    build ok -> $VR_REPO_ROOT/dist"
+
+echo "==> serving dist/ on port $VR_PORT"
+( cd "$VR_REPO_ROOT" && npm run preview -- --port "$VR_PORT" --host 127.0.0.1 ) >"$VR_LOG" 2>&1 &
+VR_PID=$!
+
+# Poll for the port to answer. A fixed sleep would either be slow or race.
+for _ in $(seq 1 60); do
+  if curl -sf -o /dev/null "$VR_URL/"; then
+    printf 'pid=%s\nport=%s\nurl=%s\n' "$VR_PID" "$VR_PORT" "$VR_URL" > "$VR_STATE"
+    echo "    up   -> $VR_URL  (pid $VR_PID)"
+    echo "    state written to $VR_STATE"
+    exit 0
+  fi
+  if ! kill -0 "$VR_PID" 2>/dev/null; then
+    echo "FAIL: preview server exited. Tail of $VR_LOG:" >&2
+    tail -20 "$VR_LOG" >&2
+    exit 1
+  fi
+  sleep 0.5
+done
+
+echo "FAIL: port $VR_PORT never answered within 30s. Tail of $VR_LOG:" >&2
+tail -20 "$VR_LOG" >&2
+exit 1

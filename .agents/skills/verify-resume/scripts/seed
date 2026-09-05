@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# seed — nothing to seed. This is a real answer, not an unfinished script.
+#
+# The Isolate half of the repo interview: the Astro site touches no database,
+# no cache, no external API, no auth session. Verified by grep across src/ and
+# astro.config.mjs for fetch( / process.env / import.meta.env -- no matches.
+# The root db.sqlite3 belongs to the legacy Django stack; no Astro source
+# reads it.
+#
+# So a drive needs no fixture state and leaves none behind. If that ever stops
+# being true -- a form that posts somewhere, a build-time API fetch -- this
+# script is where the seed goes, and cleanup gains a matching teardown.
+
+source "$(dirname "${BASH_SOURCE[0]}")/_common"
+
+echo "seed: nothing to seed — this site is hermetic once node_modules exists."
+echo "      (no DB, no cache, no external API, no auth session)"
+exit 0

@@ -177,3 +177,6 @@ static/
 *.db
 .beads-credential-key
 .beads/proxieddb/
+
+# verification evidence (agentic e2e runs)
+.verify-evidence/
