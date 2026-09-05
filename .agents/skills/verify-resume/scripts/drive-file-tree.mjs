@@ -251,10 +251,10 @@ try {
 
   if (crashed) console.log(`CRASHED: ${crashed}`);
   if (failed.length) {
-    console.log(`VERDICT: fail (${failed.length})`);
+    console.log(`DRIVE-RESULT: fail (${failed.length})`);
     for (const f of failed) console.log(`  - ${f}`);
   } else if (!crashed) {
-    console.log("VERDICT: pass");
+    console.log("DRIVE-RESULT: pass");
   }
   process.exit(crashed || failed.length ? 1 : 0);
 }

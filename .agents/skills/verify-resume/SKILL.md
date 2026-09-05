@@ -62,6 +62,8 @@ Evidence lands in `.verify-evidence/<feature>-<timestamp>/` at the repo root: th
 These are the bar for any drive added to this skill. The first one is a family-wide rule with its own home — **the `/verify` skill's own `references/output-not-exit-code.md`** (inside the `/verify` skill, *not* this skill's `references/` directory below), which carries five worked instances of a harness going green while the goal was missed. Read it before arguing that a cheaper check is good enough here.
 
 - **Check what came out, not the exit code.** A drive that exits 0 having discovered zero files and asserted nothing is green and worthless. Every drive prints its population — how many elements it found, which ones, what it observed before and after — so a reader can tell a real run from a vacuous one. `drive-file-tree.mjs` prints the discovered file list for exactly this reason.
+
+  *On precision, the other half of that rule:* a drive asserts against a known expected state rather than emitting findings to be judged, so it has no false-positive rate to sample — its checks are right or the run is red. Precision becomes live here the moment a drive starts *reporting* things rather than asserting them.
 - **Exercise the real user path, and prove the target was reachable.** Click the thing a visitor clicks — and first check a visitor could have clicked it. Every file in this tree except `README.md` starts inside a collapsed folder, so an earlier version of the drive clicked a hidden node and passed while the entire folder-expand feature could have been dead, leaving a visitor able to open nothing. The drive now picks a *hidden* file on purpose, expands its folder chain the way a visitor does, and **refuses to click a target that is still invisible**. Do not call the page's internal function directly either; that tests the function, not the feature.
 - **Capture the action and the resulting state, not just a final screenshot.** A screenshot of the end state cannot distinguish "the click worked" from "it already looked like that". Capture before, act, capture after, and require the difference.
 - **Assert every observable the behaviour is supposed to move, and make them agree.** The file-tree click moves four things — selected class, `aria-current`, panel visibility, breadcrumb text — and the drive requires all four to move *and to name the same path*. Any one alone would pass while the feature was half broken.
@@ -76,7 +78,9 @@ These are the bar for any drive added to this skill. The first one is a family-w
 
 Whoever invokes this skill and hits friction — `doctor` fails, a selector is dead, a feature is missing from the map — **fixes it inline when it is documentation or map drift**, and otherwise **files the maintenance work then and there**. Do not work around a broken drive silently; a drive that has been quietly bypassed is worse than one that is red, because it still reads as coverage.
 
-The heavier full pass — re-read every feature source, drive every mapped feature once, sort what breaks into documentation drift, harness gap, or a real product regression — runs on **named triggers only**: filed drift has accumulated, an audit flags it, or the human asks. **There is no cadence.** Product code is never edited by a maintenance pass.
+The heavier full pass — re-read every feature source, **drive every feature that has a drive and list the rest as documented-not-driven**, then sort what breaks into documentation drift, harness gap, coverage gap, or a real product regression — runs on **named triggers only**: filed drift has accumulated, an audit flags it, **the pane-verb / drive-engine surface changes**, or the human asks. **There is no cadence.** Product code is never edited by a maintenance pass.
+
+On this site that phrasing is load-bearing rather than pedantic: four of the five mapped features have no drive, so "drive every mapped feature" would describe a pass nobody can run.
 
 ## Pointers
 

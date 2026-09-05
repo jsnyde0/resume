@@ -10,7 +10,7 @@ Seeded 2026-09-05 by `/verify scaffold` with the top five. This is a map, not an
 | [Resume file-tree browser](resume-file-tree.md) | `/resume/` | **yes** — `scripts/drive file-tree` |
 | [Download-PDF joke](download-pdf-joke.md) | `/resume/` | not yet |
 | [Projects list](projects-list.md) | `/projects/` | covered statically by `npm run test:projects` |
-| [Factory orbit graph](factory-orbit-graph.md) | `/factory/` | **not yet — highest-value gap** |
+| [Factory orbit graph](factory-orbit-graph.md) | `/factory/` | **not yet — highest-value gap** (filed: `dotpi-9a81`) |
 
 ## Where the coverage actually is
 

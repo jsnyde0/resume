@@ -53,6 +53,6 @@ RIDER (FIRM): non-visual refactoring only (build scripts, data plumbing, utiliti
 
   **Less useful when:** the work is copy, positioning, or styling. Prefer the `copy-and-positioning` cold-context read-back above; a browser drive confirms the DOM moved, not that the writing lands. Also skip it for `/projects/` — `npm run test:projects` already covers that route faster and more deterministically.
 
-  **Coverage today, stated honestly:** one mapped drive (`file-tree`). The `/factory/` orbit graph is the largest uncovered interactive surface and has no drive at all. See `.agents/skills/verify-resume/references/README.md`.
+  **Coverage today, stated honestly:** one mapped drive (`file-tree`). The `/factory/` orbit graph is the largest uncovered interactive surface and has no drive at all — filed as `dotpi-9a81`, so a maintenance pass cites that bead rather than filing the gap again. See `.agents/skills/verify-resume/references/README.md`.
 
   **Evidence:** `.verify-evidence/<feature>-<timestamp>/` — three screenshots (before / expanded / after) plus `evidence.json` holding every check with its result, the discovered file list, what was expanded and what was clicked. Written on every path including a crash. Gitignored; `cleanup` never deletes it.
