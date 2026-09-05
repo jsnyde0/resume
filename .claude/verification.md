@@ -39,9 +39,11 @@ RIDER (FIRM): non-visual refactoring only (build scripts, data plumbing, utiliti
 
 ## Agentic e2e (mechanism class added 2026-09-05 by `/verify scaffold`, dotpi-gtng.2)
 
-- **`.agents/skills/verify-resume/`** — a per-project verification skill that drives the **real Astro site in a real browser** and keeps the evidence. Reached from Claude Code through the relative symlink `.claude/skills/verify-resume`; pi reads `.agents/skills/` directly, gated on project trust.
+- **`.agents/skills/verify-resume/`**
 
-  **Commands:** `scripts/doctor` (read-only, is this worth driving), `scripts/launch` (build, then serve `dist/` on 127.0.0.1:4329), `scripts/seed` (nothing to seed — hermetic), `scripts/drive file-tree`, `scripts/cleanup` (stops the server and only processes it can prove are its descendants — ancestry is checked, not inferred from port ownership; evidence survives; the shared automation Chrome on :9222 is deliberately left running).
+  **What it is:** a per-project verification skill that drives the **real Astro site in a real browser** and keeps the evidence. Reached from Claude Code through the relative symlink `.claude/skills/verify-resume`; pi reads `.agents/skills/` directly, gated on project trust.
+
+  **Command:** `scripts/doctor` (read-only, is this worth driving), `scripts/launch` (build, then serve `dist/` on 127.0.0.1:4329), `scripts/seed` (nothing to seed — hermetic), `scripts/drive file-tree`, `scripts/cleanup` (stops the server and only processes it can prove are its descendants — ancestry is checked, not inferred from port ownership; evidence survives; the shared automation Chrome on :9222 is deliberately left running).
 
   **Speed:** ~4s for the full launch→drive→cleanup cycle, measured 2026-09-05 (launch incl. build 2s, doctor+drive 2s, cleanup <1s). Cheap enough to run on any change to a page's inline script.
 
