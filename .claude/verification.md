@@ -32,9 +32,9 @@ Per-repo inventory of verification mechanisms and their fit profiles. Consult wh
 
 RIDER (FIRM): non-visual refactoring only (build scripts, data plumbing, utilities); visual/copy/styling work parks for the human. NOTE 2026-08-09: www.jonatansnyders.com is still served by the LEGACY DJANGO stack living in this repo (`a_core/`, `templates/`, `node/` Tailwind pipeline) — the Astro site is the unfinished migration target. The Django app is LIVE: not a deletion candidate; migration completion is attended work (parked proposal bead).
 
-- **Gate command:** `npm run build && npm run test:projects` (ran green 2026-08-09, offline with existing node_modules; build ~1s). NOTE: no `npm test` script exists — an earlier fleet inventory claimed one; wrong.
+- **Gate command:** `npm run gate` = `astro check && astro build && node scripts/verify-projects-page.mjs` (wired 2026-10-05, resume-db0; green offline with existing node_modules). `npm run build && npm run test:projects` is the same minus the typecheck. NOTE: no `npm test` script exists.
 - **Gate files (fail-closed):** `scripts/verify-*.mjs`, `package.json` script definitions, `docs/projects-source-inventory.md` (asserted-against), plus any future test files. `scripts/verify-resume-layout.mjs` is visual + non-hermetic (headless Chrome) — never part of the dispatch gate.
-- **D3 conformance:** partial — the build catches syntax/import breakage at a stable boundary and `test:projects` pins built-HTML content, but NOTHING type-checks (`@astrojs/check` not installed — typecheck gate bead filed; type-incompatible props currently build green).
+- **D3 conformance:** partial — `astro check` type-checks `.astro`/TS (planted type error fails the gate before build; no tsconfig.json, so Astro's default compiler options apply, not `strict`), the build catches syntax/import breakage at a stable boundary, and `test:projects` pins built-HTML content.
 - **Green-at-dispatch:** checked by the dispatching brain; result recorded on the dispatched bead.
 
 ## Agentic e2e (mechanism class added 2026-09-05 by `/verify scaffold`, dotpi-gtng.2)

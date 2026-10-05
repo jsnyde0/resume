@@ -753,7 +753,7 @@ const totalFolders = 4 + skillsSubfolders.length; // experience, achievements, e
     // ── Download PDF — fake-download interaction ────────────────────────────
     const dlBtn      = document.getElementById('ghv-dl-btn') as HTMLButtonElement;
     const dlLabel    = document.getElementById('ghv-dl-label') as HTMLElement;
-    const dlIcon     = document.getElementById('ghv-dl-icon') as SVGElement;
+    const dlIcon     = document.querySelector('#ghv-dl-icon') as SVGElement;
     const dlProgress = document.getElementById('ghv-dl-progress') as HTMLElement;
     const dlSpinner  = document.getElementById('ghv-dl-spinner') as HTMLElement;
     let dlRunning = false;

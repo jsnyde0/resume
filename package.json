@@ -10,10 +10,15 @@
     "build": "astro build",
     "preview": "astro preview",
     "test:projects": "node scripts/verify-projects-page.mjs",
+    "gate": "astro check && astro build && node scripts/verify-projects-page.mjs",
     "astro": "astro"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",
     "astro": "^6.4.5"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "typescript": "^6.0.3"
   }
 }
