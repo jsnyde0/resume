@@ -36,7 +36,7 @@
 - `templates/projects.html` page shell -> `src/pages/projects.astro` rendered inside `src/layouts/BaseLayout.astro`.
 - Intro section (`#projects`, "Web Development", intro paragraph) -> `projectsIntro` in `src/data/projects.ts` rendered by `src/pages/projects.astro`.
 - Repeated project sections -> `projectEntries` in `src/data/projects.ts` rendered by `src/components/projects/ProjectCard.astro`.
-- Django `c-carousel-frame` / `c-carousel-item` behavior -> `src/components/projects/ProjectsCarousel.astro` plus the inline script in `src/pages/projects.astro` using small vanilla-JS prev/next + dot navigation with wraparound.
+- Django `c-carousel-frame` / `c-carousel-item` behavior -> `src/components/projects/ProjectsCarousel.astro` plus the inline script in `src/pages/projects.astro` using small vanilla-JS prev/next + dot navigation with wraparound. *(ProjectsCarousel.astro deleted 2026-10-05, resume-y4s: it was an unused placeholder; the live carousel is the inline markup + script in `src/pages/projects.astro`.)*
 - Alternating desktop gallery/content order from `lg:flex` vs `lg:flex-row-reverse` -> `project.reverseOnDesktop` in `src/data/projects.ts` interpreted by `src/components/projects/ProjectCard.astro`.
 - Card body structure (`description`, `Technology`, `Key Learnings`, optional Source Code action) -> `src/components/projects/ProjectCard.astro`.
 - Source images under Django static paths -> copied to Astro-served `public/img/*` and referenced from `src/data/projects.ts`.
@@ -44,7 +44,7 @@
 ### Section-by-section inventory
 - **Just Show Up**
   - Source title/description/tech/learning/link from `templates/partials/pages/projects.html` -> `projectEntries[0]`.
-  - Source image `staticfiles/img/just_show_up.png` -> `public/img/just_show_up.png` -> carousel image in `ProjectsCarousel.astro`.
+  - Source image `staticfiles/img/just_show_up.png` -> `public/img/just_show_up.png` -> carousel image in `src/pages/projects.astro`.
   - Source Code link preserved: `https://github.com/jsnyde0/just-show-up/`.
   - Layout parity: reversed gallery/content on desktop, stacked on mobile.
 - **eBayes**
@@ -90,7 +90,7 @@
 - `staticfiles/img/getting_tasks_done-subtask.png` -> `/img/getting_tasks_done-subtask.png`
 
 ## No runtime Django/HTMX dependency
-- Astro route is plain `.astro` plus local data/components: `src/pages/projects.astro`, `src/data/projects.ts`, `src/components/projects/ProjectCard.astro`, and `src/components/projects/ProjectsCarousel.astro`.
+- Astro route is plain `.astro` plus local data/components: `src/pages/projects.astro`, `src/data/projects.ts`, `src/components/projects/ProjectCard.astro`.
 - Generated route must not contain Django template tags, Cotton tags, or HTMX attributes; this is checked by `scripts/verify-projects-page.mjs` against `dist/projects/index.html`.
 - No server-only `a_core` code is imported by the Astro route.
 

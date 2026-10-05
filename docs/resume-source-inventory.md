@@ -22,11 +22,11 @@
 - Intro card with avatar hover swap, identity badges, six intro paragraphs, skill badges, and the CV affordance -> first `ResumeCard` block in `src/pages/resume.astro`.
 - Skills card title/tooltip and view selector -> second `ResumeCard` block in `src/pages/resume.astro`.
 - `a_core/utils.py` skills tree data -> `src/data/resume.ts` (`skillsTree`).
-- Achievement cards -> `src/data/resume.ts` (`achievements`) rendered through `src/components/resume/ResumeItemCard.astro`.
-- Work Experience cards -> `src/data/resume.ts` (`workExperience`) rendered through `src/components/resume/ResumeItemCard.astro`.
-- Education cards -> `src/data/resume.ts` (`education`) rendered through `src/components/resume/ResumeItemCard.astro`.
+- Achievement cards -> `src/data/resume.ts` (`achievements`) rendered by inline `buildItemHtml` in `src/pages/resume.astro` (ResumeItemCard.astro deleted 2026-10-05, resume-kxl).
+- Work Experience cards -> `src/data/resume.ts` (`workExperience`) rendered by inline `buildItemHtml` in `src/pages/resume.astro` (ResumeItemCard.astro deleted 2026-10-05, resume-kxl).
+- Education cards -> `src/data/resume.ts` (`education`) rendered by inline `buildItemHtml` in `src/pages/resume.astro` (ResumeItemCard.astro deleted 2026-10-05, resume-kxl).
 - Cotton `resume_card` wrapper styling -> `src/components/resume/ResumeCard.astro` with component-local `.resume-card*` styles so Astro scoping applies to the rendered card markup.
-- Cotton `resume_item_card` icon / meta / body structure -> `src/components/resume/ResumeItemCard.astro` with component-local `.resume-item-card*` / badge / link styles so mobile and desktop layout rules apply to the rendered item cards.
+- Cotton `resume_item_card` icon / meta / body structure -> inline `buildItemHtml` in `src/pages/resume.astro` (ResumeItemCard.astro deleted 2026-10-05, resume-kxl), with `.resume-item-card*` / badge / link styles so mobile and desktop layout rules apply to the rendered item cards.
 
 ## CV/download behavior
 - Django `download_cv` redirects back to `/resume/` with a warning saying the PDF is not available yet.
