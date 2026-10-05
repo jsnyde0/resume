@@ -1,0 +1,36 @@
+name: Deploy to Cloudflare Pages
+
+# Push to main publishes production; any other branch publishes a preview.
+# Manual fallback: see DEPLOY.md.
+on:
+  push:
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: package.json
+          cache: npm
+
+      - run: npm ci
+
+      # astro check + astro build + projects-page assertions
+      - run: npm run gate
+
+      - uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy dist --project-name jonatansnyders-resume --branch ${{ github.ref_name }} --commit-hash ${{ github.sha }}

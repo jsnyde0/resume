@@ -6,7 +6,7 @@ This repo is an Astro static site, served in production at https://www.jonatansn
 
 - Cloudflare account: `jonatan.snyders@gmail.com` (account id `7037734937d430a15fd16d9e2dec3016`)
 - Pages project: `jonatansnyders-resume`, production branch `main`
-- Deploy source: Wrangler direct upload. The project has no Git integration, so pushing to GitHub deploys nothing.
+- Deploy source: Wrangler direct upload from GitHub Actions (`.github/workflows/deploy.yml`). The project has no Cloudflare Git integration; a direct-upload project cannot get one.
 - Domains: `jonatansnyders-resume.pages.dev`, `jonatansnyders.com`, `www.jonatansnyders.com`
 - GitHub repo: `jsnyde0/resume`
 - Node.js: `22.12.0` or newer (`package.json` declares `>=22.12.0`)
@@ -14,13 +14,29 @@ This repo is an Astro static site, served in production at https://www.jonatansn
 
 ## Deploy
 
+Push to GitHub. The `Deploy to Cloudflare Pages` workflow (`.github/workflows/deploy.yml`) runs `npm ci`, `npm run gate`, then `wrangler pages deploy dist`:
+
+- Push to `main` publishes to production (both custom domains).
+- Push to any other branch publishes a preview URL only.
+
+Watch a run: `gh run list --workflow deploy.yml -L 1`.
+
+Repo secrets the workflow needs (`gh secret list --repo jsnyde0/resume`):
+
+- `CLOUDFLARE_API_TOKEN` — custom token `github-actions-pages-deploy`, permission Account / Cloudflare Pages / Edit, scoped to this account only. Rotate it in dash.cloudflare.com → My Profile → API Tokens, then `gh secret set CLOUDFLARE_API_TOKEN --repo jsnyde0/resume`.
+- `CLOUDFLARE_ACCOUNT_ID` — the account id above.
+
+### Manual fallback
+
+Use when Actions is down or for a deploy from a local checkout:
+
 ```sh
 npm install
 npm run build
 npx wrangler pages deploy dist --project-name jonatansnyders-resume --branch main
 ```
 
-`--branch main` publishes to production (both custom domains). Any other branch name gives a preview URL only.
+`--branch main` publishes to production. Any other branch name gives a preview URL only.
 
 Do not deploy to an existing unrelated Pages project.
 
