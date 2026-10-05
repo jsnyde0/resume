@@ -424,16 +424,6 @@ Object.assign(fileContents, skillsContents);
 const DEFAULT_PATH = 'README.md';
 
 // Count total files for subheader
-const countFiles = (foldersArr: TreeFolder[]): number => {
-  let count = 1; // README.md
-  for (const f of foldersArr) {
-    count += f.files.length;
-    if (f.subfolders) count += countFiles(f.subfolders) - 1; // -1 to not double-count the offset
-  }
-  return count;
-};
-
-// Simple flat count
 const totalFiles = 1 + // README.md
   workExperience.length +
   achievements.length +
