@@ -28,7 +28,7 @@ if (!html.includes('ghv-shell')) {
 }
 
 // Refuse to start if either port is taken: a stray server would serve stale files, and a
-// browser already on :9222 (e.g. a debug-enabled personal Chrome) would be driven instead.
+// browser already on :9222 (e.g. the shared automation Chrome other agents reuse) would be driven.
 for (const url of ['http://127.0.0.1:4173/', 'http://127.0.0.1:9222/json/version']) {
   const taken = await fetch(url, { signal: AbortSignal.timeout(1000) }).then(() => true, () => false);
   if (taken) {
