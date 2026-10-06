@@ -44,7 +44,7 @@ Do not deploy to an existing unrelated Pages project.
 
 Cut over 2026-10-05 (bead `resume-bwu`).
 
-- Registrar: easyhost.be (`my.easyhost.be` → Domeinnamen → jonatansnyders.com). Nameservers there point at Cloudflare: `hunts.ns.cloudflare.com`, `love.ns.cloudflare.com`. DNSSEC is off.
+- Registrar: moving from easyhost.be (Combell) to Cloudflare Registrar (bead `resume-bcg`). Transfer submitted 2026-10-05; until it completes, easyhost (`my.easyhost.be` → Domeinnamen → jonatansnyders.com) stays registrar and its nameservers point at Cloudflare: `hunts.ns.cloudflare.com`, `love.ns.cloudflare.com`. DNSSEC is signing in Cloudflare; the DS record at .com is published once Cloudflare is registrar.
 - DNS is managed in the Cloudflare zone `jonatansnyders.com` (zone id `29992eb15208e5e7465503af944ee6db`).
 - Both custom domains are bound in Pages → `jonatansnyders-resume` → Custom domains.
 
@@ -52,12 +52,12 @@ Cut over 2026-10-05 (bead `resume-bwu`).
 | --- | --- | --- |
 | CNAME `jonatansnyders.com` | `jonatansnyders-resume.pages.dev` | Proxied |
 | CNAME `www` | `jonatansnyders-resume.pages.dev` | Proxied |
-| MX | `10 mx.mailprotect.be`, `50 mx.backup.mailprotect.be` | DNS only |
-| TXT | `v=spf1 mx a include:_spf.relay.mailprotect.be ~all` | DNS only |
-| CNAME `mail` / `autodiscover` / `autoconfig` | `pop3` / `autodiscover` / `autoconfig` `.mailprotect.be` | DNS only |
-| SRV `_imaps._tcp` / `_pop3s._tcp` / `_submission._tcp` | `imap` 993 / `pop` 995 / `smtp-auth` 587 `.mailprotect.be` | DNS only |
+| MX | `9 route1`, `15 route3`, `95 route2` `.mx.cloudflare.net` | DNS only (managed by Email Routing) |
+| TXT | `v=spf1 include:_spf.mx.cloudflare.net ~all` | DNS only (managed by Email Routing) |
+| TXT `cf2024-1._domainkey` | Cloudflare Email Routing DKIM key | DNS only (managed by Email Routing) |
+| TXT `_dmarc` | `v=DMARC1; p=reject;` | DNS only |
 
-Mail is hosted at easyhost (mailprotect.be); keep every mail record DNS only.
+**Mail is receive-only, via Cloudflare Email Routing** (decided 2026-10-06, bead `resume-bcg`; the easyhost mailbox never existed). Email Routing → Routing rules forwards `hi@jonatansnyders.com` to `jonatan.snyders@gmail.com`; the catch-all is disabled (drop). Nothing sends as this domain, so DMARC rejects spoofed mail. The old easyhost mail records (MX/SPF/CNAME/SRV at `mailprotect.be`) were deleted 2026-10-06.
 
 **Canonical host is `www`.** The Cloudflare Redirect Rule "Redirect root to www" matches `http.host eq "jonatansnyders.com"` and sends a 301 to `concat("https://www.jonatansnyders.com", http.request.uri.path)`, preserving the query string. Plain HTTP on either host is redirected to HTTPS.
 
@@ -83,4 +83,4 @@ To leave Cloudflare entirely: easyhost → jonatansnyders.com → Nameservers �
 - `npm run build` exits 0 locally.
 - `https://www.jonatansnyders.com/` returns 200 with `/_astro/` assets, and `/resume/`, `/readme/`, `/projects/`, `/factory/` return 200.
 - `https://jonatansnyders.com/<path>?q` returns 301 to `https://www.jonatansnyders.com/<path>?q`.
-- `dig MX jonatansnyders.com` still returns the mailprotect.be servers.
+- `dig MX jonatansnyders.com` returns the three `route*.mx.cloudflare.net` servers.
