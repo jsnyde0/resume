@@ -1,0 +1,63 @@
+---
+// PROTOTYPE (resume-t7j): floating switcher between /factory spines. Deleted at lock; never copied.
+// Plan: spine A "how I think" at /factory/a, spine B "how the machine works" at /factory/b,
+// current page at /factory — flip with the bar or ←/→.
+const variants = [
+  { key: 'now', label: 'current /factory', href: '/factory/' },
+  { key: 'A', label: 'A — how I think', href: '/factory/a/' },
+  { key: 'B', label: 'B — how the machine works', href: '/factory/b/' },
+];
+interface Props {
+  current: 'now' | 'A' | 'B';
+}
+const { current } = Astro.props;
+const i = variants.findIndex((v) => v.key === current);
+const prev = variants[(i + variants.length - 1) % variants.length];
+const next = variants[(i + 1) % variants.length];
+// SHORTCUT: gated on dev only; production needs no switcher at all (deleted at lock).
+const show = import.meta.env.DEV;
+---
+
+{show && (
+  <nav class="proto-switcher" aria-label="Prototype variant switcher" data-prev={prev.href} data-next={next.href}>
+    <a href={prev.href} aria-label="Previous variant">←</a>
+    <span><strong>PROTOTYPE</strong> · {variants[i].label}</span>
+    <a href={next.href} aria-label="Next variant">→</a>
+  </nav>
+)}
+
+<style>
+  .proto-switcher {
+    position: fixed;
+    bottom: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+    display: flex;
+    gap: 0.9rem;
+    align-items: center;
+    padding: 0.45rem 1rem;
+    border-radius: 999px;
+    background: #fff200;
+    color: #000;
+    font: 600 0.85rem/1.2 ui-monospace, monospace;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+  }
+  .proto-switcher a {
+    color: #000;
+    text-decoration: none;
+    font-size: 1.1rem;
+  }
+</style>
+
+<script>
+  const bar = document.querySelector<HTMLElement>('.proto-switcher');
+  if (bar) {
+    document.addEventListener('keydown', (e) => {
+      const t = e.target as HTMLElement | null;
+      if (t && (t.closest('input, textarea, [contenteditable]'))) return;
+      if (e.key === 'ArrowLeft') location.href = bar.dataset.prev!;
+      if (e.key === 'ArrowRight') location.href = bar.dataset.next!;
+    });
+  }
+</script>

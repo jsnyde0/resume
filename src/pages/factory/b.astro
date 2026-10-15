@@ -1,0 +1,246 @@
+---
+// PROTOTYPE (resume-t7j): spine B "how the machine works" — throwaway, deleted or rewritten at lock.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PrototypeSwitcher from '../../components/factory-prototype/PrototypeSwitcher.astro';
+---
+
+<BaseLayout title="How the machine works (prototype B)" description="A hand-drawn walk through Jonatan's factory of AI agents.">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&display=swap" rel="stylesheet" />
+
+  <!-- SHORTCUT: font loaded via <link> in body (BaseLayout has no head slot); production self-hosts it in head. -->
+  <div class="fb" id="fb">
+    <!-- SHORTCUT: track height 800vh is a magic number; production tunes pacing per scene. -->
+    <div class="track">
+      <div class="stage">
+        <svg class="art" viewBox="0 0 1200 700" preserveAspectRatio="xMidYMid meet" role="img"
+          aria-label="Hand-drawn story: a laptop connects to a small computer at home, a brain hires agents, agents leave mail and ring a doorbell, a parent stamps the result, and after a power cut everything comes back by itself.">
+          <!-- SHORTCUT: on 390px wide screens the whole 1200x700 canvas is letterboxed (small); production redraws a portrait composition. -->
+          <defs>
+            <filter id="wob" x="-5%" y="-5%" width="110%" height="110%">
+              <feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="2" seed="4" result="n" />
+              <feDisplacementMap in="SourceGraphic" in2="n" scale="5" />
+            </filter>
+            <g id="brain">
+              <path d="M-40 6 C-52 -20 -30 -46 -6 -38 C10 -52 40 -44 40 -18 C58 -8 48 26 26 30 C16 46 -14 46 -22 30 C-38 30 -46 20 -40 6Z" />
+              <path d="M-4 -34 C-12 -16 6 -10 -2 8 M12 -30 C20 -14 8 -6 20 10 M-26 -4 C-14 -2 -10 6 -16 18" />
+            </g>
+          </defs>
+
+          <g filter="url(#wob)">
+            <g class="cam">
+              <!-- ============ SCENE 1: always on ============ -->
+              <g class="s1" fill="none">
+                <!-- laptop -->
+                <g class="lid" style="--s:.19;--l:.05">
+                  <rect class="draw" style="--s:.04;--l:.05" x="90" y="300" width="190" height="120" rx="8" pathLength="1" />
+                  <path class="draw" style="--s:.06;--l:.04" d="M110 330 L190 330 M110 355 L240 355 M110 380 L170 380" pathLength="1" />
+                </g>
+                <path class="draw" style="--s:.05;--l:.04" d="M60 420 L310 420 L292 442 L78 442 Z" pathLength="1" />
+                <!-- link -->
+                <path class="draw link" style="--s:.09;--l:.07" d="M320 340 C430 220 520 460 640 380" pathLength="1" />
+                <text class="fade note" style="--s:.12;--l:.03" x="400" y="250">a link</text>
+                <!-- home computer -->
+                <rect class="draw" style="--s:.12;--l:.05" x="640" y="300" width="140" height="170" rx="8" pathLength="1" />
+                <path class="draw" style="--s:.15;--l:.03" d="M660 330 L760 330 M660 352 L760 352" pathLength="1" />
+                <circle class="fade lamp" style="--s:.17;--l:.03" cx="710" cy="430" r="11" />
+                <text class="fade note" style="--s:.17;--l:.03" x="640" y="505">small computer at home</text>
+                <text class="fade note" style="--s:.19;--l:.03" x="90" y="480">lid closed</text>
+                <!-- heartbeat -->
+                <path class="draw hb" style="--s:.23;--l:.05" d="M800 380 L860 380 L875 340 L895 420 L912 350 L925 380 L990 380" pathLength="1" />
+                <text class="fade note" style="--s:.25;--l:.03" x="820" y="450">heartbeat</text>
+                <use class="fade brainuse" style="--s:.27;--l:.03" href="#brain" x="1060" y="360" />
+                <text class="fade note" style="--s:.28;--l:.03" x="1020" y="440">a brain wakes</text>
+              </g>
+
+              <!-- ============ SCENE 2: brains hire agents ============ -->
+              <g class="s2" fill="none" transform="translate(1200 0)">
+                <use class="fade brainuse" style="--s:.38;--l:.03" href="#brain" x="600" y="130" />
+                <text class="fade note" style="--s:.39;--l:.03" x="660" y="110">brain</text>
+                <path class="draw" style="--s:.41;--l:.04" d="M580 175 C520 220 330 230 300 290 M600 180 L600 290 M620 175 C680 220 900 230 920 290" pathLength="1" />
+                <!-- sub-brain -->
+                <g class="fade" style="--s:.44;--l:.03">
+                  <use class="brainuse" href="#brain" x="300" y="330" transform="translate(300 330) scale(.75) translate(-300 -330)" />
+                  <text class="note" x="215" y="398">sub-brain: more to decide</text>
+                </g>
+                <path class="draw" style="--s:.48;--l:.03" d="M290 365 L190 470 M310 365 L400 470" pathLength="1" />
+                <circle class="draw" style="--s:.5;--l:.03" cx="190" cy="500" r="26" pathLength="1" />
+                <circle class="draw" style="--s:.5;--l:.03" cx="400" cy="500" r="26" pathLength="1" />
+                <!-- driver in sandbox -->
+                <g class="fade" style="--s:.45;--l:.03">
+                  <rect x="540" y="300" width="120" height="90" rx="10" />
+                  <path d="M565 345 L635 345 M600 320 L600 370" />
+                  <text class="note" x="545" y="420">driver: time to build</text>
+                </g>
+                <rect class="draw dash" style="--s:.55;--l:.04" x="515" y="275" width="170" height="200" rx="14" pathLength="1" />
+                <g class="fade" style="--s:.57;--l:.03">
+                  <rect x="585" y="448" width="30" height="24" rx="3" fill="var(--base-100)" />
+                  <path d="M590 448 C590 430 610 430 610 448" />
+                </g>
+                <text class="fade note hot" style="--s:.57;--l:.03" x="545" y="500">locked room (sandbox)</text>
+                <!-- worker on the machine -->
+                <g class="fade" style="--s:.46;--l:.03">
+                  <circle cx="920" cy="330" r="30" />
+                  <path d="M905 330 L920 345 L940 315" />
+                  <text class="note" x="840" y="395">worker: one task</text>
+                  <text class="note" x="820" y="425">works right on the machine</text>
+                </g>
+                <!-- tags -->
+                <g class="fade tags" style="--s:.52;--l:.04">
+                  <text x="120" y="570">build</text>
+                  <text x="260" y="570">brainstorm</text>
+                  <text x="450" y="570">spike</text>
+                  <text x="560" y="570">prototype</text>
+                </g>
+                <text class="fade note" style="--s:.53;--l:.04" x="120" y="610">the parent tells each one how to work</text>
+              </g>
+
+              <!-- ============ SCENE 3: mail, doorbell, stamp, power cut ============ -->
+              <g class="s3" fill="none" transform="translate(2400 0)">
+                <circle class="draw" style="--s:.7;--l:.03" cx="150" cy="380" r="34" pathLength="1" />
+                <path class="draw" style="--s:.71;--l:.02" d="M133 380 L148 396 L170 364" pathLength="1" />
+                <text class="fade note" style="--s:.71;--l:.03" x="90" y="450">a worker finishes</text>
+                <!-- mail -->
+                <path class="draw" style="--s:.73;--l:.03" d="M200 380 L330 380" pathLength="1" />
+                <rect class="draw" style="--s:.74;--l:.04" x="340" y="340" width="120" height="80" rx="4" pathLength="1" />
+                <path class="draw" style="--s:.76;--l:.03" d="M340 340 L400 385 L460 340" pathLength="1" />
+                <text class="fade note" style="--s:.76;--l:.03" x="320" y="460">a letter (survives crashes)</text>
+                <!-- bell -->
+                <path class="draw" style="--s:.78;--l:.04" d="M560 330 C560 270 640 270 640 330 L655 360 L545 360 Z M590 372 C595 385 605 385 610 372" pathLength="1" />
+                <path class="draw" style="--s:.8;--l:.02" d="M530 290 L515 275 M670 290 L685 275" pathLength="1" />
+                <text class="fade note" style="--s:.8;--l:.03" x="530" y="420">doorbell (a wake)</text>
+                <!-- parent + stamp -->
+                <use class="fade brainuse" style="--s:.81;--l:.03" href="#brain" x="880" y="370" />
+                <text class="fade note" style="--s:.81;--l:.03" x="830" y="440">the parent checks</text>
+                <g class="fade stamp" style="--s:.83;--l:.02">
+                  <circle cx="1010" cy="300" r="44" />
+                  <path d="M990 302 L1004 318 L1032 282" />
+                </g>
+                <text class="fade note hot" style="--s:.83;--l:.02" x="960" y="372">stamped</text>
+                <!-- reboot -->
+                <rect class="draw" style="--s:.91;--l:.03" x="470" y="520" width="100" height="120" rx="8" pathLength="1" />
+                <circle class="fade lamp" style="--s:.93;--l:.02" cx="520" cy="610" r="9" />
+                <path class="draw hb" style="--s:.93;--l:.03" d="M590 580 L640 580 L652 548 L668 612 L682 556 L692 580 L760 580" pathLength="1" />
+                <text class="fade note" style="--s:.94;--l:.02" x="470" y="670">back by itself</text>
+              </g>
+            </g>
+          </g>
+        </svg>
+
+        <!-- power cut overlay -->
+        <div class="blackout" aria-hidden="true"></div>
+
+        <div class="caps">
+          <div class="cap" style="--a:0;--b:.07" data-first>
+            <h1>How the machine works</h1>
+            <p>One run through my factory of AI agents, from my laptop to a signed-off result. Scroll.</p>
+          </div>
+          <div class="cap" style="--a:.09;--b:.34">
+            <h2>It is always on</h2>
+            <p>The agents live on a small computer at home. I connect from my laptop, close the lid, and they keep working. A heartbeat checks on each brain on its own schedule. A brain is an agent that clears the fog and splits the work.</p>
+          </div>
+          <div class="cap" style="--a:.42;--b:.66">
+            <h2>Brains hire agents</h2>
+            <p>A brain hands pieces to sub-brains when there is more to decide, drivers when it is time to build, and workers for single tasks. Any child can go in a locked room, or work right on the machine.</p>
+          </div>
+          <div class="cap" style="--a:.72;--b:.85">
+            <h2>Mail, a doorbell, a stamp</h2>
+            <p>A finished worker leaves a letter that survives crashes, then rings a doorbell. The parent checks the work and stamps it. Nobody approves their own work.</p>
+          </div>
+          <div class="cap lit" style="--a:.86;--b:.93">
+            <h2>Then the power cuts</h2>
+            <p>Everything goes dark.</p>
+          </div>
+          <div class="cap" style="--a:.935;--b:.965">
+            <h2>It comes back by itself</h2>
+            <p>The workspace reopens and the agents resume their sessions. If one stays silent, the heartbeat revives it.</p>
+          </div>
+          <div class="cap credits" style="--a:.97;--b:2">
+            <h2>Built on the shoulders of</h2>
+            <p>Matt Pocock, Mario Zechner, Jeffrey Emanuel, Geoffrey Huntley, superpowers, and more to come.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- reduced-motion / no-JS static reading -->
+    <article class="plain">
+      <h1>How the machine works</h1>
+      <h2>It is always on</h2>
+      <p>The agents live on a small computer at home. I connect from my laptop, close the lid, and they keep working. A heartbeat checks on each brain on its own schedule.</p>
+      <h2>Brains hire agents</h2>
+      <p>A brain clears the fog and splits the work. It hands pieces to sub-brains (more to decide), drivers (time to build) and workers (single tasks), and tells each how to work: build, brainstorm, spike or prototype. Any child can go in a locked room, or work right on the machine.</p>
+      <h2>Mail, a doorbell, a stamp</h2>
+      <p>A finished worker leaves a letter that survives crashes, then rings a doorbell. The parent checks the work and stamps it. Nobody approves their own work.</p>
+      <h2>Then the power cuts</h2>
+      <p>It comes back by itself. The workspace reopens, the agents resume their sessions, and the heartbeat revives anything that stayed silent.</p>
+      <h2>Built on the shoulders of</h2>
+      <p>Matt Pocock, Mario Zechner, Jeffrey Emanuel, Geoffrey Huntley, superpowers, and more to come.</p>
+    </article>
+  </div>
+
+  <script is:inline>
+    // SHORTCUT: plain scroll listener sets --p instead of CSS animation-timeline; production uses scroll-driven animations with this as fallback.
+    (function () {
+      var root = document.getElementById('fb');
+      var track = root.querySelector('.track');
+      function upd() {
+        var r = track.getBoundingClientRect();
+        var max = track.offsetHeight - window.innerHeight;
+        var p = Math.min(1, Math.max(0, -r.top / max));
+        root.style.setProperty('--p', p.toFixed(4));
+      }
+      window.addEventListener('scroll', upd, { passive: true });
+      window.addEventListener('resize', upd);
+      upd();
+    })();
+  </script>
+
+  <style is:global>
+    .fb { --p: 0; font-family: 'Caveat', 'Comic Sans MS', cursive; color: var(--content-bright); background: var(--base-200); }
+    .fb .track { height: 800vh; position: relative; }
+    .fb .stage { position: sticky; top: 0; height: 100vh; overflow: hidden;
+      background: radial-gradient(ellipse at 50% 40%, var(--base-300), var(--base-200) 75%); }
+    .fb .art { position: absolute; inset: 0 0 auto 0; width: 100%; height: 72%; }
+    .fb .art g, .fb .art use, .fb .art text { transition: none; }
+    .fb .art { fill: none; stroke: var(--base-content); stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round; }
+    .fb .cam { transform: translateX(calc(
+      clamp(0, (var(--p) - .30) / .08, 1) * -1200px +
+      clamp(0, (var(--p) - .62) / .08, 1) * -1200px)); }
+    .fb .draw { stroke-dasharray: 1; stroke-dashoffset: calc(1 - clamp(0, (var(--p) - var(--s)) / var(--l), 1)); }
+    .fb .fade { opacity: clamp(0, (var(--p) - var(--s)) / var(--l), 1); }
+    .fb .dash { stroke: var(--primary); stroke-dasharray: .02 .015; stroke-dashoffset: 0;
+      opacity: clamp(0, (var(--p) - var(--s)) / var(--l), 1); }
+    .fb .link, .fb .hb, .fb .lamp, .fb .hot, .fb .stamp { stroke: var(--primary); }
+    .fb .lamp { fill: var(--primary); }
+    .fb .hot { fill: var(--primary); stroke: none; }
+    .fb text { fill: var(--base-content); stroke: none; font-family: 'Caveat', cursive; font-size: 30px; }
+    .fb .tags text { fill: var(--primary); font-size: 32px; }
+    .fb .brainuse { stroke: var(--base-content); }
+    .fb .lid { transform-box: fill-box; transform-origin: bottom; transform: scaleY(calc(1 - .93 * clamp(0, (var(--p) - var(--s)) / var(--l), 1))); }
+    .fb .blackout { position: absolute; inset: 0; background: #02060a; pointer-events: none;
+      opacity: calc(clamp(0, (var(--p) - .85) / .01, 1) * clamp(0, (.92 - var(--p)) / .015, 1)); }
+    .fb .caps { position: absolute; left: 0; right: 0; bottom: 0; height: 28%; }
+    .fb .cap { position: absolute; inset: 0; padding: 0 clamp(1rem, 5vw, 4rem); display: flex; flex-direction: column; justify-content: center;
+      opacity: calc(clamp(0, (var(--p) - var(--a)) / .02, 1) * clamp(0, (var(--b) - var(--p)) / .02, 1)); }
+    .fb .cap h1, .fb .cap h2 { font-size: clamp(2rem, 4.5vw, 3.2rem); line-height: 1; margin: 0 0 .3rem; color: var(--primary); font-weight: 700; }
+    .fb .cap p { font-family: var(--font-body); font-size: clamp(.85rem, 1.5vw, 1.05rem); line-height: 1.45; max-width: 62ch; margin: 0; color: var(--base-content); }
+    .fb .cap.lit { z-index: 5; }
+    .fb .cap.lit h2 { color: var(--content-bright); }
+    .fb .cap:not(.credits) { pointer-events: none; }
+    .fb .plain { display: none; max-width: 62ch; margin: 0 auto; padding: 4rem 1.25rem; font-family: var(--font-body); }
+    .fb .plain h1, .fb .plain h2 { font-family: 'Caveat', cursive; color: var(--primary); }
+    .fb .plain p { line-height: 1.6; }
+    @media (prefers-reduced-motion: reduce) {
+      .fb .track { display: none; }
+      .fb .plain { display: block; }
+    }
+    @media (max-width: 600px) {
+      .fb .art { height: 52%; top: 8%; }
+      .fb .caps { height: 40%; }
+      /* SHORTCUT: mobile caption area sized by eye; production lays out per scene. */
+    }
+  </style>
+
+  <PrototypeSwitcher current="B" />
+</BaseLayout>

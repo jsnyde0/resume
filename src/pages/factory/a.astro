@@ -1,0 +1,266 @@
+---
+// PROTOTYPE (resume-t7j): spine A "how I think" — throwaway, deleted or rewritten at lock.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PrototypeSwitcher from '../../components/factory-prototype/PrototypeSwitcher.astro';
+---
+
+<BaseLayout
+  title="How I build | Jonatan Snyders"
+  description="How I build software with a factory of AI agents: clear the fog, check every task, keep the work on paper."
+>
+  <!-- SHORTCUT: Google Fonts <link> at render time; production should self-host the handwriting font and preload it. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&display=swap" rel="stylesheet" />
+
+  <!-- SHORTCUT: one shared wobble filter, fixed seed and strength; production tunes per stroke weight and checks perf on low-end phones. -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <filter id="wobble" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.025" numOctaves="2" seed="4" result="n" />
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="4" />
+    </filter>
+  </svg>
+
+  <div class="board">
+    <header class="intro">
+      <p class="kicker">how I build</p>
+      <h1>I don't write the plan first. I clear the fog as I go.</h1>
+      <p class="lede">
+        I build software with a team of AI agents. These are the ideas behind how I run them. Scroll, and watch each one work.
+      </p>
+      <p class="hint" aria-hidden="true">scroll &darr;</p>
+    </header>
+
+    <!-- SCENE 1: weather map -->
+    <section class="scene" id="s1" aria-labelledby="h-fog" style="--len:260vh">
+      <div class="stick">
+        <div class="copy">
+          <p class="num">1</p>
+          <h2 id="h-fog">Always clearing the fog.</h2>
+          <p>Every project has parts I can't describe yet. That's fog, and it sits right next to ground that's already clear.</p>
+          <p>I clear fog and build at the same time. When a patch clears, it turns into a task.</p>
+          <p>To clear a patch, a <b>brain</b> (the agent in charge) asks one question: who can answer this? Then it sends the right helper.</p>
+          <p class="credit">The map, the fog and wayfinding come from <a href="https://github.com/mattpocock/skills" target="_blank" rel="noopener">Matt Pocock's wayfinder</a>. The weather-map loop and the "who answers?" routing are my take on it.</p>
+        </div>
+        <svg class="art" viewBox="0 0 800 500" role="img" aria-label="A map that starts half covered in fog. A brain sends three helpers, brainstorm, spike and prototype, one into each fog patch. Each patch clears and becomes a task with a checkbox.">
+          <g filter="url(#wobble)" class="ink">
+            <path d="M12 14 L788 10 L790 488 L10 492 Z" class="frame" />
+            <!-- clear ground hatching -->
+            <g class="hatch" opacity=".35">
+              <path d="M40 60 q10 -8 20 0 M80 90 q10 -8 20 0 M50 380 q10 -8 20 0 M120 450 q10 -8 20 0 M200 60 q10 -8 20 0 M230 440 q10 -8 20 0" />
+            </g>
+            <!-- brain -->
+            <g transform="translate(90 250)">
+              <circle r="42" class="stroke" />
+              <path d="M-22 -4 q8 -18 22 -8 q14 -10 22 8 M-24 8 q10 14 24 6 q14 8 24 -6" class="stroke thin" />
+              <text y="68" text-anchor="middle" class="lbl">brain</text>
+            </g>
+            <!-- fog patches -->
+            <g class="fog k" style="--s:.12;--e:.4"><ellipse cx="560" cy="110" rx="130" ry="70" /><text x="560" y="116" text-anchor="middle" class="lbl dim">??</text></g>
+            <g class="fog k" style="--s:.38;--e:.64"><ellipse cx="610" cy="265" rx="130" ry="70" /><text x="610" y="271" text-anchor="middle" class="lbl dim">??</text></g>
+            <g class="fog k" style="--s:.62;--e:.88"><ellipse cx="560" cy="410" rx="130" ry="70" /><text x="560" y="416" text-anchor="middle" class="lbl dim">??</text></g>
+            <!-- tasks on cleared ground -->
+            <!-- SHORTCUT: task names are invented illustrations, not real project data. -->
+            <g class="task k" style="--s:.4;--e:.5" transform="translate(500 90)"><rect width="22" height="22" x="0" y="0" class="stroke thin" /><path pathLength="1" d="M4 12 l6 6 l10 -14" class="stroke draw tick k" style="--s:.45;--e:.55" /><text x="34" y="18" class="lbl sm">Pick the sign-in flow</text></g>
+            <g class="task k" style="--s:.66;--e:.76" transform="translate(550 245)"><rect width="22" height="22" class="stroke thin" /><path pathLength="1" d="M4 12 l6 6 l10 -14" class="stroke draw tick k" style="--s:.7;--e:.8" /><text x="34" y="18" class="lbl sm">Check the vendor API</text></g>
+            <g class="task k" style="--s:.9;--e:1" transform="translate(500 390)"><rect width="22" height="22" class="stroke thin" /><path pathLength="1" d="M4 12 l6 6 l10 -14" class="stroke draw tick k" style="--s:.95;--e:1" /><text x="34" y="18" class="lbl sm">Fix what felt wrong</text></g>
+            <!-- paths + agents -->
+            <path d="M135 235 Q300 120 440 110" class="route k" style="--s:.05;--e:.2" pathLength="1" />
+            <path d="M135 255 Q320 270 480 265" class="route k" style="--s:.3;--e:.45" pathLength="1" />
+            <path d="M135 275 Q300 400 440 410" class="route k" style="--s:.55;--e:.7" pathLength="1" />
+            <g class="agent a1 k" style="--s:.05;--e:.2"><circle r="14" class="stroke" /><text y="-24" text-anchor="middle" class="lbl sm">brainstorm</text><text y="38" text-anchor="middle" class="lbl xs dim">talk it through</text></g>
+            <g class="agent a2 k" style="--s:.3;--e:.45"><circle r="14" class="stroke" /><text y="-24" text-anchor="middle" class="lbl sm">spike</text><text y="38" text-anchor="middle" class="lbl xs dim">test the real thing</text></g>
+            <g class="agent a3 k" style="--s:.55;--e:.7"><circle r="14" class="stroke" /><text y="-24" text-anchor="middle" class="lbl sm">prototype</text><text y="38" text-anchor="middle" class="lbl xs dim">see it run, react</text></g>
+          </g>
+        </svg>
+      </div>
+    </section>
+
+    <!-- SCENE 2: hill climb -->
+    <section class="scene" id="s2" aria-labelledby="h-hill" style="--len:280vh">
+      <div class="stick">
+        <div class="copy">
+          <p class="num">2</p>
+          <h2 id="h-hill">Every task says how to check it's done.</h2>
+          <p>That check is a flag on top of a hill. A <b>worker</b> (an agent that does one task) climbs toward it: try, check, fix, repeat. Nobody watches.</p>
+          <p id="c2" class="work-note">The work lives on paper, not in the agent's head. Tasks, decisions and lessons are all written down. If a worker crashes, a fresh one reads the notebook it left and keeps climbing.</p>
+        </div>
+        <svg class="art" viewBox="0 0 800 500" role="img" aria-label="A worker climbs a hill toward a flag marked 'check passes'. Halfway up it crashes and leaves a notebook on the path. A fresh worker picks up the notebook and climbs to the flag.">
+          <g filter="url(#wobble)" class="ink">
+            <!-- SHORTCUT: path hard-coded twice (drawn path + offset-path in CSS); production derives one from the other. -->
+            <path d="M40 440 L120 400 L170 410 L260 330 L310 345 L400 270 L450 282 L560 190 L610 200 L700 120" class="trail" />
+            <path d="M0 460 Q200 440 400 430 T800 440" class="stroke thin" opacity=".4" />
+            <!-- flag -->
+            <g transform="translate(700 120)">
+              <path d="M0 0 L0 -80" class="stroke" /><path d="M0 -80 L50 -64 L0 -48 Z" class="stroke flagfill" />
+              <text x="-20" y="-96" class="lbl sm" text-anchor="middle">check passes</text>
+            </g>
+            <!-- try / check / fix tags -->
+            <g class="loop k" style="--s:.05;--e:.12"><text x="150" y="360" class="lbl xs dim">try</text><text x="215" y="300" class="lbl xs dim">check</text><text x="280" y="310" class="lbl xs dim">fix</text></g>
+            <!-- crash + notebook -->
+            <g class="crash k" style="--s:.42;--e:.5" transform="translate(405 262)"><path d="M-14 -14 L14 14 M14 -14 L-14 14" class="stroke bad" /></g>
+            <g class="notebook k" style="--s:.46;--e:.54" transform="translate(412 298)">
+              <rect width="34" height="24" class="stroke thin" /><path d="M6 7 h22 M6 13 h18 M6 19 h20" class="stroke thin" />
+              <text y="44" x="17" text-anchor="middle" class="lbl xs">notebook</text>
+            </g>
+            <g class="worker w1" ><circle r="12" class="stroke" /><path d="M-5 -2 h3 M3 -2 h3" class="stroke thin" /></g>
+            <g class="worker w2"><circle r="12" class="stroke good" /><path d="M-5 -2 h3 M3 -2 h3" class="stroke thin" /><text y="-22" text-anchor="middle" class="lbl xs">fresh worker</text></g>
+            <g class="done k" style="--s:.95;--e:1" transform="translate(640 60)"><text class="lbl" text-anchor="middle">done, checked</text></g>
+          </g>
+        </svg>
+      </div>
+    </section>
+
+    <!-- SCENE 3: toolbox -->
+    <section class="scene" id="s3" aria-labelledby="h-tools" style="--len:240vh">
+      <div class="stick">
+        <div class="copy">
+          <p class="num">3</p>
+          <h2 id="h-tools">Small tools that do one thing well.</h2>
+          <p>Small command-line tools snap together to do complex things. No heavy integrations, no services to babysit.</p>
+          <p>My browser tool costs an agent about <b>30× less context</b> than the popular alternative: under 500 tokens against 13,000 to 18,000.</p>
+          <p>Claude Code agents and agents on my own harness, called pi, reach into the same toolbox.</p>
+          <p class="credit">Credit: Mario Zechner, <a href="https://mariozechner.at/posts/2025-11-02-what-if-you-dont-need-mcp/" target="_blank" rel="noopener">"What if you don't need MCP"</a>.</p>
+        </div>
+        <svg class="art" viewBox="0 0 800 500" role="img" aria-label="Four small tools snap together into a toolbox. Beside it, one heavy integration. A cost bar shows the heavy one using about thirty times more context. Two agents, Claude Code and pi, both reach into the toolbox.">
+          <g filter="url(#wobble)" class="ink">
+            <!-- heavy -->
+            <g transform="translate(30 60)">
+              <path d="M0 0 L250 -6 L256 170 L-4 176 Z" class="stroke" />
+              <path d="M30 40 l40 30 l-20 20 l50 10 l-30 30 M150 30 l50 20 l-30 40 l40 30" class="stroke thin" opacity=".6" />
+              <text x="128" y="-20" text-anchor="middle" class="lbl sm">one heavy integration</text>
+            </g>
+            <!-- small tools -->
+            <text x="560" y="40" text-anchor="middle" class="lbl sm">small tools</text>
+            <!-- SHORTCUT: tool names illustrative (browser, search, mail, tasks); confirm the real set before lock. -->
+            <g class="tool t1 k" style="--s:.1;--e:.4"><rect width="100" height="56" class="stroke" /><text x="50" y="34" text-anchor="middle" class="lbl sm">browser</text></g>
+            <g class="tool t2 k" style="--s:.15;--e:.45"><rect width="100" height="56" class="stroke" /><text x="50" y="34" text-anchor="middle" class="lbl sm">search</text></g>
+            <g class="tool t3 k" style="--s:.2;--e:.5"><rect width="100" height="56" class="stroke" /><text x="50" y="34" text-anchor="middle" class="lbl sm">mail</text></g>
+            <g class="tool t4 k" style="--s:.25;--e:.55"><rect width="100" height="56" class="stroke" /><text x="50" y="34" text-anchor="middle" class="lbl sm">tasks</text></g>
+            <!-- agents -->
+            <g class="reach k" style="--s:.55;--e:.75">
+              <path d="M500 262 Q490 220 480 200" class="stroke thin dashed" /><path d="M620 262 Q600 220 600 200" class="stroke thin dashed" />
+            </g>
+            <g class="who k" style="--s:.55;--e:.7"><text x="500" y="290" text-anchor="middle" class="lbl sm">Claude Code</text><text x="620" y="290" text-anchor="middle" class="lbl sm">pi</text></g>
+            <!-- cost bars -->
+            <text x="30" y="316" class="lbl xs dim">context cost</text>
+            <rect x="30" y="326" width="360" height="22" class="stroke thin" />
+            <rect x="30" y="326" width="360" height="22" class="barfill heavy k" style="--s:.6;--e:.8" />
+            <text x="400" y="344" class="lbl xs">13,000 to 18,000 tokens</text>
+            <!-- SHORTCUT: small bar drawn at 12px (~3%) for legibility; true ratio 500/15500 would be about 1px. -->
+            <rect x="30" y="366" width="360" height="22" class="stroke thin" />
+            <rect x="30" y="366" width="12" height="22" class="barfill light k" style="--s:.8;--e:.9" />
+            <text x="400" y="384" class="lbl xs">under 500 tokens</text>
+          </g>
+        </svg>
+      </div>
+    </section>
+
+    <section class="close">
+      <h2>Judgment, not checklists.</h2>
+      <p>I give agents context and decisions instead of rigid procedures. As the models get better, the system gets better with them.</p>
+      <p class="credits">Built on the shoulders of Matt Pocock, Mario Zechner, Jeffrey Emanuel, Geoffrey Huntley, superpowers, and more to come.</p>
+    </section>
+  </div>
+
+  <PrototypeSwitcher current="A" />
+</BaseLayout>
+
+<style is:global>
+  .board { --chalk: var(--content-bright, #f2f7fb); --hand: "Kalam", "Segoe Print", "Comic Sans MS", cursive; font-family: var(--hand); color: var(--base-content); background: var(--base-200); background-image: radial-gradient(rgba(171,196,220,.05) 1px, transparent 1px); background-size: 22px 22px; }
+  .board a { color: var(--primary); text-underline-offset: 3px; }
+  .board a:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
+  .intro { min-height: 78vh; display: flex; flex-direction: column; justify-content: center; max-width: 52rem; margin: 0 auto; padding: 4rem 1.5rem; }
+  .kicker { color: var(--primary); font-size: 1.25rem; margin: 0 0 .5rem; }
+  .intro h1 { font-size: clamp(2.2rem, 6vw, 4rem); line-height: 1.12; color: var(--chalk); margin: 0 0 1.25rem; font-weight: 700; }
+  .lede { font-size: 1.35rem; max-width: 36rem; line-height: 1.5; }
+  .hint { color: var(--primary); font-size: 1.4rem; }
+
+  .scene { --p: 1; height: var(--len); position: relative; }
+  .stick { position: sticky; top: 0; height: 100vh; display: grid; grid-template-columns: minmax(0, 28rem) minmax(0, 1fr); gap: 2rem; align-items: center; max-width: 82rem; margin: 0 auto; padding: 1.5rem; }
+  .copy { font-size: 1.1rem; line-height: 1.55; }
+  .copy p { margin: 0 0 .8rem; max-width: 34rem; }
+  .copy h2 { font-size: clamp(1.7rem, 3vw, 2.4rem); color: var(--chalk); margin: 0 0 .8rem; line-height: 1.15; }
+  .copy .num { color: var(--primary); font-size: 2rem; margin: 0; line-height: 1; }
+  .copy .credit { font-size: .95rem; color: var(--muted-content); }
+  .art { width: 100%; height: auto; max-height: 86vh; }
+
+  .ink .stroke, .ink .frame, .ink .trail, .ink .route { fill: none; stroke: var(--chalk); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+  .ink .thin { stroke-width: 1.6; }
+  .ink .frame { stroke: var(--border-subtle); stroke-width: 2; }
+  .ink .hatch path { stroke: var(--base-content); fill: none; stroke-width: 1.5; }
+  .ink .dashed { stroke-dasharray: 6 6; }
+  .ink .bad { stroke: var(--primary); }
+  .ink .good { stroke: var(--success); }
+  .ink .trail { stroke: var(--base-content); stroke-width: 3; }
+  .ink .flagfill { fill: var(--primary); }
+  .ink .lbl { font-family: var(--hand); font-size: 22px; fill: var(--chalk); stroke: none; }
+  .ink .lbl.sm { font-size: 18px; } .ink .lbl.xs { font-size: 15px; } .ink .dim { fill: var(--muted-content); }
+
+  /* progress: --p set by JS (0..1); each .k element maps its own window [--s,--e] to --t */
+  .k { --t: clamp(0, calc((var(--p) - var(--s)) / (var(--e) - var(--s))), 1); }
+  .fog { opacity: calc(1 - var(--t)); } .fog ellipse { fill: rgba(171,196,220,.2); stroke: var(--base-content); stroke-width: 2; stroke-dasharray: 3 9; stroke-linecap: round; }
+  .task { opacity: var(--t); }
+  .draw { stroke-dasharray: 1; stroke-dashoffset: calc(1 - var(--t)); stroke: var(--primary) !important; stroke-width: 3 !important; }
+  .route { stroke: var(--primary) !important; stroke-dasharray: 1; stroke-dashoffset: calc(1 - var(--t)); stroke-width: 2 !important; }
+  .agent circle { fill: var(--primary); }
+  .agent { opacity: calc(var(--t) * 4); }
+  /* SHORTCUT: agent end positions are hand-measured per patch; production computes from the patch geometry. */
+  .a1 { transform: translate(calc(135px + var(--t) * 305px), calc(235px - var(--t) * 125px)); }
+  .a2 { transform: translate(calc(135px + var(--t) * 345px), calc(255px + var(--t) * 10px)); }
+  .a3 { transform: translate(calc(135px + var(--t) * 305px), calc(275px + var(--t) * 135px)); }
+
+  .loop, .crash, .notebook, .done { opacity: var(--t); }
+  .worker { offset-rotate: 0deg; }
+  .worker circle { fill: var(--base-200); }
+  .w1 { offset-path: path("M40 440 L120 400 L170 410 L260 330 L310 345 L400 270"); offset-distance: calc(var(--p1) * 100%); opacity: var(--w1o); }
+  .w2 { offset-path: path("M400 270 L450 282 L560 190 L610 200 L700 120"); offset-distance: calc(var(--p2) * 100%); opacity: var(--w2o); }
+  #s2 { --p1: clamp(0, calc((var(--p) - .05) / .38), 1); --p2: clamp(0, calc((var(--p) - .6) / .33), 1); --w1o: clamp(0, calc(1 - (var(--p) - .43) * 40), 1); --w2o: clamp(0, calc((var(--p) - .56) * 40), 1); }
+  .w2 { transition: none; }
+
+  .tool { opacity: calc(.2 + var(--t) * .8); }
+  /* SHORTCUT: tool start/end offsets hand-tuned in px for this viewBox. */
+  .t1 { transform: translate(calc(440px + (1 - var(--t)) * 120px), calc(70px - (1 - var(--t)) * 10px)); }
+  .t2 { transform: translate(calc(550px + (1 - var(--t)) * 100px), calc(70px + (1 - var(--t)) * 60px)); }
+  .t3 { transform: translate(calc(440px - (1 - var(--t)) * 0px), calc(130px + (1 - var(--t)) * 120px)); }
+  .t4 { transform: translate(calc(550px + (1 - var(--t)) * 100px), calc(130px + (1 - var(--t)) * 150px)); }
+  .reach, .who { opacity: var(--t); }
+  .barfill { stroke: none; } .barfill.heavy { fill: var(--primary); transform-box: fill-box; transform-origin: left; transform: scaleX(var(--t)); } .barfill.light { fill: var(--success); opacity: var(--t); }
+
+  .close { max-width: 44rem; margin: 0 auto; padding: 6rem 1.5rem 8rem; }
+  .close h2 { font-size: clamp(2rem, 5vw, 3.2rem); color: var(--chalk); margin: 0 0 1rem; }
+  .close p { font-size: 1.25rem; line-height: 1.55; }
+  .close .credits { color: var(--muted-content); font-size: 1.05rem; margin-top: 3rem; }
+
+  /* SHORTCUT: mobile = stacked copy over small art, no per-scene mobile art layout; long copy may crowd the 100vh sticky stage on short phones. */
+  @media (max-width: 860px) {
+    .stick { grid-template-columns: 1fr; align-content: start; gap: .5rem; padding: .75rem; }
+    .copy { font-size: .85rem; line-height: 1.35; } .copy p { margin-bottom: .45rem; }
+    .copy .num { display: none; } .copy h2 { font-size: 1.35rem; margin-bottom: .4rem; }
+    .copy .credit { font-size: .8rem; display: block; }
+    .art { max-height: 40vh; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .scene { height: auto !important; --p: 1 !important; } .stick { position: static; height: auto; padding-block: 3rem; }
+  }
+</style>
+
+<script>
+  // SHORTCUT: scroll listener sets --p per scene (rAF-throttled); production would use animation-timeline: view() with this as fallback.
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const scenes = Array.from(document.querySelectorAll<HTMLElement>('.scene'));
+  function update() {
+    for (const s of scenes) {
+      const r = s.getBoundingClientRect();
+      const span = r.height - window.innerHeight;
+      const p = Math.min(1, Math.max(0, -r.top / span));
+      s.style.setProperty('--p', reduce ? '1' : String(p));
+    }
+  }
+  let queued = false;
+  if (!reduce) {
+    addEventListener('scroll', () => { if (!queued) { queued = true; requestAnimationFrame(() => { queued = false; update(); }); } }, { passive: true });
+    addEventListener('resize', update);
+    update();
+  }
+</script>
