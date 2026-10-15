@@ -44,7 +44,7 @@ Do not deploy to an existing unrelated Pages project.
 
 Cut over 2026-10-05 (bead `resume-bwu`).
 
-- Registrar: Cloudflare Registrar (transferred from easyhost.be / Combell, completed 2026-10-11, bead `resume-bcg`). Nameservers `hunts.ns.cloudflare.com`, `love.ns.cloudflare.com`; Cloudflare Registrar requires Cloudflare nameservers. DNSSEC is on: Cloudflare signs the zone and publishes DS `2371 13 2 7B614B76…` at .com itself. The old easyhost account no longer manages the domain; its auto-renew is being turned off.
+- Registrar: Cloudflare Registrar (transferred from easyhost.be / Combell, completed 2026-10-11, bead `resume-bcg`). Nameservers `hunts.ns.cloudflare.com`, `love.ns.cloudflare.com`; Cloudflare Registrar requires Cloudflare nameservers. DNSSEC is on: Cloudflare signs the zone and publishes DS `2371 13 2 7B614B76…` at .com itself. easyhost no longer holds the domain (its panel reports no access to it since the transfer), so nothing renews there.
 - DNS is managed in the Cloudflare zone `jonatansnyders.com` (zone id `29992eb15208e5e7465503af944ee6db`).
 - Both custom domains are bound in Pages → `jonatansnyders-resume` → Custom domains.
 
