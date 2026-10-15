@@ -2,124 +2,21 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ResumeCard from '../components/resume/ResumeCard.astro';
 import { achievements, education, resumeIntro, workExperience } from '../data/resume';
-
-// ─── Slug helpers ────────────────────────────────────────────────────────────
-
-function slugify(str: string): string {
-  return str
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
-}
-
-function itemSlug(item: { company: string; title: string; slug?: string }): string {
-  return item.slug ?? slugify(item.company || item.title);
-}
-
-// ─── File tree taxonomy ───────────────────────────────────────────────────────
-
-interface TreeFile {
-  name: string;
-  path: string;
-}
-
-interface TreeFolder {
-  name: string;
-  files: TreeFile[];
-  subfolders?: TreeFolder[];
-}
-
-// Build experience folder from workExperience data
-const experienceFiles: TreeFile[] = workExperience.map((item) => {
-  const slug = itemSlug(item);
-  return { name: `${slug}.md`, path: `experience/${slug}.md` };
-});
-
-// Build achievements folder
-const achievementFiles: TreeFile[] = achievements.map((item) => {
-  const slug = itemSlug(item);
-  return { name: `${slug}.md`, path: `achievements/${slug}.md` };
-});
-
-// Build education folder
-const educationFiles: TreeFile[] = education.map((item) => {
-  const slug = itemSlug(item);
-  return { name: `${slug}.md`, path: `education/${slug}.md` };
-});
-
-// Skills subfolders (existing content, re-parented under skills/)
-const skillsSubfolders: TreeFolder[] = [
-  {
-    name: 'agentic-engineering',
-    files: [
-      { name: 'harness-factory.md',          path: 'skills/agentic-engineering/harness-factory.md' },
-      { name: 'disposable-orchestrators.md', path: 'skills/agentic-engineering/disposable-orchestrators.md' },
-      { name: 'sandboxed-autonomy.md',       path: 'skills/agentic-engineering/sandboxed-autonomy.md' },
-      { name: 'llm-app-engineering.md',      path: 'skills/agentic-engineering/llm-app-engineering.md' },
-    ],
-  },
-  {
-    name: 'web-development',
-    files: [
-      { name: 'full-stack-web.md',           path: 'skills/web-development/full-stack-web.md' },
-      { name: 'apis-and-deployment.md',      path: 'skills/web-development/apis-and-deployment.md' },
-      { name: 'analytics-instrumentation.md',path: 'skills/web-development/analytics-instrumentation.md' },
-    ],
-  },
-  {
-    name: 'data-science',
-    files: [
-      { name: 'bayesian-modeling.md',  path: 'skills/data-science/bayesian-modeling.md' },
-      { name: 'computer-vision.md',    path: 'skills/data-science/computer-vision.md' },
-      { name: 'data-pipelines.md',     path: 'skills/data-science/data-pipelines.md' },
-    ],
-  },
-  {
-    name: 'growth-engineering',
-    files: [
-      { name: 'performance-marketing.md', path: 'skills/growth-engineering/performance-marketing.md' },
-      { name: 'server-side-tracking.md',  path: 'skills/growth-engineering/server-side-tracking.md' },
-      { name: 'bayesian-mmm.md',          path: 'skills/growth-engineering/bayesian-mmm.md' },
-    ],
-  },
-  {
-    name: 'founder-operator',
-    files: [
-      { name: 'strategy.md',             path: 'skills/founder-operator/strategy.md' },
-      { name: 'teams-and-ops.md',        path: 'skills/founder-operator/teams-and-ops.md' },
-      { name: 'learning-from-failures.md',path: 'skills/founder-operator/learning-from-failures.md' },
-    ],
-  },
-];
-
-const folders: TreeFolder[] = [
-  { name: 'skills',        files: [], subfolders: skillsSubfolders },
-  { name: 'achievements',  files: achievementFiles },
-  { name: 'experience',    files: experienceFiles },
-  { name: 'education',     files: educationFiles },
-];
+import type { ResumeItem } from '../data/resume';
+import { skillFiles } from '../data/resume-skills';
+import { buildSection, buildSkills } from '../lib/resume-tree';
+import type { TreeFolder } from '../lib/resume-tree';
 
 // ─── File content builders ────────────────────────────────────────────────────
 
-function buildItemHtml(item: {
-  title: string;
-  role: string;
-  badgeColor: string;
-  company: string;
-  location: string;
-  dateRange: string;
-  imageUrl: string;
-  imageAlt: string;
-  body: string;
-  links?: { label: string; href: string }[];
-}): string {
-  const badgeColors: Record<string, string> = {
+function buildItemHtml(item: ResumeItem): string {
+  const badgeColors: Record<ResumeItem['badgeColor'], string> = {
     primary: 'ghv-badge--primary',
     accent: 'ghv-badge--accent',
     secondary: 'ghv-badge--secondary',
     info: 'ghv-badge--info',
   };
-  const badgeClass = badgeColors[item.badgeColor] ?? 'ghv-badge--primary';
+  const badgeClass = badgeColors[item.badgeColor];
 
   const linksHtml = item.links && item.links.length > 0
     ? `<div class="ghv-item-links">${item.links.map((l) => `<a href="${l.href}" class="ghv-link" target="_blank" rel="noreferrer">${l.label}</a>`).join('')}</div>`
@@ -168,269 +65,35 @@ const readmeHtml = `
   </div>
 </div>`;
 
-// Build all file contents map
+// ─── File tree taxonomy ───────────────────────────────────────────────────────
+
+const experience = buildSection('experience', workExperience, buildItemHtml);
+const achievementSection = buildSection('achievements', achievements, buildItemHtml);
+const educationSection = buildSection('education', education, buildItemHtml);
+const skills = buildSkills(skillFiles);
+
+const folders: TreeFolder[] = [
+  { name: 'skills',        files: [], subfolders: skills.subfolders },
+  { name: 'achievements',  files: achievementSection.files },
+  { name: 'experience',    files: experience.files },
+  { name: 'education',     files: educationSection.files },
+];
+
+// All file contents by path (insertion order is panel render order)
 const fileContents: Record<string, string> = {
   'README.md': readmeHtml,
+  ...experience.contents,
+  ...achievementSection.contents,
+  ...educationSection.contents,
+  ...skills.contents,
 };
-
-// Experience files
-workExperience.forEach((item) => {
-  const slug = itemSlug(item);
-  fileContents[`experience/${slug}.md`] = buildItemHtml(item);
-});
-
-// Achievement files
-achievements.forEach((item) => {
-  const slug = itemSlug(item);
-  fileContents[`achievements/${slug}.md`] = buildItemHtml(item);
-});
-
-// Education files
-education.forEach((item) => {
-  const slug = itemSlug(item);
-  fileContents[`education/${slug}.md`] = buildItemHtml(item);
-});
-
-// Skills files (re-parented under skills/)
-const skillsContents: Record<string, string> = {
-  'skills/agentic-engineering/harness-factory.md': `
-<div class="ghv-md">
-<h1>harness-factory.md</h1>
-<p>I build and own my agent harness: the prompts, tools, context routing, and review loops that turn an LLM into a system that does real work, unattended.</p>
-<h2>Technologies</h2>
-<ul>
-  <li>pi, a harness I can change all the way down</li>
-  <li>Custom skills, roles, and tools</li>
-  <li>Subagents and fresh-context review loops</li>
-  <li>Prompt templates and context routing</li>
-</ul>
-<h2>Proof</h2>
-<p>The whole system runs: <a href="/factory/" class="ghv-link">/factory</a>.</p>
-</div>`,
-  'skills/agentic-engineering/disposable-orchestrators.md': `
-<div class="ghv-md">
-<h1>disposable-orchestrators.md</h1>
-<p>I architect agent work so state lives in the substrate, not the agent. Each orchestrator reads a graph of goals, makes one move, writes its decision back, and dies, so any agent can crash and the work picks up where it left off.</p>
-<h2>Technologies</h2>
-<ul>
-  <li>Work as a dependency graph, not a chat log</li>
-  <li>Tiered memory kept by lifecycle</li>
-  <li>Disposable orchestrators over shared substrate</li>
-  <li>Crash-resumable, parallel-safe workflows</li>
-</ul>
-<h2>Proof</h2>
-<p>The work loop behind <a href="/factory/" class="ghv-link">/factory</a>, including a planner that proposes the next move.</p>
-</div>`,
-  'skills/agentic-engineering/sandboxed-autonomy.md': `
-<div class="ghv-md">
-<h1>sandboxed-autonomy.md</h1>
-<p>I run agents unattended by putting hard limits around them: containerized execution, every shell command checked before it runs, and credentials the agent never holds directly.</p>
-<h2>Technologies</h2>
-<ul>
-  <li>rip-cage, a container plus command-gating I built</li>
-  <li>Credential isolation through a proxy</li>
-  <li>Always-on host, not a laptop</li>
-  <li>Safe-to-run-unattended execution</li>
-</ul>
-<h2>Proof</h2>
-<p>Open source: <a href="https://github.com/jsnyde0/rip-cage" class="ghv-link">rip-cage</a>.</p>
-</div>`,
-  'skills/agentic-engineering/llm-app-engineering.md': `
-<div class="ghv-md">
-<h1>llm-app-engineering.md</h1>
-<p>Beyond tooling my own workflow, I build agentic apps: LLM calls wrapped in tools, structured output, and guardrails meant to hold up in production.</p>
-<h2>Technologies</h2>
-<ul>
-  <li>LLM-powered features and agents</li>
-  <li>Tool use and structured output</li>
-  <li>Retrieval and context design</li>
-  <li>Evaluation and guardrails</li>
-</ul>
-</div>`,
-  'skills/web-development/full-stack-web.md': `
-<div class="ghv-md">
-<h1>full-stack-web.md</h1>
-<p>I build full-stack web apps across backend, frontend, and the data layer behind them. I default to hypermedia-driven apps: server-rendered HTML with focused interactivity and little client-side state. I build with React too, but reach for it when an app genuinely needs a rich client.</p>
-<h2>Technologies</h2>
-<ul>
-  <li>Django, PostgreSQL, MongoDB</li>
-  <li>HTMX, Tailwind, Astro</li>
-  <li>React, JavaScript</li>
-</ul>
-<h2>Approach</h2>
-<p>Why hypermedia-driven: <a href="https://htmx.org/essays/hypermedia-driven-applications/" class="ghv-link">htmx.org/essays/hypermedia-driven-applications</a>.</p>
-</div>`,
-  'skills/web-development/apis-and-deployment.md': `
-<div class="ghv-md">
-<h1>apis-and-deployment.md</h1>
-<p>I build APIs, containerize apps, and deploy them with practical CI/CD.</p>
-<h2>Technologies</h2>
-<ul>
-  <li>Django REST Framework</li>
-  <li>Pydantic</li>
-  <li>Docker</li>
-  <li>DigitalOcean</li>
-  <li>GitHub Actions</li>
-</ul>
-</div>`,
-  'skills/web-development/analytics-instrumentation.md': `
-<div class="ghv-md">
-<h1>analytics-instrumentation.md</h1>
-<p>I instrument product and marketing data so teams can trust what they measure.</p>
-<h2>Technologies</h2>
-<ul>
-  <li>PostHog</li>
-  <li>GA4</li>
-  <li>BigQuery</li>
-  <li>Dataform</li>
-  <li>Looker Studio</li>
-</ul>
-</div>`,
-  'skills/data-science/bayesian-modeling.md': `
-<div class="ghv-md">
-<h1>bayesian-modeling.md</h1>
-<p>I use Bayesian modelling when signals are noisy and decisions still need to be made.</p>
-<h2>Technologies</h2>
-<ul>
-  <li>Python</li>
-  <li>PyMC</li>
-  <li>pandas</li>
-  <li>NumPy</li>
-  <li>Marketing Mix Models</li>
-</ul>
-<h2>Proof</h2>
-<p>Built a Bayesian MMM at Moonbird.</p>
-</div>`,
-  'skills/data-science/computer-vision.md': `
-<div class="ghv-md">
-<h1>computer-vision.md</h1>
-<p>I worked on medical image processing, 3D meshes, and computer vision systems.</p>
-<h2>Technologies</h2>
-<ul>
-  <li>C++</li>
-  <li>Computer vision</li>
-  <li>Medical image processing</li>
-  <li>3D mesh processing</li>
-  <li>Deep learning consulting</li>
-</ul>
-<h2>Proof</h2>
-<p>Created <a href="https://github.com/TheWebMonks/meshmonk" class="ghv-link">MeshMonk</a>; used or cited in 140+ research projects.</p>
-</div>`,
-  'skills/data-science/data-pipelines.md': `
-<div class="ghv-md">
-<h1>data-pipelines.md</h1>
-<p>I build ELT pipelines that turn source data into models, dashboards, and decisions.</p>
-<h2>Technologies</h2>
-<ul>
-  <li>Python</li>
-  <li>SQL</li>
-  <li>BigQuery</li>
-  <li>Dataform</li>
-  <li>API and database extraction</li>
-</ul>
-<h2>Proof</h2>
-<p>Built the Moonbird pipeline behind growth reporting and modelling.</p>
-</div>`,
-  'skills/growth-engineering/performance-marketing.md': `
-<div class="ghv-md">
-<h1>performance-marketing.md</h1>
-<p>I combine acquisition, experiments, automation, and measurement into one growth loop.</p>
-<h2>Technologies</h2>
-<ul>
-  <li>Paid search</li>
-  <li>Paid social</li>
-  <li>Email marketing</li>
-  <li>SEO and CRO</li>
-  <li>Marketing automation</li>
-</ul>
-<h2>Proof</h2>
-<p>At Moonbird, grew monthly revenue from four to six figures in 3.5 years.</p>
-</div>`,
-  'skills/growth-engineering/server-side-tracking.md': `
-<div class="ghv-md">
-<h1>server-side-tracking.md</h1>
-<p>I preserve attribution signal by sending conversion events from the backend.</p>
-<h2>Technologies</h2>
-<ul>
-  <li>Server-side tracking</li>
-  <li>Conversion APIs</li>
-  <li>Backend event forwarding</li>
-  <li>Ad-platform measurement</li>
-</ul>
-<h2>Proof</h2>
-<p>Built and maintained server-side tracking for Moonbird's ad stack.</p>
-</div>`,
-  'skills/growth-engineering/bayesian-mmm.md': `
-<div class="ghv-md">
-<h1>bayesian-mmm.md</h1>
-<p>I model channel contribution when last-click attribution is too noisy to trust.</p>
-<h2>Technologies</h2>
-<ul>
-  <li>Python</li>
-  <li>PyMC</li>
-  <li>Bayesian modelling</li>
-  <li>Marketing Mix Modelling</li>
-  <li>Diminishing-return and lag effects</li>
-</ul>
-<h2>Proof</h2>
-<p>Used at Moonbird to guide marketing budget allocation.</p>
-</div>`,
-  'skills/founder-operator/strategy.md': `
-<div class="ghv-md">
-<h1>strategy.md</h1>
-<p>I founded and ran an impact-first organization focused on digital jobs and training.</p>
-<h2>Methods</h2>
-<ul>
-  <li>Vision and strategy</li>
-  <li>Market selection</li>
-  <li>Partnership design</li>
-  <li>Funding approach</li>
-</ul>
-<h2>Proof</h2>
-<p>Humainly supported 30 people through NGO partnerships in Venezuela and Nigeria.</p>
-</div>`,
-  'skills/founder-operator/teams-and-ops.md': `
-<div class="ghv-md">
-<h1>teams-and-ops.md</h1>
-<p>I ran small international teams with explicit roles and distributed authority.</p>
-<h2>Methods</h2>
-<ul>
-  <li>Holacracy</li>
-  <li>Hiring and onboarding</li>
-  <li>Role design</li>
-  <li>Remote operations</li>
-</ul>
-<h2>Proof</h2>
-<p>Humainly operated across Belgium, Venezuela, and Nigeria.</p>
-</div>`,
-  'skills/founder-operator/learning-from-failures.md': `
-<div class="ghv-md">
-<h1>learning-from-failures.md</h1>
-<p>Humainly did not scale before founder burnout; that changed how I think about pace and sustainability.</p>
-<h2>Methods</h2>
-<ul>
-  <li>Retrospective practice</li>
-  <li>Scope control</li>
-  <li>Founder sustainability</li>
-  <li>Impact-model evaluation</li>
-</ul>
-<h2>Proof</h2>
-<p>The mission worked; the growth rate and operating model did not.</p>
-</div>`,
-};
-
-Object.assign(fileContents, skillsContents);
 
 const DEFAULT_PATH = 'README.md';
 
 // Count total files for subheader
-const totalFiles = 1 + // README.md
-  workExperience.length +
-  achievements.length +
-  education.length +
-  Object.keys(skillsContents).length;
+const totalFiles = Object.keys(fileContents).length;
 
-const totalFolders = 4 + skillsSubfolders.length; // experience, achievements, education, skills + skill subfolders
+const totalFolders = 4 + skills.subfolders.length; // experience, achievements, education, skills + skill subfolders
 ---
 
 <BaseLayout title="Resume | Jonatan Snyders" description="Resume of Jonatan Snyders — web developer, data scientist, ex-founder, and growth engineer.">
