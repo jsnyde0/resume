@@ -44,7 +44,7 @@ Do not deploy to an existing unrelated Pages project.
 
 Cut over 2026-10-05 (bead `resume-bwu`).
 
-- Registrar: moving from easyhost.be (Combell) to Cloudflare Registrar (bead `resume-bcg`). Transfer submitted 2026-10-05; until it completes, easyhost (`my.easyhost.be` → Domeinnamen → jonatansnyders.com) stays registrar and its nameservers point at Cloudflare: `hunts.ns.cloudflare.com`, `love.ns.cloudflare.com`. DNSSEC is signing in Cloudflare; the DS record at .com is published once Cloudflare is registrar.
+- Registrar: Cloudflare Registrar (transferred from easyhost.be / Combell, completed 2026-10-11, bead `resume-bcg`). Nameservers `hunts.ns.cloudflare.com`, `love.ns.cloudflare.com`; Cloudflare Registrar requires Cloudflare nameservers. DNSSEC is on: Cloudflare signs the zone and publishes DS `2371 13 2 7B614B76…` at .com itself. The old easyhost account no longer manages the domain; its auto-renew is being turned off.
 - DNS is managed in the Cloudflare zone `jonatansnyders.com` (zone id `29992eb15208e5e7465503af944ee6db`).
 - Both custom domains are bound in Pages → `jonatansnyders-resume` → Custom domains.
 
@@ -76,7 +76,7 @@ To put the old site back while keeping Cloudflare DNS:
 2. Disable or delete the "Redirect root to www" rule.
 3. Optionally remove both custom domains from the Pages project.
 
-To leave Cloudflare entirely: easyhost → jonatansnyders.com → Nameservers → choose "Easyhost nameservers" and save. The easyhost zone still holds the pre-cutover records. Re-enable DNSSEC at easyhost only after the nameserver change has settled.
+To leave Cloudflare entirely, transfer the domain out first: Cloudflare Registrar does not allow non-Cloudflare nameservers, and a new transfer is blocked for 60 days after 2026-10-11. Get the auth code in Cloudflare → Domain Registration → jonatansnyders.com, start the transfer at the new registrar, and recreate the records above in its DNS. Turn DNSSEC off in Cloudflare before the move and back on at the new host after it settles.
 
 ## Verification checklist
 
@@ -84,3 +84,4 @@ To leave Cloudflare entirely: easyhost → jonatansnyders.com → Nameservers �
 - `https://www.jonatansnyders.com/` returns 200 with `/_astro/` assets, and `/resume/`, `/readme/`, `/projects/`, `/factory/` return 200.
 - `https://jonatansnyders.com/<path>?q` returns 301 to `https://www.jonatansnyders.com/<path>?q`.
 - `dig MX jonatansnyders.com` returns the three `route*.mx.cloudflare.net` servers.
+- `whois jonatansnyders.com` shows `Registrar: Cloudflare, Inc.` and `DNSSEC: signedDelegation`; a validating resolver sets the AD flag (`curl -s 'https://dns.google/resolve?name=jonatansnyders.com&type=A' | jq .AD` → `true`).
