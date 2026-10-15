@@ -30,7 +30,7 @@ Per-repo inventory of verification mechanisms and their fit profiles. Consult wh
 
 ## Refactoring fit profile (gate manifest — dotpi-aut6.8, 2026-08-09)
 
-RIDER (FIRM): non-visual refactoring only (build scripts, data plumbing, utilities); visual/copy/styling work parks for the human. NOTE 2026-08-09: www.jonatansnyders.com is still served by the LEGACY DJANGO stack living in this repo (`a_core/`, `templates/`, `node/` Tailwind pipeline) — the Astro site is the unfinished migration target. The Django app is LIVE: not a deletion candidate; migration completion is attended work (parked proposal bead).
+RIDER (FIRM): non-visual refactoring only (build scripts, data plumbing, utilities); visual/copy/styling work parks for the human. NOTE 2026-10-15: the Astro site on Cloudflare Pages is the live site (cutover 2026-10-05); the legacy Django app was removed from `main` and is preserved at git tag `legacy-django`.
 
 - **Gate command:** `npm run gate` = `astro check && astro build && node scripts/verify-projects-page.mjs` (wired 2026-10-05, resume-db0; green offline with existing node_modules). `npm run build && npm run test:projects` is the same minus the typecheck. NOTE: no `npm test` script exists.
 - **Gate files (fail-closed):** `scripts/verify-*.mjs`, `package.json` script definitions, `docs/projects-source-inventory.md` (asserted-against), plus any future test files.

@@ -70,7 +70,7 @@ Pre-cutover state, as served by easyhost's nameservers `ns1`/`ns2`/`ns3.easyhost
 - `ftp` A `217.21.190.175` (deleted at cutover; unused).
 - DNSSEC was on, with DS `22265 13 2 FB544A05570ED26BE614AFCAF80301C3E1E9897A52B0029DA689C5B247413594`.
 
-To put the old site back while keeping Cloudflare DNS:
+The Django source lives at git tag `legacy-django` (`git checkout legacy-django`); it was removed from `main` after cutover. Render is suspended: to roll back, resume the Render service, which redeploys from that tag (set the service's branch/ref to `legacy-django`), then:
 
 1. In the Cloudflare zone, replace the apex CNAME with the two Render A records and point `www` back to `resume-j9w5.onrender.com`, all **DNS only**.
 2. Disable or delete the "Redirect root to www" rule.
