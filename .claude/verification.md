@@ -33,7 +33,7 @@ Per-repo inventory of verification mechanisms and their fit profiles. Consult wh
 RIDER (FIRM): non-visual refactoring only (build scripts, data plumbing, utilities); visual/copy/styling work parks for the human. NOTE 2026-10-15: the Astro site on Cloudflare Pages is the live site (cutover 2026-10-05); the legacy Django app was removed from `main` and is preserved at git tag `legacy-django`.
 
 - **Gate command:** `npm run gate` = `astro check && astro build && node scripts/verify-projects-page.mjs` (wired 2026-10-05, resume-db0; green offline with existing node_modules). `npm run build && npm run test:projects` is the same minus the typecheck. NOTE: no `npm test` script exists.
-- **Gate files (fail-closed):** `scripts/verify-*.mjs`, `package.json` script definitions, `docs/projects-source-inventory.md` (asserted-against), plus any future test files.
+- **Gate files (fail-closed):** `scripts/verify-*.mjs`, `package.json` script definitions, plus any future test files.
 - **D3 conformance:** partial — `astro check` type-checks `.astro`/TS (planted type error fails the gate before build; `tsconfig.json` extends `astro/tsconfigs/strict`, resume-00g), the build catches syntax/import breakage at a stable boundary, and `test:projects` pins built-HTML content.
 - **Green-at-dispatch:** checked by the dispatching brain; result recorded on the dispatched bead.
 
