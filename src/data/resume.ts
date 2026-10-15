@@ -1,7 +1,6 @@
 export interface ResumeIntro {
   paragraphs: string[];
   headlineBadges: string[];
-  skillBadges: { label: string; tooltip?: string }[];
 }
 
 export interface ResumeItem {
@@ -29,12 +28,6 @@ export const resumeIntro: ResumeIntro = {
     "Transparency is my top value.",
   ],
   headlineBadges: ['Web Developer', 'Data Scientist', 'Ex-Founder', 'Growth Engineer'],
-  skillBadges: [
-    { label: 'Python' },
-    { label: 'Django' },
-    { label: 'SQL' },
-    { label: 'Fashion Icon', tooltip: "You've seen the crocs. You know it." },
-  ],
 };
 
 export const achievements: ResumeItem[] = [

@@ -188,7 +188,7 @@ const totalFolders = 4 + skills.subfolders.length; // experience, achievements, 
 
               <!-- Top-level folders: experience, achievements, education, skills -->
               {folders.map((folder, folderIdx) => (
-                <div class="ghv-folder" data-ghv-folder={folder.name}>
+                <div class="ghv-folder">
                   <div
                     class="ghv-folder-row"
                     role="button"
@@ -222,7 +222,7 @@ const totalFolders = 4 + skills.subfolders.length; // experience, achievements, 
                     ))}
                     {/* Skill subfolders */}
                     {folder.subfolders && folder.subfolders.map((sub, subIdx) => (
-                      <div class="ghv-folder" data-ghv-folder={`${folder.name}/${sub.name}`}>
+                      <div class="ghv-folder">
                         <div
                           class="ghv-folder-row ghv-folder-row--sub"
                           role="button"
@@ -357,49 +357,29 @@ const totalFolders = 4 + skills.subfolders.length; // experience, achievements, 
       });
     });
 
-    // Top-level folder toggle
-    document.querySelectorAll<HTMLElement>('[data-ghv-folder-toggle]').forEach((toggleEl) => {
-      toggleEl.addEventListener('click', () => {
-        const folderName = toggleEl.getAttribute('data-ghv-folder-toggle');
-        const panelId = toggleEl.getAttribute('aria-controls');
-        if (!panelId) return;
-        const filesPanel = document.getElementById(panelId);
-        const caret = toggleEl.querySelector('.ghv-folder-caret');
-        if (!filesPanel) return;
-        const isOpen = filesPanel.style.display !== 'none';
-        filesPanel.style.display = isOpen ? 'none' : '';
-        toggleEl.setAttribute('aria-expanded', String(!isOpen));
-        caret?.classList.toggle('is-open', !isOpen);
+    // Folder toggles (top-level and sub-folder)
+    document
+      .querySelectorAll<HTMLElement>('[data-ghv-folder-toggle], [data-ghv-subfolder-toggle]')
+      .forEach((toggleEl) => {
+        toggleEl.addEventListener('click', (e: Event) => {
+          e.stopPropagation(); // a sub-folder click must not trigger the parent folder toggle
+          const panelId = toggleEl.getAttribute('aria-controls');
+          if (!panelId) return;
+          const filesPanel = document.getElementById(panelId);
+          const caret = toggleEl.querySelector('.ghv-folder-caret');
+          if (!filesPanel) return;
+          const isOpen = filesPanel.style.display !== 'none';
+          filesPanel.style.display = isOpen ? 'none' : '';
+          toggleEl.setAttribute('aria-expanded', String(!isOpen));
+          caret?.classList.toggle('is-open', !isOpen);
+        });
+        toggleEl.addEventListener('keydown', (e: KeyboardEvent) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            toggleEl.click();
+          }
+        });
       });
-      toggleEl.addEventListener('keydown', (e: KeyboardEvent) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          toggleEl.click();
-        }
-      });
-    });
-
-    // Sub-folder toggle
-    document.querySelectorAll<HTMLElement>('[data-ghv-subfolder-toggle]').forEach((toggleEl) => {
-      toggleEl.addEventListener('click', (e: Event) => {
-        e.stopPropagation(); // don't trigger parent folder toggle
-        const panelId = toggleEl.getAttribute('data-ghv-subfolder-panel');
-        if (!panelId) return;
-        const filesPanel = document.getElementById(panelId);
-        const caret = toggleEl.querySelector('.ghv-folder-caret');
-        if (!filesPanel) return;
-        const isOpen = filesPanel.style.display !== 'none';
-        filesPanel.style.display = isOpen ? 'none' : '';
-        toggleEl.setAttribute('aria-expanded', String(!isOpen));
-        caret?.classList.toggle('is-open', !isOpen);
-      });
-      toggleEl.addEventListener('keydown', (e: KeyboardEvent) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          toggleEl.click();
-        }
-      });
-    });
 
     // Mobile tree toggle
     mobileToggleBtn?.addEventListener('click', () => {

@@ -1,5 +1,5 @@
 ---
-import type { ProjectEntry } from '../../data/projects';
+import type { ProjectEntry, ProjectTag } from '../../data/projects';
 
 interface Props {
   project: ProjectEntry;
@@ -7,22 +7,18 @@ interface Props {
 
 const { project } = Astro.props;
 
-const tagLabel: Record<string, string> = {
-  built: 'built',
-  company: 'company',
-  'in-progress': 'in progress',
+const tagMeta: Record<ProjectTag, { label: string; cls: string }> = {
+  built: { label: 'built', cls: 'project-tag--built' },
+  company: { label: 'company', cls: 'project-tag--company' },
+  'in-progress': { label: 'in progress', cls: 'project-tag--in-progress' },
 };
-const tagClass: Record<string, string> = {
-  built: 'project-tag--built',
-  company: 'project-tag--company',
-  'in-progress': 'project-tag--in-progress',
-};
+const tag = tagMeta[project.tag];
 ---
 
 <article class="project-panel">
   <header class="project-panel__header">
     <h2 class="project-panel__title">{project.title}</h2>
-    <span class:list={['project-tag', tagClass[project.tag]]}>{tagLabel[project.tag]}</span>
+    <span class:list={['project-tag', tag.cls]}>{tag.label}</span>
   </header>
 
   {project.image && (
