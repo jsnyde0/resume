@@ -14,11 +14,10 @@ Checks already exist here, and they are worth running first. `.claude/verificati
 - `npm run build` — proves the routes compile.
 - `npm run test:projects` — reads built HTML off disk and pins the `/projects/` content.
 - Cloudflare Pages preview — each route checked for route-specific content, not just HTTP 200.
-- `scripts/verify-resume-layout.mjs` — **already drives headless Chrome**: serves `dist/` and reads *computed* styles on `/resume/` at two widths (390 must stack to `column`, 1200 must sit in a `row`, `.resume-card` must keep a non-zero border radius). No npm script wires it, and the inventory marks it visual and non-hermetic, so it is never part of a dispatch gate.
 
 None of them can see **client-side behaviour**. The file-tree browser on `/resume/` and the orbit graph on `/factory/` are inline vanilla JS that rewrite the DOM on click with no URL or hash change. To a static-HTML reader they are invisible: the markup is identical whether the click handlers work or were never wired at all.
 
-**This skill is not the only thing here that pays for a browser — it is the only thing that clicks.** The layout script loads a page and measures it standing still; that answers a styling question and would pass on a page whose every handler is dead. The distinction worth holding is act-then-observe, not browser-versus-no-browser.
+**This skill is not the only thing here that pays for a browser — it is the only thing that clicks.** A static-HTML or computed-style check measures a page standing still; it would pass on a page whose every handler is dead. The distinction worth holding is act-then-observe, not browser-versus-no-browser.
 
 ## The repo interview
 
