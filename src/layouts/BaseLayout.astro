@@ -134,40 +134,48 @@ const canonicalUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).toStri
       }
 
       .home-content {
-        max-width: var(--container-content);
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        align-content: center;
+        max-width: var(--container-site);
+        min-height: calc(100svh - 14 * var(--space-4));
         margin: 0 auto;
       }
 
       .hero-grid {
         display: grid;
-        max-width: var(--container-site);
+        width: 100%;
         margin: 0 auto;
-        padding: var(--space-8) var(--space-4);
-        gap: var(--space-8);
+        padding: var(--space-4) 0 var(--space-8);
+        gap: var(--space-6);
         align-items: center;
       }
 
       .hero-copy h1 {
         max-width: var(--container-prose);
-        margin: 0 0 var(--space-4);
+        margin: 0 0 var(--space-5);
+        color: var(--content-bright);
         font-size: var(--text-hero);
-        line-height: 1;
-        letter-spacing: -0.035em;
+        line-height: 0.95;
+        letter-spacing: -0.045em;
         font-weight: 800;
+        text-wrap: balance;
       }
 
       .hero-copy p {
-        max-width: var(--container-prose);
-        margin: 0 0 var(--space-6);
-        color: var(--muted-content);
+        max-width: 28ch;
+        margin: 0 0 var(--space-10);
+        color: var(--base-content);
         font-size: var(--text-hero-lead);
-        font-weight: 300;
+        line-height: var(--line-height-body);
+        font-weight: 400;
+        text-wrap: balance;
       }
 
       .hero-actions {
         display: flex;
         flex-direction: column;
-        gap: var(--space-4);
+        gap: var(--space-3);
       }
 
       .button {
@@ -202,13 +210,52 @@ const canonicalUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).toStri
         height: 1.25rem;
       }
 
+      .hero-actions .button {
+        min-height: 3rem;
+        padding: var(--space-3) var(--space-6);
+        border-radius: var(--radius-button);
+        font-weight: 600;
+        letter-spacing: -0.005em;
+        transition:
+          background var(--transition-base),
+          border-color var(--transition-base),
+          color var(--transition-base),
+          transform var(--transition-base);
+      }
+
+      .hero-actions .button-secondary {
+        border-color: var(--border-subtle);
+        background: transparent;
+        color: var(--base-content);
+        font-weight: 500;
+      }
+
+      .hero-actions .button-secondary:hover {
+        border-color: var(--base-content);
+        background: var(--surface-subtle);
+        color: var(--content-bright);
+      }
+
+      .hero-actions .button svg {
+        transition: transform var(--transition-base);
+      }
+
+      .hero-actions .button:hover svg { transform: translateX(var(--space-1)); }
+      .hero-actions .button:active { transform: translateY(1px); }
+
+      .hero-actions .button:focus-visible {
+        outline: 2px solid var(--primary);
+        outline-offset: var(--space-1);
+      }
+
       .hero-image {
         display: flex;
         justify-content: center;
       }
 
       .hero-image img {
-        max-width: 100%;
+        width: 100%;
+        max-width: 22rem;
         height: auto;
         display: block;
       }
@@ -276,18 +323,25 @@ const canonicalUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).toStri
         .footer-inner { flex-direction: row; }
       }
 
+      @media (prefers-reduced-motion: reduce) {
+        .hero-actions .button,
+        .hero-actions .button svg { transition: none; }
+        .hero-actions .button:hover svg,
+        .hero-actions .button:active { transform: none; }
+      }
+
       @media (min-width: 1024px) {
         .hero-grid {
           grid-template-columns: repeat(12, minmax(0, 1fr));
-          padding-top: 4rem;
-          padding-bottom: 4rem;
+          padding: var(--space-8) var(--space-8);
           gap: var(--space-8);
         }
-        .hero-copy { grid-column: span 7 / span 7; }
+        .hero-copy { grid-column: span 6 / span 6; }
         .hero-image {
-          grid-column: span 5 / span 5;
+          grid-column: span 6 / span 6;
           justify-content: flex-start;
         }
+        .hero-image img { max-width: 30rem; }
       }
     </style>
   </head>
