@@ -1,0 +1,78 @@
+---
+/** PROTOTYPE (resume-soe.12), direction B "Runway": colophon footer shared by home + resume. */
+---
+<footer class="rwf">
+  <p class="rwf-mast" aria-hidden="true">JS</p>
+  <div class="rwf-cols">
+    <p class="rw-label">Jonatan Snyders<br />Berlin, Germany</p>
+    <nav aria-label="Footer">
+      <ul class="rwf-links">
+        <li><a href="/directions/b/">The cover</a></li>
+        <li><a href="/directions/b/resume/">The lookbook</a></li>
+        <li><a href="/factory/">The factory</a></li>
+      </ul>
+    </nav>
+    <!-- SHORTCUT: faked colophon / issue details; no real issue numbering exists. -->
+    <p class="rw-label rwf-colo">Issue Nº 37, Autumn 2026<br />Printed on nothing. Free.</p>
+  </div>
+</footer>
+
+<style>
+  .rwf {
+    position: relative;
+    border-top: 1px solid var(--rw-line);
+    padding: clamp(3rem, 6vw, 5rem) clamp(1.25rem, 4vw, 3.5rem) 7rem;
+    overflow: hidden;
+  }
+  .rwf-mast {
+    margin: 0 0 2rem;
+    font-family: var(--rw-mast);
+    font-size: clamp(6rem, 18vw, 16rem);
+    line-height: 0.8;
+    color: var(--rw-red);
+  }
+  .rwf-cols {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 2rem;
+    align-items: start;
+    color: var(--rw-mute);
+  }
+  .rwf-cols p {
+    margin: 0;
+    line-height: 1.8;
+  }
+  .rwf-colo {
+    text-align: right;
+  }
+  .rwf-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 0.25rem 2rem;
+    flex-wrap: wrap;
+  }
+  .rwf-links a {
+    display: inline-block;
+    padding: 0.75rem 0;
+    font-family: var(--rw-serif);
+    font-style: italic;
+    font-size: 1.25rem;
+    color: var(--rw-paper);
+    text-decoration: none;
+    background: linear-gradient(var(--rw-red), var(--rw-red)) 0 88% / 0 1px no-repeat;
+    transition: background-size 0.6s var(--rw-ease), color 0.3s;
+  }
+  .rwf-links a:hover {
+    background-size: 100% 1px;
+  }
+  @media (max-width: 720px) {
+    .rwf-cols {
+      grid-template-columns: 1fr;
+    }
+    .rwf-colo {
+      text-align: left;
+    }
+  }
+</style>

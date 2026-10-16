@@ -1,20 +1,564 @@
 ---
-// PROTOTYPE (resume-soe.12) — direction C resume slice. STUB: replaced by the ui-craftsman build.
+// PROTOTYPE (resume-soe.12) — direction C "Sticker Sheet" resume slice: sticker-album bento,
+// peel-off skill stickers, ticket-stub education.
 import DirectionSwitcher from '../../../components/directions/DirectionSwitcher.astro';
-import { workExperience, education } from '../../../data/resume';
+import Head from '../../../components/directions/c/Head.astro';
+import Header from '../../../components/directions/c/Header.astro';
+import Footer from '../../../components/directions/c/Footer.astro';
+import { workExperience, education, resumeIntro } from '../../../data/resume';
+import { skillFiles } from '../../../data/resume-skills';
+
+// SHORTCUT: per-index skin table (colour/shape/span/tilt) hard-coded for exactly 6 jobs; a 7th job
+// wraps around to the first skin. Layout is hand-composed for the current data, not generic.
+const skins = ['s-cobalt', 's-sun', 's-tomato', 's-paper', 's-ink', 's-sun2'];
+
+// Group skill files by folder, keep source order.
+const folders: { name: string; skills: string[] }[] = [];
+for (const f of skillFiles) {
+  let g = folders.find((x) => x.name === f.folder);
+  if (!g) folders.push((g = { name: f.folder, skills: [] }));
+  // SHORTCUT: only the skill names render (filename minus .md); each file's prose/proof is dropped.
+  g.skills.push(f.filename.replace(/\.md$/, '').replace(/-/g, ' '));
+}
+const folderColour = ['k-cobalt', 'k-sun', 'k-tomato', 'k-white', 'k-sun'];
+const tilts = [-4, 3, -2, 5, -3, 2, -5, 4];
 ---
 <!doctype html>
 <html lang="en">
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="robots" content="noindex, nofollow" />
-    <title>Resume — direction C</title>
+    <Head
+      title="Resume · Jonatan Snyders · direction C, Sticker Sheet"
+      description="Jonatan Snyders' resume: work, skills, education."
+    />
   </head>
   <body>
-    <h1>Resume</h1>
-    {workExperience.map((w) => <p>{w.dateRange} — {w.title} ({w.company})</p>)}
-    {education.map((e) => <p>{e.dateRange} — {e.title} ({e.company})</p>)}
+    <Header page="resume" />
+
+    <main id="main">
+      <section class="intro wrap" aria-labelledby="title">
+        <!-- SHORTCUT: hard-coded page headline + kicker copy. -->
+        <p class="kicker c-mono">The resume, a.k.a.</p>
+        <h1 id="title">What bores me</h1>
+        <p class="lede">{resumeIntro.paragraphs[0]} {resumeIntro.paragraphs[2]}</p>
+      </section>
+
+      <section class="wrap" aria-labelledby="work-h">
+        <h2 id="work-h" class="sec"><span>Work</span></h2>
+        <ol class="album">
+          {workExperience.map((job, i) => (
+            <li class={`job ${skins[i % skins.length]}`}>
+              <p class="stamp c-mono"><span>{job.dateRange}</span></p>
+              <img class="logo" src={job.imageUrl} alt={job.imageAlt} width="56" height="56" loading="lazy" />
+              <h3>{job.role}</h3>
+              <p class="job-title">{job.title.trim()}</p>
+              <p class="where c-mono">{job.company} &middot; {job.location}</p>
+              <p class="body" set:html={job.body} />
+              {job.links && (
+                <p class="links">
+                  {job.links.map((l) => (
+                    <a href={l.href} rel="noopener">{l.label} &#8599;</a>
+                  ))}
+                </p>
+              )}
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <section class="wrap" aria-labelledby="skills-h">
+        <h2 id="skills-h" class="sec"><span>Skills</span></h2>
+        <div class="sheet">
+          <p class="sheet-note c-mono" aria-hidden="true">Peel &amp; stick &middot; {skillFiles.length} pcs</p>
+          {folders.map((g, gi) => (
+            <div class="group">
+              <h3 class="c-mono">{g.name.replace(/-/g, ' ')}</h3>
+              <ul>
+                {g.skills.map((s, si) => (
+                  <li class={folderColour[gi % folderColour.length]} style={`--tilt:${tilts[(gi * 3 + si) % tilts.length]}deg`}>
+                    {s}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section class="wrap" aria-labelledby="edu-h">
+        <h2 id="edu-h" class="sec"><span>Education</span></h2>
+        <ul class="tickets">
+          {education.map((e, i) => (
+            <li class={`ticket ${i % 2 ? 't-cobalt' : 't-sun'}`}>
+              <div class="stub c-mono">
+                <span class="admit">Admit one</span>
+                <span class="stub-date">{e.dateRange}</span>
+              </div>
+              <div class="ticket-main">
+                <p class="where c-mono">{e.company} &middot; {e.location}</p>
+                <h3>{e.title.trim()}</h3>
+                <p class="body" set:html={e.body} />
+              </div>
+            </li>
+          ))}
+        </ul>
+      </section>
+    </main>
+
+    <Footer />
     <DirectionSwitcher current="c" page="resume" />
   </body>
 </html>
+
+<style>
+  .wrap {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding-inline: clamp(1rem, 4vw, 3rem);
+  }
+
+  /* ---------- intro ---------- */
+  .intro {
+    padding-block: clamp(2rem, 5vw, 4rem) clamp(1rem, 3vw, 2rem);
+  }
+  .kicker {
+    display: inline-block;
+    margin: 0 0 1rem;
+    padding: 0.35rem 0.9rem;
+    background: var(--c-white);
+    border: var(--line-thin);
+    border-radius: 999px;
+    box-shadow: 3px 3px 0 var(--c-ink);
+    transform: rotate(-3deg);
+    font-size: 0.9rem;
+  }
+  h1 {
+    margin: 0;
+    font-weight: 900;
+    font-variation-settings: 'wdth' 125;
+    text-transform: uppercase;
+    line-height: 0.88;
+    letter-spacing: -0.02em;
+    font-size: clamp(3rem, 9vw, 8.5rem);
+  }
+  .lede {
+    max-width: 58ch;
+    margin: 2rem 0 0;
+    font-size: clamp(1.1rem, 1.6vw, 1.3rem);
+    font-weight: 600;
+    font-variation-settings: 'wdth' 95;
+  }
+
+  /* ---------- section labels: a tilted strip of tape ---------- */
+  .sec {
+    margin: clamp(4rem, 8vw, 6.5rem) 0 2.5rem;
+  }
+  .sec span {
+    display: inline-block;
+    padding: 0.2rem 1rem 0.3rem;
+    background: var(--c-ink);
+    color: var(--c-sun);
+    font-weight: 900;
+    font-variation-settings: 'wdth' 125;
+    text-transform: uppercase;
+    font-size: clamp(1.8rem, 3.6vw, 3rem);
+    line-height: 1.1;
+    transform: rotate(-2deg);
+  }
+
+  /* ---------- work: sticker album bento ---------- */
+  .album {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 2.5rem 2rem;
+    align-items: start;
+  }
+  .job {
+    position: relative;
+    padding: 2rem 1.75rem 1.75rem;
+    border: var(--line);
+    box-shadow: var(--shadow);
+    transform: rotate(var(--r, 0deg));
+    transition: transform 260ms var(--ease), box-shadow 260ms var(--ease);
+  }
+  .job:hover {
+    transform: translate(-4px, -6px) rotate(calc(var(--r, 0deg) * -0.5));
+    box-shadow: var(--shadow-lift);
+  }
+  .job h3 {
+    margin: 0;
+    max-width: 14ch;
+    font-weight: 900;
+    font-variation-settings: 'wdth' 118;
+    text-transform: uppercase;
+    font-size: clamp(1.7rem, 2.8vw, 2.6rem);
+    line-height: 0.95;
+  }
+  .job-title {
+    margin: 0.9rem 0 0;
+    font-weight: 800;
+    font-size: 1.15rem;
+    line-height: 1.25;
+    max-width: 32ch;
+  }
+  .where {
+    margin: 0.6rem 0 0;
+    font-size: 0.78rem;
+  }
+  .body {
+    margin: 1rem 0 0;
+    max-width: 52ch;
+    font-weight: 500;
+    font-variation-settings: 'wdth' 95;
+  }
+  .links {
+    margin: 1rem 0 0;
+  }
+  .links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0.4rem 1rem;
+    background: var(--c-white);
+    color: var(--c-ink);
+    border: var(--line-thin);
+    border-radius: 999px;
+    font-family: var(--f-mono);
+    font-weight: 700;
+    font-size: 0.85rem;
+    text-decoration: none;
+    box-shadow: 3px 3px 0 var(--c-ink);
+  }
+  .links a:hover {
+    background: var(--c-sun);
+  }
+
+  /* Logo as an outlined circular sticker. */
+  .logo {
+    width: 56px;
+    height: 56px;
+    margin-bottom: 1.25rem;
+    padding: 8px;
+    object-fit: contain;
+    background: var(--c-white);
+    border: var(--line-thin);
+    border-radius: 50%;
+    box-shadow: 3px 3px 0 var(--c-ink);
+  }
+
+  /* Year as a rubber stamp hanging off the top-right corner. */
+  .stamp {
+    position: absolute;
+    top: -1.1rem;
+    right: 1.25rem;
+    margin: 0;
+    padding: 4px;
+    background: var(--c-white);
+    border: var(--line-thin);
+    border-radius: 10px;
+    box-shadow: 3px 3px 0 var(--c-ink);
+    transform: rotate(7deg);
+    font-size: 0.82rem;
+    white-space: nowrap;
+  }
+  .stamp span {
+    display: block;
+    padding: 0.3rem 0.65rem;
+    border: 2px dashed var(--c-ink);
+    border-radius: 6px;
+  }
+
+  /* Each skin: different colour, size, shape, tilt. */
+  .s-cobalt {
+    grid-column: span 4;
+    --r: -1deg;
+    background: var(--c-cobalt);
+    color: var(--c-paper);
+    border-radius: 6px;
+    padding: 2.75rem 2.5rem 2.5rem;
+  }
+  .s-cobalt h3 {
+    font-size: clamp(2.2rem, 4.6vw, 4.25rem);
+  }
+  .s-cobalt .stamp {
+    background: var(--c-sun);
+    color: var(--c-ink);
+  }
+  .s-sun {
+    grid-column: span 2;
+    --r: 2.5deg;
+    margin-top: 2.5rem;
+    background: var(--c-sun);
+    border-radius: 36px;
+  }
+  .s-tomato {
+    grid-column: span 3;
+    --r: -2deg;
+    background: var(--c-tomato);
+    border-radius: 6px 60px 6px 6px;
+  }
+  .s-paper {
+    grid-column: span 3;
+    --r: 1.5deg;
+    margin-top: 3rem;
+    background: var(--c-white);
+    border-radius: 140px 140px 18px 18px;
+    padding-top: 3.25rem;
+    text-align: center;
+  }
+  .s-paper .logo,
+  .s-paper h3,
+  .s-paper .job-title,
+  .s-paper .body {
+    margin-inline: auto;
+  }
+  .s-paper .stamp {
+    right: auto;
+    left: 50%;
+    transform: translateX(-50%) rotate(-5deg);
+    background: var(--c-tomato);
+  }
+  .s-ink {
+    grid-column: span 2;
+    --r: -3deg;
+    background: var(--c-ink);
+    color: var(--c-paper);
+    border-radius: 50% 50% 18px 18px / 30% 30% 18px 18px;
+    padding-top: 3rem;
+  }
+  .s-ink h3 {
+    color: var(--c-sun);
+  }
+  .s-ink .stamp {
+    background: var(--c-sun);
+    color: var(--c-ink);
+  }
+  .s-sun2 {
+    grid-column: span 4;
+    --r: 1deg;
+    background: var(--c-sun);
+    border-radius: 6px;
+  }
+  /* Light/white logo artwork needs a dark sticker backing to read. */
+  .s-sun .logo,
+  .s-ink .logo {
+    background: var(--c-cobalt);
+  }
+  .s-sun2 .stamp {
+    background: var(--c-cobalt);
+    color: var(--c-paper);
+    border-color: var(--c-ink);
+  }
+  .s-sun2 .stamp span {
+    border-color: var(--c-paper);
+  }
+
+  /* ---------- skills: peel-off sticker sheet ---------- */
+  .sheet {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
+    gap: 2.25rem 2rem;
+    padding: clamp(2.5rem, 4vw, 3.5rem) clamp(1.25rem, 3vw, 3rem) clamp(2rem, 3vw, 3rem);
+    background: var(--c-white);
+    border: var(--line);
+    border-radius: 24px;
+    box-shadow: var(--shadow);
+    /* Backing-paper grid lines. */
+    background-image: linear-gradient(rgba(35, 71, 255, 0.12) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(35, 71, 255, 0.12) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+  .sheet-note {
+    position: absolute;
+    top: -1rem;
+    right: 2rem;
+    margin: 0;
+    padding: 0.3rem 0.8rem;
+    background: var(--c-tomato);
+    border: var(--line-thin);
+    transform: rotate(3deg);
+    font-size: 0.78rem;
+  }
+  .group h3 {
+    margin: 0 0 1rem;
+    font-size: 0.85rem;
+  }
+  .group ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 0.6rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .group li {
+    padding: 0.5rem 1rem 0.55rem;
+    border: var(--line-thin);
+    border-radius: 999px;
+    box-shadow: 3px 3px 0 var(--c-ink);
+    font-weight: 800;
+    font-variation-settings: 'wdth' 108;
+    font-size: 1.02rem;
+    line-height: 1.15;
+    transform: rotate(var(--tilt));
+    transition: transform 220ms var(--ease), box-shadow 220ms var(--ease);
+  }
+  .group li:hover {
+    transform: translate(-2px, -4px) rotate(calc(var(--tilt) * -1));
+    box-shadow: 5px 7px 0 var(--c-ink);
+  }
+  .k-cobalt {
+    background: var(--c-cobalt);
+    color: var(--c-paper);
+  }
+  .k-sun {
+    background: var(--c-sun);
+  }
+  .k-tomato {
+    background: var(--c-tomato);
+  }
+  .k-white {
+    background: var(--c-paper);
+  }
+
+  /* ---------- education: ticket stubs ---------- */
+  .tickets {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2.5rem;
+  }
+  .ticket {
+    position: relative;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    border: var(--line);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    background: var(--c-white);
+    transition: transform 260ms var(--ease), box-shadow 260ms var(--ease);
+  }
+  .ticket:nth-child(1) {
+    transform: rotate(-1.5deg);
+  }
+  .ticket:nth-child(2) {
+    transform: rotate(1.5deg);
+    margin-top: 1.5rem;
+  }
+  .ticket:hover {
+    transform: translate(-3px, -5px) rotate(0deg);
+    box-shadow: var(--shadow-lift);
+  }
+  .stub {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem 0.9rem;
+    /* Element is rotated 180deg for bottom-to-top text, so its left border renders as the right perforation. */
+    border-left: 4px dashed var(--c-ink);
+    border-radius: 0 10px 10px 0;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    font-size: 0.8rem;
+  }
+  .t-sun .stub {
+    background: var(--c-sun);
+  }
+  .t-cobalt .stub {
+    background: var(--c-cobalt);
+    color: var(--c-paper);
+  }
+  .stub-date {
+    font-size: 1.05rem;
+  }
+  /* Punched notches top and bottom of the perforation. */
+  .ticket-main::before,
+  .ticket-main::after {
+    content: '';
+    position: absolute;
+    left: -2px;
+    width: 26px;
+    height: 26px;
+    margin-left: -13px;
+    background: var(--c-paper);
+    border: var(--line);
+    border-radius: 50%;
+  }
+  .ticket-main::before {
+    top: -15px;
+    clip-path: inset(50% 0 0 0);
+  }
+  .ticket-main::after {
+    bottom: -15px;
+    clip-path: inset(0 0 50% 0);
+  }
+  .ticket-main {
+    position: relative;
+    padding: 1.5rem 1.75rem 1.75rem;
+  }
+  .ticket-main .where {
+    margin: 0 0 0.6rem;
+  }
+  .ticket-main h3 {
+    margin: 0;
+    font-weight: 900;
+    font-variation-settings: 'wdth' 112;
+    font-size: clamp(1.35rem, 2.2vw, 1.85rem);
+    line-height: 1.05;
+  }
+
+  /* ---------- narrow ---------- */
+  @media (max-width: 960px) {
+    .album {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .s-cobalt,
+    .s-sun2 {
+      grid-column: span 2;
+    }
+    .s-sun,
+    .s-tomato,
+    .s-paper,
+    .s-ink {
+      grid-column: span 1;
+    }
+    .tickets {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .ticket:nth-child(2) {
+      margin-top: 0;
+    }
+    .ticket {
+      margin-right: 8px;
+    }
+  }
+  @media (max-width: 600px) {
+    .album {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 2.75rem;
+    }
+    .album > .job {
+      grid-column: 1 / -1;
+      margin-right: 8px; /* keep the hard shadow of tilted blocks inside the viewport */
+      margin-top: 0;
+      padding: 2.25rem 1.4rem 1.5rem;
+    }
+    .s-paper {
+      border-radius: 90px 90px 18px 18px;
+    }
+    .job h3 {
+      font-size: 2rem;
+    }
+    .s-cobalt h3 {
+      font-size: 2.5rem;
+    }
+  }
+</style>

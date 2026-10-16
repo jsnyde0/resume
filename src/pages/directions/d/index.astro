@@ -1,6 +1,9 @@
 ---
-// PROTOTYPE (resume-soe.12) — direction D homepage. STUB: replaced by the ui-craftsman build.
+// PROTOTYPE (resume-soe.12) direction D "Dread": homepage.
+// One thin oversized line, a small figure in the void, grain, slate labels. Everything else is silence.
 import DirectionSwitcher from '../../../components/directions/DirectionSwitcher.astro';
+import DreadChrome from '../../../components/directions/d/DreadChrome.astro';
+const photo = '/img/jonatan_posing_rocks_no_bg.png';
 ---
 <!doctype html>
 <html lang="en">
@@ -8,12 +11,196 @@ import DirectionSwitcher from '../../../components/directions/DirectionSwitcher.
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex, nofollow" />
-    <title>Jonatan Snyders — direction D</title>
+    <title>Jonatan Snyders</title>
+    <meta name="description" content="Jonatan Snyders. From catwalks to startups, agent harnesses to existential dread." />
+    <!-- SHORTCUT: Google Fonts link instead of self-hosted fonts. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..300&family=IBM+Plex+Mono:wght@400;500&display=swap"
+    />
   </head>
   <body>
-    <h1>Jonatan Snyders</h1>
-    <p>From catwalks to startups, agent harnesses to existential dread.</p>
-    <img src="/img/jonatan_posing_rocks_no_bg.png" alt="Jonatan posing on rocks" width="600" height="600" />
+    <DreadChrome scene="Sc. 1 &middot; Int. Void &middot; Night" />
+
+    <main class="stage">
+      <h1 class="name">Jonatan Snyders</h1>
+
+      <!-- SHORTCUT: hard-coded line breaks; the four rows are tuned by eye, not measured. -->
+      <p class="line" aria-label="From catwalks to startups, agent harnesses to existential dread.">
+        <span class="row r1" aria-hidden="true">From catwalks</span>
+        <span class="row r2" aria-hidden="true">to startups,</span>
+        <span class="row r3" aria-hidden="true">agent harnesses to</span>
+        <span class="void" aria-hidden="true">
+          <span class="figure">
+            <span class="pool"></span>
+            <img class="cast" src={photo} alt="" width="500" height="499" />
+            <img class="body" src={photo} alt="Jonatan, full body, mid-stride in cycling bibs and pink crocs, alone in the dark." width="500" height="499" />
+            <img class="crocs" src={photo} alt="" width="500" height="499" />
+          </span>
+        </span>
+        <span class="row r4" aria-hidden="true">existential dread.</span>
+      </p>
+
+      <!-- SHORTCUT: hard-coded CTA copy; hover and focus-visible states styled but not screenshot-verified. -->
+      <nav class="exits" aria-label="Two ways out">
+        <a class="dd-link" href="/directions/d/resume/">what bores me</a>
+        <span class="aside">the résumé, in order of disappearance</span>
+        <a class="dd-link" href="/factory/">what excites me</a>
+        <span class="aside">the agent factory, still running</span>
+      </nav>
+    </main>
+
+    <footer class="end">
+      <!-- SHORTCUT: hard-coded footer copy. -->
+      <p>Nothing here is permanent. &copy; 2026</p>
+    </footer>
+
     <DirectionSwitcher current="d" page="home" />
   </body>
 </html>
+
+<style>
+  .stage {
+    position: relative;
+    overflow-x: clip;
+    display: flex;
+    flex-direction: column;
+    min-height: 100svh;
+    box-sizing: border-box;
+    padding: 0 1.75rem 4.5rem;
+  }
+
+  .name {
+    position: absolute;
+    top: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    margin: 0;
+    font: 400 0.6875rem/1 var(--dd-mono);
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--dd-quiet);
+    white-space: nowrap;
+  }
+
+  .line {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding-top: max(5.5rem, 12vh);
+    font-family: var(--dd-thin);
+    font-weight: 100;
+    font-stretch: 112%;
+    font-size: min(7.4vw, 12.5vh);
+    line-height: 1;
+    letter-spacing: -0.035em;
+    color: var(--dd-ink);
+  }
+  .row { display: block; white-space: nowrap; position: relative; z-index: 1; }
+  .r2 { padding-left: 1.5em; }
+  .r3 { padding-left: 0.55em; }
+  .r4 { margin-left: -0.06em; }
+
+  /* The void between "to" and "dread": a figure walks across it, toward the last word. */
+  .void {
+    position: relative;
+    display: block;
+    flex: 1;
+    min-height: 15rem;
+  }
+  .figure {
+    position: absolute;
+    left: 41%;
+    bottom: -0.02em;
+    height: min(36vh, 96%);
+    aspect-ratio: 500 / 499;
+  }
+  .figure img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .body {
+    filter: grayscale(1) brightness(0.62) contrast(1.08);
+  }
+  /* The only colour on the page: his crocs, washed pale. */
+  .crocs {
+    filter: saturate(0.55) brightness(0.95);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 82%, #000 85.5%);
+    mask-image: linear-gradient(to bottom, transparent 82%, #000 85.5%);
+  }
+  /* A long stage shadow, cast back across the lit floor, away from the light. */
+  .cast {
+    filter: brightness(0) blur(5px);
+    opacity: 0.85;
+    transform-origin: 50% 93%;
+    transform: scaleY(0.18) skewX(-62deg);
+  }
+  .pool {
+    position: absolute;
+    left: -70%;
+    right: -70%;
+    bottom: -12%;
+    height: 30%;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgba(233, 231, 226, 0.08), rgba(233, 231, 226, 0.02) 60%, transparent);
+  }
+
+  .exits {
+    position: absolute;
+    right: 1.75rem;
+    bottom: 5rem;
+    display: grid;
+    grid-template-columns: max-content;
+    justify-items: end;
+    text-align: right;
+    font-size: 0.8125rem;
+  }
+  .exits a { padding: 0.7rem 0 0.15rem; }
+  .aside {
+    font-size: 0.6875rem;
+    letter-spacing: 0.04em;
+    color: var(--dd-faint);
+  }
+
+  .end {
+    padding: 34vh 1.75rem 6rem;
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--dd-faint);
+  }
+  .end p { margin: 0; }
+
+  /* Slow arrival: rows surface one by one, the figure last, as if the lights were warming up. */
+  @media (prefers-reduced-motion: no-preference) {
+    .row, .figure, .exits { animation: dd-surface 2.6s var(--dd-ease) both; }
+    .r1 { animation-delay: 0.3s; }
+    .r2 { animation-delay: 0.9s; }
+    .r3 { animation-delay: 1.5s; }
+    .figure { animation-duration: 5s; animation-delay: 2s; }
+    .r4 { animation-duration: 4s; animation-delay: 3.4s; }
+    .exits { animation-delay: 4.8s; }
+    @keyframes dd-surface {
+      from { opacity: 0; filter: blur(6px); }
+      to { opacity: 1; filter: blur(0); }
+    }
+  }
+
+  @media (max-width: 760px) {
+    .stage { padding: 0 1.25rem; min-height: 0; }
+    .name { position: static; transform: none; padding-top: 3.5rem; letter-spacing: 0.24em; }
+    .line { padding-top: 9vh; font-size: 14vw; font-stretch: 80%; line-height: 1.02; letter-spacing: -0.03em; }
+    .r2 { padding-left: 1em; }
+    .r3 { padding-left: 0; }
+    .void { flex: none; height: 44vh; }
+    .figure { left: 26%; height: 30vh; }
+    .exits { position: static; justify-items: start; text-align: left; margin-top: 4rem; }
+    .exits .aside { margin-bottom: 0.75rem; }
+    .end { padding: 22vh 1.25rem 6.5rem; }
+  }
+</style>

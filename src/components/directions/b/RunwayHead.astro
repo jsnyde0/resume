@@ -1,0 +1,100 @@
+---
+/**
+ * PROTOTYPE (resume-soe.12), direction B "Runway": shared <head> pieces + global ground.
+ * Fonts: League Gothic (towering condensed masthead), Bodoni Moda (didone cover lines),
+ * IBM Plex Mono (issue details / labels). One accent: blood red.
+ */
+interface Props {
+  title: string;
+  description: string;
+}
+const { title, description } = Astro.props;
+---
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex, nofollow" />
+<title>{title}</title>
+<meta name="description" content={description} />
+<!-- SHORTCUT: Google Fonts CDN instead of self-hosted woff2 subsets; render-blocking stylesheet. -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=IBM+Plex+Mono:wght@400;500&family=League+Gothic&display=swap"
+/>
+
+<style is:global>
+  :root {
+    --rw-ink: #0a0909;
+    --rw-ink-2: #141212;
+    --rw-paper: #f3efe8;
+    --rw-mute: #a39d95;
+    --rw-line: rgba(243, 239, 232, 0.16);
+    --rw-red: #e3120b;
+    --rw-mast: 'League Gothic', 'Arial Narrow', sans-serif;
+    --rw-serif: 'Bodoni Moda', 'Didot', 'Bodoni 72', serif;
+    --rw-mono: 'IBM Plex Mono', ui-monospace, monospace;
+    --rw-ease: cubic-bezier(0.16, 1, 0.3, 1);
+    color-scheme: dark;
+  }
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+  html {
+    background: var(--rw-ink);
+  }
+  body {
+    margin: 0;
+    background: var(--rw-ink);
+    color: var(--rw-paper);
+    font-family: var(--rw-serif);
+    /* low optical size by default: Didone hairlines at display opsz vanish on black */
+    font-variation-settings: 'opsz' 14;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  a {
+    color: inherit;
+  }
+  :focus-visible {
+    outline: 2px solid var(--rw-red);
+    outline-offset: 4px;
+  }
+  .rw-label {
+    font-family: var(--rw-mono);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .rw-skip {
+    position: absolute;
+    left: 1rem;
+    top: -4rem;
+    z-index: 100;
+    padding: 0.75rem 1rem;
+    background: var(--rw-paper);
+    color: var(--rw-ink);
+    font-family: var(--rw-mono);
+    font-size: 0.75rem;
+    text-decoration: none;
+  }
+  .rw-skip:focus {
+    top: 1rem;
+  }
+  /* Reveal-on-load: opacity/transform only, never blocks reading (content is visible without JS). */
+  @media (prefers-reduced-motion: no-preference) {
+    .rw-rise {
+      animation: rw-rise 1.4s var(--rw-ease) both;
+      animation-delay: var(--d, 0ms);
+    }
+    @keyframes rw-rise {
+      from {
+        opacity: 0;
+        transform: translate3d(0, 2.5rem, 0);
+      }
+    }
+  }
+</style>

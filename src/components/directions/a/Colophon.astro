@@ -1,0 +1,38 @@
+---
+// PROTOTYPE (resume-soe.12) direction A "Broadsheet": footer set as a newspaper colophon.
+const year = new Date().getFullYear();
+---
+<footer class="col">
+  <div class="bs-sheet">
+    <div class="col-inner">
+      <p class="col-name">Jonatan Snyders</p>
+      <p class="bs-label">Printed in Berlin &middot; Set in Archivo, Newsreader &amp; Plex Mono &middot; &copy; {year}</p>
+      <p class="bs-label"><a href="mailto:jonatan.snyders@gmail.com">Letters to the editor</a></p>
+      <!-- SHORTCUT: contact email hard-coded (same address the live site uses). -->
+    </div>
+  </div>
+</footer>
+<style>
+  .col { margin-top: 96px; }
+  .col-inner {
+    border-top: var(--thick);
+    padding: 18px 0 8px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 32px;
+    align-items: baseline;
+    justify-content: space-between;
+  }
+  .col-name {
+    margin: 0;
+    font-family: var(--display);
+    font-weight: 900;
+    font-stretch: 125%;
+    text-transform: uppercase;
+    font-size: 20px;
+    letter-spacing: -0.01em;
+  }
+  .col p { margin: 0; }
+  .col a { text-decoration-thickness: 1px; text-underline-offset: 3px; }
+  .col a:hover { color: var(--signal-ink); }
+</style>

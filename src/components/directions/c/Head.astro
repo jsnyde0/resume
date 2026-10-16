@@ -1,0 +1,111 @@
+---
+// PROTOTYPE (resume-soe.12) — direction C "Sticker Sheet": shared <head> bits + global base styles.
+interface Props {
+  title: string;
+  description: string;
+}
+const { title, description } = Astro.props;
+---
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex, nofollow" />
+<title>{title}</title>
+<meta name="description" content={description} />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<!-- SHORTCUT: Google Fonts link instead of self-hosted fonts (Archivo variable width/weight + IBM Plex Mono). -->
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=IBM+Plex+Mono:wght@500;700&display=swap"
+/>
+
+<style is:global>
+  :root {
+    /* Three hard colours + black on a warm paper ground. Committed, used loud. */
+    --c-paper: #fff3dc;
+    --c-white: #fffdf7;
+    --c-ink: #121212;
+    --c-cobalt: #2347ff;
+    --c-sun: #ffc61a;
+    --c-tomato: #ff4f3a;
+
+    --line: 4px solid var(--c-ink);
+    --line-thin: 3px solid var(--c-ink);
+    --shadow: 6px 6px 0 var(--c-ink);
+    --shadow-lift: 10px 10px 0 var(--c-ink);
+    --ease: cubic-bezier(0.22, 1, 0.36, 1); /* ease-out-quint */
+
+    --f-display: 'Archivo', 'Arial Black', system-ui, sans-serif;
+    --f-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  }
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    background: var(--c-paper);
+    color: var(--c-ink);
+    -webkit-text-size-adjust: 100%;
+    overflow-x: clip; /* rotated stickers and the tape strip deliberately bleed past the edge */
+  }
+
+  body {
+    margin: 0;
+    font-family: var(--f-display);
+    font-variation-settings: 'wdth' 100;
+    font-size: 1.0625rem;
+    line-height: 1.5;
+    /* Faint halftone dots: the sheet the stickers sit on. */
+    background-image: radial-gradient(rgba(18, 18, 18, 0.09) 1.2px, transparent 1.3px);
+    background-size: 22px 22px;
+    overflow-x: hidden;
+  }
+
+  img {
+    max-width: 100%;
+    display: block;
+  }
+
+  a {
+    color: inherit;
+  }
+
+  :focus-visible {
+    outline: 4px solid var(--c-cobalt);
+    outline-offset: 4px;
+  }
+
+  .c-mono {
+    font-family: var(--f-mono);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .c-skip {
+    position: absolute;
+    left: 1rem;
+    top: -4rem;
+    z-index: 100;
+    padding: 0.75rem 1rem;
+    background: var(--c-sun);
+    border: var(--line);
+    font-family: var(--f-mono);
+    font-weight: 700;
+  }
+  .c-skip:focus {
+    top: 1rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      transition: none !important;
+      animation: none !important;
+    }
+  }
+</style>

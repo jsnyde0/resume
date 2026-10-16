@@ -1,0 +1,102 @@
+---
+/**
+ * PROTOTYPE (resume-soe.12) direction D "Dread": shared chrome for both D pages.
+ * Film-slate corner labels, the grain (body background), and the global base styles (ground, fonts, links).
+ * SHORTCUT: slate labels are faked copy (reel / take / coordinates), not data-driven.
+ */
+interface Props {
+  scene: string;
+}
+const { scene } = Astro.props;
+---
+
+<div class="dd-slate" aria-hidden="true">
+  <span class="dd-corner dd-tl">{scene}</span>
+  <span class="dd-corner dd-tr">Roll 01 &middot; Take 37</span>
+  <span class="dd-corner dd-bl">Berlin &middot; 52.52&deg;N 13.40&deg;E</span>
+  <span class="dd-corner dd-br">TC <span data-dd-tc>00:00:00:00</span></span>
+</div>
+
+<style is:global>
+  :root {
+    --dd-ground: #0b0b0b;
+    --dd-ink: #e9e7e2;
+    --dd-quiet: #a3a19c;
+    --dd-faint: #9a9a9a;
+    --dd-hair: rgba(233, 231, 226, 0.22);
+    /* The single accent: the pale pink of the crocs. */
+    --dd-pale: #e7b9d3;
+    --dd-thin: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
+    --dd-mono: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace;
+    --dd-ease: cubic-bezier(0.16, 1, 0.3, 1);
+    color-scheme: dark;
+  }
+  html { background: var(--dd-ground); }
+  /* Grain: static feTurbulence noise tiled over the whole document, baked into the body background. */
+  body {
+    margin: 0;
+    background-color: var(--dd-ground);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.9 -0.42'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.16'/%3E%3C/svg%3E");
+    color: var(--dd-ink);
+    font-family: var(--dd-mono);
+    font-size: 0.8125rem;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  ::selection { background: var(--dd-pale); color: #0b0b0b; }
+  a { color: inherit; }
+  :focus-visible { outline: 1px solid var(--dd-pale); outline-offset: 4px; }
+
+  .dd-link {
+    font-family: var(--dd-mono);
+    color: var(--dd-ink);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.35em;
+    text-decoration-color: rgba(233, 231, 226, 0.45);
+    transition: text-decoration-color 0.6s var(--dd-ease), color 0.6s var(--dd-ease);
+  }
+  .dd-link:hover { text-decoration-color: var(--dd-pale); color: #fff; }
+
+  .dd-corner {
+    position: fixed;
+    z-index: 40;
+    font: 400 0.6875rem/1 var(--dd-mono);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--dd-faint);
+    font-variant-numeric: tabular-nums;
+  }
+  .dd-corner a { text-decoration: none; }
+  .dd-tl { top: 1.5rem; left: 1.75rem; }
+  .dd-tr { top: 1.5rem; right: 1.75rem; }
+  .dd-bl { bottom: 1.5rem; left: 1.75rem; }
+  .dd-br { bottom: 1.5rem; right: 1.75rem; }
+
+  /* Narrow screens: the switcher owns the bottom edge, so the slate keeps only its top corners. */
+  @media (max-width: 760px) {
+    .dd-corner { position: absolute; font-size: 0.625rem; letter-spacing: 0.1em; }
+    .dd-tl { top: 1.125rem; left: 1.25rem; }
+    .dd-tr { top: 1.125rem; right: 1.25rem; }
+    .dd-bl, .dd-br { display: none; }
+  }
+
+</style>
+
+<script>
+  // SHORTCUT: fake timecode (time since page load), runs a rAF loop forever; cosmetic only.
+  // Timecode since arrival, 24 fps. Text only, no movement.
+  const el = document.querySelector<HTMLElement>('[data-dd-tc]');
+  if (el) {
+    const t0 = performance.now();
+    const pad = (n: number) => String(n).padStart(2, '0');
+    const tick = () => {
+      const ms = performance.now() - t0;
+      const s = Math.floor(ms / 1000);
+      el.textContent = `${pad(Math.floor(s / 3600))}:${pad(Math.floor(s / 60) % 60)}:${pad(s % 60)}:${pad(Math.floor((ms % 1000) / (1000 / 24)))}`;
+      requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }
+</script>

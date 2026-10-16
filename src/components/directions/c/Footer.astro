@@ -1,0 +1,36 @@
+---
+// PROTOTYPE (resume-soe.12) — direction C footer: one black tape strip.
+const year = new Date().getFullYear();
+---
+<footer class="ftr">
+  <p class="c-mono">Jonatan Snyders &middot; Berlin &middot; {year}</p>
+  <p class="c-mono">
+    <a href="/directions/c/">Home</a> / <a href="/directions/c/resume/">Resume</a> / <a href="/factory/">Factory</a>
+  </p>
+</footer>
+
+<style>
+  .ftr {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.5rem 2rem;
+    margin-top: clamp(4rem, 10vw, 8rem);
+    padding: 1.5rem clamp(1rem, 4vw, 3rem) 6rem; /* bottom room for the floating review switcher */
+    background: var(--c-ink);
+    color: var(--c-paper);
+    font-size: 0.85rem;
+  }
+  p {
+    margin: 0;
+  }
+  a {
+    display: inline-block;
+    padding: 0.6rem 0.15rem;
+    text-underline-offset: 4px;
+    text-decoration-thickness: 2px;
+  }
+  a:hover {
+    color: var(--c-sun);
+  }
+</style>

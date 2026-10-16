@@ -1,19 +1,230 @@
 ---
-// PROTOTYPE (resume-soe.12) — direction A homepage. STUB: replaced by the ui-craftsman build.
+// PROTOTYPE (resume-soe.12) direction A "Broadsheet": homepage set as a newspaper front page.
 import DirectionSwitcher from '../../../components/directions/DirectionSwitcher.astro';
+import Head from '../../../components/directions/a/Head.astro';
+import Masthead from '../../../components/directions/a/Masthead.astro';
+import Colophon from '../../../components/directions/a/Colophon.astro';
+import { resumeIntro } from '../../../data/resume';
+
+// SHORTCUT: headline, kicker, byline and jump-line copy are hard-coded prototype copy, not from src/data.
+const headline = ['Local man', 'teaches', 'machines', 'to do his job'];
 ---
 <!doctype html>
 <html lang="en">
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="robots" content="noindex, nofollow" />
-    <title>Jonatan Snyders — direction A</title>
+    <Head title="Jonatan Snyders: front page (direction A, Broadsheet)" />
   </head>
   <body>
-    <h1>Jonatan Snyders</h1>
-    <p>From catwalks to startups, agent harnesses to existential dread.</p>
-    <img src="/img/jonatan_posing_rocks_no_bg.png" alt="Jonatan posing on rocks" width="600" height="600" />
+    <Masthead page="home" />
+    <main class="bs-sheet fp">
+      <article class="lead" aria-labelledby="lead-hed">
+        <p class="lead-kicker bs-label"><span class="lead-flag">Profile</span> Agentic engineering &middot; Berlin edition</p>
+        <h1 class="lead-hed" id="lead-hed">
+          {headline.map((line, i) => <span class="lead-line" style={`--i:${i}`}>{line}</span>)}
+        </h1>
+        <figure class="lead-photo">
+          <img
+            src="/img/jonatan_posing_rocks_no_bg.png"
+            alt="Jonatan Snyders mid-stride in cycling bib shorts, a lime T-shirt, sunglasses and pink clogs, striking a pose."
+            width="500"
+            height="499"
+            fetchpriority="high"
+          />
+        </figure>
+        <p class="lead-deck">From catwalks to startups, agent harnesses to existential dread.</p>
+      </article>
+
+      <section class="story" aria-label="The story">
+        <p class="story-byline bs-label">By Jonatan Snyders &middot; subject, writer and editor</p>
+        <div class="story-body">
+          {resumeIntro.paragraphs.map((p) => <p>{p}</p>)}
+        </div>
+        <nav class="jumps" aria-label="Inside this edition">
+          <h2 class="jumps-head bs-label">Inside</h2>
+          <a class="jump" href="/directions/a/resume/">
+            <span class="jump-page bs-label">p. 2</span>
+            <span class="jump-hed">What bores me</span>
+            <span class="jump-dek">The record: every job, degree and startup, typeset in full.</span>
+            <span class="jump-arrow" aria-hidden="true">&rarr;</span>
+          </a>
+          <a class="jump" href="/factory/">
+            <span class="jump-page bs-label">p. 3</span>
+            <span class="jump-hed">What excites me</span>
+            <span class="jump-dek">The factory: the agent harness I build that builds things.</span>
+            <span class="jump-arrow" aria-hidden="true">&rarr;</span>
+          </a>
+        </nav>
+      </section>
+    </main>
+    <Colophon />
     <DirectionSwitcher current="a" page="home" />
   </body>
 </html>
+
+<style>
+  .fp { overflow-x: clip; }
+
+  /* ---------- lead: headline + photo standing on the signal rule ---------- */
+  .lead {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: 24px;
+    padding-top: 28px;
+    border-bottom: 10px solid var(--signal);
+  }
+  .lead-kicker {
+    grid-column: 1 / 6;
+    grid-row: 1;
+    align-self: end;
+    margin: 0 0 14px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+  .lead-flag {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 4px 8px;
+  }
+  .lead-hed {
+    grid-column: 1 / 10;
+    grid-row: 2;
+    margin: 0;
+    font-family: var(--display);
+    font-weight: 900;
+    font-stretch: 62%;
+    text-transform: uppercase;
+    font-size: clamp(72px, 13.2vw, 210px);
+    line-height: 0.84;
+    letter-spacing: -0.01em;
+    position: relative;
+    z-index: 1;
+  }
+  .lead-line { display: block; }
+  .lead-photo {
+    grid-column: 6 / -1;
+    grid-row: 1 / 4;
+    align-self: end;
+    /* bleeds past the sheet edge; feet planted on the signal rule (PNG has ~2.8% transparent floor) */
+    margin: 0 calc(-1 * var(--gutter) - 9vw) -3.4% 0;
+    position: relative;
+    z-index: 2;
+    pointer-events: none;
+  }
+  .lead-photo img {
+    display: block;
+    width: 100%;
+    height: auto;
+    /* SHORTCUT: source PNG is only 500px wide, so it is upscaled ~1.7x here and reads soft. Needs a high-res cut-out. */
+  }
+  .lead-deck {
+    grid-column: 1 / 7;
+    grid-row: 3;
+    align-self: end;
+    margin: 32px 0 36px;
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(26px, 2.9vw, 44px);
+    line-height: 1.12;
+    letter-spacing: -0.01em;
+    max-width: 18ch;
+    position: relative;
+    z-index: 3;
+  }
+
+  /* ---------- story: byline, columns, jump lines ---------- */
+  .story {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: 24px;
+    padding-top: 20px;
+  }
+  .story-byline {
+    grid-column: 1 / -1;
+    margin: 0 0 22px;
+    padding-bottom: 10px;
+    border-bottom: var(--hair);
+  }
+  .story-body {
+    grid-column: 1 / 8;
+    columns: 2;
+    column-gap: 40px;
+    column-rule: var(--hair);
+    align-self: start;
+    font-size: 18px;
+    line-height: 1.52;
+    hyphens: auto;
+  }
+  .story-body p { margin: 0 0 0.9em; text-wrap: pretty; }
+  .story-body p:first-child { font-size: 1.22em; line-height: 1.35; }
+  .story-body p:first-child::first-line { font-variant-caps: all-small-caps; letter-spacing: 0.04em; }
+  .jumps {
+    grid-column: 9 / -1;
+    align-self: start;
+    border-top: var(--thick);
+  }
+  .jumps-head { margin: 0; padding: 10px 0; border-bottom: var(--hair); }
+  .jump {
+    display: grid;
+    grid-template-columns: 48px 1fr 40px;
+    grid-template-areas: 'page hed arrow' '. dek arrow';
+    column-gap: 12px;
+    padding: 18px 0 20px;
+    border-bottom: var(--hair);
+    text-decoration: none;
+    transition: background-color 180ms var(--ease), color 180ms var(--ease);
+  }
+  .jump-page { grid-area: page; padding-top: 8px; }
+  .jump-hed {
+    grid-area: hed;
+    font-family: var(--display);
+    font-weight: 900;
+    font-stretch: 75%;
+    text-transform: uppercase;
+    font-size: clamp(34px, 3.2vw, 48px);
+    line-height: 0.95;
+  }
+  .jump-dek { grid-area: dek; margin-top: 8px; font-size: 16px; line-height: 1.4; color: var(--ink-2); }
+  .jump-arrow {
+    grid-area: arrow;
+    align-self: center;
+    font-family: var(--mono);
+    font-size: 28px;
+    transition: transform 220ms var(--ease);
+  }
+  .jump:hover { background: var(--ink); color: var(--paper); }
+  .jump:hover .jump-dek { color: var(--paper); }
+  .jump:hover .jump-arrow { transform: translateX(-6px); color: var(--signal); }
+  .jump:focus-visible { outline-offset: -3px; }
+
+  /* ---------- load motion ---------- */
+  @media (prefers-reduced-motion: no-preference) {
+    .lead-line { animation: rise 700ms var(--ease) both; animation-delay: calc(var(--i) * 70ms); }
+    .lead-photo { animation: stride 900ms var(--ease) 180ms both; }
+    @keyframes rise { from { transform: translateY(0.35em); opacity: 0; } }
+    @keyframes stride { from { transform: translateX(8%); opacity: 0; } }
+  }
+
+  /* ---------- tablet ---------- */
+  @media (max-width: 960px) {
+    .story-body { grid-column: 1 / -1; }
+    .jumps { grid-column: 1 / -1; margin-top: 32px; }
+  }
+
+  /* ---------- phone ---------- */
+  @media (max-width: 640px) {
+    .lead { padding-top: 20px; }
+    .lead-kicker { grid-column: 1 / -1; }
+    .lead-hed { grid-column: 1 / -1; font-size: 21vw; line-height: 0.85; }
+    .lead-photo {
+      grid-column: 1 / -1;
+      grid-row: 3;
+      margin: -30vw -24vw 0 -2vw;
+    }
+    .lead-deck { grid-column: 1 / -1; grid-row: 4; font-size: 28px; margin: 20px 0 28px; max-width: 16ch; }
+    .story-body { columns: 1; font-size: 17px; }
+    .jump { grid-template-columns: 40px 1fr 28px; }
+  }
+</style>

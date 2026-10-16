@@ -1,19 +1,373 @@
 ---
-// PROTOTYPE (resume-soe.12) — direction C homepage. STUB: replaced by the ui-craftsman build.
+// PROTOTYPE (resume-soe.12) — direction C "Sticker Sheet" homepage.
 import DirectionSwitcher from '../../../components/directions/DirectionSwitcher.astro';
+import Head from '../../../components/directions/c/Head.astro';
+import Header from '../../../components/directions/c/Header.astro';
+import Footer from '../../../components/directions/c/Footer.astro';
+import { resumeIntro } from '../../../data/resume';
+
+const tape = resumeIntro.headlineBadges;
 ---
 <!doctype html>
 <html lang="en">
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="robots" content="noindex, nofollow" />
-    <title>Jonatan Snyders — direction C</title>
+    <Head
+      title="Jonatan Snyders · direction C, Sticker Sheet"
+      description="Jonatan Snyders: from catwalks to startups, agent harnesses to existential dread."
+    />
   </head>
   <body>
-    <h1>Jonatan Snyders</h1>
-    <p>From catwalks to startups, agent harnesses to existential dread.</p>
-    <img src="/img/jonatan_posing_rocks_no_bg.png" alt="Jonatan posing on rocks" width="600" height="600" />
+    <Header page="home" />
+
+    <main id="main">
+      <section class="hero" aria-labelledby="name">
+        <div class="copy">
+          <!-- SHORTCUT: hard-coded "Hi, I'm" sticker copy. -->
+          <p class="hi c-mono" aria-hidden="true">Hi, I'm</p>
+          <h1 id="name" class="name">
+            <span class="name-1">Jonatan</span>
+            <span class="name-2">Snyders</span>
+          </h1>
+
+          <p class="bubble">From catwalks to startups, agent harnesses to existential dread.</p>
+
+          <div class="ctas">
+            <!-- SHORTCUT: hard-coded CTA labels/subtitles, rewording of the live site's pair. -->
+            <a class="cta cta-bores" href="/directions/c/resume/">
+              <span class="cta-kicker c-mono">The resume</span>
+              <span class="cta-label">What bores me</span>
+            </a>
+            <a class="cta cta-excites" href="/factory/">
+              <span class="cta-kicker c-mono">The agent factory</span>
+              <span class="cta-label">What excites me</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="art">
+          <div class="disc" aria-hidden="true"></div>
+          <div class="burst" aria-hidden="true"></div>
+          <img
+            class="photo"
+            src="/img/jonatan_posing_rocks_no_bg.png"
+            alt="Jonatan, full body, posing on rocks in a dark shirt and jeans"
+            width="500"
+            height="499"
+            fetchpriority="high"
+          />
+          <!-- SHORTCUT: decorative location sticker, hard-coded. -->
+          <p class="loc c-mono">Based in<br /><strong>Berlin</strong></p>
+        </div>
+      </section>
+
+      <!-- SHORTCUT: marquee has no pause control (WCAG 2.2.2); only prefers-reduced-motion stops it. List is duplicated for the seamless loop, second copy aria-hidden. -->
+      <section class="tape-wrap" aria-label="Things I have been">
+        <ul class="tape">
+          {tape.concat(tape).map((t, i) => (
+            <li aria-hidden={i >= tape.length ? 'true' : undefined}>{t}</li>
+          ))}
+        </ul>
+      </section>
+    </main>
+
+    <Footer />
     <DirectionSwitcher current="c" page="home" />
   </body>
 </html>
+
+<style>
+  .hero {
+    position: relative;
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: clamp(1rem, 3vw, 2.5rem) clamp(1rem, 4vw, 3rem) clamp(3rem, 6vw, 5rem);
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    gap: clamp(2rem, 4vw, 4rem);
+    align-items: center;
+  }
+
+  /* Copy sits above the photo sticker: the SNYDERS block is allowed to overlap the disc, collage-style. */
+  .copy {
+    position: relative;
+    z-index: 2;
+  }
+
+  .hi {
+    display: inline-block;
+    margin: 0 0 1rem;
+    padding: 0.35rem 0.9rem;
+    background: var(--c-sun);
+    border: var(--line-thin);
+    border-radius: 999px;
+    box-shadow: 3px 3px 0 var(--c-ink);
+    transform: rotate(-4deg);
+    font-size: 0.95rem;
+  }
+
+  .name {
+    margin: 0;
+    font-weight: 900;
+    font-variation-settings: 'wdth' 125;
+    text-transform: uppercase;
+    line-height: 0.86;
+    letter-spacing: -0.02em;
+    font-size: clamp(3.4rem, 9.2vw, 9.5rem);
+  }
+  .name span {
+    display: block;
+    width: fit-content;
+  }
+  .name-2 {
+    margin-top: 0.12em;
+    padding: 0.06em 0.18em 0.1em;
+    background: var(--c-cobalt);
+    color: var(--c-paper);
+    border: var(--line);
+    box-shadow: var(--shadow);
+    transform: rotate(-2deg) translateX(0.1em);
+  }
+
+  .bubble {
+    position: relative;
+    max-width: 30ch;
+    margin: clamp(2.5rem, 4vw, 3.5rem) 0 0;
+    padding: 1.4rem 1.6rem;
+    background: var(--c-white);
+    border: var(--line);
+    border-radius: 28px;
+    box-shadow: var(--shadow);
+    font-size: clamp(1.3rem, 2.1vw, 1.75rem);
+    font-weight: 800;
+    font-variation-settings: 'wdth' 92;
+    line-height: 1.2;
+    transform: rotate(1.5deg);
+  }
+  /* Speech-bubble tail pointing at the photo (right). Two stacked triangles: outline + fill. */
+  .bubble::before,
+  .bubble::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    border-style: solid;
+  }
+  .bubble::before {
+    right: -34px;
+    margin-top: -18px;
+    border-width: 18px 0 18px 34px;
+    border-color: transparent transparent transparent var(--c-ink);
+  }
+  .bubble::after {
+    right: -25px;
+    margin-top: -12px;
+    border-width: 12px 0 12px 24px;
+    border-color: transparent transparent transparent var(--c-white);
+  }
+
+  .ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.25rem 1.5rem;
+    margin-top: clamp(2.5rem, 4vw, 3.5rem);
+  }
+  .cta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    min-height: 44px;
+    padding: 1rem 1.5rem 1.1rem;
+    border: var(--line);
+    box-shadow: var(--shadow);
+    text-decoration: none;
+    transition: transform 240ms var(--ease), box-shadow 240ms var(--ease);
+  }
+  .cta-kicker {
+    font-size: 0.78rem;
+  }
+  .cta-label {
+    font-weight: 900;
+    font-variation-settings: 'wdth' 112;
+    font-size: clamp(1.35rem, 2vw, 1.7rem);
+    line-height: 1.05;
+  }
+  .cta-label::after {
+    content: ' \2192';
+  }
+  .cta-bores {
+    background: var(--c-sun);
+    border-radius: 18px;
+    transform: rotate(-3deg);
+  }
+  .cta-excites {
+    background: var(--c-tomato);
+    border-radius: 999px;
+    padding-inline: 2rem;
+    transform: rotate(2.5deg);
+  }
+  .cta:hover {
+    transform: translate(-4px, -4px) rotate(0deg);
+    box-shadow: var(--shadow-lift);
+  }
+  .cta:active {
+    transform: translate(3px, 3px) rotate(0deg);
+    box-shadow: 2px 2px 0 var(--c-ink);
+  }
+
+  /* ---------- photo sticker ---------- */
+  .art {
+    position: relative;
+    aspect-ratio: 1 / 1.08;
+    width: 100%;
+    max-width: 560px;
+    justify-self: center;
+  }
+  .disc {
+    position: absolute;
+    inset: 10% 2% 0 2%;
+    border-radius: 50%;
+    background: var(--c-sun);
+    border: var(--line);
+    box-shadow: 10px 10px 0 var(--c-ink);
+  }
+  /* Cobalt starburst peeking out behind the disc. */
+  .burst {
+    position: absolute;
+    width: 34%;
+    aspect-ratio: 1;
+    top: 0;
+    right: -4%;
+    background: var(--c-cobalt);
+    clip-path: polygon(
+      50% 0%, 61% 18%, 82% 8%, 80% 30%, 100% 38%, 84% 54%, 96% 74%, 74% 76%,
+      70% 98%, 52% 84%, 34% 100%, 28% 78%, 6% 80%, 16% 60%, 0% 42%, 20% 32%, 14% 10%, 36% 16%
+    );
+    transform: rotate(12deg);
+  }
+  /* Die-cut sticker edge: hard white outline then hard black outline, zero blur. */
+  .photo {
+    position: absolute;
+    left: 50%;
+    bottom: 1%;
+    width: 92%;
+    height: auto;
+    transform: translateX(-50%) rotate(-3deg);
+    filter: drop-shadow(4px 0 0 var(--c-white)) drop-shadow(-4px 0 0 var(--c-white))
+      drop-shadow(0 4px 0 var(--c-white)) drop-shadow(0 -4px 0 var(--c-white))
+      drop-shadow(3px 0 0 var(--c-ink)) drop-shadow(-3px 0 0 var(--c-ink))
+      drop-shadow(0 3px 0 var(--c-ink)) drop-shadow(0 -3px 0 var(--c-ink));
+  }
+  .loc {
+    position: absolute;
+    left: -2%;
+    bottom: 12%;
+    margin: 0;
+    padding: 0.7rem 1rem;
+    background: var(--c-tomato);
+    border: var(--line-thin);
+    border-radius: 12px;
+    box-shadow: 4px 4px 0 var(--c-ink);
+    font-size: 0.8rem;
+    line-height: 1.25;
+    transform: rotate(-9deg);
+  }
+  .loc strong {
+    font-family: var(--f-display);
+    font-weight: 900;
+    font-variation-settings: 'wdth' 125;
+    font-size: 1.35rem;
+    letter-spacing: 0;
+  }
+
+  /* ---------- tape strip ---------- */
+  .tape-wrap {
+    overflow: hidden;
+    padding: 2rem 0;
+  }
+  .tape {
+    display: flex;
+    gap: 0;
+    width: max-content;
+    margin: 0 -2rem;
+    padding: 0;
+    list-style: none;
+    background: var(--c-ink);
+    color: var(--c-sun);
+    border-block: var(--line);
+    transform: rotate(-1.5deg);
+    animation: slide 38s linear infinite;
+  }
+  .tape li {
+    padding: 0.9rem 1.5rem;
+    font-weight: 900;
+    font-variation-settings: 'wdth' 125;
+    text-transform: uppercase;
+    font-size: clamp(1.4rem, 2.6vw, 2.2rem);
+    white-space: nowrap;
+  }
+  .tape li::after {
+    content: '\2605';
+    margin-left: 3rem;
+    color: var(--c-tomato);
+  }
+  @keyframes slide {
+    from {
+      transform: rotate(-1.5deg) translateX(0);
+    }
+    to {
+      transform: rotate(-1.5deg) translateX(-50%);
+    }
+  }
+
+  /* ---------- narrow ---------- */
+  @media (max-width: 860px) {
+    .hero {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .name-2 {
+      transform: rotate(-2deg);
+    }
+    .art {
+      order: -1;
+      max-width: 420px;
+      width: 88%;
+    }
+    .bubble::before,
+    .bubble::after {
+      /* Tail flips to point up at the photo above. */
+      top: auto;
+      right: auto;
+      left: 2.5rem;
+      margin-top: 0;
+    }
+    .bubble::before {
+      top: -34px;
+      border-width: 0 18px 34px 18px;
+      border-color: transparent transparent var(--c-ink) transparent;
+    }
+    .bubble::after {
+      top: -24px;
+      left: calc(2.5rem + 6px);
+      border-width: 0 12px 24px 12px;
+      border-color: transparent transparent var(--c-white) transparent;
+    }
+  }
+  @media (max-width: 480px) {
+    .loc {
+      left: -6%;
+      bottom: 2%;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.7rem;
+    }
+    .loc strong {
+      font-size: 1.05rem;
+    }
+    .name {
+      font-size: clamp(2.4rem, 12vw, 4rem);
+    }
+    /* Tilted stickers need a few px of air so their hard shadows don't hit the viewport edge. */
+    .bubble,
+    .cta {
+      width: calc(100% - 12px);
+    }
+  }
+</style>

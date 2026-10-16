@@ -1,7 +1,25 @@
 ---
-// PROTOTYPE (resume-soe.12) — direction D resume slice. STUB: replaced by the ui-craftsman build.
+// PROTOTYPE (resume-soe.12) direction D "Dread": resume slice.
+// A ledger read like end credits: one hairline down the page, a thin year per job, long silences between.
 import DirectionSwitcher from '../../../components/directions/DirectionSwitcher.astro';
+import DreadChrome from '../../../components/directions/d/DreadChrome.astro';
 import { workExperience, education } from '../../../data/resume';
+import { skillFiles } from '../../../data/resume-skills';
+
+const span = (range: string) => {
+  const years = range.match(/\d{4}/g) ?? [];
+  const open = /\.\.\./.test(range);
+  return { from: years[0] ?? range, to: open ? 'now' : years[1] ?? '' };
+};
+
+// Skills grouped by folder, in data order.
+const skillGroups: { folder: string; files: string[] }[] = [];
+for (const f of skillFiles) {
+  const g = skillGroups.find((x) => x.folder === f.folder);
+  if (g) g.files.push(f.filename);
+  else skillGroups.push({ folder: f.folder, files: [f.filename] });
+}
+const label = (folder: string) => folder.replace(/-/g, ' ');
 ---
 <!doctype html>
 <html lang="en">
@@ -9,12 +27,313 @@ import { workExperience, education } from '../../../data/resume';
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex, nofollow" />
-    <title>Resume — direction D</title>
+    <title>The record. Jonatan Snyders</title>
+    <!-- SHORTCUT: Google Fonts link instead of self-hosted fonts. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..300&family=IBM+Plex+Mono:wght@400;500&display=swap"
+    />
+    <script is:inline>
+      // Hide-until-revealed only when JS runs and motion is welcome; otherwise everything is simply there.
+      if (window.matchMedia('(prefers-reduced-motion: no-preference)').matches) {
+        document.documentElement.classList.add('dd-anim');
+      }
+    </script>
   </head>
   <body>
-    <h1>Resume</h1>
-    {workExperience.map((w) => <p>{w.dateRange} — {w.title} ({w.company})</p>)}
-    {education.map((e) => <p>{e.dateRange} — {e.title} ({e.company})</p>)}
+    <DreadChrome scene="Sc. 2 &middot; Int. Archive &middot; Late" />
+
+    <header class="head">
+      <a class="dd-link" href="/directions/d/">back to the void</a>
+      <h1>The record</h1>
+      <!-- SHORTCUT: hard-coded intro copy. -->
+      <p class="lede">Jonatan Snyders. Everything done for money, most recent first. Scroll slowly; nobody is waiting.</p>
+    </header>
+
+    <main>
+      <div class="axis">
+      <section class="ledger" aria-labelledby="work-h">
+        <h2 id="work-h" class="sr-only">Work</h2>
+        <ol>
+          {workExperience.map((job, i) => {
+            const s = span(job.dateRange);
+            return (
+              <li class:list={['entry', 'dd-reveal', { now: i === 0 }]}>
+                <p class="when">
+                  <span class="year">{s.from}</span>
+                  <span class="until">{s.to ? `to ${s.to}` : ''}</span>
+                </p>
+                <div class="what">
+                  <p class="role">{job.role}</p>
+                  <h3>{job.title.trim()}</h3>
+                  <p class="where">{job.company}, {job.location}</p>
+                  <p class="body" set:html={job.body} />
+                  {job.links?.map((l) => (
+                    <a class="dd-link out" href={l.href} rel="noopener">{l.label}</a>
+                  ))}
+                </div>
+              </li>
+            );
+          })}
+        </ol>
+      </section>
+
+      <section class="credits dd-reveal" aria-labelledby="credits-h">
+        <h2 id="credits-h">Credits</h2>
+        <div class="cols">
+          <div class="col edu">
+            <h3>Education</h3>
+            <dl>
+              {education.map((e) => (
+                <div class="credit">
+                  <dt>{e.title.trim()}</dt>
+                  <dd>{e.company}, {e.dateRange.replace(' - ...', ', ongoing').replace(' - ', ' to ')}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+          <div class="col skills">
+            <h3>Skills</h3>
+            <dl>
+              {skillGroups.map((g) => (
+                <div class="credit">
+                  <dt>{label(g.folder)}</dt>
+                  {g.files.map((f) => <dd>{f}</dd>)}
+                </div>
+              ))}
+            </dl>
+          </div>
+        </div>
+      </section>
+      </div>
+
+      <section class="fin dd-reveal" aria-label="End">
+        <!-- SHORTCUT: hard-coded closing copy. -->
+        <p class="fin-word">Fin.</p>
+        <p class="fin-links">
+          <a class="dd-link" href="/factory/">what excites me instead</a>
+          <a class="dd-link" href="/directions/d/">back to the void</a>
+        </p>
+      </section>
+    </main>
+
     <DirectionSwitcher current="d" page="resume" />
+
+    <script>
+      // SHORTCUT: reveal state is never undone and has no no-JS fallback beyond "visible by default".
+      // Slow reveal on scroll. Skipped entirely under reduced motion (the dd-anim class is never set).
+      if (document.documentElement.classList.contains('dd-anim')) {
+        const io = new IntersectionObserver(
+          (entries) => {
+            for (const e of entries) {
+              if (e.isIntersecting) {
+                e.target.classList.add('is-in');
+                io.unobserve(e.target);
+              }
+            }
+          },
+          { rootMargin: '0px 0px -18% 0px' },
+        );
+        document.querySelectorAll('.dd-reveal').forEach((el) => io.observe(el));
+      }
+    </script>
   </body>
 </html>
+
+<style>
+  /* The axis: one hairline down the page. Years hang left of it, everything else sits right. */
+  :root { --axis: 41vw; --gutter: 2.75rem; }
+
+  .sr-only {
+    position: absolute; width: 1px; height: 1px; overflow: hidden;
+    clip: rect(0 0 0 0); white-space: nowrap;
+  }
+
+  body { overflow-x: clip; }
+  .axis { position: relative; }
+  .axis::before {
+    content: '';
+    position: absolute;
+    top: -16vh;
+    bottom: 12vh;
+    left: var(--axis);
+    width: 1px;
+    background: var(--dd-hair);
+  }
+
+  .head {
+    min-height: 78svh;
+    box-sizing: border-box;
+    padding: 30vh 1.75rem 0 calc(var(--axis) + var(--gutter));
+  }
+  .head a { font-size: 0.75rem; display: inline-block; padding: 0.6rem 0; }
+  .head h1 {
+    margin: 2.5rem 0 0.75rem;
+    font: 400 0.6875rem/1 var(--dd-mono);
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--dd-quiet);
+  }
+  .lede {
+    max-width: 34ch;
+    margin: 0;
+    font: 200 1.375rem/1.35 var(--dd-thin);
+    font-stretch: 108%;
+    color: var(--dd-ink);
+  }
+
+  .ledger ol { list-style: none; margin: 0; padding: 0; }
+  .entry {
+    position: relative;
+    display: grid;
+    grid-template-columns: var(--axis) 1fr;
+    padding-bottom: 42vh;
+  }
+  /* A tick where each entry touches the axis; the current one is the page's single spot of colour. */
+  .entry::before {
+    content: '';
+    position: absolute;
+    left: calc(var(--axis) - 0.5rem);
+    top: 3.4vw;
+    width: 1rem;
+    height: 1px;
+    background: var(--dd-ink);
+  }
+  .entry.now::before { background: var(--dd-pale); }
+
+  .when {
+    margin: 0;
+    padding-right: var(--gutter);
+    text-align: right;
+  }
+  .year {
+    display: block;
+    font-family: var(--dd-thin);
+    font-weight: 100;
+    font-stretch: 115%;
+    font-size: 9.5vw;
+    line-height: 0.8;
+    letter-spacing: -0.04em;
+    font-variant-numeric: lining-nums;
+    color: var(--dd-ink);
+  }
+  .until {
+    display: block;
+    margin-top: 1.25rem;
+    font-size: 0.6875rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--dd-faint);
+  }
+
+  .what {
+    max-width: 38ch;
+    padding: 0.4vw 1.75rem 0 var(--gutter);
+  }
+  .role {
+    margin: 0 0 1rem;
+    font-size: 0.6875rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--dd-faint);
+  }
+  .what h3 {
+    margin: 0 0 0.5rem;
+    font: 300 1.5rem/1.2 var(--dd-thin);
+    font-stretch: 106%;
+    letter-spacing: -0.005em;
+    color: var(--dd-ink);
+  }
+  .where {
+    margin: 0 0 1.5rem;
+    font-size: 0.75rem;
+    color: var(--dd-quiet);
+  }
+  .body {
+    margin: 0 0 1rem;
+    font-size: 0.8125rem;
+    line-height: 1.7;
+    color: var(--dd-quiet);
+  }
+  .out { display: inline-block; font-size: 0.75rem; padding: 0.6rem 0; }
+
+  /* Credits: tiny mono in two columns that meet at the axis, like the roll at the end of a film. */
+  .credits { padding: 4vh 1.75rem 30vh; }
+  .credits > h2 {
+    margin: 0 0 6rem;
+    padding-left: calc(var(--axis) + var(--gutter) - 1.75rem);
+    font: 400 0.6875rem/1 var(--dd-mono);
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--dd-quiet);
+  }
+  .cols {
+    display: grid;
+    grid-template-columns: calc(var(--axis) - 1.75rem) 1fr;
+  }
+  .col h3 {
+    margin: 0 0 2.5rem;
+    font: 500 0.6875rem/1 var(--dd-mono);
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--dd-ink);
+  }
+  .edu { text-align: right; padding-right: var(--gutter); }
+  .skills { padding-left: var(--gutter); }
+  .col dl { margin: 0; }
+  .credit { margin-bottom: 2.25rem; }
+  .credit dt {
+    font-size: 0.6875rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--dd-faint);
+    margin-bottom: 0.5rem;
+  }
+  .credit dd {
+    margin: 0;
+    font-size: 0.75rem;
+    line-height: 1.75;
+    color: var(--dd-ink);
+  }
+
+  .fin { padding: 0 1.75rem 24vh calc(var(--axis) + var(--gutter)); }
+  .fin-word {
+    margin: 0 0 3rem;
+    font: 100 3.5rem/1 var(--dd-thin);
+    font-stretch: 115%;
+    color: var(--dd-ink);
+  }
+  .fin-links { display: flex; flex-wrap: wrap; gap: 0.5rem 2.5rem; margin: 0; font-size: 0.75rem; }
+  .fin-links a { padding: 0.6rem 0; }
+
+  /* Slow reveal: opacity and a whisper of blur, nothing travels far. */
+  :global(html.dd-anim) .dd-reveal {
+    opacity: 0;
+    filter: blur(4px);
+    transition: opacity 2.4s var(--dd-ease), filter 2.4s var(--dd-ease);
+  }
+  :global(html.dd-anim) .dd-reveal.is-in { opacity: 1; filter: none; }
+
+  @media (max-width: 760px) {
+    :root { --axis: 1.25rem; --gutter: 1.5rem; }
+    .axis::before { top: -10vh; bottom: 10vh; }
+    .head { min-height: 70svh; padding: 22vh 1.25rem 0 calc(var(--axis) + var(--gutter)); }
+    .lede { font-size: 1.25rem; }
+    .entry { grid-template-columns: 1fr; padding-bottom: 30vh; }
+    .entry::before { left: calc(var(--axis) - 0.375rem); width: 0.75rem; top: 9vw; }
+    .when { text-align: left; padding: 0 1.25rem 2rem calc(var(--axis) + var(--gutter)); }
+    .year { font-size: 24vw; }
+    .until { margin-top: 0.875rem; }
+    .what { padding: 0 1.25rem 0 calc(var(--axis) + var(--gutter)); }
+    .credits { padding: 4vh 1.25rem 22vh calc(var(--axis) + var(--gutter)); }
+    .credits > h2 { padding-left: 0; margin-bottom: 4rem; }
+    .cols { grid-template-columns: 2fr 3fr; gap: 1rem; }
+    .skills dd { white-space: nowrap; }
+    .edu { text-align: left; padding-right: 0; }
+    .skills { padding-left: 0; }
+    .credit dt, .credit dd { font-size: 0.625rem; letter-spacing: 0.06em; }
+    .fin { padding: 0 1.25rem 26vh calc(var(--axis) + var(--gutter)); }
+  }
+</style>

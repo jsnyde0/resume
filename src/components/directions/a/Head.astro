@@ -1,0 +1,55 @@
+---
+// PROTOTYPE (resume-soe.12) direction A "Broadsheet": shared <head> + global type/paper system.
+interface Props { title: string }
+const { title } = Astro.props;
+---
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex, nofollow" />
+<title>{title}</title>
+<!-- SHORTCUT: Google Fonts link instead of self-hosted fonts (Archivo variable width/weight, Newsreader, IBM Plex Mono). -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=IBM+Plex+Mono:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400..600&display=swap"
+/>
+<style is:global>
+  :root {
+    --paper: #fbfaf7;
+    --ink: #0b0b0b;
+    --ink-2: #3a3a38;
+    --signal: #ff3b00;
+    --signal-ink: #d42f00; /* signal darkened for small text on paper (AA) */
+    --hair: 1px solid var(--ink);
+    --thick: 8px solid var(--ink);
+    --gutter: clamp(16px, 3vw, 40px);
+    --display: 'Archivo', 'Arial Narrow', sans-serif;
+    --serif: 'Newsreader', Georgia, serif;
+    --mono: 'IBM Plex Mono', ui-monospace, monospace;
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  html { background: var(--paper); color: var(--ink); -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    font-family: var(--serif);
+    font-size: 18px;
+    line-height: 1.5;
+    font-optical-sizing: auto;
+    text-rendering: optimizeLegibility;
+    padding-bottom: 96px; /* room for the floating review switcher */
+  }
+  ::selection { background: var(--signal); color: var(--paper); }
+  a { color: inherit; }
+  a:focus-visible { outline: 3px solid var(--signal); outline-offset: 3px; }
+  .bs-sheet { max-width: 1520px; margin: 0 auto; padding: 0 var(--gutter); }
+  .bs-label {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .bs-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+</style>

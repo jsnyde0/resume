@@ -1,20 +1,270 @@
 ---
-// PROTOTYPE (resume-soe.12) — direction A resume slice. STUB: replaced by the ui-craftsman build.
+// PROTOTYPE (resume-soe.12) direction A "Broadsheet": resume slice typeset as a broadsheet inside page.
 import DirectionSwitcher from '../../../components/directions/DirectionSwitcher.astro';
-import { workExperience, education } from '../../../data/resume';
+import Head from '../../../components/directions/a/Head.astro';
+import Masthead from '../../../components/directions/a/Masthead.astro';
+import Colophon from '../../../components/directions/a/Colophon.astro';
+import { workExperience, education, achievements, resumeIntro } from '../../../data/resume';
+import type { ResumeItem } from '../../../data/resume';
+import { skillFiles } from '../../../data/resume-skills';
+
+// Margin-column dates: "2015 - 2020" -> ["2015", "to 2020"]; "July 2025 - ..." -> ["July 2025", "to date"].
+const splitDate = (range: string): [string, string | null] => {
+  const [start, end] = range.split(' - ').map((s) => s.trim());
+  if (!end) return [start, null];
+  return [start, end === '...' ? 'to date' : `to ${end}`];
+};
+const metaDate = (range: string) => range.replace(' - ...', ' to date').replace(' - ', '–');
+
+// Skills grouped by folder, rendered as a classifieds-style index of filenames.
+const skillGroups = Object.entries(
+  skillFiles.reduce<Record<string, string[]>>((acc, f) => {
+    (acc[f.folder] ??= []).push(f.filename.replace(/\.md$/, '').replace(/-/g, ' '));
+    return acc;
+  }, {}),
+);
+const humanise = (slug: string) => slug.replace(/-/g, ' ');
+
+const sections: { id: string; no: string; label: string; items: ResumeItem[] }[] = [
+  { id: 'employment', no: '01', label: 'Employment', items: workExperience },
+  { id: 'education', no: '02', label: 'Education', items: education },
+];
+// SHORTCUT: page headline + deck below are hard-coded prototype copy, not from src/data.
 ---
 <!doctype html>
 <html lang="en">
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="robots" content="noindex, nofollow" />
-    <title>Resume — direction A</title>
+    <Head title="The Record: Jonatan Snyders' resume (direction A, Broadsheet)" />
   </head>
   <body>
-    <h1>Resume</h1>
-    {workExperience.map((w) => <p>{w.dateRange} — {w.title} ({w.company})</p>)}
-    {education.map((e) => <p>{e.dateRange} — {e.title} ({e.company})</p>)}
+    <Masthead page="resume" />
+    <main class="bs-sheet cv">
+      <header class="cv-head">
+        <p class="cv-kicker bs-label"><span class="cv-flag">Section B</span> Curriculum vitae &middot; what bores me</p>
+        <h1 class="cv-hed">The Record</h1>
+        <p class="cv-deck">Research, a startup, growth and agents: every job and degree, filed in reverse chronological order.</p>
+        <ul class="cv-badges bs-label" aria-label="Headline roles">
+          {resumeIntro.headlineBadges.map((b) => <li>{b}</li>)}
+        </ul>
+      </header>
+
+      <div class="cv-grid">
+        <div class="cv-main">
+          {sections.map((sec) => (
+            <section class="cv-sec" aria-labelledby={`sec-${sec.id}`}>
+              <h2 class="cv-sec-head" id={`sec-${sec.id}`}>
+                <span class="cv-sec-no">{sec.no}</span>
+                <span>{sec.label}</span>
+              </h2>
+              <ol class="cv-list">
+                {sec.items.map((item) => {
+                  const [start, end] = splitDate(item.dateRange);
+                  return (
+                    <li class="cv-entry">
+                      <p class="cv-date" aria-hidden="true">
+                        <span class="cv-date-start">{start}</span>
+                        {end && <span class="cv-date-end">{end}</span>}
+                      </p>
+                      <div class="cv-body">
+                        <p class="cv-role bs-label">{item.role}</p>
+                        <h3 class="cv-title">{item.title.trim()}</h3>
+                        <p class="cv-meta">
+                          <strong>{item.company}</strong>
+                          {item.location && <span> &middot; {item.location}</span>}
+                          <span> &middot; {metaDate(item.dateRange)}</span>
+                        </p>
+                        <p class="cv-text" set:html={item.body} />
+                        {item.links && (
+                          <p class="cv-links bs-label">
+                            {item.links.map((l) => (
+                              <a href={l.href} rel="noopener">{l.label} &nearr;</a>
+                            ))}
+                          </p>
+                        )}
+                      </div>
+                    </li>
+                  );
+                })}
+              </ol>
+            </section>
+          ))}
+        </div>
+
+        <aside class="cv-side" aria-label="Sidebar">
+          <section class="side-sec" aria-labelledby="sec-brief">
+            <h2 class="cv-sec-head" id="sec-brief"><span class="cv-sec-no">03</span><span>In brief</span></h2>
+            <ul class="brief">
+              {achievements.map((a) => (
+                <li>
+                  <p class="brief-meta bs-label">{a.company} &middot; {metaDate(a.dateRange)}</p>
+                  <h3 class="brief-title">{a.title}</h3>
+                  <p class="brief-text" set:html={a.body} />
+                </li>
+              ))}
+            </ul>
+          </section>
+
+          <section class="side-sec" aria-labelledby="sec-skills">
+            <h2 class="cv-sec-head" id="sec-skills"><span class="cv-sec-no">04</span><span>Skills index</span></h2>
+            <dl class="skills">
+              {skillGroups.map(([folder, names]) => (
+                <div class="skills-row">
+                  <dt class="bs-label">{humanise(folder)}</dt>
+                  <dd>{names.join(' · ')}</dd>
+                </div>
+              ))}
+            </dl>
+            <!-- SHORTCUT: skill filenames only; the per-skill detail panels (skillFiles[].html) are not rendered in this direction yet. -->
+            <p class="skills-more bs-label"><a href="/factory/">Proof of work: the factory &rarr;</a></p>
+          </section>
+        </aside>
+      </div>
+    </main>
+    <Colophon />
     <DirectionSwitcher current="a" page="resume" />
   </body>
 </html>
+
+<style>
+  /* ---------- page head ---------- */
+  .cv-head { padding: 28px 0 0; border-bottom: var(--hair); }
+  .cv-kicker { margin: 0 0 8px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  .cv-flag { background: var(--signal); color: var(--ink); padding: 4px 8px; }
+  .cv-hed {
+    margin: 0;
+    font-family: var(--display);
+    font-weight: 900;
+    font-stretch: 62%;
+    text-transform: uppercase;
+    font-size: min(calc((100vw - 2 * var(--gutter)) / 4.7), 300px);
+    white-space: nowrap;
+    line-height: 0.82;
+    letter-spacing: -0.01em;
+    margin-left: -0.03em;
+  }
+  .cv-deck {
+    margin: 22px 0 20px;
+    max-width: 30ch;
+    font-style: italic;
+    font-size: clamp(24px, 2.4vw, 34px);
+    line-height: 1.18;
+  }
+  .cv-badges {
+    list-style: none;
+    margin: 0;
+    padding: 10px 0;
+    border-top: var(--hair);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 0;
+  }
+  .cv-badges li + li::before { content: '/'; margin: 0 12px; color: var(--signal-ink); }
+
+  /* ---------- two-column broadsheet body ---------- */
+  .cv-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 8fr) minmax(0, 4fr);
+    column-gap: 0;
+    margin-top: 40px;
+  }
+  .cv-main { padding-right: 40px; }
+  .cv-side { padding-left: 32px; border-left: var(--hair); } /* column rule, as on a broadsheet; 1px, not an accent stripe */
+
+  .cv-sec + .cv-sec { margin-top: 64px; }
+  .cv-sec-head {
+    margin: 0;
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    border-top: var(--thick);
+    border-bottom: var(--hair);
+    padding: 10px 0 9px;
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .cv-sec-no { color: var(--signal-ink); }
+
+  .cv-list { list-style: none; margin: 0; padding: 0; }
+  .cv-entry {
+    display: grid;
+    grid-template-columns: 132px minmax(0, 1fr);
+    column-gap: 28px;
+    padding: 26px 0 28px;
+    border-bottom: var(--hair);
+  }
+  .cv-date {
+    margin: 0;
+    padding-top: 4px;
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.35;
+    display: flex;
+    flex-direction: column;
+  }
+  .cv-date-start { font-weight: 600; font-size: 15px; }
+  .cv-date-end { color: var(--ink-2); }
+  .cv-role { margin: 0 0 6px; color: var(--signal-ink); }
+  .cv-title {
+    margin: 0;
+    font-family: var(--display);
+    font-weight: 800;
+    font-stretch: 75%;
+    font-size: clamp(28px, 2.6vw, 38px);
+    line-height: 1;
+    letter-spacing: -0.005em;
+    text-wrap: balance;
+  }
+  .cv-meta { margin: 10px 0 0; font-size: 16px; font-style: italic; color: var(--ink-2); }
+  .cv-meta strong { font-style: normal; font-weight: 600; color: var(--ink); }
+  .cv-text { margin: 10px 0 0; max-width: 62ch; text-wrap: pretty; }
+  .cv-links { margin: 12px 0 0; display: flex; gap: 18px; }
+  .cv-links a, .skills-more a {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 4px;
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+  .cv-links a:hover, .skills-more a:hover { color: var(--signal-ink); text-decoration-thickness: 3px; }
+
+  /* ---------- sidebar ---------- */
+  .side-sec + .side-sec { margin-top: 56px; }
+  .brief { list-style: none; margin: 0; padding: 0; }
+  .brief li { padding: 18px 0 20px; border-bottom: var(--hair); }
+  .brief-meta { margin: 0 0 6px; font-size: 11px; }
+  .brief-title {
+    margin: 0;
+    font-family: var(--display);
+    font-weight: 800;
+    font-stretch: 75%;
+    font-size: 22px;
+    line-height: 1.05;
+    text-wrap: balance;
+  }
+  .brief-text { margin: 8px 0 0; font-size: 16px; line-height: 1.45; color: var(--ink-2); }
+  .skills { margin: 0; }
+  .skills-row { padding: 14px 0; border-bottom: var(--hair); }
+  .skills-row dt { margin: 0 0 4px; color: var(--signal-ink); }
+  .skills-row dd { margin: 0; font-size: 17px; line-height: 1.4; }
+  .skills-more { margin: 10px 0 0; }
+
+  /* ---------- tablet / phone ---------- */
+  @media (max-width: 960px) {
+    .cv-grid { grid-template-columns: 1fr; }
+    .cv-main { padding-right: 0; }
+    .cv-side { padding-left: 0; border-left: 0; margin-top: 64px; }
+  }
+  @media (max-width: 640px) {
+    .cv-hed { font-size: 25vw; white-space: normal; }
+    .cv-entry { grid-template-columns: 1fr; row-gap: 8px; padding: 22px 0 24px; }
+    .cv-date { flex-direction: row; gap: 8px; padding-top: 0; }
+    .cv-date-start { font-size: 13px; }
+    .cv-text { font-size: 17px; }
+    .cv-badges { display: grid; grid-template-columns: 1fr 1fr; }
+    .cv-badges li + li::before { content: none; }
+  }
+</style>

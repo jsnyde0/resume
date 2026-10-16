@@ -1,0 +1,75 @@
+---
+/** PROTOTYPE (resume-soe.12), direction B "Runway": the cover's issue strip (top chrome). */
+interface Props {
+  mid: string;
+  current: 'home' | 'resume';
+}
+const { mid, current } = Astro.props;
+---
+<header class="strip">
+  <!-- SHORTCUT: faked "issue" details (number, season) for the cover conceit. -->
+  {
+    current === 'home' ? (
+      <p class="rw-label">Issue Nº 37</p>
+    ) : (
+      <a class="rw-label strip-home" href="/directions/b/">&larr; Issue Nº 37</a>
+    )
+  }
+  <p class="rw-label strip-mid" aria-hidden="true">{mid}</p>
+  <nav aria-label="Primary">
+    <ul class="strip-nav">
+      <li>
+        <a class="rw-label" href="/directions/b/resume/" aria-current={current === 'resume' ? 'page' : undefined}>Lookbook</a>
+      </li>
+      <li><a class="rw-label" href="/factory/">Factory</a></li>
+    </ul>
+  </nav>
+</header>
+
+<style>
+  .strip {
+    position: relative;
+    z-index: 5;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    padding: 0 clamp(1.25rem, 3vw, 2.5rem);
+    min-height: 3.25rem;
+    border-bottom: 1px solid var(--rw-line);
+    color: var(--rw-mute);
+  }
+  .strip p {
+    margin: 0;
+  }
+  .strip-home {
+    justify-self: start;
+  }
+  .strip-nav {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: flex-end;
+    gap: 1.5rem;
+  }
+  .strip a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    color: var(--rw-paper);
+    text-decoration: none;
+    transition: color 0.3s;
+  }
+  .strip a:hover,
+  .strip a[aria-current='page'] {
+    color: var(--rw-red);
+  }
+  @media (max-width: 760px) {
+    .strip {
+      grid-template-columns: 1fr auto;
+    }
+    .strip-mid {
+      display: none;
+    }
+  }
+</style>

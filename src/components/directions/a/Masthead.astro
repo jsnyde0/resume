@@ -1,0 +1,99 @@
+---
+// PROTOTYPE (resume-soe.12) direction A "Broadsheet": newspaper masthead (dateline, title, section strip).
+interface Props { page: 'home' | 'resume' }
+const { page } = Astro.props;
+const today = new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+// SHORTCUT: date is build-time (static site), so it is stale until the next deploy; volume/issue numbers are invented.
+const sections = [
+  { href: '/directions/a/', label: 'Front page', key: 'home' },
+  { href: '/directions/a/resume/', label: 'The Record', key: 'resume' },
+  { href: '/factory/', label: 'The Factory', key: 'factory' },
+  { href: 'https://github.com/jsnyde0', label: 'GitHub', key: 'gh' },
+  { href: 'https://www.linkedin.com/in/jonatan-snyders/', label: 'LinkedIn', key: 'li' },
+];
+// SHORTCUT: GitHub/LinkedIn URLs hard-coded here, not read from site config.
+---
+<header class="mh">
+  <div class="bs-sheet">
+    <div class="mh-dateline bs-label">
+      <span>Berlin</span>
+      <span class="mh-date">{today}</span>
+      <span class="mh-vol">Vol. I &middot; No. 1</span>
+      <span class="mh-price">Free of charge</span>
+    </div>
+    <a class="mh-title" href="/directions/a/" aria-label="Jonatan Snyders, front page">
+      <span aria-hidden="true">Jonatan <br class="mh-br" />Snyders</span>
+    </a>
+    <nav class="mh-strip" aria-label="Sections">
+      <ul>
+        {sections.map((s) => (
+          <li><a href={s.href} aria-current={s.key === page ? 'page' : undefined}>{s.label}</a></li>
+        ))}
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .mh { padding-top: 14px; }
+  .mh-dateline {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding-bottom: 10px;
+    border-bottom: var(--hair);
+  }
+  .mh-title {
+    display: block;
+    text-decoration: none;
+    font-family: var(--display);
+    font-stretch: 125%;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: -0.035em;
+    line-height: 0.82;
+    /* fits "JONATAN SNYDERS" edge to edge of the sheet (1 em of this face ≈ 1/11.85 of the line) */
+    font-size: min(calc((100vw - 2 * var(--gutter)) / 12.7), 120px);
+    padding: 0.14em 0 0.08em;
+    white-space: nowrap;
+    text-align: center;
+  }
+  .mh-title:hover span { color: var(--signal); }
+  .mh-br { display: none; }
+  @media (max-width: 640px) { .mh-br { display: inline; } }
+  .mh-strip { border-top: var(--thick); border-bottom: var(--hair); }
+  .mh-strip ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .mh-strip li { flex: 1 1 auto; }
+  .mh-strip li + li { border-left: var(--hair); }
+  .mh-strip a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 0 14px;
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: background-color 160ms var(--ease), color 160ms var(--ease);
+  }
+  .mh-strip a:hover { background: var(--ink); color: var(--paper); }
+  .mh-strip a[aria-current='page'] { background: var(--signal); color: var(--ink); }
+  .mh-strip a:focus-visible { outline-offset: -3px; }
+  @media (max-width: 640px) {
+    .mh-vol, .mh-price { display: none; }
+    .mh-title { font-size: calc((100vw - 2 * var(--gutter)) / 6.1); text-align: left; line-height: 0.86; }
+    .mh-strip li { flex: 1 1 33%; }
+    .mh-strip li:nth-child(4) { border-left: 0; }
+    .mh-strip li:nth-child(n + 4) { border-top: var(--hair); }
+    .mh-strip a { padding: 0 8px; font-size: 11px; letter-spacing: 0.06em; }
+  }
+</style>

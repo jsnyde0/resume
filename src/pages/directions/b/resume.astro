@@ -1,20 +1,476 @@
 ---
-// PROTOTYPE (resume-soe.12) — direction B resume slice. STUB: replaced by the ui-craftsman build.
+// PROTOTYPE (resume-soe.12), direction B "Runway": the résumé as a lookbook.
+// Work = numbered looks with a towering year; education + skills = the credits page.
 import DirectionSwitcher from '../../../components/directions/DirectionSwitcher.astro';
-import { workExperience, education } from '../../../data/resume';
+import RunwayHead from '../../../components/directions/b/RunwayHead.astro';
+import RunwayStrip from '../../../components/directions/b/RunwayStrip.astro';
+import RunwayFooter from '../../../components/directions/b/RunwayFooter.astro';
+import { resumeIntro, workExperience, education, achievements } from '../../../data/resume';
+import { skillFiles } from '../../../data/resume-skills';
+
+const pad = (n: number) => String(n).padStart(2, '0');
+const startYear = (r: string) => r.match(/\d{4}/)?.[0] ?? '';
+// "July 2025 - ..." -> "July 2025 to now"; "2015 - 2020" -> "2015 to 2020" (no dashes in display copy).
+const range = (r: string) => r.replace(/\s*-\s*\.\.\./, ' to now').replace(/\s*-\s*/, ' to ');
+const total = pad(workExperience.length);
+// Bodoni Moda's hyphen is a hairline that vanishes on black ("5-person" reads "5 person").
+// SHORTCUT: swap word-joining hyphens in text nodes for a span set in a sturdier fallback serif.
+const hy = (html: string) =>
+  html
+    .split(/(<[^>]+>)/)
+    .map((part) => (part.startsWith('<') ? part : part.replace(/(\w)-(\w)/g, '$1<span class="rw-hy">-</span>$2')))
+    .join('');
+
+// Skills grouped by folder for the credits; "harness-factory.md" -> "harness factory".
+const skillGroups = Array.from(
+  skillFiles.reduce((m, f) => {
+    const list = m.get(f.folder) ?? [];
+    list.push(f.filename.replace(/\.md$/, '').replace(/-/g, ' '));
+    m.set(f.folder, list);
+    return m;
+  }, new Map<string, string[]>()),
+).map(([folder, names]) => ({ folder: folder.replace(/-/g, ' '), names }));
 ---
 <!doctype html>
 <html lang="en">
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="robots" content="noindex, nofollow" />
-    <title>Resume — direction B</title>
+    <RunwayHead
+      title="The Lookbook, Jonatan Snyders"
+      description="Jonatan Snyders' résumé as a lookbook: every job a look, education and skills in the credits."
+    />
   </head>
   <body>
-    <h1>Resume</h1>
-    {workExperience.map((w) => <p>{w.dateRange} — {w.title} ({w.company})</p>)}
-    {education.map((e) => <p>{e.dateRange} — {e.title} ({e.company})</p>)}
+    <a class="rw-skip" href="#main">Skip to content</a>
+    <RunwayStrip current="resume" mid="The Lookbook · Autumn / Winter 2026" />
+
+    <main id="main">
+      <header class="open">
+        <p class="rw-label open-kick rw-rise">Jonatan Snyders &middot; {workExperience.length} looks</p>
+        <h1 class="open-h rw-rise" style="--d: 100ms">The Lookbook</h1>
+        <div class="open-foot rw-rise" style="--d: 240ms">
+          <p class="open-dek" set:html={hy(resumeIntro.paragraphs[1].replace(/\s*—\s*/g, ': '))} />
+          <p class="rw-label open-feat">
+            <span>Featuring</span>
+            {resumeIntro.headlineBadges.map((b, i) => <><span class="feat-b">{b}</span>{i < resumeIntro.headlineBadges.length - 1 && ' / '}</>)}
+          </p>
+        </div>
+      </header>
+
+      <ol class="looks" aria-label="Work experience">
+        {
+          workExperience.map((job, i) => (
+            <li class:list={['look', i % 2 === 1 && 'look--flip']}>
+              <p class="look-year" aria-hidden="true">
+                {startYear(job.dateRange)}
+              </p>
+              <article class="look-text" aria-labelledby={`look-${i + 1}`}>
+                <p class="look-num">
+                  Look {pad(i + 1)} <span>/ {total}</span>
+                </p>
+                <h2 id={`look-${i + 1}`} class="look-title" set:html={hy(job.title.trim())} />
+                <p class="rw-label look-credit">
+                  {job.role} &middot; {job.company} &middot; {job.location} &middot; {range(job.dateRange)}
+                </p>
+                <div class="look-body" set:html={hy(job.body)} />
+                {job.links && job.links.length > 0 && (
+                  <p class="look-links">
+                    {job.links.map((l) => (
+                      <a href={l.href} rel="noopener" target="_blank">
+                        {l.label}
+                        <span aria-hidden="true">&nbsp;&#8599;</span>
+                        <span class="sr">(opens in a new tab)</span>
+                      </a>
+                    ))}
+                  </p>
+                )}
+              </article>
+            </li>
+          ))
+        }
+      </ol>
+
+      <section class="credits" aria-labelledby="credits-h">
+        <h2 id="credits-h" class="credits-h">Credits</h2>
+        <div class="credits-cols">
+          <div>
+            <h3 class="rw-label credits-k">Education</h3>
+            <ul class="credits-list">
+              {
+                education.map((e) => (
+                  <li>
+                    <span class="cr-title" set:html={hy(e.title.trim())} />
+                    <span class="cr-meta">
+                      {e.company}, {e.location}, {range(e.dateRange)}
+                    </span>
+                    <span class="cr-note" set:html={hy(e.body)} />
+                  </li>
+                ))
+              }
+            </ul>
+
+            <h3 class="rw-label credits-k">Also featured</h3>
+            <ul class="credits-list">
+              {
+                achievements.map((a) => (
+                  <li>
+                    <span class="cr-title" set:html={hy(a.title.trim())} />
+                    <span class="cr-meta">
+                      {a.company}, {range(a.dateRange)}
+                    </span>
+                  </li>
+                ))
+              }
+            </ul>
+          </div>
+
+          <div>
+            <h3 class="rw-label credits-k">Skills, styled by</h3>
+            <dl class="credits-skills">
+              {
+                skillGroups.map((g) => (
+                  <div>
+                    <dt>{g.folder}</dt>
+                    <dd>{g.names.join(' · ')}</dd>
+                  </div>
+                ))
+              }
+            </dl>
+            <p class="credits-cta">
+              <a href="/factory/">
+                <span class="rw-label">What excites me</span>
+                <span class="credits-cta-t">Inside the Factory</span>
+              </a>
+            </p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <RunwayFooter />
+
+    <script>
+      // Year numerals rise in as each look enters view. Text is never hidden; skipped for reduced motion.
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (!reduce && 'IntersectionObserver' in window) {
+        document.documentElement.classList.add('rw-io');
+        const io = new IntersectionObserver(
+          (entries) => {
+            for (const e of entries) {
+              if (e.isIntersecting) {
+                e.target.classList.add('in');
+                io.unobserve(e.target);
+              }
+            }
+          },
+          { rootMargin: '0px 0px -15% 0px' },
+        );
+        document.querySelectorAll('.look').forEach((el) => io.observe(el));
+      }
+    </script>
+
     <DirectionSwitcher current="b" page="resume" />
   </body>
 </html>
+
+<style>
+  :global(.rw-hy) {
+    font-family: Georgia, "Times New Roman", serif;
+    font-style: normal;
+  }
+  .sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  /* ---------- opener ---------- */
+  .open {
+    padding: clamp(2.5rem, 5vw, 4rem) clamp(1.25rem, 3vw, 2.5rem) clamp(4rem, 8vw, 7rem);
+    border-bottom: 1px solid var(--rw-line);
+  }
+  .open-kick {
+    margin: 0 0 1rem;
+    color: var(--rw-red);
+  }
+  .open-h {
+    margin: 0;
+    font-family: var(--rw-mast);
+    font-weight: 400;
+    font-size: 21.5vw;
+    line-height: 0.8;
+    text-transform: uppercase;
+    letter-spacing: -0.005em;
+    white-space: nowrap;
+    color: var(--rw-paper);
+  }
+  .open-foot {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 2rem;
+    align-items: end;
+    margin-top: clamp(2rem, 4vw, 3.5rem);
+  }
+  .open-dek {
+    margin: 0;
+    max-width: 30ch;
+    font-style: italic;
+    font-variation-settings: 'opsz' 36;
+    font-size: clamp(1.5rem, 2.4vw, 2.25rem);
+    line-height: 1.15;
+    text-wrap: pretty;
+  }
+  .open-feat {
+    margin: 0;
+    max-width: 22rem;
+    text-align: right;
+    line-height: 1.9;
+    color: var(--rw-mute);
+  }
+  .open-feat .feat-b {
+    white-space: nowrap;
+  }
+  .open-feat > span:first-child {
+    display: block;
+    color: var(--rw-red);
+  }
+
+  /* ---------- the looks ---------- */
+  .looks {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .look {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    align-items: end;
+    gap: 2rem clamp(2rem, 4vw, 4rem);
+    padding: clamp(4rem, 9vw, 8rem) clamp(1.25rem, 3vw, 2.5rem);
+    border-bottom: 1px solid var(--rw-line);
+    overflow: hidden;
+  }
+  .look--flip {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  }
+  .look--flip .look-year {
+    order: 2;
+    text-align: right;
+  }
+  .look-year {
+    margin: 0;
+    font-family: var(--rw-mast);
+    font-size: clamp(9rem, 30vw, 30rem);
+    line-height: 0.74;
+    letter-spacing: -0.01em;
+    color: var(--rw-red);
+  }
+  .look-text {
+    max-width: 30rem;
+    padding-bottom: 0.4rem;
+  }
+  .look--flip .look-text {
+    justify-self: start;
+  }
+  .look-num {
+    margin: 0 0 1.25rem;
+    font-family: var(--rw-mast);
+    font-size: 2.5rem;
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: 0.02em;
+    color: var(--rw-paper);
+  }
+  .look-num span {
+    color: var(--rw-mute);
+  }
+  .look-title {
+    margin: 0 0 1rem;
+    font-family: var(--rw-serif);
+    font-weight: 500;
+    font-variation-settings: 'opsz' 30;
+    font-size: clamp(1.9rem, 2.8vw, 2.75rem);
+    line-height: 1.04;
+    letter-spacing: -0.012em;
+    text-wrap: balance;
+  }
+  .look-credit {
+    margin: 0 0 1.5rem;
+    line-height: 1.8;
+    color: var(--rw-mute);
+  }
+  .look-body {
+    max-width: 34ch;
+    font-size: 1.125rem;
+    line-height: 1.6;
+    color: #d9d3ca;
+  }
+  .look-links {
+    margin: 1.25rem 0 0;
+    display: flex;
+    gap: 1.5rem;
+  }
+  .look-links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    font-family: var(--rw-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    text-decoration: underline;
+    text-decoration-color: var(--rw-red);
+    text-underline-offset: 0.4em;
+  }
+  .look-links a:hover {
+    color: var(--rw-red);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    :global(.rw-io) .look .look-year {
+      opacity: 0;
+      transform: translate3d(0, 18%, 0);
+      transition:
+        opacity 1.2s var(--rw-ease),
+        transform 1.4s var(--rw-ease);
+    }
+    :global(.rw-io) .look.in .look-year {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* ---------- credits ---------- */
+  .credits {
+    padding: clamp(5rem, 10vw, 9rem) clamp(1.25rem, 3vw, 2.5rem);
+  }
+  .credits-h {
+    margin: 0 0 clamp(2.5rem, 5vw, 4rem);
+    font-family: var(--rw-serif);
+    font-style: italic;
+    font-weight: 400;
+    font-variation-settings: 'opsz' 96;
+    font-size: clamp(3.5rem, 9vw, 8rem);
+    line-height: 0.9;
+    letter-spacing: -0.02em;
+  }
+  .credits-cols {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 3rem clamp(2rem, 6vw, 6rem);
+    border-top: 1px solid var(--rw-line);
+    padding-top: 2rem;
+  }
+  .credits-k {
+    margin: 0 0 1.25rem;
+    color: var(--rw-red);
+  }
+  .credits-k:not(:first-child) {
+    margin-top: 3rem;
+  }
+  .credits-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 1.5rem;
+  }
+  .credits-list li {
+    display: grid;
+    gap: 0.3rem;
+    max-width: 36rem;
+  }
+  .cr-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    line-height: 1.4;
+  }
+  .cr-meta {
+    font-family: var(--rw-mono);
+    font-size: 0.75rem;
+    color: var(--rw-mute);
+  }
+  .cr-note {
+    font-style: italic;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #d9d3ca;
+  }
+  .credits-skills {
+    margin: 0;
+    display: grid;
+    gap: 1.4rem;
+  }
+  .credits-skills div {
+    display: grid;
+    grid-template-columns: 11rem minmax(0, 1fr);
+    gap: 1rem;
+    align-items: baseline;
+  }
+  .credits-skills dt {
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .credits-skills dd {
+    margin: 0;
+    font-style: italic;
+    font-size: 1.1rem;
+    line-height: 1.45;
+    color: #d9d3ca;
+  }
+  .credits-cta {
+    margin: 3.5rem 0 0;
+  }
+  .credits-cta a {
+    display: inline-grid;
+    gap: 0.4rem;
+    text-decoration: none;
+  }
+  .credits-cta .rw-label {
+    color: var(--rw-red);
+  }
+  .credits-cta-t {
+    font-family: var(--rw-mast);
+    font-size: clamp(2.5rem, 5vw, 4.5rem);
+    line-height: 0.9;
+    text-transform: uppercase;
+    transition: color 0.3s;
+  }
+  .credits-cta a:hover .credits-cta-t {
+    color: var(--rw-red);
+  }
+
+  /* ---------- narrow ---------- */
+  @media (max-width: 760px) {
+    .open-foot {
+      grid-template-columns: 1fr;
+    }
+    .open-feat {
+      text-align: left;
+    }
+    .look,
+    .look--flip {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+    .look--flip .look-year {
+      order: 0;
+      text-align: left;
+    }
+    .look-year {
+      font-size: 56vw;
+    }
+    .credits-cols {
+      grid-template-columns: 1fr;
+    }
+    .credits-skills div {
+      grid-template-columns: 1fr;
+      gap: 0.3rem;
+    }
+  }
+</style>
