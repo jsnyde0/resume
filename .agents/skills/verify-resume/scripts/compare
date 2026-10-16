@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# compare — diff two screenshots-drive evidence dirs.
+#
+# Usage: scripts/compare <baselineDir> <afterDir>
+#
+# Prints, per page+viewport: PNG byte-equality and the fingerprint diff
+# (changed / added / removed elements, with the differing properties).
+# Exit 0 only when every PNG is byte-equal and every fingerprint is identical.
+set -euo pipefail
+[ $# -eq 2 ] || { echo "Usage: scripts/compare <baselineDir> <afterDir>" >&2; exit 2; }
+exec node "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)/compare.mjs" "$1" "$2"

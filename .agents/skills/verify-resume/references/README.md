@@ -12,6 +12,8 @@ Seeded 2026-09-05 by `/verify scaffold` with the top five. This is a map, not an
 | [Projects list](projects-list.md) | `/projects/` | covered statically by `npm run test:projects` |
 | [Factory orbit graph](factory-orbit-graph.md) | `/factory/` | **not yet — highest-value gap** (filed: `dotpi-9a81`) |
 
+**Cross-cutting: visual and computed-style baseline.** `scripts/drive screenshots` covers every route above at 1440px and 390px (full-page PNG plus a computed-style fingerprint per page and viewport), and `scripts/compare <baselineDir> <afterDir>` diffs two runs. It is a before/after gate for refactors, not a behaviour drive: it sees pages standing still. See SKILL.md "Screenshots drive".
+
 ## Where the coverage actually is
 
 Two features are genuinely interactive: the file-tree browser and the orbit graph. Only the file tree has a mapped drive. **The orbit graph is the biggest hole in this map** — it is the most complex client-side behaviour on the site and nothing verifies it at all today.

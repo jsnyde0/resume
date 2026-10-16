@@ -35,11 +35,11 @@ Answered from the codebase on 2026-09-05. Recorded so the next reader can check 
 
 | Route | Route-specific observable | Interactive? | Mapped drive |
 |---|---|---|---|
-| `/` | `From catwalks to startups, agent harnesses to existential dread.` | no | — |
-| `/resume/` | `.ghv-shell`, breadcrumb `#ghv-preview-path` | **yes** — file tree, fake PDF button | `scripts/drive file-tree` |
-| `/readme/` | `<h1 class="readme-page__title">README</h1>` | no | — |
-| `/projects/` | `<h1>Building</h1>` | no | covered by `npm run test:projects` |
-| `/factory/` | `#graph-scene`, `#detail-panel` | **yes** — clickable orbit graph | not yet — see `references/README.md` |
+| `/` | `From catwalks to startups, agent harnesses to existential dread.` | no | `scripts/drive screenshots` (visual + style baseline) |
+| `/resume/` | `.ghv-shell`, breadcrumb `#ghv-preview-path` | **yes** — file tree, fake PDF button | `scripts/drive file-tree`, `scripts/drive screenshots` |
+| `/readme/` | `<h1 class="readme-page__title">README</h1>` | no | `scripts/drive screenshots` |
+| `/projects/` | `<h1>Building</h1>` | no | `scripts/drive screenshots`; content also covered by `npm run test:projects` |
+| `/factory/` | `#graph-scene`, `#detail-panel` | **yes** — clickable orbit graph | `scripts/drive screenshots` (graph interaction: not yet — see `references/README.md`) |
 
 ## The drive engine
 
@@ -56,12 +56,33 @@ scripts/doctor              # read-only: is this worth driving? (run it first)
 scripts/launch              # build, then serve dist/ on 127.0.0.1:4329
 scripts/seed                # nothing to seed here; says so and exits 0
 scripts/drive file-tree     # expand a folder, open a file, capture evidence
+scripts/drive screenshots   # 10 full-page PNGs + 10 computed-style fingerprints
+scripts/compare A B         # diff two screenshots-* evidence dirs
 scripts/cleanup             # stop only what launch started; evidence survives
 ```
 
 Evidence lands in `.verify-evidence/<feature>-<timestamp>/` at the repo root: three screenshots (before, expanded, after) and an `evidence.json` holding every check with its result, the discovered file list, what was expanded, and what was clicked. `cleanup` never deletes it.
 
 `cleanup` stops the preview server and **only** processes it can prove are that server's descendants — it collects the ancestry before stopping anything and leaves anything else alone, loudly. It deliberately leaves the shared automation Chrome on `:9222` running, because other skills and other agents reuse it; the drive reuses one labelled tab rather than opening one per run, so nothing accumulates.
+
+## Screenshots drive (before/after baseline)
+
+`scripts/drive screenshots` visits `/`, `/resume/`, `/readme/`, `/projects/`, `/factory/` at 1440px (desktop) and 390px (mobile) and writes to `.verify-evidence/screenshots-<timestamp>/`: `<page>-<viewport>.png` (full page) and `<page>-<viewport>.fingerprint.json` (10 + 10 files, plus `evidence.json`). Page names: `home resume readme projects factory`; viewports: `desktop mobile`.
+
+The fingerprint is one entry per element under `<html>`/`<body>` (script/style/noscript/template skipped), keyed by a structural path (`html>body>div.site-shell>nav.navbar...`: tag, `:n` among same-tag siblings, classes; never ids). Each entry holds computed color, background-color/-image, border width/style/color per side, per-corner border-radius, box-shadow, font-family/size/weight, line-height, letter-spacing, margin/padding per side, row/column gap, opacity. `::before`/`::after` get their own entries when their `content` is not none/normal.
+
+`scripts/compare <baselineDir> <afterDir>` prints per page: PNG byte-equality and the fingerprint diff (changed/added/removed elements and the differing properties). Exit 0 and `COMPARE-RESULT: identical` only when all PNGs are byte-equal and no fingerprint differs. Used as the before/after gate for the resume-soe.1..5 design-system work: capture a baseline on the unchanged tree, change, capture again, compare. A deliberate visual change shows up as diffs; an intended no-op refactor must show none.
+
+**Determinism: what is frozen or excluded** (the run is only useful as a baseline because two runs on one tree compare identical):
+
+- `prefers-reduced-motion: reduce` is emulated, so page JS that checks it (the factory graph does) takes its motionless path.
+- A stylesheet injected after load sets `animation: none`, `transition: none`, `scroll-behavior: auto`, `caret-color: transparent` on everything, so no frame is captured mid-transition. The `transition`/`animation` properties are not fingerprinted anyway.
+- Capture waits for `networkidle0`, `document.fonts.ready`, then a 600 ms settle, and scrolls to top.
+- Fingerprints hold style values only, never text: time-based copy (the footer build year from `new Date().getFullYear()`) cannot enter them. The PNGs do show that text, so a baseline taken in one calendar year and compared in the next will report a PNG diff on every page: re-baseline across a year boundary.
+- No generated ids or text in path keys.
+- Fingerprint is read BEFORE the full-page screenshot. Puppeteer resizes the viewport to the page height for `fullPage`; reading styles while that is in flight flaked (`.site-shell` auto margins read 0px instead of 16px on `/factory/` mobile, 2 of 5 runs). After the reorder, 6 of 6 consecutive runs were stable.
+- Device scale factor pinned to 1; the shared Chrome's viewport and media emulation are cleared at the end of the run.
+- Not covered: hover/focus/active states, JS-driven states after clicks (see `scripts/drive file-tree`), other viewport widths, anything below `<body>` text content.
 
 ## Evidence standards
 
