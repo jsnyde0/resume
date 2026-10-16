@@ -6,5 +6,8 @@ import sitemap from '@astrojs/sitemap';
 export default defineConfig({
   // Production domain — used for canonical URLs and sitemap generation.
   site: 'https://www.jonatansnyders.com',
-  integrations: [sitemap()],
+  integrations: [
+    // /directions/ are noindex visual-identity prototypes (resume-soe.12); keep them out of the sitemap.
+    sitemap({ filter: (page) => !page.includes('/directions/') }),
+  ],
 });

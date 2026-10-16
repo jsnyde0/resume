@@ -1,0 +1,95 @@
+---
+/**
+ * PROTOTYPE (resume-soe.12) — floating switcher for the /directions/ visual-identity prototypes.
+ * Deliberately visible in production: the human reviews on the live site, so this bar IS the
+ * review UI. Styled to be obviously not part of any direction (neutral pill, mono, fixed).
+ * SHORTCUT: shown in prod on purpose (the recipe hides switchers in prod); the routes are noindex
+ * and unlinked, and the whole /directions/ tree is deleted when the winner lands.
+ */
+import { directions, directionHref } from './directions';
+import type { DirectionPage } from './directions';
+
+interface Props {
+  current: string;
+  page: DirectionPage;
+}
+
+const { current, page } = Astro.props;
+const idx = directions.findIndex((d) => d.key === current);
+const dir = directions[idx];
+const prev = directions[(idx - 1 + directions.length) % directions.length];
+const next = directions[(idx + 1) % directions.length];
+const otherPage: DirectionPage = page === 'home' ? 'resume' : 'home';
+---
+
+<nav class="dsw" aria-label="Prototype direction switcher" data-dsw>
+  <a class="dsw-arrow" href={directionHref(prev.key, page)} aria-label={`Previous direction: ${prev.name}`} data-dsw-prev>&larr;</a>
+  <span class="dsw-label">
+    <span class="dsw-tag">PROTOTYPE</span>
+    <strong>{current.toUpperCase()} &middot; {dir?.name}</strong>
+  </span>
+  <a class="dsw-arrow" href={directionHref(next.key, page)} aria-label={`Next direction: ${next.name}`} data-dsw-next>&rarr;</a>
+  <span class="dsw-sep" aria-hidden="true"></span>
+  <a class="dsw-page" href={directionHref(current, otherPage)}>{otherPage === 'home' ? 'home' : 'resume'}</a>
+  <a class="dsw-page" href="/directions/">all</a>
+</nav>
+
+<style>
+  .dsw {
+    position: fixed;
+    left: 50%;
+    bottom: 1rem;
+    z-index: 2147483000;
+    transform: translateX(-50%);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.6rem 0.4rem 0.4rem;
+    border-radius: 999px;
+    background: #111;
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+    font: 500 12px/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+  }
+  .dsw a { color: inherit; text-decoration: none; }
+  .dsw-arrow {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 999px;
+    background: #fff;
+    color: #111;
+    font-size: 14px;
+  }
+  .dsw-arrow:hover { background: #ffe600; }
+  .dsw-label { display: inline-flex; align-items: center; gap: 0.5rem; }
+  .dsw-tag {
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    background: #ffe600;
+    color: #111;
+    font-size: 10px;
+    font-weight: 700;
+  }
+  .dsw-sep { width: 1px; height: 1rem; background: rgba(255, 255, 255, 0.3); }
+  .dsw-page { opacity: 0.8; padding: 0.2rem 0.3rem; }
+  .dsw-page:hover { opacity: 1; text-decoration: underline; }
+</style>
+
+<script>
+  // Keyboard ← / → cycle directions; ignored while typing in a field.
+  const root = document.querySelector('[data-dsw]');
+  const prev = root?.querySelector<HTMLAnchorElement>('[data-dsw-prev]');
+  const next = root?.querySelector<HTMLAnchorElement>('[data-dsw-next]');
+  document.addEventListener('keydown', (e) => {
+    const t = e.target as HTMLElement | null;
+    if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+    if (e.key === 'ArrowLeft' && prev) location.href = prev.href;
+    if (e.key === 'ArrowRight' && next) location.href = next.href;
+  });
+</script>

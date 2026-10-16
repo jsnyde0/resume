@@ -1,0 +1,20 @@
+---
+// PROTOTYPE (resume-soe.12) — direction A resume slice. STUB: replaced by the ui-craftsman build.
+import DirectionSwitcher from '../../../components/directions/DirectionSwitcher.astro';
+import { workExperience, education } from '../../../data/resume';
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Resume — direction A</title>
+  </head>
+  <body>
+    <h1>Resume</h1>
+    {workExperience.map((w) => <p>{w.dateRange} — {w.title} ({w.company})</p>)}
+    {education.map((e) => <p>{e.dateRange} — {e.title} ({e.company})</p>)}
+    <DirectionSwitcher current="a" page="resume" />
+  </body>
+</html>

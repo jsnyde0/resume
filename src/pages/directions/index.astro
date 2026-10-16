@@ -1,0 +1,59 @@
+---
+/**
+ * PROTOTYPE (resume-soe.12) — hub for the visual-identity directions. noindex, not in nav.
+ * The human opens this, reads one line per direction, clicks through. Deleted when the winner lands.
+ */
+import { directions, directionHref } from '../../components/directions/directions';
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Directions — prototype</title>
+    <style>
+      :root { color-scheme: dark; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: #0a0a0a;
+        color: #eee;
+        font: 16px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        padding: clamp(1.5rem, 5vw, 4rem);
+      }
+      h1 { font-size: 1rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.6; margin: 0 0 2rem; }
+      ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; max-width: 60rem; }
+      li { display: grid; grid-template-columns: 3rem 1fr auto; gap: 1rem; align-items: baseline; padding: 1.25rem 0; border-top: 1px solid #333; }
+      li:last-child { border-bottom: 1px solid #333; }
+      .key { font-size: 2rem; font-weight: 700; line-height: 1; }
+      .name { font-size: 1.25rem; font-weight: 700; margin: 0 0 0.25rem; }
+      .pitch { margin: 0; opacity: 0.75; }
+      .links { display: flex; gap: 0.5rem; }
+      .links a { color: #ffe600; text-decoration: none; border: 1px solid #ffe600; border-radius: 999px; padding: 0.4rem 0.9rem; font-size: 0.85rem; }
+      .links a:hover { background: #ffe600; color: #111; }
+      p.note { max-width: 60rem; opacity: 0.5; font-size: 0.85rem; margin-top: 2rem; }
+      @media (max-width: 640px) { li { grid-template-columns: 2.5rem 1fr; } .links { grid-column: 2; } }
+    </style>
+  </head>
+  <body>
+    <h1>Prototype — visual identity directions</h1>
+    <ol>
+      {directions.map((d) => (
+        <li>
+          <span class="key">{d.key.toUpperCase()}</span>
+          <div>
+            <p class="name">{d.name}</p>
+            <p class="pitch">{d.pitch}</p>
+          </div>
+          <div class="links">
+            <a href={directionHref(d.key, 'home')}>home</a>
+            <a href={directionHref(d.key, 'resume')}>resume</a>
+          </div>
+        </li>
+      ))}
+    </ol>
+    <p class="note">Each direction keeps the tagline and the full-body photo; everything else is open. Use the floating bar (or ← →) to flip between directions on any page. Noindex; unlinked from the site nav.</p>
+  </body>
+</html>
