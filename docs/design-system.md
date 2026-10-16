@@ -17,7 +17,7 @@ Single source for the site's visual values. Read this before touching CSS on `/`
 | Font | `--font-body`, `--font-mono`, `--line-height-body` (1.5), `--line-height-relaxed` (1.65) |
 | Type scale, fixed | `--text-xs` .75rem, `--text-sm` .875rem, `--text-base` 1rem, `--text-prose-sm` .95rem, `--text-xl` 1.5rem, `--text-2xl` 1.875rem |
 | Type scale, fluid | `--text-title` (page h1), `--text-lead` (intro paragraph), `--text-card-title`, `--text-hero`, `--text-hero-lead` |
-| Spacing (n x 0.25rem) | `--space-1` .25, `-2` .5, `-3` .75, `-4` 1, `-5` 1.25, `-6` 1.5, `-8` 2, `-10` 2.5, `-12` 3 (rem) |
+| Spacing (n x 0.25rem) | `--space-1` .25, `-2` .5, `-3` .75, `-4` 1, `-5` 1.25, `-6` 1.5, `-8` 2, `-10` 2.5, `-12` 3 (rem); plus off-grid `--space-2-5` 0.6 |
 | Containers | `--container-prose` 42rem, `--container-narrow` 52rem (/projects/), `--container-content` 56rem (/resume/, /readme/, home), `--container-site` 80rem |
 | Radius | `--radius-sm/md/lg/xl/full`, `--radius-button` |
 | Shadow | `--shadow-card`, `--shadow-avatar` |
@@ -34,7 +34,7 @@ Single source for the site's visual values. Read this before touching CSS on `/`
 
 ## Shared components
 
-- `src/components/resume/ResumeCard.astro` (props: `title?: string`, `tooltip?: string`; default slot). The card surface, used by `/readme/`. Its surface values are the `--card-*` tokens.
+- `src/components/resume/ResumeCard.astro` (props: `title?: string`, `tooltip?: string`; default slot). The card surface, used by `/readme/` and also by `/resume/` (resume.astro wraps the viewer in it). Its surface values are the `--card-*` tokens.
 - `src/components/projects/ProjectCard.astro` (prop: `project: ProjectEntry`). Same card surface via the same `--card-*` tokens, so the two cards cannot drift apart.
 
 Class names are part of the verification fingerprint (below). Renaming or adding a class on an existing element shows up as a diff, so do it only on purpose.
@@ -50,13 +50,13 @@ Class names are part of the verification fingerprint (below). Renaming or adding
 
 ## How to verify
 
-Run from `.agents/skills/verify-resume` (details in its `SKILL.md`, "Screenshots drive"):
+Run from `.agents/skills/verify-resume` (details in its `SKILL.md`, "Screenshots drive"). Evidence dirs live at the repo root, so from that directory they are `../../../.verify-evidence/...`:
 
 ```
 scripts/launch && scripts/drive screenshots && scripts/cleanup
-scripts/compare <baselineDir> <afterDir>   # dirs under .verify-evidence/screenshots-<ts>/
+scripts/compare ../../../.verify-evidence/screenshots-<baselineTs> ../../../.verify-evidence/screenshots-<afterTs>
 ```
 
-The drive captures full-page PNGs (1440 and 390 wide) and a computed-style fingerprint of every element for `/`, `/resume/`, `/readme/`, `/projects/`, `/factory/`. Capture a baseline on the unchanged tree before editing, then compare. A pure refactor must show zero diffs; every non-zero diff must be an intended change you can name. `/factory/` must always be zero unless you own it. Not covered: hover/focus states, post-click JS states. Also run `npm run gate` (typecheck, build, projects verifier).
+The drive captures full-page PNGs (1440 and 390 wide) and a computed-style fingerprint of every element for `/`, `/resume/`, `/readme/`, `/projects/`, `/factory/`. Capture a baseline on the unchanged tree before editing, then compare. A pure refactor must show zero diffs; every non-zero diff must be an intended change you can name. `/factory/` must always be zero unless you own it. Not covered: hover/focus states, post-click JS states, `/factory/a` and `/factory/b` prototypes, and layout width: the fingerprint has no `width`/`max-width`, so a container-width change is invisible to it (check the PNGs). Also run `npm run gate` (typecheck, build, projects verifier).
 
-Centralization check: grep for `#hex` / `rgb(a)` and raw `rem|px` in `margin|padding|gap` across the page and component files; remaining hits need a justification.
+Centralization check: grep for `#hex` / `rgb(a)`, raw `rem|px` in `margin|padding|gap`, and raw `rem|px|clamp` in `font-size`, across `src/layouts/BaseLayout.astro`, the four pages and `src/components/{resume,projects}/`; remaining hits need a justification.

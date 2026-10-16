@@ -45,8 +45,8 @@ const canonicalUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).toStri
       a { color: inherit; text-decoration: none; }
 
       .site-shell {
-        width: min(100% - 2rem, var(--container-site));
-        margin: 1rem auto 0;
+        width: min(100% - var(--space-8), var(--container-site));
+        margin: var(--space-4) auto 0;
       }
 
       .navbar {
@@ -56,19 +56,19 @@ const canonicalUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).toStri
       .navbar-inner {
         max-width: var(--container-site);
         margin: 0 auto;
-        padding: 1rem;
+        padding: var(--space-4);
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 1rem;
+        gap: var(--space-4);
         flex-wrap: wrap;
       }
 
       .brand {
         display: inline-flex;
         align-items: center;
-        gap: 0.75rem;
-        font-size: 1.5rem;
+        gap: var(--space-3);
+        font-size: var(--text-xl);
         font-weight: 600;
         white-space: nowrap;
       }
@@ -85,7 +85,7 @@ const canonicalUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).toStri
         justify-content: center;
         width: 2.5rem;
         height: 2.5rem;
-        padding: 0.5rem;
+        padding: var(--space-2);
         border: 0;
         border-radius: var(--radius-sm);
         color: var(--base-content);
@@ -100,7 +100,7 @@ const canonicalUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).toStri
       .nav-links {
         display: flex;
         align-items: center;
-        gap: 2rem;
+        gap: var(--space-8);
         margin: 0;
         padding: 0;
         list-style: none;
@@ -110,7 +110,7 @@ const canonicalUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).toStri
       .nav-links a {
         display: block;
         border-radius: var(--radius-sm);
-        padding: 0.5rem 0.75rem;
+        padding: var(--space-2) var(--space-3);
         transition: color var(--transition-base), background var(--transition-base);
       }
 
@@ -120,7 +120,7 @@ const canonicalUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).toStri
 
       main {
         min-height: calc(100vh - 10rem);
-        padding: 2.5rem 1rem 1rem;
+        padding: var(--space-10) var(--space-4) var(--space-4);
       }
 
       .page-section {
@@ -130,7 +130,7 @@ const canonicalUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).toStri
       .content-container {
         width: min(100%, var(--container-site));
         margin: 0 auto;
-        padding: 2rem 0;
+        padding: var(--space-8) 0;
       }
 
       .home-content {
@@ -142,14 +142,14 @@ const canonicalUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).toStri
         display: grid;
         max-width: var(--container-site);
         margin: 0 auto;
-        padding: 2rem 1rem;
-        gap: 2rem;
+        padding: var(--space-8) var(--space-4);
+        gap: var(--space-8);
         align-items: center;
       }
 
       .hero-copy h1 {
         max-width: var(--container-prose);
-        margin: 0 0 1rem;
+        margin: 0 0 var(--space-4);
         font-size: var(--text-hero);
         line-height: 1;
         letter-spacing: -0.035em;
@@ -158,7 +158,7 @@ const canonicalUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).toStri
 
       .hero-copy p {
         max-width: var(--container-prose);
-        margin: 0 0 1.5rem;
+        margin: 0 0 var(--space-6);
         color: var(--muted-content);
         font-size: var(--text-hero-lead);
         font-weight: 300;
@@ -167,17 +167,17 @@ const canonicalUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).toStri
       .hero-actions {
         display: flex;
         flex-direction: column;
-        gap: 1rem;
+        gap: var(--space-4);
       }
 
       .button {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        gap: 0.5rem;
+        gap: var(--space-2);
         border-radius: var(--radius-sm);
-        padding: 0.75rem 1.25rem;
-        font-size: 1rem;
+        padding: var(--space-3) var(--space-5);
+        font-size: var(--text-base);
         font-weight: 500;
         text-align: center;
         transition: background var(--transition-base), border-color var(--transition-base);
@@ -222,20 +222,20 @@ const canonicalUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).toStri
         flex-direction: column;
         align-items: center;
         justify-content: space-between;
-        gap: 1rem;
-        padding: 1.5rem;
+        gap: var(--space-4);
+        padding: var(--space-6);
       }
 
       .footer-social {
         display: flex;
         align-items: center;
-        gap: 1rem;
+        gap: var(--space-4);
       }
 
       .footer-social p {
         margin: 0;
-        padding-right: 0.5rem;
-        font-size: 0.875rem;
+        padding-right: var(--space-2);
+        font-size: var(--text-sm);
       }
 
       .social-link {
@@ -262,8 +262,8 @@ const canonicalUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).toStri
           flex-direction: column;
           align-items: stretch;
           gap: 0;
-          margin-top: 1rem;
-          padding: 1rem;
+          margin-top: var(--space-4);
+          padding: var(--space-4);
           border: 1px solid var(--base-300);
           border-radius: var(--radius-sm);
           background: var(--base-200);
@@ -281,7 +281,7 @@ const canonicalUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).toStri
           grid-template-columns: repeat(12, minmax(0, 1fr));
           padding-top: 4rem;
           padding-bottom: 4rem;
-          gap: 2rem;
+          gap: var(--space-8);
         }
         .hero-copy { grid-column: span 7 / span 7; }
         .hero-image {
