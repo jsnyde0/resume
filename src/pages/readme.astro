@@ -117,13 +117,13 @@ import ResumeCard from '../components/resume/ResumeCard.astro';
 
   <style>
     .readme-page {
-      width: min(100%, 56rem);
+      width: min(100%, var(--container-content));
       margin: 0 auto;
     }
 
     .readme-page__title {
-      margin: 0 0 2rem;
-      font-size: 1.875rem;
+      margin: 0 0 var(--space-8);
+      font-size: var(--text-2xl);
       line-height: 2.25rem;
       font-weight: 700;
     }
@@ -133,12 +133,12 @@ import ResumeCard from '../components/resume/ResumeCard.astro';
       padding-left: 0;
       list-style-position: inside;
       display: grid;
-      gap: 0.75rem;
+      gap: var(--space-3);
     }
 
     .readme-list li {
-      font-size: 0.875rem;
-      line-height: 1.65;
+      font-size: var(--text-sm);
+      line-height: var(--line-height-relaxed);
     }
 
     .readme-link {
@@ -153,7 +153,7 @@ import ResumeCard from '../components/resume/ResumeCard.astro';
 
     @media (min-width: 640px) {
       .readme-list li {
-        font-size: 1rem;
+        font-size: var(--text-base);
       }
     }
   </style>

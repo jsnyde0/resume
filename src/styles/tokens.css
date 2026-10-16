@@ -1,0 +1,127 @@
+/*
+ * Design tokens: the single source of truth for the site's visual values.
+ * Imported once by src/layouts/BaseLayout.astro. Documented in docs/design-system.md.
+ * Additive-only rule: never rename or change an existing token (/factory consumes them).
+ */
+:root {
+  color-scheme: dark;
+
+  /* ── Color palette ── */
+  --base-100: #101c22;
+  --base-200: #0c171d;
+  --base-300: #1a2a32;
+  --base-content: #abc4dc;
+  --muted-content: rgba(171, 196, 220, 0.72);
+  --primary: #ff7f50;
+  --primary-focus: #ff6d3a;
+  --primary-content: #0b1116;
+
+  /* Semantic accent palette (badge / tag colors) */
+  --accent: #8b5cf6;
+  --accent-content: #f8f5ff;
+  --success: #22c55e;
+  --success-content: #052e16;
+  --info: #38bdf8;
+  --info-content: #082f49;
+
+  /* Bright content (headings, important labels) */
+  --content-bright: #f2f7fb;
+
+  /* Tooltip */
+  --tooltip-bg: #071016;
+  --tooltip-text: #f7fbff;
+  --tooltip-dark-bg: #1f2937;
+
+  /* Surface tints */
+  --surface-subtle: rgba(255, 255, 255, 0.02);
+  --border-subtle: rgba(171, 196, 220, 0.12);
+  --primary-tint: rgba(255, 127, 80, 0.08);
+  --info-tint: rgba(56, 189, 248, 0.1);
+
+  /* ── Typography ── */
+  --font-body: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --line-height-body: 1.5;
+  --line-height-relaxed: 1.65;
+
+  /* Type scale: fixed steps */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-prose-sm: 0.95rem;
+  --text-xl: 1.5rem;
+  --text-2xl: 1.875rem;
+  /* Type scale: fluid steps (page titles and ledes) */
+  --text-title: clamp(2rem, 4vw, 2.5rem);
+  --text-lead: clamp(1rem, 2vw, 1.15rem);
+  --text-card-title: clamp(1.1rem, 2.5vw, 1.35rem);
+  --text-hero: clamp(2.25rem, 7vw, 3.75rem);
+  --text-hero-lead: clamp(1rem, 2vw, 1.25rem);
+
+  /* ── Spacing scale (step n = n * 0.25rem) ── */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+
+  /* ── Container widths ── */
+  --container-prose: 42rem;   /* intro / hero copy measure */
+  --container-narrow: 52rem;  /* /projects/ */
+  --container-content: 56rem; /* /resume/, /readme/, home */
+  --container-site: 80rem;    /* site shell, navbar */
+
+  /* ── Border radius ── */
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.25rem;
+  --radius-full: 999px;
+  --radius-button: 0.8rem;
+
+  /* ── Shadows ── */
+  --shadow-card: 0 16px 36px rgba(0, 0, 0, 0.28);
+  --shadow-avatar: 0 12px 28px rgba(0, 0, 0, 0.35);
+
+  /* ── Transitions ── */
+  --transition-base: 160ms ease;
+
+  /* ── Card surface (shared by ResumeCard and ProjectCard) ── */
+  --card-bg: var(--base-200);
+  --card-radius: var(--radius-xl);
+  --card-shadow: var(--shadow-card);
+  --card-padding: var(--space-6);
+  --card-padding-compact: 1.15rem;
+
+  /* ── GitHub-viewer sub-palette (/resume/ only; deliberate sub-theme, not remapped onto the site palette) ── */
+  --ghv-canvas: #0d1117;
+  --ghv-canvas-subtle: #161b22;
+  --ghv-border: #30363d;
+  --ghv-border-muted: #21262d;
+  --ghv-fg: #c9d1d9;
+  --ghv-fg-muted: #8b949e;
+  --ghv-fg-bright: #f0f6fc;
+  --ghv-fg-on-emphasis: #ffffff;
+  --ghv-accent: #58a6ff;
+  --ghv-accent-light: #79c0ff;
+  --ghv-accent-emphasis: #388bfd;
+  --ghv-green: #3fb950;
+  --ghv-btn-green: #238636;
+  --ghv-btn-green-hover: #2ea043;
+  --ghv-tint-control: rgba(255, 255, 255, 0.04);
+  --ghv-tint-pill: rgba(255, 255, 255, 0.06);
+  --ghv-tint-hover: rgba(177, 186, 196, 0.08);
+  --ghv-tint-selected: rgba(56, 139, 253, 0.15);
+  --ghv-tint-selected-hover: rgba(56, 139, 253, 0.2);
+  --ghv-tint-code: rgba(110, 118, 129, 0.4);
+  --ghv-btn-border: rgba(240, 246, 252, 0.1);
+  --ghv-btn-progress: rgba(240, 246, 252, 0.55);
+  --ghv-spinner-track: rgba(255, 255, 255, 0.3);
+  --ghv-radius: 6px;
+  --ghv-radius-sm: 4px;
+  --ghv-radius-xs: 3px;
+}

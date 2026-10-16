@@ -446,8 +446,8 @@ const totalFolders = 4 + skills.subfolders.length; // experience, achievements, 
         dlLabel.textContent = 'if you need this as a PDF, are we really a match?';
         dlLabel.style.whiteSpace = 'normal';
         dlBtn.setAttribute('aria-label', 'if you need this as a PDF, are we really a match?');
-        dlBtn.style.background = '#21262d';
-        dlBtn.style.borderColor = '#30363d';
+        dlBtn.style.background = 'var(--ghv-border-muted)';
+        dlBtn.style.borderColor = 'var(--ghv-border)';
         dlBtn.style.whiteSpace = 'normal';
 
         // Complete bar then fade it
@@ -463,22 +463,22 @@ const totalFolders = 4 + skills.subfolders.length; // experience, achievements, 
 
   <style>
     .resume-page {
-      width: min(100%, 56rem);
+      width: min(100%, var(--container-content));
       margin: 0 auto;
     }
 
     .resume-page__title {
-      margin: 0 0 2rem;
-      font-size: clamp(2rem, 4vw, 2.5rem);
+      margin: 0 0 var(--space-8);
+      font-size: var(--text-title);
       line-height: 1.1;
     }
 
     /* === GITHUB-DARK SHELL === */
     .ghv-shell {
-      background: #0d1117;
-      color: #c9d1d9;
-      border: 1px solid #30363d;
-      border-radius: 6px;
+      background: var(--ghv-canvas);
+      color: var(--ghv-fg);
+      border: 1px solid var(--ghv-border);
+      border-radius: var(--ghv-radius);
       overflow: hidden;
       font-size: 14px;
       line-height: 1.5;
@@ -488,10 +488,10 @@ const totalFolders = 4 + skills.subfolders.length; // experience, achievements, 
     .ghv-header {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: var(--space-2);
       padding: 12px 16px;
-      background: #161b22;
-      border-bottom: 1px solid #30363d;
+      background: var(--ghv-canvas-subtle);
+      border-bottom: 1px solid var(--ghv-border);
       flex-wrap: wrap;
     }
 
@@ -504,23 +504,23 @@ const totalFolders = 4 + skills.subfolders.length; // experience, achievements, 
     }
 
     .ghv-crumb-owner {
-      color: #8b949e;
+      color: var(--ghv-fg-muted);
     }
 
     .ghv-crumb-sep {
-      color: #30363d;
+      color: var(--ghv-border);
       font-size: 1.1em;
     }
 
     .ghv-crumb-repo {
-      color: #58a6ff;
+      color: var(--ghv-accent);
       font-weight: 600;
     }
 
     .ghv-header-pills {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: var(--space-2);
       margin-left: auto;
       flex-shrink: 0;
     }
@@ -530,11 +530,11 @@ const totalFolders = 4 + skills.subfolders.length; // experience, achievements, 
       align-items: center;
       gap: 0.3rem;
       padding: 3px 10px;
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid #30363d;
-      border-radius: 999px;
+      background: var(--ghv-tint-pill);
+      border: 1px solid var(--ghv-border);
+      border-radius: var(--radius-full);
       font-size: 12px;
-      color: #8b949e;
+      color: var(--ghv-fg-muted);
     }
 
     .ghv-pill svg {
@@ -548,12 +548,12 @@ const totalFolders = 4 + skills.subfolders.length; // experience, achievements, 
     .ghv-subheader {
       display: flex;
       align-items: center;
-      gap: 0.75rem;
+      gap: var(--space-3);
       padding: 8px 16px;
-      background: #161b22;
-      border-bottom: 1px solid #30363d;
+      background: var(--ghv-canvas-subtle);
+      border-bottom: 1px solid var(--ghv-border);
       font-size: 12px;
-      color: #8b949e;
+      color: var(--ghv-fg-muted);
       flex-wrap: wrap;
     }
 
@@ -562,12 +562,12 @@ const totalFolders = 4 + skills.subfolders.length; // experience, achievements, 
       align-items: center;
       gap: 0.3rem;
       padding: 3px 8px;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid #30363d;
-      border-radius: 6px;
-      color: #c9d1d9;
+      background: var(--ghv-tint-control);
+      border: 1px solid var(--ghv-border);
+      border-radius: var(--ghv-radius);
+      color: var(--ghv-fg);
       font-size: 12px;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-family: var(--font-mono);
     }
 
     .ghv-branch-badge svg {
@@ -577,7 +577,7 @@ const totalFolders = 4 + skills.subfolders.length; // experience, achievements, 
     }
 
     .ghv-subheader-sep {
-      color: #30363d;
+      color: var(--ghv-border);
     }
 
     /* === MAIN TWO-PANE === */
@@ -589,8 +589,8 @@ const totalFolders = 4 + skills.subfolders.length; // experience, achievements, 
 
     /* === FILE TREE === */
     .ghv-tree {
-      background: #0d1117;
-      border-right: 1px solid #30363d;
+      background: var(--ghv-canvas);
+      border-right: 1px solid var(--ghv-border);
       overflow-y: auto;
       padding: 8px 0;
     }
@@ -602,10 +602,10 @@ const totalFolders = 4 + skills.subfolders.length; // experience, achievements, 
       padding: 6px 12px 8px;
       font-size: 12px;
       font-weight: 600;
-      color: #8b949e;
+      color: var(--ghv-fg-muted);
       text-transform: uppercase;
       letter-spacing: 0.06em;
-      border-bottom: 1px solid #21262d;
+      border-bottom: 1px solid var(--ghv-border-muted);
       margin-bottom: 4px;
     }
 
@@ -619,9 +619,9 @@ const totalFolders = 4 + skills.subfolders.length; // experience, achievements, 
       align-items: center;
       gap: 6px;
       padding: 4px 12px;
-      border-radius: 4px;
+      border-radius: var(--ghv-radius-sm);
       font-size: 13px;
-      color: #c9d1d9;
+      color: var(--ghv-fg);
       cursor: pointer;
       user-select: none;
       white-space: nowrap;
@@ -632,13 +632,13 @@ const totalFolders = 4 + skills.subfolders.length; // experience, achievements, 
     }
 
     .ghv-file:hover {
-      background: rgba(177, 186, 196, 0.08);
-      color: #f0f6fc;
+      background: var(--ghv-tint-hover);
+      color: var(--ghv-fg-bright);
     }
 
     .ghv-file--selected {
-      background: rgba(56, 139, 253, 0.15);
-      color: #ffffff;
+      background: var(--ghv-tint-selected);
+      color: var(--ghv-fg-on-emphasis);
     }
 
     .ghv-file--selected::before {
@@ -648,12 +648,12 @@ const totalFolders = 4 + skills.subfolders.length; // experience, achievements, 
       top: 0;
       bottom: 0;
       width: 2px;
-      background: #58a6ff;
+      background: var(--ghv-accent);
       border-radius: 0 2px 2px 0;
     }
 
     .ghv-file--selected:hover {
-      background: rgba(56, 139, 253, 0.2);
+      background: var(--ghv-tint-selected-hover);
     }
 
     .ghv-file-icon {
@@ -684,15 +684,15 @@ const totalFolders = 4 + skills.subfolders.length; // experience, achievements, 
       padding: 4px 12px;
       font-size: 13px;
       font-weight: 600;
-      color: #c9d1d9;
+      color: var(--ghv-fg);
       cursor: pointer;
       user-select: none;
-      border-radius: 4px;
+      border-radius: var(--ghv-radius-sm);
       transition: background 80ms ease-out;
     }
 
     .ghv-folder-row:hover {
-      background: rgba(177, 186, 196, 0.08);
+      background: var(--ghv-tint-hover);
     }
 
     /* Subfolder rows get extra indent */
@@ -703,7 +703,7 @@ const totalFolders = 4 + skills.subfolders.length; // experience, achievements, 
 
     .ghv-folder-icon {
       flex-shrink: 0;
-      color: #58a6ff;
+      color: var(--ghv-accent);
       width: 16px;
       height: 16px;
       display: flex;
@@ -718,7 +718,7 @@ const totalFolders = 4 + skills.subfolders.length; // experience, achievements, 
 
     .ghv-folder-caret {
       flex-shrink: 0;
-      color: #8b949e;
+      color: var(--ghv-fg-muted);
       font-size: 10px;
       width: 12px;
       text-align: center;
@@ -744,7 +744,7 @@ const totalFolders = 4 + skills.subfolders.length; // experience, achievements, 
 
     /* === PREVIEW PANE === */
     .ghv-preview {
-      background: #0d1117;
+      background: var(--ghv-canvas);
       display: flex;
       flex-direction: column;
       min-width: 0;
@@ -753,17 +753,17 @@ const totalFolders = 4 + skills.subfolders.length; // experience, achievements, 
     .ghv-preview-header {
       display: flex;
       align-items: center;
-      gap: 0.75rem;
+      gap: var(--space-3);
       padding: 10px 16px;
-      background: #161b22;
-      border-bottom: 1px solid #30363d;
+      background: var(--ghv-canvas-subtle);
+      border-bottom: 1px solid var(--ghv-border);
       flex-wrap: wrap;
     }
 
     .ghv-preview-path {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-family: var(--font-mono);
       font-size: 12px;
-      color: #8b949e;
+      color: var(--ghv-fg-muted);
       flex: 1;
       min-width: 0;
       overflow: hidden;
@@ -773,13 +773,13 @@ const totalFolders = 4 + skills.subfolders.length; // experience, achievements, 
 
     /* JS dynamically rewrites this span without scoped attributes — must be fully :global */
     :global(.ghv-preview-path span) {
-      color: #58a6ff;
+      color: var(--ghv-accent);
     }
 
     .ghv-preview-actions {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: var(--space-2);
       flex-shrink: 0;
     }
 
@@ -788,11 +788,11 @@ const totalFolders = 4 + skills.subfolders.length; // experience, achievements, 
       align-items: center;
       gap: 4px;
       padding: 4px 10px;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid #30363d;
-      border-radius: 6px;
+      background: var(--ghv-tint-control);
+      border: 1px solid var(--ghv-border);
+      border-radius: var(--ghv-radius);
       font-size: 12px;
-      color: #c9d1d9;
+      color: var(--ghv-fg);
       cursor: default;
     }
 
@@ -805,7 +805,7 @@ const totalFolders = 4 + skills.subfolders.length; // experience, achievements, 
     /* === RESUME ITEM CARD & GHV PANEL CONTENT (global — targets set:html injected content) === */
     :global(.resume-item-card) {
       display: flex;
-      gap: 1.25rem;
+      gap: var(--space-5);
       align-items: flex-start;
     }
 
@@ -833,16 +833,16 @@ const totalFolders = 4 + skills.subfolders.length; // experience, achievements, 
       flex-wrap: wrap;
       gap: 0.4rem 0.6rem;
       align-items: center;
-      color: #8b949e;
+      color: var(--ghv-fg-muted);
       font-size: 0.875rem;
-      margin: 0.5rem 0 1rem !important;
+      margin: var(--space-2) 0 var(--space-4) !important;
     }
 
     :global(.ghv-item-links) {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.5rem;
-      margin-top: 0.75rem;
+      gap: var(--space-2);
+      margin-top: var(--space-3);
     }
 
     /* === BADGES (inside ghv panels — global) === */
@@ -850,25 +850,25 @@ const totalFolders = 4 + skills.subfolders.length; // experience, achievements, 
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      border-radius: 999px;
-      padding: 0.25rem 0.65rem;
+      border-radius: var(--radius-full);
+      padding: var(--space-1) 0.65rem;
       font-size: 0.8rem;
       font-weight: 700;
       line-height: 1;
       white-space: nowrap;
     }
 
-    :global(.ghv-badge--primary)   { background: #388bfd; color: #ffffff; }
-    :global(.ghv-badge--accent)    { background: #3fb950; color: #0d1117; }
-    :global(.ghv-badge--secondary) { background: #58a6ff; color: #0d1117; }
-    :global(.ghv-badge--info)      { background: #79c0ff; color: #0d1117; }
+    :global(.ghv-badge--primary)   { background: var(--ghv-accent-emphasis); color: var(--ghv-fg-on-emphasis); }
+    :global(.ghv-badge--accent)    { background: var(--ghv-green); color: var(--ghv-canvas); }
+    :global(.ghv-badge--secondary) { background: var(--ghv-accent); color: var(--ghv-canvas); }
+    :global(.ghv-badge--info)      { background: var(--ghv-accent-light); color: var(--ghv-canvas); }
 
     /* === README PROFILE (global) === */
     :global(.ghv-readme-profile) {
       display: flex;
       gap: 1.75rem;
       align-items: flex-start;
-      margin-bottom: 2.5rem;
+      margin-bottom: var(--space-10);
       flex-wrap: wrap;
     }
 
@@ -878,8 +878,8 @@ const totalFolders = 4 + skills.subfolders.length; // experience, achievements, 
       height: 6rem;
       border-radius: 50%;
       overflow: hidden;
-      border: 2px solid #30363d;
-      background: #161b22;
+      border: 2px solid var(--ghv-border);
+      background: var(--ghv-canvas-subtle);
     }
 
     :global(.ghv-readme-avatar__img) {
@@ -898,7 +898,7 @@ const totalFolders = 4 + skills.subfolders.length; // experience, achievements, 
     :global(.ghv-readme.ghv-md .ghv-readme-intro h1) {
       border-bottom: none;
       padding-bottom: 0;
-      margin-bottom: 0.5rem;
+      margin-bottom: var(--space-2);
       font-size: 1.6em;
     }
 
@@ -906,15 +906,15 @@ const totalFolders = 4 + skills.subfolders.length; // experience, achievements, 
       display: flex;
       flex-wrap: wrap;
       gap: 0.4rem;
-      margin: 0 0 1rem;
+      margin: 0 0 var(--space-4);
     }
 
     /* === Markdown-style content rendering (all fully global — targets set:html content) === */
     :global(.ghv-md h1) {
       font-size: 1.5em;
       font-weight: 600;
-      color: #f0f6fc;
-      border-bottom: 1px solid #21262d;
+      color: var(--ghv-fg-bright);
+      border-bottom: 1px solid var(--ghv-border-muted);
       padding-bottom: 0.4em;
       margin: 0 0 0.75em;
       line-height: 1.25;
@@ -923,22 +923,22 @@ const totalFolders = 4 + skills.subfolders.length; // experience, achievements, 
     :global(.ghv-md h2) {
       font-size: 1.25em;
       font-weight: 600;
-      color: #f0f6fc;
-      border-bottom: 1px solid #21262d;
+      color: var(--ghv-fg-bright);
+      border-bottom: 1px solid var(--ghv-border-muted);
       padding-bottom: 0.3em;
       margin: 1.5em 0 0.75em;
       line-height: 1.25;
     }
 
     :global(.ghv-md p) {
-      color: #c9d1d9;
+      color: var(--ghv-fg);
       margin: 0 0 1em;
       line-height: 1.6;
       max-width: 72ch;
     }
 
     :global(.ghv-md ul) {
-      color: #c9d1d9;
+      color: var(--ghv-fg);
       margin: 0 0 1em;
       padding-left: 1.5em;
       line-height: 1.6;
@@ -950,20 +950,20 @@ const totalFolders = 4 + skills.subfolders.length; // experience, achievements, 
     }
 
     :global(.ghv-md strong) {
-      color: #f0f6fc;
+      color: var(--ghv-fg-bright);
       font-weight: 600;
     }
 
     :global(.ghv-md code) {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-family: var(--font-mono);
       font-size: 0.875em;
-      background: rgba(110, 118, 129, 0.4);
-      border-radius: 3px;
+      background: var(--ghv-tint-code);
+      border-radius: var(--ghv-radius-xs);
       padding: 0.1em 0.35em;
     }
 
     :global(.ghv-link) {
-      color: #58a6ff !important;
+      color: var(--ghv-accent) !important;
       text-decoration: none;
     }
 
@@ -978,10 +978,10 @@ const totalFolders = 4 + skills.subfolders.length; // experience, achievements, 
       gap: 6px;
       width: 100%;
       padding: 10px 16px;
-      background: #161b22;
-      border-bottom: 1px solid #30363d;
+      background: var(--ghv-canvas-subtle);
+      border-bottom: 1px solid var(--ghv-border);
       font-size: 13px;
-      color: #c9d1d9;
+      color: var(--ghv-fg);
       cursor: pointer;
       text-align: left;
       border-radius: 0;
@@ -996,7 +996,7 @@ const totalFolders = 4 + skills.subfolders.length; // experience, achievements, 
     .ghv-mobile-toggle-caret {
       margin-left: auto;
       font-size: 11px;
-      color: #8b949e;
+      color: var(--ghv-fg-muted);
       transition: transform 140ms ease-out;
     }
 
@@ -1010,10 +1010,10 @@ const totalFolders = 4 + skills.subfolders.length; // experience, achievements, 
       align-items: center;
       gap: 5px;
       padding: 4px 10px;
-      background: #238636;
-      color: #ffffff;
-      border: 1px solid rgba(240, 246, 252, 0.1);
-      border-radius: 6px;
+      background: var(--ghv-btn-green);
+      color: var(--ghv-fg-on-emphasis);
+      border: 1px solid var(--ghv-btn-border);
+      border-radius: var(--ghv-radius);
       font-size: 12px;
       font-weight: 500;
       font-family: inherit;
@@ -1024,8 +1024,8 @@ const totalFolders = 4 + skills.subfolders.length; // experience, achievements, 
       flex-shrink: 0;
     }
 
-    .ghv-dl-btn:hover { background: #2ea043; }
-    .ghv-dl-btn:focus-visible { outline: 2px solid #58a6ff; outline-offset: 2px; }
+    .ghv-dl-btn:hover { background: var(--ghv-btn-green-hover); }
+    .ghv-dl-btn:focus-visible { outline: 2px solid var(--ghv-accent); outline-offset: 2px; }
 
     .ghv-dl-btn svg {
       width: 13px;
@@ -1037,8 +1037,8 @@ const totalFolders = 4 + skills.subfolders.length; // experience, achievements, 
     .ghv-dl-spinner {
       width: 11px;
       height: 11px;
-      border: 1.5px solid rgba(255, 255, 255, 0.3);
-      border-top-color: #ffffff;
+      border: 1.5px solid var(--ghv-spinner-track);
+      border-top-color: var(--ghv-fg-on-emphasis);
       border-radius: 50%;
       flex-shrink: 0;
       animation: ghv-spin 700ms linear infinite;
@@ -1054,7 +1054,7 @@ const totalFolders = 4 + skills.subfolders.length; // experience, achievements, 
       bottom: 0;
       left: 0;
       height: 2px;
-      background: rgba(240, 246, 252, 0.55);
+      background: var(--ghv-btn-progress);
       width: 0%;
       border-radius: 0 0 0 6px;
       transition: width 900ms cubic-bezier(0.25, 1, 0.5, 1);
@@ -1075,7 +1075,7 @@ const totalFolders = 4 + skills.subfolders.length; // experience, achievements, 
       float: left;
       width: 3.5rem;
       height: 3.5rem;
-      margin: 0 1.25rem 0.75rem 0;
+      margin: 0 var(--space-5) var(--space-3) 0;
       flex: none; /* cancel any residual flex sizing */
     }
 
@@ -1100,7 +1100,7 @@ const totalFolders = 4 + skills.subfolders.length; // experience, achievements, 
     /* === README PROFILE — width-fill layout === */
     :global(.ghv-readme-profile) {
       display: block; /* override flex */
-      margin-bottom: 2.5rem;
+      margin-bottom: var(--space-10);
     }
 
     :global(.ghv-readme-avatar) {
@@ -1109,9 +1109,9 @@ const totalFolders = 4 + skills.subfolders.length; // experience, achievements, 
       height: 6rem;
       border-radius: 50%;
       overflow: hidden;
-      border: 2px solid #30363d;
-      background: #161b22;
-      margin: 0 1.75rem 1rem 0;
+      border: 2px solid var(--ghv-border);
+      background: var(--ghv-canvas-subtle);
+      margin: 0 1.75rem var(--space-4) 0;
       flex: none;
     }
 
@@ -1144,14 +1144,14 @@ const totalFolders = 4 + skills.subfolders.length; // experience, achievements, 
       /* On narrow screens revert to stacked block — no float needed */
       :global(.ghv-item-logo) {
         float: none;
-        margin: 0 0 0.75rem 0;
+        margin: 0 0 var(--space-3) 0;
         width: 2.75rem;
         height: 2.75rem;
       }
 
       :global(.ghv-readme-avatar) {
         float: none;
-        margin: 0 0 1rem 0;
+        margin: 0 0 var(--space-4) 0;
       }
     }
 
@@ -1163,7 +1163,7 @@ const totalFolders = 4 + skills.subfolders.length; // experience, achievements, 
 
       .ghv-tree {
         border-right: none;
-        border-bottom: 1px solid #30363d;
+        border-bottom: 1px solid var(--ghv-border);
         /* collapsed by default on mobile */
         display: none;
         padding: 8px 0;

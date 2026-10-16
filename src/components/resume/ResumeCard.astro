@@ -18,22 +18,22 @@ const { title, tooltip } = Astro.props;
 
 <style>
   .resume-card {
-    margin-bottom: 2rem;
-    border-radius: var(--radius-xl);
-    background: var(--base-200);
-    box-shadow: var(--shadow-card);
-    padding: 1.5rem;
+    margin-bottom: var(--space-8);
+    border-radius: var(--card-radius);
+    background: var(--card-bg);
+    box-shadow: var(--card-shadow);
+    padding: var(--card-padding);
   }
 
   .resume-card__header {
     position: relative;
     display: inline-block;
-    margin-bottom: 1.25rem;
+    margin-bottom: var(--space-5);
   }
 
   .resume-card__title {
     margin: 0;
-    font-size: 1.5rem;
+    font-size: var(--text-xl);
   }
 
   .resume-card__title.has-tooltip {
@@ -52,8 +52,8 @@ const { title, tooltip } = Astro.props;
     border-radius: var(--radius-md);
     background: var(--tooltip-bg);
     color: var(--tooltip-text);
-    padding: 0.5rem 0.75rem;
-    font-size: 0.875rem;
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-sm);
     line-height: 1.35;
     opacity: 0;
     pointer-events: none;
@@ -69,7 +69,7 @@ const { title, tooltip } = Astro.props;
 
   @media (max-width: 767px) {
     .resume-card {
-      padding: 1.15rem;
+      padding: var(--card-padding-compact);
     }
   }
 </style>
