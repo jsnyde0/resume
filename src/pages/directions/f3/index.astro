@@ -1,0 +1,255 @@
+---
+// PROTOTYPE (resume-soe.12) direction F3 "F2 · side by side": homepage.
+// F2's poster (near-black field, shirt-lime name, clog-pink as the single hit), recomposed as two
+// masses facing each other: the full-height figure on the left strides toward the stacked name on the
+// right. They never overlap; they share one floor (the clog soles stand on the baseline of "Snyders").
+// Tagline and links sit in the space above the name, level with his head.
+import DirectionSwitcher from '../../../components/directions/DirectionSwitcher.astro';
+const photo = '/img/jonatan_posing_rocks_hires_no_bg.png';
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="theme-color" content="#151513" />
+    <title>Jonatan Snyders</title>
+    <meta name="description" content="Jonatan Snyders. From catwalks to startups, agent harnesses to existential dread." />
+    <!-- SHORTCUT: Google Fonts link instead of self-hosted fonts. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400..900&display=swap"
+    />
+    <link rel="preload" as="image" href={photo} />
+  </head>
+  <body>
+    <main class="field">
+      <h1 class="name">
+        <span>Jonatan</span>
+        <span>Snyders</span>
+      </h1>
+
+      <div class="intro">
+        <p class="tagline">
+          From catwalks to startups, agent harnesses to existential <mark>dread.</mark>
+        </p>
+
+        <nav class="links" aria-label="Site">
+          <ul class="primary">
+            <li><a href="/factory/">What excites me</a></li>
+            <li><a href="/directions/f3/resume/">What bores me</a></li>
+          </ul>
+          <ul class="secondary">
+            <li><a href="https://github.com/jsnyde0/" rel="me">GitHub</a></li>
+            <li><a href="https://www.linkedin.com/in/jonatan-snyders/" rel="me">LinkedIn</a></li>
+          </ul>
+        </nav>
+      </div>
+
+      <img
+        class="figure"
+        src={photo}
+        alt="Jonatan mid-stride in a lime shirt, black cycling bibs and pink clogs."
+        width="595"
+        height="1041"
+        fetchpriority="high"
+      />
+    </main>
+
+    <DirectionSwitcher current="f3" page="home" />
+  </body>
+</html>
+
+<style is:global>
+  html { background: #151513; }
+  body { margin: 0; }
+</style>
+
+<style>
+  .field {
+    /* Brand palette, lifted from the photo: shirt #abc36d -> lime type, clogs #bb85a7 -> pink hit.
+       The ground is a lifted warm near-black, not #000, so the blue-black bib shorts still read as a shape. */
+    --ground: #151513;
+    --lime: #c8ec6c;
+    --pink: #f294cc;
+    --ink: #0b0b0a;
+    --paper: #efede4;
+    --pad: clamp(1rem, 2.4vw, 2.25rem);
+    --ease: cubic-bezier(0.25, 1, 0.5, 1);
+
+    /* The two masses. The figure is as tall as the screen allows (crisp up to its native 1041px);
+       the name takes whatever width is left beside it. 0.5716 = the cut-out's aspect (595 / 1041).
+       3.86 = width of "Jonatan" in em at this weight and tracking (measured). The height cap keeps
+       room above the name for the tagline and links. */
+    --fig-h: min(calc(100svh - var(--pad)), 1040px);
+    --fig-w: calc(var(--fig-h) * 0.5716);
+    --gap: clamp(1.5rem, 4.5vw, 5rem);
+    --fs: min(
+      calc((100vw - var(--fig-w) - var(--gap) - 2 * var(--pad)) / 3.86),
+      calc((100svh - 17rem) / 1.62),
+      26rem
+    );
+    /* Distance from the bottom of the name's box up to the baseline of "Snyders" (measured, in em):
+       the figure is lifted by the same amount so the clog soles stand on that baseline. */
+    --floor: calc(var(--fs) * 0.25);
+
+    position: relative;
+    box-sizing: border-box;
+    min-height: 100svh;
+    overflow: clip;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-rows: auto 1fr auto;
+    column-gap: var(--gap);
+    padding: var(--pad) var(--pad) 0;
+    background: var(--ground);
+    color: var(--paper);
+    font-family: 'Schibsted Grotesk', 'Helvetica Neue', Arial, sans-serif;
+    font-optical-sizing: auto;
+  }
+
+  .figure {
+    grid-column: 1;
+    grid-row: 1 / -1;
+    align-self: end;
+    display: block;
+    height: calc(var(--fig-h) - var(--floor));
+    width: auto;
+    max-width: none;
+    margin-bottom: var(--floor);
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .name {
+    grid-column: 2;
+    grid-row: 3;
+    align-self: end;
+    margin: 0 0 0 -0.045em;
+    color: var(--lime);
+    font-weight: 900;
+    font-size: var(--fs);
+    line-height: 0.8;
+    letter-spacing: -0.055em;
+    /* Room for the y's descender below the shared floor. */
+    padding-bottom: 0.21em;
+  }
+  .name span { display: block; }
+
+  .intro {
+    grid-column: 2;
+    grid-row: 1;
+    /* Starts level with his eyes rather than the top edge of the screen. */
+    padding-top: calc(var(--fig-h) * 0.06);
+    margin-bottom: 2rem;
+  }
+
+  .tagline {
+    margin: 0 0 clamp(1rem, 2vw, 1.5rem);
+    max-width: 19ch;
+    font-size: clamp(1.6rem, min(2.7vw, 4.6svh), 3.1rem);
+    font-weight: 800;
+    line-height: 1.02;
+    letter-spacing: -0.03em;
+    text-wrap: balance;
+  }
+
+  mark {
+    background: var(--pink);
+    color: var(--ink);
+    padding: 0 0.12em;
+    margin: 0 -0.04em;
+  }
+
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.25rem 2.5rem;
+  }
+  .links ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 1.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    color: var(--lime);
+    text-decoration: underline;
+    text-decoration-thickness: 0.12em;
+    text-underline-offset: 0.18em;
+    transition: background-color 160ms var(--ease), color 160ms var(--ease);
+  }
+  .primary a {
+    font-size: clamp(1.15rem, 1.5vw, 1.4rem);
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+  .secondary a {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--paper);
+  }
+  .links a:hover {
+    background: var(--pink);
+    color: var(--ink);
+    text-decoration-color: transparent;
+  }
+  .links a:focus-visible {
+    outline: 3px solid var(--pink);
+    outline-offset: 3px;
+  }
+  .links a:active { background: var(--lime); color: var(--ink); }
+
+  /* Portrait and narrow screens: there is no room for two columns, so the masses stack.
+     Name first, then the figure, never touching. */
+  @media (max-width: 760px), (max-aspect-ratio: 1/1) {
+    .field {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-rows: auto auto auto;
+      padding-bottom: 4.5rem; /* clears the fixed prototype switcher */
+    }
+    .name {
+      grid-column: 1;
+      grid-row: 1;
+      font-size: min(22.5vw, 15rem);
+      padding-bottom: 0.05em;
+    }
+    .intro {
+      grid-column: 1;
+      grid-row: 2;
+      padding-top: 0;
+      margin: clamp(1.25rem, 6vw, 2rem) 0 0;
+    }
+    .tagline {
+      max-width: 14ch;
+      font-size: clamp(1.9rem, 9vw, 2.8rem);
+      margin-bottom: 0.75rem;
+    }
+    .links {
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+    .figure {
+      grid-column: 1;
+      grid-row: 3;
+      justify-self: center;
+      height: auto;
+      width: min(86%, 500px);
+      margin: 1.75rem 0 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .links a { transition: none; }
+  }
+</style>

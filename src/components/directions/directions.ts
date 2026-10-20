@@ -23,6 +23,10 @@ export const directions: Direction[] = [
   // Round 3 (2026-10-20): F and H reworked; outfit must pop off the ground; resume = the repo explorer reworked; hi-res cut-out + more photos.
   { key: 'f2', name: 'Poster, on black', pitch: 'F on black: lime type, the outfit pops. Resume is the repo explorer rebuilt in the poster language.' },
   { key: 'h2', name: 'Cut-out, refined', pitch: 'H refined with a sharp hi-res cut-out and no lime behind the shirt. Resume is the repo explorer rebuilt around the body.' },
+  // Round 4 (2026-10-20): F2 is the chosen direction; variations on it. Axes: name/photo composition on desktop + a mobile-first resume explorer.
+  { key: 'f3', name: 'F2 · side by side', pitch: 'Name and figure never overlap: name stacked tall on one side, you full height on the other. Mobile resume: list, then tap into a file, back button.' },
+  { key: 'f4', name: 'F2 · standing on the name', pitch: 'The name is the floor: your clogs stand on top of the letters. Mobile resume: compact accordion, files open inline.' },
+  { key: 'f5', name: 'F2 · through the name', pitch: 'You stand centred, the name runs huge behind you at hip height, the body cuts through it. Mobile resume: sticky section tabs.' },
 ];
 
 export type DirectionPage = 'home' | 'resume';

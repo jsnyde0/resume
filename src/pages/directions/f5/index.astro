@@ -1,0 +1,281 @@
+---
+// PROTOTYPE (resume-soe.12) direction F5 "F2 · through the name": homepage.
+// F2's poster on black, recomposed for depth: the figure stands dead centre at full height and the
+// name runs across the whole width BEHIND him at hip height, so the black bibs and legs cut through
+// the lime letters. The shirt always sits on black, above the name; the pink clogs land on black below it.
+// Tagline hangs top-left, links hang top-right, both from the same top line as the head.
+import DirectionSwitcher from '../../../components/directions/DirectionSwitcher.astro';
+const photo = '/img/jonatan_posing_rocks_hires_no_bg.png';
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="theme-color" content="#151513" />
+    <title>Jonatan Snyders</title>
+    <meta name="description" content="Jonatan Snyders. From catwalks to startups, agent harnesses to existential dread." />
+    <!-- SHORTCUT: Google Fonts link instead of self-hosted fonts. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400..900&display=swap"
+    />
+    <link rel="preload" as="image" href={photo} />
+  </head>
+  <body>
+    <main class="field">
+      <p class="tagline">
+        From catwalks to startups, agent harnesses to existential <mark>dread.</mark>
+      </p>
+
+      <nav class="links" aria-label="Site">
+        <ul class="primary">
+          <li><a href="/factory/">What excites me</a></li>
+          <li><a href="/directions/f5/resume/">What bores me</a></li>
+        </ul>
+        <ul class="secondary">
+          <li><a href="https://github.com/jsnyde0/" rel="me">GitHub</a></li>
+          <li><a href="https://www.linkedin.com/in/jonatan-snyders/" rel="me">LinkedIn</a></li>
+        </ul>
+      </nav>
+
+      <div class="stage">
+        <h1 class="name">
+          <span>Jonatan</span>
+          <span>Snyders</span>
+        </h1>
+        <img
+          class="figure"
+          src={photo}
+          alt="Jonatan mid-stride in a lime shirt, black cycling bibs and pink clogs."
+          width="595"
+          height="1041"
+          fetchpriority="high"
+        />
+      </div>
+    </main>
+
+    <DirectionSwitcher current="f5" page="home" />
+  </body>
+</html>
+
+<style is:global>
+  html { background: #151513; }
+  body { margin: 0; }
+</style>
+
+<style>
+  .field {
+    /* Brand palette, lifted from the photo: shirt #abc36d -> lime type, clogs #bb85a7 -> pink hit.
+       The ground is a lifted warm near-black, so the blue-black bibs still read as a shape. */
+    --ground: #151513;
+    --lime: #c8ec6c;
+    --pink: #f294cc;
+    --ink: #0b0b0a;
+    --paper: #efede4;
+    --pad: clamp(1rem, 2.4vw, 2.25rem);
+    /* Clear floor under the clogs: the pink shoes are the point, keep them off the bottom edge
+       (and clear of the fixed prototype switcher). */
+    --floor: 4.25rem;
+    --ease: cubic-bezier(0.25, 1, 0.5, 1);
+
+    position: relative;
+    box-sizing: border-box;
+    height: max(100svh, 600px);
+    overflow: clip;
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    grid-template-rows: auto 1fr;
+    column-gap: var(--pad);
+    padding: var(--pad) var(--pad) 0;
+    background: var(--ground);
+    color: var(--paper);
+    font-family: 'Schibsted Grotesk', 'Helvetica Neue', Arial, sans-serif;
+    font-optical-sizing: auto;
+  }
+
+  /* ── Top line: tagline hangs from the left edge, links from the right ── */
+  .tagline {
+    grid-column: 1 / span 4;
+    grid-row: 1;
+    position: relative;
+    z-index: 3;
+    margin: 0;
+    max-width: 14ch;
+    font-size: clamp(1.75rem, min(2.75vw, 4.6svh), 3.1rem);
+    font-weight: 800;
+    line-height: 1.02;
+    letter-spacing: -0.03em;
+    text-wrap: balance;
+  }
+
+  mark {
+    background: var(--pink);
+    color: var(--ink);
+    padding: 0 0.12em;
+    margin: 0 -0.04em;
+  }
+
+  .links {
+    grid-column: 9 / -1;
+    grid-row: 1;
+    align-self: start;
+    position: relative;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.75rem;
+    /* Optically align the first link's cap line with the tagline's. */
+    margin-top: -0.35rem;
+  }
+  .links ul {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .secondary { flex-direction: row !important; gap: 0 1.5rem; }
+  .links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    color: var(--lime);
+    text-decoration: underline;
+    text-decoration-thickness: 0.1em;
+    text-underline-offset: 0.18em;
+    transition: background-color 160ms var(--ease), color 160ms var(--ease);
+  }
+  .primary a {
+    font-size: clamp(1.25rem, 1.9vw, 1.75rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    min-height: 0;
+    padding: 0.1em 0;
+  }
+  .secondary a {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--paper);
+  }
+  .links a:hover {
+    background: var(--pink);
+    color: var(--ink);
+    text-decoration-color: transparent;
+  }
+  .links a:focus-visible {
+    outline: 3px solid var(--pink);
+    outline-offset: 3px;
+  }
+  .links a:active { background: var(--lime); color: var(--ink); }
+
+  /* ── The stage: figure in front, name behind at hip height ── */
+  .stage {
+    /* Spans the whole field so the figure can use the full height, top line to floor. */
+    position: absolute;
+    inset: var(--pad) 0 var(--floor);
+    z-index: 1;
+    container-type: size;
+    pointer-events: none;
+  }
+
+  .figure {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    z-index: 2;
+    display: block;
+    height: min(100cqh, 1040px);
+    width: auto;
+    max-width: none;
+    /* The cut-out's body axis (shorts + standing leg) sits just right of the image centre; nudge
+       the image so the body, not the bounding box, is on the centre line. */
+    transform: translateX(-52%);
+    user-select: none;
+  }
+
+  .name {
+    /* --h = rendered figure height. The name's baseline sits at the bottom of the bib shorts
+       (~60% down the figure) and its cap line below the shirt hem (~34%), so only the bibs,
+       the hands and the legs cross the letters. */
+    --h: min(100cqh, 1040px);
+    position: absolute;
+    left: var(--pad);
+    right: var(--pad);
+    bottom: calc(var(--h) * 0.385);
+    z-index: 1;
+    display: flex;
+    justify-content: space-between;
+    margin: 0;
+    color: var(--lime);
+    font-weight: 900;
+    /* Fitted so "Jonatan Snyders" runs edge to edge on one line: the two words measure ~7.81em,
+       plus ~0.3em of extra word space so the body eats half of the n and half of the S, not all. */
+    font-size: calc((100cqw - 2 * var(--pad)) / 8.1);
+    line-height: 0.74;
+    letter-spacing: -0.055em;
+    white-space: nowrap;
+  }
+  /* Pay back the last letter's negative tracking so the box holds the ink (keeps the s inside the pad). */
+  .name span { display: block; padding-right: 0.055em; }
+
+  /* Portrait screens: stack tagline and links above, name breaks onto two lines so it stays huge,
+     the same depth trick at phone scale. */
+  @media (max-width: 760px), (max-aspect-ratio: 4/5) {
+    .field {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-rows: auto auto 1fr;
+      /* A definite height, so the stage row (1fr) is definite and its cqh units resolve. */
+      height: max(100svh, 720px);
+      --floor: 4.5rem;
+    }
+    .tagline {
+      grid-column: 1;
+      grid-row: 1;
+      max-width: 13ch;
+      font-size: clamp(1.9rem, 8.6vw, 3rem);
+    }
+    .links {
+      grid-column: 1;
+      grid-row: 2;
+      align-items: flex-start;
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 0.25rem 1.5rem;
+      margin: 0.75rem 0 0;
+    }
+    .links ul { align-items: flex-start; }
+    .primary { flex-direction: column; }
+    .primary a { font-size: 1.3rem; min-height: 44px; padding: 0; }
+    .secondary { align-self: flex-end; }
+    .stage {
+      position: relative;
+      inset: auto;
+      grid-row: 3;
+      min-height: 0;
+      margin: 1.25rem calc(-1 * var(--pad)) var(--floor);
+    }
+    .figure { height: min(100cqh, 175cqw); }
+    .name {
+      --h: min(100cqh, 175cqw);
+      flex-direction: column;
+      /* Width-fitted, but capped by the figure's height so both lines stay between the shirt hem
+         and the knees on tall-narrow screens (else the shirt would land on lime). */
+      font-size: min(calc((100cqw - 2 * var(--pad)) / 3.95), calc(var(--h) * 0.17));
+      line-height: 0.74;
+      bottom: calc(var(--h) * 0.36);
+    }
+    .name span:last-child { align-self: flex-end; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .links a { transition: none; }
+  }
+</style>

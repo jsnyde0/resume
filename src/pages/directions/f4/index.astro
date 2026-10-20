@@ -1,0 +1,263 @@
+---
+// PROTOTYPE (resume-soe.12) direction F4 "F2 · standing on the name": homepage.
+// F2's identity (near-black field, shirt-lime poster type, clog-pink as the single hit), recomposed:
+// the name is the floor. "Jonatan Snyders" runs across the foot of the screen in one lime line and
+// the full-colour figure stands on it, back clog planted on the cap of the S, front clog mid-stride
+// over the "ny". Nothing of the body crosses a letter; the tagline and links sit in the air beside him.
+import DirectionSwitcher from '../../../components/directions/DirectionSwitcher.astro';
+const photo = '/img/jonatan_posing_rocks_hires_no_bg.png';
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="theme-color" content="#151513" />
+    <title>Jonatan Snyders</title>
+    <meta name="description" content="Jonatan Snyders. From catwalks to startups, agent harnesses to existential dread." />
+    <!-- SHORTCUT: Google Fonts link instead of self-hosted fonts. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400..900&display=swap"
+    />
+    <link rel="preload" as="image" href={photo} />
+  </head>
+  <body>
+    <main class="field">
+      <div class="air">
+        <p class="tagline">
+          From catwalks to startups, agent harnesses to existential <mark>dread.</mark>
+        </p>
+
+        <nav class="links" aria-label="Site">
+          <ul class="primary">
+            <li><a href="/factory/">What excites me</a></li>
+            <li><a href="/directions/f4/resume/">What bores me</a></li>
+          </ul>
+          <ul class="secondary">
+            <li><a href="https://github.com/jsnyde0/" rel="me">GitHub</a></li>
+            <li><a href="https://www.linkedin.com/in/jonatan-snyders/" rel="me">LinkedIn</a></li>
+          </ul>
+        </nav>
+      </div>
+
+      <div class="floor">
+        <h1 class="name"><span class="first">Jonatan</span> <span class="last">Snyders</span></h1>
+        <img
+          class="figure"
+          src={photo}
+          alt="Jonatan mid-stride in a lime shirt, black cycling bibs and pink clogs."
+          width="595"
+          height="1041"
+          fetchpriority="high"
+        />
+      </div>
+    </main>
+
+    <DirectionSwitcher current="f4" page="home" />
+  </body>
+</html>
+
+<style is:global>
+  html { background: #151513; }
+  body { margin: 0; }
+</style>
+
+<style>
+  .field {
+    --ground: #151513;
+    --lime: #c8ec6c;
+    --pink: #f294cc;
+    --ink: #0b0b0a;
+    --paper: #efede4;
+    --pad: clamp(1rem, 2.4vw, 2.25rem);
+    --ease: cubic-bezier(0.25, 1, 0.5, 1);
+
+    /* Glyph geometry of Schibsted Grotesk 900 at letter-spacing -0.05em, in em of the name.
+       Measured once in Chrome (canvas measureText + a baseline probe), then the cap nudged by eye so
+       the sole touches the S with no gap; the figure is placed from these. */
+    --name-w: 7.9;   /* advance width of "Jonatan Snyders" */
+    --s-mid: 4.27;   /* centre of the S's ink, from the J's ink edge */
+    --cap: 0.876;    /* top of the S (cap + overshoot), up from the bottom of the name block */
+    /* The cut-out is 595 x 1041; the back clog's sole is flat from x 20 to 130 and touches y 1038. */
+    --sole-x: 0.126; /* sole centre, as a fraction of the figure's width */
+    --sole-y: 0.003; /* transparent strip under the sole, as a fraction of the figure's height */
+
+    position: relative;
+    box-sizing: border-box;
+    min-height: 100svh;
+    overflow: clip;
+    display: grid;
+    grid-template-rows: 1fr auto;
+    padding: var(--pad) var(--pad) 0;
+    background: var(--ground);
+    color: var(--paper);
+    font-family: 'Schibsted Grotesk', 'Helvetica Neue', Arial, sans-serif;
+    font-optical-sizing: auto;
+  }
+
+  /* ── The air: everything that is not the floor ─────────── */
+  .air {
+    grid-row: 1;
+    /* The words stand on the floor too: bottom of the air, just above "Jonatan". */
+    align-self: end;
+    padding-bottom: clamp(1.5rem, 4svh, 3rem);
+    position: relative;
+    z-index: 3;
+    max-width: calc(var(--f) * var(--s-mid) - var(--sole-x) * var(--fig-w) - 2rem);
+  }
+
+  .tagline {
+    margin: 0 0 clamp(1rem, 2vw, 1.5rem);
+    max-width: 13ch;
+    font-size: clamp(1.75rem, min(4.3vw, 7.4svh), 4.75rem);
+    font-weight: 800;
+    line-height: 0.98;
+    letter-spacing: -0.035em;
+    text-wrap: balance;
+  }
+
+  mark {
+    background: var(--pink);
+    color: var(--ink);
+    padding: 0 0.12em;
+    margin: 0 -0.04em;
+  }
+
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.25rem 2.5rem;
+  }
+  .links ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 1.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    color: var(--lime);
+    text-decoration: underline;
+    text-decoration-thickness: 0.12em;
+    text-underline-offset: 0.18em;
+    transition: background-color 160ms var(--ease), color 160ms var(--ease);
+  }
+  .primary a {
+    font-size: clamp(1.15rem, 1.5vw, 1.4rem);
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+  .secondary a {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--paper);
+  }
+  .links a:hover {
+    background: var(--pink);
+    color: var(--ink);
+    text-decoration-color: transparent;
+  }
+  .links a:focus-visible {
+    outline: 3px solid var(--pink);
+    outline-offset: 3px;
+  }
+  .links a:active { background: var(--lime); color: var(--ink); }
+
+  /* ── The floor: the name, and him on it ──────────────── */
+  .floor {
+    grid-row: 2;
+    min-width: 0;
+    position: relative;
+  }
+
+  .name {
+    margin: 0 0 0 -0.045em;
+    color: var(--lime);
+    font-weight: 900;
+    font-size: var(--f);
+    line-height: 1;
+    letter-spacing: -0.05em;
+    white-space: nowrap;
+    /* The y's descender (0.19em) just clears the screen edge. */
+    padding-bottom: 0.045em;
+  }
+
+  .figure {
+    position: absolute;
+    z-index: 2;
+    /* The sole lands on the cap of the S: line box bottom + cap height, minus the transparent strip. */
+    bottom: calc(var(--f) * var(--cap) - var(--sole-y) * var(--fig-h));
+    left: calc(var(--f) * var(--s-mid) - var(--sole-x) * var(--fig-w));
+    display: block;
+    height: var(--fig-h);
+    width: var(--fig-w);
+    max-width: none;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  /* Desktop: one line of name, full width; the figure takes the height that is left above it. */
+  .field {
+    --f: calc((100vw - 2 * var(--pad)) / var(--name-w));
+    --fig-h: min(1040px, 100svh - var(--pad) - var(--f) * var(--cap) - 0.5rem);
+    --fig-w: calc(var(--fig-h) * 0.5716);
+  }
+
+  /* Mobile: the name breaks onto two lines so it stays poster-sized, and he stands on the first one,
+     back clog on the flat top of the J, front clog stepping out over "on". Words above, in the air.
+     Portrait tablets take this layout too: one line of name would leave him towering over a thin strip. */
+  @media (max-width: 760px), (max-aspect-ratio: 1/1) {
+    .field {
+      --f: calc((100vw - 2 * var(--pad)) / 3.95); /* "Snyders", the wider word, edge to edge */
+      --fig-h: clamp(300px, 100svh - 4.5rem - var(--f) * 1.86 - 13.5rem, 1040px);
+      grid-template-rows: auto 1fr;
+      padding-bottom: 4.5rem; /* clears the fixed prototype switcher */
+    }
+    .air {
+      grid-row: 1;
+      align-self: start;
+      max-width: none;
+      padding-bottom: 1rem;
+    }
+    .tagline {
+      max-width: 16ch;
+      margin-bottom: 0.5rem;
+      font-size: clamp(1.6rem, 7.4vw, 2.4rem);
+      line-height: 1;
+    }
+    .links { gap: 0 1.25rem; }
+    .links ul { gap: 0 1.25rem; }
+    .primary a { font-size: 1.1rem; }
+    .floor {
+      align-self: end;
+      display: flex;
+      flex-direction: column;
+    }
+    .name { order: 2; line-height: 0.86; padding-bottom: 0.12em; }
+    .name span { display: block; }
+    .figure {
+      order: 1;
+      position: relative;
+      bottom: auto;
+      /* Centre of the sole over the centre of the J (0.29em in, less the name's -0.045em pull). */
+      left: auto;
+      margin-left: calc(var(--f) * 0.245 - var(--sole-x) * var(--fig-w));
+      /* Pull the name up so the J's flat top (0.12em below its line box top, measured by eye) meets the sole. */
+      margin-bottom: calc(var(--sole-y) * var(--fig-h) - var(--f) * 0.12);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .links a { transition: none; }
+  }
+</style>

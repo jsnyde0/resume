@@ -1,0 +1,904 @@
+---
+// PROTOTYPE (resume-soe.12) direction F5 "F2 · through the name": resume slice.
+// F2's repo explorer (README landing file, folders, every item a file you open). Desktop keeps F2's
+// two panes: giant lime folder words on the left, the open file set like poster type on the right.
+// Mobile is rebuilt around sticky section tabs: one compact bar holds the five sections, under it the
+// section's files as a short list, and the open file directly beneath. Once the list scrolls away,
+// the bar shows where you are and takes you back to the list in one tap. Pink marks the open file.
+import DirectionSwitcher from '../../../components/directions/DirectionSwitcher.astro';
+import { achievements, education, resumeIntro, workExperience } from '../../../data/resume';
+import type { ResumeItem } from '../../../data/resume';
+import { skillFiles } from '../../../data/resume-skills';
+import { buildSection, buildSkills } from '../../../lib/resume-tree';
+import type { TreeFolder } from '../../../lib/resume-tree';
+
+const years = (range: string) => {
+  const ys = range.match(/\d{4}/g) ?? [];
+  const open = /\.\.\./.test(range);
+  const from = ys[0] ?? range;
+  const to = open ? 'now' : ys[1];
+  return to ? `${from}–${to}` : from;
+};
+
+// Skill files carry their filename as an <h1>; the poster sets a readable title instead.
+const acronyms: Record<string, string> = { llm: 'LLM', apis: 'APIs', mmm: 'MMM' };
+const titleFromFile = (f: string) =>
+  f
+    .replace(/\.md$/, '')
+    .split('-')
+    .map((w) => acronyms[w] ?? w)
+    .join(' ')
+    .replace(/^./, (c) => c.toUpperCase());
+
+const renderItem = (item: ResumeItem) => {
+  const place = [item.company, item.location].filter(Boolean).join(', ');
+  const links = item.links?.length
+    ? `<p class="p-links">${item.links
+        .map((l) => `<a href="${l.href}" target="_blank" rel="noreferrer">${l.label}</a>`)
+        .join('')}</p>`
+    : '';
+  return `
+<h2 class="p-title">${item.title.trim()}</h2>
+<p class="p-meta"><span class="p-role">${item.role}</span><span>${place}</span><span>${years(item.dateRange)}</span></p>
+<div class="p-prose"><p>${item.body}</p></div>
+${links}`;
+};
+
+const experience = buildSection('experience', workExperience, renderItem);
+const achievementSection = buildSection('achievements', achievements, renderItem);
+const educationSection = buildSection('education', education, renderItem);
+const skills = buildSkills(skillFiles);
+
+for (const [path, html] of Object.entries(skills.contents)) {
+  const file = path.split('/').pop() ?? path;
+  skills.contents[path] = `
+<h2 class="p-title">${titleFromFile(file)}</h2>
+<div class="p-prose p-skill">${html.replace(/<h1>[\s\S]*?<\/h1>/, '')}</div>`;
+}
+
+// Years shown beside each file in the tree (dated sections only).
+const itemYears: Record<string, string> = {};
+for (const [section, items] of [
+  [experience, workExperience],
+  [achievementSection, achievements],
+  [educationSection, education],
+] as const) {
+  section.files.forEach((f, i) => (itemYears[f.path] = years(items[i].dateRange)));
+}
+
+const folders: (TreeFolder & { label: string })[] = [
+  { name: 'experience', label: 'Experience', files: experience.files },
+  { name: 'achievements', label: 'Achievements', files: achievementSection.files },
+  { name: 'skills', label: 'Skills', files: [], subfolders: skills.subfolders },
+  { name: 'education', label: 'Education', files: educationSection.files },
+];
+const countFiles = (f: TreeFolder): number =>
+  f.files.length + (f.subfolders ?? []).reduce((n, s) => n + countFiles(s), 0);
+
+const readmeHtml = `
+<div class="readme">
+  <div class="readme-head">
+    <h2 class="p-title p-title--readme">Jonatan Snyders</h2>
+    <p class="readme-roles">${resumeIntro.headlineBadges.join('<br />')}</p>
+  </div>
+  <img class="readme-photo" src="/img/jonatan_roaring_no_bg.png" alt="Jonatan on all fours on a rock, roaring at the camera." width="436" height="437" loading="lazy" />
+  <div class="p-prose readme-prose">${resumeIntro.paragraphs.map((p) => `<p>${p}</p>`).join('')}</div>
+</div>`;
+
+const contents: Record<string, string> = {
+  'README.md': readmeHtml,
+  ...experience.contents,
+  ...achievementSection.contents,
+  ...skills.contents,
+  ...educationSection.contents,
+};
+const panelId = (path: string) => 'f-' + path.replace(/[^a-z0-9]+/gi, '-');
+const DEFAULT_PATH = 'README.md';
+
+// Reading order inside each section, so every file can hand you to the next one.
+const flatFiles = (f: TreeFolder): string[] => [
+  ...f.files.map((x) => x.path),
+  ...(f.subfolders ?? []).flatMap((sub) => flatFiles(sub)),
+];
+const nextInSection: Record<string, { path: string; name: string }> = {};
+for (const folder of folders) {
+  const paths = flatFiles(folder);
+  paths.forEach((p, i) => {
+    const next = paths[i + 1];
+    if (next) nextInSection[p] = { path: next, name: next.split('/').pop() ?? next };
+  });
+}
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="theme-color" content="#151513" />
+    <title>Resume | Jonatan Snyders</title>
+    <meta name="description" content="Resume of Jonatan Snyders: web developer, data scientist, ex-founder, growth engineer." />
+    <!-- SHORTCUT: Google Fonts link instead of self-hosted fonts. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400..900&display=swap"
+    />
+  </head>
+  <body class="f5">
+    <header class="top">
+      <a class="home" href="/directions/f5/">
+        <img src="/img/avatar_jonatan.png" alt="" width="253" height="252" />
+        <span>Jonatan Snyders</span>
+      </a>
+      <h1 class="top-title">Resume</h1>
+      <ul class="top-links">
+        <li><a href="https://github.com/jsnyde0/" rel="me">GitHub</a></li>
+        <li><a href="https://www.linkedin.com/in/jonatan-snyders/" rel="me">LinkedIn</a></li>
+      </ul>
+    </header>
+
+    <nav class="mnav" id="mnav" aria-label="Resume sections">
+      <ul class="mtabs" id="mtabs">
+        <li><button class="mtab" type="button" data-section="readme" aria-current="true">README</button></li>
+        {folders.map((folder) => (
+          <li><button class="mtab" type="button" data-section={folder.name} aria-current="false">{folder.label}</button></li>
+        ))}
+      </ul>
+      <button class="mcrumb" id="mcrumb" type="button" tabindex="-1" aria-hidden="true">
+        <span class="mcrumb-path"><span class="mcrumb-dir"></span><span class="mcrumb-file"></span></span>
+        <span class="mcrumb-up">Files <span aria-hidden="true">&uarr;</span></span>
+      </button>
+    </nav>
+
+    <main class="explorer">
+      <div class="mfiles" id="mfiles">
+        {folders.map((folder) => (
+          <div class="mgroup" data-section={folder.name} hidden>
+            {folder.subfolders?.length ? (
+              <>
+                <ul class="msubs" aria-label={`${folder.label} folders`}>
+                  {folder.subfolders.map((sub, i) => (
+                    <li>
+                      <button class="msub" type="button" data-sub={`${folder.name}/${sub.name}`} aria-pressed={i === 0 ? "true" : "false"}>
+                        {sub.name}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+                {folder.subfolders.map((sub, i) => (
+                  <ul class="mlist" data-sub-list={`${folder.name}/${sub.name}`} hidden={i !== 0}>
+                    {sub.files.map((file) => (
+                      <li>
+                        <button class="file mleaf" type="button" data-path={file.path} aria-controls={panelId(file.path)}>
+                          <span class="leaf-name">{file.name}</span>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                ))}
+              </>
+            ) : (
+              <ul class="mlist">
+                {folder.files.map((file) => (
+                  <li>
+                    <button class="file mleaf" type="button" data-path={file.path} aria-controls={panelId(file.path)}>
+                      <span class="leaf-name">{file.name}</span>
+                      {itemYears[file.path] && <span class="leaf-meta">{itemYears[file.path]}</span>}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        ))}
+      </div>
+
+      <nav class="tree" id="tree" aria-label="Resume files">
+        <ul class="tree-root">
+          <li>
+            <button
+              class="sect file"
+              type="button"
+              data-path="README.md"
+              aria-controls={panelId('README.md')}
+              aria-current="true"
+            >README</button>
+          </li>
+          {folders.map((folder) => (
+            <li class="folder">
+              <button
+                class="sect folder-toggle"
+                type="button"
+                aria-expanded="false"
+                aria-controls={`dir-${folder.name}`}
+                data-folder={folder.name}
+              >
+                <span>{folder.label}</span>
+                <span class="count" aria-label={`${countFiles(folder)} files`}>{countFiles(folder)}</span>
+              </button>
+              <ul class="files" id={`dir-${folder.name}`} hidden>
+                {folder.files.map((file) => (
+                  <li>
+                    <button class="file leaf" type="button" data-path={file.path} aria-controls={panelId(file.path)}>
+                      <span class="leaf-name">{file.name}</span>
+                      {itemYears[file.path] && <span class="leaf-meta">{itemYears[file.path]}</span>}
+                    </button>
+                  </li>
+                ))}
+                {folder.subfolders?.map((sub) => (
+                  <li class="sub">
+                    <button
+                      class="sub-toggle"
+                      type="button"
+                      aria-expanded="false"
+                      aria-controls={`dir-${folder.name}-${sub.name}`}
+                      data-folder={`${folder.name}/${sub.name}`}
+                    >
+                      {sub.name}/
+                    </button>
+                    <ul class="files files--sub" id={`dir-${folder.name}-${sub.name}`} hidden>
+                      {sub.files.map((file) => (
+                        <li>
+                          <button class="file leaf" type="button" data-path={file.path} aria-controls={panelId(file.path)}>
+                            <span class="leaf-name">{file.name}</span>
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </li>
+                ))}
+              </ul>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
+      <section class="pane" id="pane" aria-label="Open file">
+        {Object.entries(contents).map(([path, html]) => {
+          const parts = path.split('/');
+          const file = parts.pop();
+          return (
+            <article class="panel" id={panelId(path)} data-panel={path} tabindex="-1" hidden={path !== DEFAULT_PATH}>
+              <p class="p-path">
+                {parts.map((p) => <span class="p-dir">{p}/</span>)}
+                <span class="p-file">{file}</span>
+              </p>
+              <Fragment set:html={html} />
+              {nextInSection[path] && (
+                <p class="p-next">
+                  <button class="file next" type="button" data-path={nextInSection[path].path} aria-controls={panelId(nextInSection[path].path)}>
+                    <span class="next-label">Next</span>
+                    <span class="next-name">{nextInSection[path].name}</span>
+                  </button>
+                </p>
+              )}
+            </article>
+          );
+        })}
+      </section>
+    </main>
+
+    <DirectionSwitcher current="f5" page="resume" />
+
+    <script>
+      const DEFAULT_PATH = 'README.md';
+      const desktop = window.matchMedia('(min-width: 861px)');
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+      const behavior = (): ScrollBehavior => (reduced.matches ? 'auto' : 'smooth');
+
+      const fileButtons = [...document.querySelectorAll<HTMLButtonElement>('button[data-path]')];
+      const panels = [...document.querySelectorAll<HTMLElement>('[data-panel]')];
+      const tabs = [...document.querySelectorAll<HTMLButtonElement>('.mtab')];
+      const groups = [...document.querySelectorAll<HTMLElement>('.mgroup')];
+      const mnav = document.getElementById('mnav') as HTMLElement;
+      const mtabs = document.getElementById('mtabs') as HTMLElement;
+      const mfiles = document.getElementById('mfiles') as HTMLElement;
+      const crumb = document.getElementById('mcrumb') as HTMLButtonElement;
+
+      const sectionOf = (path: string) => (path === DEFAULT_PATH ? 'readme' : path.split('/')[0]);
+      // The last file read in each section, so a tab brings you back to where you were.
+      const lastIn: Record<string, string> = { readme: DEFAULT_PATH };
+      let currentPath = DEFAULT_PATH;
+
+      /* ── Desktop tree ── */
+      function setFolder(toggle: HTMLButtonElement, open: boolean) {
+        const list = document.getElementById(toggle.getAttribute('aria-controls') ?? '');
+        if (!list) return;
+        list.hidden = !open;
+        toggle.setAttribute('aria-expanded', String(open));
+      }
+      document.querySelectorAll<HTMLButtonElement>('button[data-folder]').forEach((toggle) => {
+        toggle.addEventListener('click', () => setFolder(toggle, toggle.getAttribute('aria-expanded') !== 'true'));
+      });
+      // Open every folder on the way to a file, so a deep link shows where you are.
+      function revealInTree(path: string) {
+        const parts = path.split('/').slice(0, -1);
+        for (let i = 1; i <= parts.length; i++) {
+          const t = document.querySelector<HTMLButtonElement>(`button[data-folder="${parts.slice(0, i).join('/')}"]`);
+          if (t) setFolder(t, true);
+        }
+      }
+
+      /* ── Mobile: section tabs, the section's file list, the crumb ── */
+      function showSub(sub: string) {
+        document.querySelectorAll<HTMLButtonElement>('.msub').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.sub === sub)));
+        document.querySelectorAll<HTMLElement>('[data-sub-list]').forEach((l) => (l.hidden = l.dataset.subList !== sub));
+        const li = document.querySelector<HTMLElement>(`.msub[data-sub="${sub}"]`)?.parentElement;
+        const row = li?.parentElement;
+        if (li && row) row.scrollTo({ left: Math.max(0, li.offsetLeft - (row.clientWidth - li.offsetWidth) / 2), behavior: behavior() });
+      }
+
+      function syncMobile(path: string) {
+        const section = sectionOf(path);
+        tabs.forEach((t) => t.setAttribute('aria-current', String(t.dataset.section === section)));
+        groups.forEach((g) => (g.hidden = g.dataset.section !== section));
+        mfiles.classList.toggle('is-empty', section === 'readme');
+        updateCrumb();
+        const parts = path.split('/');
+        if (parts.length > 2) showSub(parts.slice(0, 2).join('/'));
+        (crumb.querySelector('.mcrumb-dir') as HTMLElement).textContent = parts.length > 1 ? parts[parts.length - 2] + '/' : '';
+        (crumb.querySelector('.mcrumb-file') as HTMLElement).textContent = parts[parts.length - 1];
+        // Keep the active tab in view inside the bar without moving the page.
+        const tab = tabs.find((t) => t.dataset.section === section);
+        const li = tab?.parentElement;
+        if (li) {
+          const left = li.offsetLeft - (mtabs.clientWidth - li.offsetWidth) / 2;
+          mtabs.scrollTo({ left: Math.max(0, left), behavior: behavior() });
+        }
+      }
+
+      // The scroll position at which the file list sits right under the sticky bar.
+      const listAnchor = () => mfiles.getBoundingClientRect().top + window.scrollY - mtabs.offsetHeight;
+      function backToList() {
+        const y = listAnchor();
+        if (window.scrollY > y + 1) window.scrollTo({ top: y, behavior: behavior() });
+      }
+
+      function open(path: string, opts: { userAction: boolean }) {
+        const panel = panels.find((p) => p.dataset.panel === path);
+        if (!panel) return;
+        currentPath = path;
+        lastIn[sectionOf(path)] = path;
+        panels.forEach((p) => (p.hidden = p !== panel));
+        fileButtons.forEach((b) => {
+          if (!b.classList.contains('next')) b.setAttribute('aria-current', String(b.dataset.path === path));
+        });
+        panel.classList.remove('is-entering');
+        void panel.offsetWidth; // restart the entrance
+        panel.classList.add('is-entering');
+        revealInTree(path);
+        syncMobile(path);
+        history.replaceState(null, '', path === DEFAULT_PATH ? location.pathname : `#${path}`);
+        if (!opts.userAction) return;
+        if (desktop.matches) {
+          const pane = document.getElementById('pane');
+          if (!pane) return;
+          pane.scrollTop = 0;
+          if (pane.getBoundingClientRect().top < 0) pane.scrollIntoView({ behavior: behavior() });
+        } else {
+          // Never send the reader up to a menu: the list stays put and the file opens right under it.
+          backToList();
+        }
+      }
+
+      fileButtons.forEach((b) => b.addEventListener('click', () => open(b.dataset.path ?? DEFAULT_PATH, { userAction: true })));
+
+      tabs.forEach((t) =>
+        t.addEventListener('click', () => {
+          const section = t.dataset.section ?? 'readme';
+          if (sectionOf(currentPath) === section) {
+            backToList();
+            return;
+          }
+          const first = document.querySelector<HTMLButtonElement>(`.mgroup[data-section="${section}"] button[data-path]`);
+          open(lastIn[section] ?? first?.dataset.path ?? DEFAULT_PATH, { userAction: true });
+        }),
+      );
+
+      // A skills folder chip shows its files and opens the first one.
+      document.querySelectorAll<HTMLButtonElement>('.msub').forEach((b) =>
+        b.addEventListener('click', () => {
+          const sub = b.dataset.sub ?? '';
+          if (currentPath.startsWith(sub + '/')) return;
+          showSub(sub);
+          const first = document.querySelector<HTMLButtonElement>(`[data-sub-list="${sub}"] button[data-path]`);
+          if (first?.dataset.path) open(first.dataset.path, { userAction: true });
+        }),
+      );
+
+      crumb.addEventListener('click', () => {
+        backToList();
+        const current =
+          mfiles.querySelector<HTMLButtonElement>('.mgroup:not([hidden]) button[aria-current="true"]') ??
+          tabs.find((t) => t.getAttribute('aria-current') === 'true');
+        current?.focus({ preventScroll: true });
+      });
+
+      // Once the list has scrolled away under the bar, the bar says where you are and offers the way back.
+      let listGone = false;
+      function updateCrumb() {
+        const reading = listGone && sectionOf(currentPath) !== 'readme';
+        mnav.classList.toggle('is-reading', reading);
+        crumb.tabIndex = reading ? 0 : -1;
+        crumb.setAttribute('aria-hidden', String(!reading));
+      }
+      new IntersectionObserver(
+        ([entry]) => {
+          listGone = !entry.isIntersecting && entry.boundingClientRect.top < mtabs.offsetHeight;
+          updateCrumb();
+        },
+        { rootMargin: `-${mtabs.offsetHeight}px 0px 0px 0px` },
+      ).observe(mfiles);
+
+      const fromHash = decodeURIComponent(location.hash.slice(1));
+      if (fromHash && panels.some((p) => p.dataset.panel === fromHash)) {
+        open(fromHash, { userAction: false });
+      } else {
+        syncMobile(DEFAULT_PATH);
+        if (desktop.matches) {
+          // On wide screens there is room to show what a folder holds before anyone asks.
+          const exp = document.querySelector<HTMLButtonElement>('button[data-folder="experience"]');
+          if (exp) setFolder(exp, true);
+        }
+      }
+    </script>
+  </body>
+</html>
+
+<style is:global>
+  html { background: #151513; }
+  body { margin: 0; }
+
+  .f5 {
+    --ground: #151513;
+    --lime: #c8ec6c;
+    --lime-dim: #8fa84f;
+    --pink: #f294cc;
+    --ink: #0b0b0a;
+    --paper: #efede4;
+    --paper-2: #b9b6ab;
+    --rule: rgba(239, 237, 228, 0.16);
+    --pad: clamp(1rem, 2.4vw, 2.25rem);
+    --ease: cubic-bezier(0.25, 1, 0.5, 1);
+
+    background: var(--ground);
+    color: var(--paper);
+    font-family: 'Schibsted Grotesk', 'Helvetica Neue', Arial, sans-serif;
+    font-optical-sizing: auto;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .f5 a { color: inherit; }
+  .f5 a:focus-visible,
+  .f5 button:focus-visible {
+    /* Paper, not pink: the selected file is already pink, and the ring must stay visible on it. */
+    outline: 3px solid var(--paper);
+    outline-offset: 3px;
+  }
+
+  /* ── Top bar ─────────────────────────────────────────── */
+  .f5 .top {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--pad);
+    align-items: center;
+    padding: var(--pad) var(--pad) 0;
+  }
+  .f5 .home {
+    grid-column: 1 / span 5;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    justify-self: start;
+    min-height: 44px;
+    font-weight: 800;
+    font-size: 1.05rem;
+    letter-spacing: -0.01em;
+    text-decoration: none;
+  }
+  .f5 .home img { width: 44px; height: auto; }
+  .f5 .home:hover span { background: var(--pink); color: var(--ink); }
+  .f5 .top-title {
+    grid-column: 6 / span 3;
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: var(--lime);
+  }
+  .f5 .top-links {
+    grid-column: 9 / -1;
+    flex-wrap: wrap;
+    justify-self: end;
+    display: flex;
+    gap: 1.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .f5 .top-links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    text-underline-offset: 0.18em;
+    transition: background-color 160ms var(--ease), color 160ms var(--ease);
+  }
+  .f5 .top-links a:hover { background: var(--pink); color: var(--ink); text-decoration-color: transparent; }
+
+  /* ── Explorer: tree left, open file right ─────────────── */
+  .f5 .explorer {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--pad);
+    align-items: start;
+    padding: clamp(2rem, 5vw, 4.5rem) var(--pad) 7rem;
+  }
+  /* The tree is a size container so the longest name ("Achievements" + count) always fits its column. */
+  .f5 .tree { grid-column: 1 / span 5; container-type: inline-size; }
+  .f5 .pane {
+    grid-column: 6 / -1;
+    position: sticky;
+    top: var(--pad);
+    max-height: calc(100svh - 2 * var(--pad));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: var(--rule) transparent;
+    padding-left: clamp(0rem, 2vw, 2rem);
+  }
+
+  :where(.f5 .tree) ul { list-style: none; margin: 0; padding: 0; }
+  /* :where() keeps this reset at zero specificity so the type rules below win. */
+  :where(.f5 .tree) button {
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+    text-align: left;
+  }
+
+  /* The section names are the poster. */
+  .f5 .sect {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.12em;
+    width: 100%;
+    color: var(--lime);
+    font-weight: 900;
+    font-size: min(14.2cqi, 7rem);
+    line-height: 0.86;
+    letter-spacing: -0.055em;
+    padding: 0.06em 0 0.08em;
+    margin-left: -0.04em;
+    transition: color 160ms var(--ease);
+  }
+  .f5 .sect:hover { color: var(--paper); }
+  .f5 .sect.file[aria-current='true'] > :first-child,
+  .f5 .sect.file[aria-current='true'] { color: var(--lime); }
+  .f5 .sect.file[aria-current='true'] {
+    width: auto;
+    background: var(--pink);
+    color: var(--ink);
+    padding-inline: 0.06em;
+  }
+  .f5 .count {
+    font-size: 0.2em;
+    font-weight: 700;
+    letter-spacing: 0;
+    line-height: 1;
+    padding-top: 0.5em;
+    color: var(--paper-2);
+  }
+  .f5 .folder-toggle[aria-expanded='true'] .count { color: var(--lime); }
+
+  /* Files: plain readable lines on a strict two-column rhythm (name, years). */
+  .f5 .files {
+    margin: 0.75rem 0 1.75rem ;
+    border-top: 1px solid var(--rule);
+  }
+  .f5 .files--sub { margin: 0 0 0.5rem 1.25rem ; border-top: 0; }
+  .f5 .leaf,
+  .f5 .sub-toggle {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+    width: 100%;
+    min-height: 44px;
+    padding: 0.55rem 0.5rem ;
+    border-bottom: 1px solid var(--rule) ;
+    font-size: 1.125rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    transition: background-color 140ms var(--ease), color 140ms var(--ease);
+  }
+  .f5 .sub-toggle { color: var(--lime) ; font-weight: 800; }
+  .f5 .files--sub .leaf { font-size: 1.05rem; font-weight: 500; border-bottom-color: transparent ; min-height: 40px; }
+  .f5 .leaf-meta { color: var(--paper-2); font-weight: 500; font-variant-numeric: tabular-nums; font-size: 1rem; }
+  .f5 .leaf:hover,
+  .f5 .sub-toggle:hover { background: rgba(239, 237, 228, 0.07); }
+  .f5 .leaf[aria-current='true'] { background: var(--pink); color: var(--ink); }
+  .f5 .leaf[aria-current='true'] .leaf-meta { color: var(--ink); }
+
+  /* ── The open file, set like poster type ─────────────── */
+  .f5 .panel { outline: none; }
+  .f5 .panel.is-entering { animation: f5-enter 380ms var(--ease) both; }
+  @keyframes f5-enter {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  .f5 .p-path {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    margin: 0 0 1.5rem;
+    font-size: 0.95rem;
+    color: var(--paper-2);
+  }
+  .f5 .p-file { color: var(--lime); font-weight: 700; }
+
+  .f5 .p-title {
+    margin: 0 0 1.25rem;
+    max-width: 16ch;
+    color: var(--paper);
+    font-size: clamp(2.25rem, 4.2vw, 4.25rem);
+    font-weight: 850;
+    line-height: 0.98;
+    letter-spacing: -0.04em;
+    text-wrap: balance;
+  }
+  .f5 .p-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1.5rem;
+    margin: 0 0 2rem;
+    padding: 0.75rem 0;
+    border-block: 1px solid var(--rule);
+    font-size: 1.05rem;
+    color: var(--paper-2);
+  }
+  .f5 .p-role { color: var(--lime); font-weight: 800; }
+
+  .f5 .p-prose { max-width: 58ch; }
+  .f5 .p-prose p {
+    margin: 0 0 1em;
+    font-size: clamp(1.125rem, 1.35vw, 1.3rem);
+    line-height: 1.5;
+  }
+  .f5 .p-skill h2 {
+    margin: 2rem 0 0.5rem;
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: var(--lime);
+  }
+  .f5 .p-skill ul { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--rule); }
+  .f5 .p-skill li {
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--rule);
+    font-size: 1.1rem;
+    line-height: 1.4;
+  }
+  .f5 .p-links { display: flex; gap: 1.5rem; margin: 0.5rem 0 0; }
+  .f5 .p-links a,
+  .f5 .p-prose a {
+    color: var(--lime);
+    font-weight: 700;
+    text-decoration-thickness: 0.1em;
+    text-underline-offset: 0.18em;
+    transition: background-color 160ms var(--ease), color 160ms var(--ease);
+  }
+  .f5 .p-links a { display: inline-flex; align-items: center; min-height: 44px; font-size: 1.15rem; }
+  .f5 .p-links a:hover,
+  .f5 .p-prose a:hover { background: var(--pink); color: var(--ink); text-decoration-color: transparent; }
+
+  /* README: the roar earns its place next to who he is. */
+  .f5 .readme {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.8fr);
+    column-gap: var(--pad);
+    align-items: start;
+  }
+  .f5 .readme-head { grid-column: 1; }
+  .f5 .p-title--readme { font-size: clamp(2.5rem, 5vw, 5rem); max-width: 8ch; }
+  .f5 .readme-roles {
+    margin: 0;
+    color: var(--lime);
+    font-size: clamp(1.15rem, 1.6vw, 1.5rem);
+    font-weight: 800;
+    line-height: 1.2;
+    letter-spacing: -0.015em;
+  }
+  .f5 .readme-photo {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    width: 100%;
+    max-width: 436px;
+    height: auto;
+    justify-self: end;
+  }
+  .f5 .readme-prose { grid-column: 1 / -1; margin-top: 1rem; columns: 2 18rem; column-gap: var(--pad); max-width: none; }
+  .f5 .readme-prose p { break-inside: avoid; }
+
+  /* Next file: the end of every file hands you to the one after it. */
+  :where(.f5 .mnav, .f5 .mfiles, .f5 .p-next) button {
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+    text-align: left;
+  }
+  .f5 .p-next { margin: 3rem 0 0; max-width: 58ch; }
+  .f5 .next {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    width: 100%;
+    min-height: 56px;
+    padding: 0.9rem 0.5rem;
+    border-block: 1px solid var(--rule);
+    transition: background-color 140ms var(--ease), color 140ms var(--ease);
+  }
+  .f5 .next-label { color: var(--paper-2); font-size: 0.95rem; font-weight: 600; }
+  .f5 .next-name { color: var(--lime); font-size: 1.25rem; font-weight: 800; letter-spacing: -0.015em; }
+  .f5 .next-name::after { content: ' \2192'; }
+  .f5 .next:hover { background: rgba(239, 237, 228, 0.07); }
+  .f5 .next:active { background: var(--pink); }
+  .f5 .next:active .next-name,
+  .f5 .next:active .next-label { color: var(--ink); }
+
+  /* Mobile-only navigation; the desktop tree does this job on wide screens. */
+  .f5 .mnav,
+  .f5 .mfiles { display: none; }
+
+  @media (max-width: 860px) {
+    .f5 .top { grid-template-columns: 1fr auto; row-gap: 0; padding-bottom: 0.5rem; }
+    .f5 .home { grid-column: 1; }
+    .f5 .top-links { grid-column: 2; gap: 0.875rem; font-size: 0.95rem; }
+    .f5 .home { font-size: 0.95rem; gap: 0.5rem; }
+    .f5 .home img { width: 36px; }
+    .f5 .top-title { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+    .f5 .tree { display: none; }
+    .f5 .explorer { grid-template-columns: minmax(0, 1fr); padding-top: 0; }
+    .f5 .pane {
+      grid-column: 1;
+      position: static;
+      max-height: none;
+      overflow: visible;
+      padding: 0;
+      margin-top: 1.75rem;
+    }
+
+    /* The sticky bar: five sections, one row, swipeable. The section you are in is a lime block. */
+    .f5 .mnav {
+      display: block;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: var(--ground);
+    }
+    .f5 .mtabs {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      margin: 0;
+      padding: 0 2.5rem 0 calc(var(--pad) - 0.5rem);
+      list-style: none;
+      overflow-x: auto;
+      scrollbar-width: none;
+      background: var(--ground);
+      border-bottom: 1px solid var(--rule);
+      /* Fade the right edge so the clipped tab reads as "more this way". */
+      mask-image: linear-gradient(to right, #000 calc(100% - 2.5rem), transparent);
+    }
+    .f5 .mtabs::-webkit-scrollbar { display: none; }
+    .f5 .mtab {
+      display: flex;
+      align-items: center;
+      min-height: 52px;
+      padding: 0 0.5rem;
+      white-space: nowrap;
+      color: var(--lime);
+      font-size: 1.3rem;
+      font-weight: 900;
+      letter-spacing: -0.035em;
+      transition: background-color 160ms var(--ease), color 160ms var(--ease);
+    }
+    .f5 .mtab:hover { color: var(--paper); }
+    .f5 .mtab[aria-current='true'] { background: var(--lime); color: var(--ink); }
+    .f5 .mtab:focus-visible { outline-offset: -3px; }
+
+    /* Where you are, once the list has scrolled away; one tap takes you back to it. */
+    .f5 .mcrumb {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      min-height: 44px;
+      padding: 0 var(--pad);
+      background: var(--ground);
+      border-bottom: 1px solid var(--rule);
+      font-size: 0.95rem;
+      color: var(--paper-2);
+      opacity: 0;
+      transform: translateY(-100%);
+      pointer-events: none;
+      transition: opacity 200ms var(--ease), transform 260ms var(--ease);
+    }
+    .f5 .mnav.is-reading .mcrumb { opacity: 1; transform: none; pointer-events: auto; }
+    .f5 .mcrumb-path { display: flex; min-width: 0; white-space: nowrap; }
+    /* The folder gives way first; the file name stays whole. */
+    .f5 .mcrumb-dir { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+    .f5 .mcrumb-file { flex: none; }
+    .f5 .mcrumb-file { color: var(--lime); font-weight: 700; }
+    .f5 .mcrumb-up { flex: none; color: var(--paper); font-weight: 800; }
+    .f5 .mcrumb:focus-visible { outline-offset: -3px; }
+
+    /* The section's files: a short list, the open file directly beneath it. */
+    .f5 .mfiles { display: block; padding-top: 1rem; }
+    .f5 .mfiles.is-empty { padding: 0; }
+    .f5 .mlist { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--rule); }
+    .f5 .mleaf {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 1rem;
+      width: 100%;
+      min-height: 44px;
+      padding: 0.6rem 0.5rem;
+      border-bottom: 1px solid var(--rule);
+      font-size: 1.0625rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      transition: background-color 140ms var(--ease), color 140ms var(--ease);
+    }
+    .f5 .mleaf:hover { background: rgba(239, 237, 228, 0.07); }
+    .f5 .mleaf[aria-current='true'] { background: var(--pink); color: var(--ink); }
+    .f5 .mleaf[aria-current='true'] .leaf-meta { color: var(--ink); }
+
+    /* Skills has folders inside: a row of folder chips, then that folder's three files. */
+    .f5 .msubs {
+      display: flex;
+      gap: 0.5rem;
+      margin: 0 calc(-1 * var(--pad)) 0.875rem;
+      padding: 0 var(--pad);
+      list-style: none;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .f5 .msubs::-webkit-scrollbar { display: none; }
+    .f5 .msub {
+      display: flex;
+      align-items: center;
+      min-height: 44px;
+      padding: 0 0.75rem;
+      border: 1px solid var(--rule);
+      white-space: nowrap;
+      color: var(--paper-2);
+      font-size: 0.95rem;
+      font-weight: 700;
+      transition: border-color 140ms var(--ease), color 140ms var(--ease);
+    }
+    .f5 .msub[aria-pressed='true'] { border-color: var(--lime); color: var(--lime); }
+
+    .f5 .panel { scroll-margin-top: 6rem; }
+    .f5 .readme { grid-template-columns: minmax(0, 1fr); }
+    .f5 .readme-photo { grid-column: 1; grid-row: auto; justify-self: start; max-width: 300px; margin-top: 1.5rem; }
+    .f5 .readme-prose { columns: auto; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .f5 .panel.is-entering { animation: none; }
+    .f5 *, .f5 *::before { transition: none !important; }
+  }
+</style>
