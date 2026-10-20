@@ -1,0 +1,164 @@
+---
+// PROTOTYPE (resume-soe.12) direction E "Dread, played straight": homepage.
+// The tagline, very large and very thin. Jonatan, in full colour, small and alone, standing on a lime line
+// that sits on top of "existential dread." Lime (shirt) and pink (clogs) are the only colours.
+import DirectionSwitcher from '../../../components/directions/DirectionSwitcher.astro';
+import Head from '../../../components/directions/e/Head.astro';
+import Bar from '../../../components/directions/e/Bar.astro';
+const photo = '/img/jonatan_posing_rocks_no_bg.png';
+const tagline = 'From catwalks to startups, agent harnesses to existential dread.';
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <Head title="Jonatan Snyders" description={`Jonatan Snyders. ${tagline}`} />
+  </head>
+  <body>
+    <div class="page">
+      <Bar page="home" />
+
+      <main class="stage">
+        <!-- SHORTCUT: hard-coded line breaks; rows are tuned by eye for the wide layout. -->
+        <div class="line">
+          <p class="e-sr">{tagline}</p>
+          <span class="row r1" aria-hidden="true">From catwalks</span>
+          <span class="row r2" aria-hidden="true">to startups,</span>
+          <span class="row r3" aria-hidden="true">agent harnesses to</span>
+          <span class="void">
+            <img
+              class="figure"
+              src={photo}
+              alt="Jonatan mid-stride in a lime shirt, black cycling bibs and pink clogs."
+              width="500"
+              height="499"
+              fetchpriority="high"
+            />
+          </span>
+          <span class="floor" aria-hidden="true"></span>
+          <span class="row r4" aria-hidden="true">existential dread<span class="stop">.</span></span>
+        </div>
+
+        <nav class="exits" aria-label="Where next">
+          <a class="e-link" href="/factory/">what excites me</a>
+          <a class="e-link" href="/directions/e/resume/">what bores me</a>
+        </nav>
+      </main>
+    </div>
+
+    <DirectionSwitcher current="e" page="home" />
+  </body>
+</html>
+
+<style>
+  .page {
+    display: flex;
+    flex-direction: column;
+    min-height: 100svh;
+  }
+
+  .stage {
+    position: relative;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 0 var(--e-pad) 5.5rem;
+    overflow-x: clip;
+  }
+
+  .line {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding-top: clamp(1.5rem, 5vh, 3.5rem);
+    font-weight: 150;
+    font-stretch: 112%;
+    font-size: min(7.6vw, 12vh);
+    line-height: 0.98;
+    letter-spacing: -0.035em;
+    color: var(--e-ink);
+  }
+  .row { display: block; white-space: nowrap; }
+  .r1 { margin-left: -0.05em; }
+  .r2 { padding-left: 1.5em; }
+  .r3 { padding-left: 0.55em; }
+  .r4 { margin-left: -0.05em; padding-top: 0.12em; }
+  /* The one pink mark on the page, under the clogs it was taken from. */
+  .stop { color: var(--e-pink); }
+
+  /* The space between "to" and "existential dread." He stands in it, in colour, on the line. */
+  .void {
+    position: relative;
+    display: block;
+    flex: 1;
+    min-height: 14rem;
+  }
+  .figure {
+    position: absolute;
+    left: 44%;
+    bottom: 0;
+    /* The clogs' soles sit ~3% above the image's bottom edge; this puts them on the floor line. */
+    translate: 0 3%;
+    height: min(40vh, 100%);
+    max-height: 520px; /* ~1.04x of the 499px source: stays crisp. */
+    width: auto;
+    aspect-ratio: 500 / 499;
+  }
+
+  .floor {
+    display: block;
+    height: 2px;
+    margin: 0 calc(-1 * var(--e-pad));
+    background: var(--e-lime);
+  }
+
+  .exits {
+    position: absolute;
+    right: var(--e-pad);
+    bottom: 5.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    font-size: 1.0625rem;
+    font-stretch: 100%;
+  }
+  .exits a { display: inline-flex; align-items: center; min-height: 44px; }
+
+  /* Arrival: rows surface, the line draws, he appears last. Opacity/transform only. */
+  @media (prefers-reduced-motion: no-preference) {
+    .row, .figure, .exits { animation: e-surface 1.6s var(--e-ease) both; }
+    .r1 { animation-delay: 0.1s; }
+    .r2 { animation-delay: 0.25s; }
+    .r3 { animation-delay: 0.4s; }
+    .r4 { animation-delay: 0.55s; }
+    .floor { transform-origin: 0 50%; animation: e-draw 1.8s var(--e-ease) 0.5s both; }
+    .figure { animation-duration: 2.4s; animation-delay: 1.1s; }
+    .exits { animation-delay: 1.6s; }
+    @keyframes e-surface {
+      from { opacity: 0; transform: translateY(0.25rem); }
+      to { opacity: 1; transform: none; }
+    }
+    @keyframes e-draw {
+      from { transform: scaleX(0); }
+      to { transform: scaleX(1); }
+    }
+  }
+
+  @media (max-width: 760px) {
+    .stage { padding-bottom: 7rem; }
+    .line {
+      flex: none;
+      padding-top: 2.5rem;
+      font-size: 13.6vw;
+      font-stretch: 78%;
+      font-weight: 200;
+      line-height: 1;
+      letter-spacing: -0.03em;
+    }
+    .r2 { padding-left: 0.9em; }
+    .r3 { padding-left: 0; }
+    .void { flex: none; height: 36vh; min-height: 15rem; }
+    .figure { left: auto; right: 2%; height: 94%; }
+    .exits { position: static; align-items: flex-start; margin-top: 2rem; font-size: 1.125rem; }
+  }
+</style>

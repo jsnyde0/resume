@@ -1,0 +1,287 @@
+---
+// PROTOTYPE (resume-soe.12) direction E "Dread, played straight": resume slice.
+// Same ground and type as the homepage. Lime draws the structure (the rule each section stands on, links),
+// pink names what he was (roles, current). Years set thin and large; everything else plain and readable.
+import DirectionSwitcher from '../../../components/directions/DirectionSwitcher.astro';
+import Head from '../../../components/directions/e/Head.astro';
+import Bar from '../../../components/directions/e/Bar.astro';
+import { workExperience, achievements, education, resumeIntro } from '../../../data/resume';
+import type { ResumeItem } from '../../../data/resume';
+import { skillFiles } from '../../../data/resume-skills';
+
+const span = (range: string) => {
+  const years = range.match(/\d{4}/g) ?? [];
+  const open = /\.\.\./.test(range);
+  return { from: years[0] ?? range, to: open ? 'now' : years[1] ?? '' };
+};
+
+// Filenames to plain words. SHORTCUT: acronym fix-ups are a hand list, not data.
+const acronyms: Record<string, string> = { apis: 'APIs', llm: 'LLM', mmm: 'MMM' };
+const plain = (s: string) =>
+  s.replace(/\.md$/, '').split('-').map((w) => acronyms[w] ?? w).join(' ');
+
+// Skills grouped by folder, in data order.
+const skillGroups: { folder: string; skills: string[] }[] = [];
+for (const f of skillFiles) {
+  const g = skillGroups.find((x) => x.folder === f.folder);
+  if (g) g.skills.push(plain(f.filename));
+  else skillGroups.push({ folder: f.folder, skills: [plain(f.filename)] });
+}
+
+const sections: { id: string; title: string; items: ResumeItem[] }[] = [
+  { id: 'experience', title: 'Experience', items: workExperience },
+  { id: 'achievements', title: 'Achievements', items: achievements },
+  { id: 'education', title: 'Education', items: education },
+];
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <Head
+      title="Resume. Jonatan Snyders"
+      description="Resume of Jonatan Snyders: web developer, data scientist, ex-founder, and growth engineer."
+    />
+  </head>
+  <body>
+    <Bar page="resume" />
+
+    <main>
+      <header class="intro">
+        <h1>Resume</h1>
+        <div class="intro-text">
+          <p class="roles">{resumeIntro.headlineBadges.join(', ')}</p>
+          {resumeIntro.paragraphs.map((p) => <p>{p}</p>)}
+        </div>
+      </header>
+
+      {sections.map((sec) => (
+        <section class="block" aria-labelledby={`${sec.id}-h`}>
+          <h2 id={`${sec.id}-h`}>{sec.title}</h2>
+          <ol class="entries">
+            {sec.items.map((item) => {
+              const s = span(item.dateRange);
+              const isNow = s.to === 'now';
+              return (
+                <li class="entry">
+                  <p class="when">
+                    <span class="year">{s.from}</span>
+                    {s.to && <span class:list={['until', { now: isNow }]}>to {s.to}</span>}
+                  </p>
+                  <div class="what">
+                    <h3>{item.title.trim()}</h3>
+                    <p class="meta">
+                      <span class="role">{item.role}</span>
+                      <span class="where">{[item.company, item.location].filter(Boolean).join(', ')}</span>
+                    </p>
+                    <p class="body" set:html={item.body} />
+                    {item.links && item.links.length > 0 && (
+                      <p class="links">
+                        {item.links.map((l) => (
+                          <a class="e-link" href={l.href} rel="noopener">{l.label}</a>
+                        ))}
+                      </p>
+                    )}
+                  </div>
+                </li>
+              );
+            })}
+          </ol>
+        </section>
+      ))}
+
+      <section class="block" aria-labelledby="skills-h">
+        <h2 id="skills-h">Skills</h2>
+        <div class="skills">
+          {skillGroups.map((g) => (
+            <div class="group">
+              <h3>{plain(g.folder)}</h3>
+              <ul>
+                {g.skills.map((sk) => <li>{sk}</li>)}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </section>
+    </main>
+
+    <footer class="end">
+      <a class="e-link" href="/factory/">what excites me</a>
+      <a class="e-link" href="/directions/e/">Home</a>
+    </footer>
+
+    <DirectionSwitcher current="e" page="resume" />
+  </body>
+</html>
+
+<style>
+  /* One grid for the whole page: a years column and a content column. */
+  main, .end {
+    --col: clamp(9rem, 26vw, 24rem);
+    padding: 0 var(--e-pad);
+  }
+
+  .intro {
+    display: grid;
+    grid-template-columns: var(--col) minmax(0, 1fr);
+    align-items: end;
+    gap: 0 2rem;
+    padding: clamp(4rem, 14vh, 9rem) 0 clamp(4rem, 10vh, 7rem);
+  }
+  .intro h1 {
+    grid-column: 1 / -1;
+    margin: 0 0 clamp(2rem, 6vh, 4rem) -0.06em;
+    font-weight: 150;
+    font-stretch: 112%;
+    font-size: clamp(4.5rem, 14vw, 13rem);
+    line-height: 0.85;
+    letter-spacing: -0.045em;
+  }
+  .intro-text {
+    grid-column: 2;
+    max-width: 62ch;
+  }
+  .intro-text p {
+    margin: 0 0 0.9rem;
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    color: var(--e-quiet);
+  }
+  .intro-text p:nth-child(2) { color: var(--e-ink); }
+  .intro-text .roles {
+    margin-bottom: 1.75rem;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    color: var(--e-pink);
+  }
+
+  /* Each section stands on a lime line, the same line he stands on at home. */
+  .block {
+    position: relative;
+    padding-top: 1.25rem;
+    padding-bottom: clamp(4rem, 12vh, 8rem);
+  }
+  .block::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: calc(-1 * var(--e-pad));
+    right: calc(-1 * var(--e-pad));
+    height: 2px;
+    background: var(--e-lime);
+  }
+  .block > h2 {
+    margin: 0 0 clamp(2.5rem, 6vh, 4rem);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    color: var(--e-lime);
+  }
+
+  .entries { list-style: none; margin: 0; padding: 0; }
+  .entry {
+    display: grid;
+    grid-template-columns: var(--col) minmax(0, 1fr);
+    gap: 0 2rem;
+    padding: 2.25rem 0 2.75rem;
+    border-top: 1px solid var(--e-hair);
+  }
+  .entry:first-child { border-top: 0; padding-top: 0; }
+
+  .when { margin: 0; }
+  .year {
+    display: block;
+    font-weight: 150;
+    font-stretch: 112%;
+    font-size: clamp(3rem, 5.6vw, 5.5rem);
+    line-height: 0.82;
+    letter-spacing: -0.04em;
+    font-variant-numeric: lining-nums;
+  }
+  .until {
+    display: block;
+    margin-top: 0.75rem;
+    font-size: 0.875rem;
+    color: var(--e-quiet);
+  }
+  .until.now { color: var(--e-pink); }
+
+  .what { max-width: 62ch; }
+  .what h3 {
+    margin: 0 0 0.6rem;
+    font-weight: 300;
+    font-stretch: 104%;
+    font-size: clamp(1.375rem, 2vw, 1.875rem);
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1rem;
+    margin: 0 0 1rem;
+    font-size: 0.9375rem;
+  }
+  .role { color: var(--e-pink); font-weight: 500; }
+  .where { color: var(--e-quiet); }
+  .body {
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--e-quiet);
+  }
+  .links { display: flex; gap: 1.5rem; margin: 0.5rem 0 0; font-size: 0.9375rem; }
+  .links a { display: inline-flex; align-items: center; min-height: 44px; }
+
+  .skills {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+    gap: 2.5rem 2rem;
+    margin-left: calc(var(--col) + 2rem);
+  }
+  .group h3 {
+    margin: 0 0 0.75rem;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: var(--e-pink);
+  }
+  .group h3::first-letter, .group li::first-letter { text-transform: uppercase; }
+  .group ul { list-style: none; margin: 0; padding: 0; }
+  .group li { margin-bottom: 0.45rem; font-size: 1rem; line-height: 1.35; color: var(--e-ink); }
+
+  .end {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 2rem;
+    padding-top: 1.5rem;
+    padding-bottom: 8rem;
+    padding-left: calc(var(--e-pad) + var(--col) + 2rem);
+    font-size: 1.0625rem;
+  }
+  .end::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--e-lime);
+  }
+  .end a { display: inline-flex; align-items: center; min-height: 44px; }
+
+  @media (max-width: 760px) {
+    .intro { grid-template-columns: 1fr; padding-top: 3rem; }
+    .intro h1 { font-size: 24vw; font-stretch: 90%; }
+    .intro-text { grid-column: 1; }
+    .intro-text p { font-size: 1rem; }
+    .entry { grid-template-columns: 1fr; }
+    .when { display: flex; align-items: baseline; gap: 1rem; margin-bottom: 1.25rem; }
+    .year { font-size: 3.5rem; }
+    .until { margin-top: 0; }
+    .skills { margin-left: 0; grid-template-columns: 1fr 1fr; gap: 2rem 1.25rem; }
+    .group li { font-size: 0.9375rem; }
+    .end { padding-left: var(--e-pad); padding-bottom: 7rem; }
+  }
+</style>

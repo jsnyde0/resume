@@ -1,0 +1,190 @@
+---
+// PROTOTYPE (resume-soe.12) direction G "Big Type": homepage.
+// A light page where the tagline is the interface: the sentence fills the first screen, the
+// key words carry shirt-lime and clog-pink as solid marks, and Jonatan strides inside the type.
+import DirectionSwitcher from '../../../components/directions/DirectionSwitcher.astro';
+import Chrome from '../../../components/directions/g/Chrome.astro';
+const photo = '/img/jonatan_posing_rocks_no_bg.png';
+
+// Each word is a span so it can settle in on load; `mark` words get a solid brand-colour block.
+type Word = { t: string; mark?: 'lime' | 'pink'; join?: boolean };
+const before: Word[] = [
+  { t: 'From' }, { t: 'catwalks', mark: 'pink' }, { t: 'to' }, { t: 'startups,', mark: 'lime' },
+  { t: 'agent' }, { t: 'harnesses', mark: 'lime' }, { t: 'to' },
+];
+const after: Word[] = [{ t: 'existential', mark: 'pink', join: true }, { t: 'dread.', mark: 'pink' }];
+const photoAlt = 'Jonatan mid-stride in a lime shirt, black cycling bibs and pink clogs.';
+const tagline = 'From catwalks to startups, agent harnesses to existential dread.';
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Jonatan Snyders</title>
+    <meta name="description" content={`Jonatan Snyders. ${tagline}`} />
+    <!-- SHORTCUT: Google Fonts link instead of self-hosted fonts. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&display=swap"
+    />
+    <script is:inline>
+      // Motion only when JS runs and motion is welcome; otherwise the words are simply there.
+      if (window.matchMedia('(prefers-reduced-motion: no-preference)').matches) {
+        document.documentElement.classList.add('g-anim');
+      }
+    </script>
+  </head>
+  <body>
+    <Chrome current="home" />
+
+    <main class="stage">
+      <p class="tagline">
+        <span class="sr-only">{tagline}</span>
+        {before.map((w, i) => (
+          <><span class:list={['w', w.mark && `g-mark g-mark--${w.mark}`]} style={`--i:${i}`} aria-hidden="true">{w.t}</span>{' '}</>
+        ))}
+        <!-- SHORTCUT: same photo in two flow positions toggled by breakpoint, figure offsets tuned by eye for the 3- and 4-line wraps. Positions: between "to" and "existential" on wide screens, after "dread." on narrow ones. -->
+        <span class="w figure figure--wide" style={`--i:${before.length}`}>
+          <img src={photo} alt={photoAlt} width="500" height="499" />
+        </span>{' '}
+        {after.map((w, i) => (
+          <><span class:list={['w', w.mark && `g-mark g-mark--${w.mark}`, w.join && 'g-mark--join']} style={`--i:${before.length + 1 + i}`} aria-hidden="true">{w.t}</span>{' '}</>
+        ))}
+        <span class="w figure figure--narrow" style={`--i:${before.length + 1}`}>
+          <img src={photo} alt={photoAlt} width="500" height="499" />
+        </span>
+      </p>
+
+      <ul class="exits">
+        <li><a href="/factory/"><span>what excites me</span></a></li>
+        <li><a href="/directions/g/resume/"><span>what bores me</span></a></li>
+      </ul>
+    </main>
+
+    <DirectionSwitcher current="g" page="home" />
+  </body>
+</html>
+
+<style>
+  .stage {
+    box-sizing: border-box;
+    min-height: calc(100svh - 3.5rem);
+    padding: clamp(1.5rem, 4vh, 3rem) var(--g-gutter) 5.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 2.5rem;
+  }
+
+  .tagline {
+    margin: 0;
+    font-size: clamp(3.5rem, min(12.6vw, 19.5vh), 14rem);
+    font-weight: 800;
+    font-variation-settings: 'wdth' 80;
+    line-height: 0.92;
+    letter-spacing: -0.035em;
+  }
+
+  .w { display: inline-block; }
+  /* A two-word phrase reads as one block: bridge the word space. */
+  .g-mark--join::before { right: -0.3em; }
+
+  /* The figure hangs from line two into the empty right side of line three, feet on its baseline. */
+  .figure { vertical-align: top; position: relative; z-index: 1; }
+  .figure img {
+    display: block;
+    height: 2.45em;
+    width: auto;
+    margin: -0.42em -0.6em -1.12em 0.8em;
+  }
+  .figure--narrow { display: none; }
+
+  .exits {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 2.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: clamp(1.375rem, 2.2vw, 2rem);
+    font-weight: 700;
+    letter-spacing: -0.015em;
+  }
+  .exits a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    color: inherit;
+    text-decoration: none;
+  }
+  .exits a span {
+    position: relative;
+    isolation: isolate;
+    padding: 0 0.1em;
+  }
+  .exits a span::before {
+    content: '';
+    position: absolute;
+    inset: 0.15em 0 0.05em;
+    z-index: -1;
+    transform: scaleX(0);
+    transform-origin: 0 50%;
+    transition: transform 0.45s var(--g-ease);
+  }
+  .exits li:first-child span::before { background: var(--g-lime); }
+  .exits li:last-child span::before { background: var(--g-pink); }
+  .exits a span::after {
+    content: '';
+    position: absolute;
+    left: 0.1em; right: 0.1em; bottom: -0.05em;
+    height: 3px;
+    background: currentColor;
+  }
+  .exits a:hover span::before,
+  .exits a:focus-visible span::before { transform: scaleX(1); }
+  .exits a:active span { transform: translateY(1px); }
+
+  @media (max-width: 640px) {
+    .g-mark--join::before { right: -0.05em; }
+    .stage { min-height: auto; padding-top: 2.5rem; gap: 3rem; }
+    .tagline { font-size: 16.4vw; line-height: 0.95; }
+    .figure--wide { display: none; }
+    .figure--narrow { display: inline-block; vertical-align: top; }
+    /* Narrow: he walks out of the end of the sentence, head level with "dread.". */
+    .figure--narrow img { height: 3em; margin: -0.1em -0.3em 0 0; }
+    .exits { flex-direction: column; gap: 0.25rem; }
+  }
+
+  /* Load-in: words rise and settle, then the marks sweep across. */
+  :global(.g-anim) .w {
+    animation: g-settle 0.9s var(--g-ease) both;
+    animation-delay: calc(var(--i) * 55ms + 80ms);
+  }
+  :global(.g-anim) .g-mark::before {
+    animation: g-sweep 0.7s var(--g-ease) both;
+    animation-delay: calc(var(--i) * 55ms + 520ms);
+  }
+  :global(.g-anim) .figure {
+    animation: g-stride 1.1s var(--g-ease) both;
+    animation-delay: calc(var(--i) * 55ms + 80ms);
+  }
+  @keyframes g-settle {
+    from { opacity: 0; transform: translateY(0.28em); }
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes g-sweep {
+    from { transform: scaleX(0); }
+    to { transform: scaleX(1); }
+  }
+  @keyframes g-stride {
+    from { opacity: 0; transform: translateX(-0.6em); }
+    to { opacity: 1; transform: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .exits a span::before { transition: none; }
+  }
+</style>

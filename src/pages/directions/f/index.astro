@@ -1,0 +1,228 @@
+---
+// PROTOTYPE (resume-soe.12) direction F "Poster": homepage.
+// One flat field of shirt-lime, the name in black at poster scale, the photo standing on the field,
+// clog-pink as the single hit colour. Strict grid, few elements, loud through scale and colour only.
+import DirectionSwitcher from '../../../components/directions/DirectionSwitcher.astro';
+const photo = '/img/jonatan_posing_rocks_no_bg.png';
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="theme-color" content="#c8ec6c" />
+    <title>Jonatan Snyders</title>
+    <meta name="description" content="Jonatan Snyders. From catwalks to startups, agent harnesses to existential dread." />
+    <!-- SHORTCUT: Google Fonts link instead of self-hosted fonts. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400..900&display=swap"
+    />
+  </head>
+  <body>
+    <main class="field">
+      <h1 class="name">
+        <span>Jonatan</span>
+        <span>Snyders</span>
+      </h1>
+
+      <p class="tagline">
+        From catwalks to startups, agent harnesses to existential <mark>dread.</mark>
+      </p>
+
+      <nav class="links" aria-label="Site">
+        <ul class="primary">
+          <li><a href="/factory/">What excites me</a></li>
+          <li><a href="/directions/f/resume/">What bores me</a></li>
+        </ul>
+        <ul class="secondary">
+          <li><a href="https://github.com/jsnyde0/" rel="me">GitHub</a></li>
+          <li><a href="https://www.linkedin.com/in/jonatan-snyders/" rel="me">LinkedIn</a></li>
+        </ul>
+      </nav>
+
+      <!-- SHORTCUT: 500px source photo upscaled to at most ~1.3x; slightly soft at the largest sizes. -->
+      <img
+        class="figure"
+        src={photo}
+        alt="Jonatan mid-stride in a lime shirt, black cycling bibs and pink clogs."
+        width="500"
+        height="499"
+      />
+    </main>
+
+    <DirectionSwitcher current="f" page="home" />
+  </body>
+</html>
+
+<style is:global>
+  html { background: #c8ec6c; }
+  body { margin: 0; }
+</style>
+
+<style>
+  .field {
+    /* Brand palette, lifted from the photo: shirt #abc36d -> lime field, clogs #bb85a7 -> pink hit. */
+    --lime: #c8ec6c;
+    --pink: #f294cc;
+    --ink: #0b0b0a;
+    --pad: clamp(1rem, 2.4vw, 2.25rem);
+
+    position: relative;
+    box-sizing: border-box;
+    min-height: 100svh;
+    overflow: clip;
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    grid-template-rows: auto 1fr auto auto;
+    column-gap: var(--pad);
+    padding: var(--pad) var(--pad) 0;
+    background: var(--lime);
+    color: var(--ink);
+    font-family: 'Schibsted Grotesk', 'Helvetica Neue', Arial, sans-serif;
+    font-optical-sizing: auto;
+  }
+
+  .name {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    margin: 0;
+    font-weight: 900;
+    /* Sized so "Snyders" spans the full grid width, capped by viewport height on wide screens. */
+    font-size: min(23.4vw, 34svh);
+    line-height: 0.8;
+    letter-spacing: -0.055em;
+    margin-left: -0.04em;
+  }
+  .name span { display: block; }
+
+  .tagline {
+    grid-column: 1 / span 6;
+    grid-row: 3;
+    margin: clamp(1.25rem, 2.5vw, 2.25rem) 0 clamp(1rem, 2vw, 1.75rem);
+    max-width: 19ch;
+    font-size: clamp(1.75rem, min(3.1vw, 5svh), 3.25rem);
+    font-weight: 800;
+    line-height: 1.02;
+    letter-spacing: -0.03em;
+    text-wrap: balance;
+  }
+
+  mark {
+    background: var(--pink);
+    color: var(--ink);
+    padding: 0 0.12em;
+    margin: 0 -0.04em;
+  }
+
+  .links {
+    grid-column: 1 / span 6;
+    grid-row: 4;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.25rem 2.5rem;
+    /* Clears the fixed prototype switcher. */
+    padding-bottom: 4.75rem;
+    position: relative;
+    z-index: 2;
+  }
+  .links ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 1.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    color: var(--ink);
+    text-decoration: underline;
+    text-decoration-thickness: 0.12em;
+    text-underline-offset: 0.18em;
+    transition: background-color 160ms cubic-bezier(0.25, 1, 0.5, 1);
+  }
+  .primary a {
+    font-size: clamp(1.15rem, 1.5vw, 1.4rem);
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+  .secondary a {
+    font-size: 1rem;
+    font-weight: 500;
+  }
+  .links a:hover {
+    background: var(--pink);
+    text-decoration-color: transparent;
+  }
+  .links a:focus-visible {
+    outline: 3px solid var(--ink);
+    outline-offset: 3px;
+    background: var(--pink);
+  }
+  .links a:active { background: var(--ink); color: var(--lime); }
+
+  .figure {
+    grid-column: 7 / -1;
+    grid-row: 1 / -1;
+    align-self: end;
+    justify-self: end;
+    position: relative;
+    z-index: 1;
+    display: block;
+    width: auto;
+    height: min(78svh, 650px);
+    max-width: 100%;
+    object-fit: contain;
+    object-position: bottom;
+    /* The PNG has ~3% transparent margin under the clogs; pull the soles onto the bottom edge. */
+    margin-bottom: -1.6%;
+    margin-right: -4vw;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  @media (max-width: 760px) {
+    .field {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-rows: auto auto auto auto;
+    }
+    .name { font-size: 23.5vw; }
+    .tagline,
+    .links { grid-column: 1; }
+    .tagline {
+      grid-row: 2;
+      margin: clamp(1.25rem, 6vw, 2rem) 0 1rem;
+      max-width: 14ch;
+      font-size: clamp(1.9rem, 9vw, 2.6rem);
+    }
+    .links {
+      grid-row: 3;
+      flex-direction: column;
+      gap: 0.25rem;
+      padding-bottom: 0;
+    }
+    .figure {
+      grid-column: 1;
+      grid-row: 4;
+      justify-self: center;
+      width: min(118%, 560px);
+      height: auto;
+      max-width: none;
+      margin: -2rem 0 -1.6%;
+    }
+    /* Clears the fixed prototype switcher so the clogs stay visible. */
+    .field { padding-bottom: 4.5rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .links a { transition: none; }
+  }
+</style>

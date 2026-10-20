@@ -1,0 +1,304 @@
+---
+// PROTOTYPE (resume-soe.12) direction G "Big Type": resume slice.
+// Same voice as the homepage: big numerals carry the timeline, section names carry the brand
+// marks, and the reading text stays calm and narrow so the page is actually readable.
+import DirectionSwitcher from '../../../components/directions/DirectionSwitcher.astro';
+import Chrome from '../../../components/directions/g/Chrome.astro';
+import { achievements, education, resumeIntro, workExperience } from '../../../data/resume';
+import type { ResumeItem } from '../../../data/resume';
+import { skillFiles } from '../../../data/resume-skills';
+
+const span = (range: string) => {
+  const years = range.match(/\d{4}/g) ?? [];
+  const open = /\.\.\./.test(range);
+  return { from: years[0] ?? range, to: open ? 'now' : years[1] ?? '' };
+};
+
+// Skills grouped by folder, in data order; file names read as plain words.
+const skillGroups: { folder: string; files: string[] }[] = [];
+for (const f of skillFiles) {
+  const name = f.filename.replace(/\.md$/, '').replace(/-/g, ' ');
+  const g = skillGroups.find((x) => x.folder === f.folder);
+  if (g) g.files.push(name);
+  else skillGroups.push({ folder: f.folder, files: [name] });
+}
+const words = (s: string) => s.replace(/-/g, ' ');
+// SHORTCUT: hand-kept acronym map; file names are lowercase slugs, so restore acronyms to read as written.
+const acronyms: Record<string, string> = { llm: 'LLM', apis: 'APIs', mmm: 'MMM' };
+const fixCase = (s: string) => s.split(' ').map((w) => acronyms[w] ?? w).join(' ');
+
+const marks = ['lime', 'pink', 'lime', 'pink'] as const;
+const timeline: { id: string; title: string; items: ResumeItem[] }[] = [
+  { id: 'work', title: 'Work', items: workExperience },
+  { id: 'education', title: 'Education', items: education },
+];
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Resume | Jonatan Snyders</title>
+    <meta name="description" content="Resume of Jonatan Snyders: web developer, data scientist, ex-founder, growth engineer." />
+    <!-- SHORTCUT: Google Fonts link instead of self-hosted fonts. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&display=swap"
+    />
+    <script is:inline>
+      if (window.matchMedia('(prefers-reduced-motion: no-preference)').matches) {
+        document.documentElement.classList.add('g-anim');
+      }
+    </script>
+  </head>
+  <body>
+    <Chrome current="resume" />
+
+    <main>
+      <header class="intro">
+        <h1 class="sr-only">Resume of Jonatan Snyders</h1>
+        <p class="roles">
+          {resumeIntro.headlineBadges.map((b, i) => (
+            <><span class:list={['g-mark', `g-mark--${marks[i % marks.length]}`, 'sweep']} style={`--i:${i}`}>{b}{i < resumeIntro.headlineBadges.length - 1 ? ',' : '.'}</span>{' '}</>
+          ))}
+        </p>
+        <div class="about">
+          {resumeIntro.paragraphs.map((p) => <p>{p}</p>)}
+        </div>
+      </header>
+
+      {timeline.map((sec, si) => (
+        <section class="block" aria-labelledby={`${sec.id}-h`}>
+          <h2 id={`${sec.id}-h`} class="sec"><span class:list={['g-mark', `g-mark--${si === 0 ? 'lime' : 'pink'}`, 'sweep']}>{sec.title}</span></h2>
+          <ol class="timeline">
+            {sec.items.map((job) => {
+              const s = span(job.dateRange);
+              return (
+                <li class="entry">
+                  <p class="when" aria-label={`${s.from}${s.to ? ` to ${s.to}` : ''}`}>
+                    <span class="year" aria-hidden="true">{s.from}</span>
+                    {s.to && (
+                      <span class="until" aria-hidden="true">
+                        to {s.to === 'now' ? <span class="g-mark g-mark--lime now">now</span> : s.to}
+                      </span>
+                    )}
+                  </p>
+                  <div class="what">
+                    <h3>{job.title.trim()}</h3>
+                    <p class="where">{job.role}<span class="dot" aria-hidden="true"> / </span>{job.company}, {job.location}</p>
+                    <p class="body">{job.body}</p>
+                    {job.links && job.links.length > 0 && (
+                      <p class="links">
+                        {job.links.map((l) => <a class="g-link" href={l.href} rel="noopener">{l.label}</a>)}
+                      </p>
+                    )}
+                  </div>
+                </li>
+              );
+            })}
+          </ol>
+        </section>
+      ))}
+
+      <section class="block" aria-labelledby="ach-h">
+        <h2 id="ach-h" class="sec"><span class="g-mark g-mark--pink sweep">Achievements</span></h2>
+        <ol class="wins">
+          {achievements.map((a, i) => (
+            <li class="win">
+              <span class="n" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+              <div class="win-body">
+                <h3>{a.title.replace(/ - /, ': ')}</h3>
+                <p class="where">{a.company}, {a.dateRange.replace(/\s*-\s*\.\.\./, ' to now').replace(/\s-\s/, ' to ')}</p>
+                <p class="body">{a.body}</p>
+                {a.links?.map((l) => <p class="links"><a class="g-link" href={l.href} rel="noopener">{l.label}</a></p>)}
+              </div>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <section class="block" aria-labelledby="skills-h">
+        <h2 id="skills-h" class="sec"><span class="g-mark g-mark--lime sweep">Skills</span></h2>
+        <dl class="skills">
+          {skillGroups.map((g) => (
+            <div class="skill">
+              <dt>{words(g.folder)}</dt>
+              <dd>{fixCase(g.files.join(', '))}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+
+      <nav class="end" aria-label="Elsewhere">
+        <a class="g-link" href="/factory/">what excites me</a>
+        <a class="g-link" href="/directions/g/">Home</a>
+      </nav>
+    </main>
+
+    <DirectionSwitcher current="g" page="resume" />
+
+    <script is:inline>
+      // Section marks sweep in as they scroll into view. Without JS or with reduced motion, they are simply drawn.
+      (function () {
+        var root = document.documentElement;
+        if (!root.classList.contains('g-anim') || !('IntersectionObserver' in window)) return;
+        var io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (e) {
+            if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); }
+          });
+        }, { rootMargin: '0px 0px -12% 0px' });
+        document.querySelectorAll('.sweep').forEach(function (el) { io.observe(el); });
+      })();
+    </script>
+  </body>
+</html>
+
+<style>
+  main {
+    padding: 0 var(--g-gutter) 7rem;
+    /* One two-column grid for the whole page: numerals / labels left, reading text right. */
+    --g-cols: minmax(11rem, 0.62fr) minmax(0, 1.5fr);
+  }
+
+  /* ── Intro ─────────────────────────────────────────── */
+  .intro { padding: clamp(2.5rem, 8vh, 5.5rem) 0 clamp(1rem, 4vh, 3rem); }
+  .roles {
+    margin: 0 0 clamp(2.5rem, 6vh, 4rem);
+    font-size: clamp(2.75rem, 8.4vw, 9.5rem);
+    font-weight: 800;
+    font-variation-settings: 'wdth' 80;
+    line-height: 0.95;
+    letter-spacing: -0.035em;
+    max-width: 12ch;
+  }
+  .about {
+    display: grid;
+    grid-template-columns: var(--g-cols);
+    column-gap: clamp(1.5rem, 4vw, 4rem);
+    font-size: clamp(1.125rem, 1.4vw, 1.3125rem);
+    line-height: 1.5;
+  }
+  .about p { grid-column: 2; max-width: 36rem; margin: 0 0 1em; }
+  .about p:first-child { font-size: 1.3em; line-height: 1.3; font-weight: 600; letter-spacing: -0.01em; }
+
+  /* ── Sections ──────────────────────────────────────── */
+  .block { padding-top: clamp(3rem, 8vh, 6rem); }
+  .sec {
+    margin: 0 0 clamp(2rem, 5vh, 3.5rem);
+    font-size: clamp(2.5rem, 6vw, 6rem);
+    font-weight: 800;
+    font-variation-settings: 'wdth' 80;
+    line-height: 1;
+    letter-spacing: -0.03em;
+  }
+
+  ol, dl { margin: 0; padding: 0; list-style: none; }
+
+  .entry {
+    display: grid;
+    grid-template-columns: var(--g-cols);
+    gap: 1rem clamp(1.5rem, 4vw, 4rem);
+    padding: clamp(1.75rem, 4vh, 2.75rem) 0;
+    border-top: 1px solid var(--g-rule);
+  }
+  .when { margin: 0; display: flex; flex-direction: column; }
+  .year {
+    font-size: clamp(4rem, 9vw, 8.5rem);
+    font-weight: 800;
+    font-variation-settings: 'wdth' 75;
+    line-height: 0.82;
+    letter-spacing: -0.04em;
+    font-variant-numeric: tabular-nums;
+  }
+  .until {
+    margin-top: 0.6rem;
+    font-size: clamp(1.125rem, 1.6vw, 1.5rem);
+    font-weight: 700;
+    color: var(--g-mute);
+  }
+  .now { color: var(--g-ink); padding: 0 0.05em; }
+
+  .what h3, .win h3 {
+    margin: 0 0 0.5rem;
+    font-size: clamp(1.5rem, 2.4vw, 2.25rem);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    max-width: 24ch;
+  }
+  .where { margin: 0 0 1rem; color: var(--g-mute); font-size: 1rem; }
+  .body { margin: 0; max-width: 60ch; font-size: 1.125rem; line-height: 1.55; }
+  .links { margin: 0.75rem 0 0; display: flex; gap: 1.25rem; font-weight: 600; }
+  .links a { display: inline-flex; align-items: center; min-height: 44px; }
+
+  /* Achievements: numbered rows, title takes the room. */
+  .win {
+    display: grid;
+    grid-template-columns: var(--g-cols);
+    gap: 0.75rem clamp(1.5rem, 4vw, 4rem);
+    padding: clamp(1.5rem, 3.5vh, 2.5rem) 0;
+    border-top: 1px solid var(--g-rule);
+  }
+  .n {
+    font-size: clamp(2.5rem, 4.5vw, 4.25rem);
+    font-weight: 800;
+    font-variation-settings: 'wdth' 75;
+    line-height: 0.85;
+    letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
+  }
+  .win h3 { font-size: clamp(1.625rem, 2.8vw, 2.75rem); max-width: 22ch; }
+
+  /* Skills: the area is the big word, the specifics are a sentence. */
+  .skill {
+    display: grid;
+    grid-template-columns: var(--g-cols);
+    gap: 0.5rem clamp(1.5rem, 4vw, 4rem);
+    padding: 1.25rem 0;
+    border-top: 1px solid var(--g-rule);
+    align-items: baseline;
+  }
+  .skill dt {
+    font-size: clamp(1.625rem, 2.8vw, 2.75rem);
+    font-weight: 800;
+    font-variation-settings: 'wdth' 80;
+    letter-spacing: -0.025em;
+    line-height: 1.05;
+    text-transform: capitalize;
+  }
+  .skill dd { margin: 0; font-size: 1.125rem; line-height: 1.5; max-width: 60ch; }
+  .skill dd::first-letter { text-transform: uppercase; }
+
+  .end {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 2.5rem;
+    margin-top: clamp(4rem, 12vh, 8rem);
+    padding-top: 2rem;
+    border-top: 2px solid var(--g-ink);
+    font-size: clamp(1.375rem, 2.2vw, 2rem);
+    font-weight: 700;
+    letter-spacing: -0.015em;
+  }
+  .end a { display: inline-flex; align-items: center; min-height: 44px; }
+
+  @media (max-width: 760px) {
+    .entry, .skill { grid-template-columns: minmax(0, 1fr); }
+    .when { flex-direction: row; align-items: baseline; gap: 0.75rem; flex-wrap: wrap; }
+    .until { margin-top: 0; }
+    .win, .about { grid-template-columns: minmax(0, 1fr); }
+    .about p { grid-column: 1; }
+    .roles { font-size: 12.4vw; }
+  }
+
+  /* Scroll-in: brand marks sweep across once their word is on screen. */
+  :global(.g-anim) .sweep::before {
+    transform: scaleX(0);
+    transition: transform 0.8s var(--g-ease);
+    transition-delay: calc(var(--i, 0) * 90ms + 120ms);
+  }
+  :global(.g-anim) .sweep.is-in::before { transform: scaleX(1); }
+</style>

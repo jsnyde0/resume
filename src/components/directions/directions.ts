@@ -15,6 +15,11 @@ export const directions: Direction[] = [
   { key: 'b', name: 'Runway', pitch: 'Fashion-cover cinema: full-bleed photo, towering condensed caps, dark and glossy.' },
   { key: 'c', name: 'Sticker Sheet', pitch: 'Saturated colour blocks, cut-out shapes, rotated stickers, playful and loud.' },
   { key: 'd', name: 'Dread', pitch: 'Existential minimalism: near-black, grain, one thin oversized line, radical emptiness.' },
+  // Round 2 (2026-10-20): no borrowed-format costume; strong personality played straight; brand colours = lime shirt + pink clogs from the photo.
+  { key: 'e', name: 'Dread, played straight', pitch: 'D without the film props: dark, the tagline as hero, lime and pink from the photo carried through the whole site.' },
+  { key: 'f', name: 'Poster', pitch: 'Flat full-bleed lime field, huge black grotesque, pink as the hit colour. Loud, simple, no ornament.' },
+  { key: 'g', name: 'Big Type', pitch: 'Light page where the tagline is the interface: giant words, lime and pink highlights, type that moves.' },
+  { key: 'h', name: 'Cut-out', pitch: 'The photo is the layout: you, big and cropped, with type and colour blocks built around the body.' },
 ];
 
 export type DirectionPage = 'home' | 'resume';

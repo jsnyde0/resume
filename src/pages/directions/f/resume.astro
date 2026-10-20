@@ -1,0 +1,364 @@
+---
+// PROTOTYPE (resume-soe.12) direction F "Poster": resume slice.
+// The homepage inverted: black ground, the same heavy grotesque, lime for the big type, pink for links.
+// One strict grid: years on the left, the work in a readable column. No cards.
+import DirectionSwitcher from '../../../components/directions/DirectionSwitcher.astro';
+import { workExperience, education, achievements, resumeIntro } from '../../../data/resume';
+import type { ResumeItem } from '../../../data/resume';
+import { skillFiles } from '../../../data/resume-skills';
+
+const years = (range: string) => {
+  const ys = range.match(/\d{4}/g) ?? [];
+  const open = /\.\.\./.test(range);
+  const from = ys[0] ?? range;
+  const to = open ? 'now' : ys[1];
+  return to ? `${from}–${to}` : from;
+};
+
+// One line per skill: the filename as a name, the first paragraph as its summary.
+// Sentence case with the acronyms the filenames flatten restored.
+const acronyms: Record<string, string> = { llm: 'LLM', apis: 'APIs', mmm: 'MMM' };
+const skillName = (f: string) => {
+  const words = f.replace(/\.md$/, '').split('-').map((w) => acronyms[w] ?? w);
+  return words.join(' ').replace(/^./, (c) => c.toUpperCase());
+};
+const firstPara = (html: string) => (html.match(/<p>([\s\S]*?)<\/p>/)?.[1] ?? '').replace(/<[^>]+>/g, '').trim();
+const skillGroups: { folder: string; skills: { name: string; summary: string }[] }[] = [];
+for (const f of skillFiles) {
+  const entry = { name: skillName(f.filename), summary: firstPara(f.html) };
+  const g = skillGroups.find((x) => x.folder === f.folder);
+  if (g) g.skills.push(entry);
+  else skillGroups.push({ folder: f.folder, skills: [entry] });
+}
+const label = (folder: string) => folder.replace(/-/g, ' ').replace(/^./, (c) => c.toUpperCase());
+
+const sections: { id: string; title: string; items: ResumeItem[] }[] = [
+  { id: 'work', title: 'Work', items: workExperience },
+  { id: 'achievements', title: 'Achievements', items: achievements },
+  { id: 'education', title: 'Education', items: education },
+];
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="theme-color" content="#0b0b0a" />
+    <title>Resume | Jonatan Snyders</title>
+    <!-- SHORTCUT: Google Fonts link instead of self-hosted fonts. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400..900&display=swap"
+    />
+  </head>
+  <body>
+    <div class="page">
+      <header class="head">
+        <a class="home" href="/directions/f/">Jonatan Snyders</a>
+        <h1>Resume</h1>
+        <p class="roles">{resumeIntro.headlineBadges.join(', ')}.</p>
+        <div class="intro">
+          {resumeIntro.paragraphs.map((p) => <p>{p}</p>)}
+        </div>
+      </header>
+
+      <main>
+        {sections.map((s) => (
+          <section class="section" aria-labelledby={`${s.id}-h`}>
+            <h2 id={`${s.id}-h`}>{s.title}</h2>
+            <ol class="entries">
+              {s.items.map((item) => (
+                <li class="entry">
+                  <p class="when">{years(item.dateRange)}</p>
+                  <div class="what">
+                    <h3>{item.title.trim()}</h3>
+                    <p class="meta">
+                      <span class="role">{item.role}</span>
+                      {[item.company, item.location].filter(Boolean).join(', ')}
+                    </p>
+                    <p class="body">{item.body}</p>
+                    {item.links && item.links.length > 0 && (
+                      <p class="refs">
+                        {item.links.map((l) => (
+                          <a class="hit" href={l.href} target="_blank" rel="noreferrer">{l.label}</a>
+                        ))}
+                      </p>
+                    )}
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </section>
+        ))}
+
+        <section class="section" aria-labelledby="skills-h">
+          <h2 id="skills-h">Skills</h2>
+          <div class="skills">
+            {skillGroups.map((g) => (
+              <div class="group">
+                <h3>{label(g.folder)}</h3>
+                <dl>
+                  {g.skills.map((sk) => (
+                    <div class="skill">
+                      <dt>{sk.name}</dt>
+                      <dd>{sk.summary}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+            ))}
+          </div>
+        </section>
+      </main>
+
+      <footer class="foot">
+        <a class="hit" href="/factory/">What excites me</a>
+        <a href="https://github.com/jsnyde0/" rel="me">GitHub</a>
+        <a href="https://www.linkedin.com/in/jonatan-snyders/" rel="me">LinkedIn</a>
+      </footer>
+    </div>
+
+    <DirectionSwitcher current="f" page="resume" />
+  </body>
+</html>
+
+<style is:global>
+  html { background: #0b0b0a; }
+  body { margin: 0; }
+</style>
+
+<style>
+  .page {
+    --lime: #c8ec6c;
+    --pink: #f294cc;
+    --ink: #0b0b0a;
+    --paper: #efeee6;
+    --mute: #a3a29a;
+    --pad: clamp(1rem, 2.4vw, 2.25rem);
+
+    box-sizing: border-box;
+    min-height: 100svh;
+    padding: var(--pad) var(--pad) 6rem;
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'Schibsted Grotesk', 'Helvetica Neue', Arial, sans-serif;
+    font-size: 1.0625rem;
+    line-height: 1.55;
+  }
+
+  /* The shared 12-column grid: cols 1-3 hold years and labels, 4-10 hold reading text. */
+  .head,
+  .entry,
+  .section,
+  .skill,
+  .foot {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--pad);
+  }
+
+  a { color: inherit; }
+  a:focus-visible {
+    outline: 3px solid var(--lime);
+    outline-offset: 3px;
+  }
+
+  .home {
+    grid-column: 1 / -1;
+    justify-self: start;
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    font-weight: 800;
+    font-size: 1.125rem;
+    letter-spacing: -0.01em;
+    color: var(--lime);
+    text-decoration: none;
+  }
+  .home:hover { text-decoration: underline; text-decoration-thickness: 0.12em; text-underline-offset: 0.18em; }
+
+  h1 {
+    grid-column: 1 / -1;
+    margin: clamp(1rem, 4vw, 3rem) 0 0;
+    font-size: min(24.5vw, 22rem);
+    font-weight: 900;
+    line-height: 0.8;
+    letter-spacing: -0.06em;
+    margin-left: -0.05em;
+    color: var(--lime);
+  }
+
+  .roles {
+    grid-column: 1 / span 9;
+    margin: clamp(1.5rem, 3vw, 2.5rem) 0 0;
+    font-size: clamp(1.6rem, 3.3vw, 3.25rem);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    text-wrap: balance;
+  }
+
+  .intro {
+    grid-column: 4 / span 6;
+    margin-top: clamp(2rem, 4vw, 3.5rem);
+    max-width: 62ch;
+    font-size: 1.1875rem;
+  }
+  .intro p { margin: 0 0 0.9em; }
+
+  .section {
+    margin-top: clamp(4.5rem, 9vw, 8rem);
+    padding-top: 1rem;
+    border-top: 3px solid var(--paper);
+    align-items: start;
+  }
+  h2 {
+    grid-column: 1 / -1;
+    margin: 0 0 clamp(1.5rem, 3vw, 2.75rem);
+    font-size: clamp(3rem, 9vw, 8.5rem);
+    font-weight: 900;
+    line-height: 0.9;
+    letter-spacing: -0.045em;
+    color: var(--lime);
+    margin-left: -0.04em;
+  }
+
+  .entries {
+    grid-column: 1 / -1;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .entry {
+    padding: 0.35rem 0 2.75rem;
+  }
+  .entry + .entry {
+    border-top: 1px solid #3a3a36;
+    padding-top: 1.25rem;
+  }
+  .when {
+    grid-column: 1 / span 3;
+    margin: 0;
+    font-weight: 800;
+    font-size: clamp(1.4rem, 2vw, 1.875rem);
+    line-height: 1.12;
+    color: var(--lime);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+  }
+  .what {
+    grid-column: 4 / span 7;
+    max-width: 62ch;
+  }
+  h3 {
+    margin: 0;
+    font-size: clamp(1.4rem, 2vw, 1.875rem);
+    font-weight: 800;
+    line-height: 1.12;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+  .meta {
+    margin: 0.5rem 0 0;
+    color: var(--mute);
+    font-size: 0.9375rem;
+  }
+  .role {
+    color: var(--paper);
+    font-weight: 700;
+    margin-right: 0.6em;
+  }
+  .body { margin: 0.75rem 0 0; }
+  .refs { margin: 0.5rem 0 0; display: flex; gap: 1.25rem; }
+
+  .hit {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    color: var(--pink);
+    font-weight: 700;
+    text-decoration: underline;
+    text-decoration-thickness: 0.1em;
+    text-underline-offset: 0.2em;
+    transition: color 160ms cubic-bezier(0.25, 1, 0.5, 1), background-color 160ms cubic-bezier(0.25, 1, 0.5, 1);
+  }
+  .hit:hover { background: var(--pink); color: var(--ink); text-decoration-color: transparent; }
+
+  .skills {
+    grid-column: 1 / -1;
+    display: grid;
+    gap: 2.75rem;
+  }
+  .group {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--pad);
+    align-items: start;
+  }
+  .group h3 {
+    grid-column: 1 / span 3;
+    margin: 0;
+    padding-top: calc(0.7rem + 1px);
+    font-size: 1.125rem;
+    line-height: inherit;
+    color: var(--lime);
+    letter-spacing: -0.01em;
+  }
+  .group dl { grid-column: 4 / -1; margin: 0; }
+  .skill {
+    grid-template-columns: repeat(9, minmax(0, 1fr));
+    padding: 0.7rem 0;
+    border-top: 1px solid #3a3a36;
+  }
+  .skill dt {
+    grid-column: 1 / span 3;
+    font-weight: 700;
+  }
+  .skill dd {
+    grid-column: 4 / span 6;
+    margin: 0;
+    color: #cfcec6;
+    max-width: 62ch;
+  }
+
+  .foot {
+    margin-top: clamp(4.5rem, 9vw, 8rem);
+    padding-top: 1rem;
+    border-top: 3px solid var(--paper);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 2rem;
+    align-items: center;
+  }
+  .foot a:not(.hit) {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+  .foot .hit { font-size: 1.375rem; font-weight: 800; }
+
+  @media (max-width: 760px) {
+    .head,
+    .section,
+    .entry,
+    .group,
+    .skill { grid-template-columns: minmax(0, 1fr); }
+    .home, h1, .roles, .intro, h2, .entries, .skills, .when, .what, .group h3, .group dl, .skill dt, .skill dd { grid-column: 1; }
+    h1 { font-size: 24vw; }
+    .group h3 { color: var(--lime); padding: 0 0 0.5rem; }
+    .intro { font-size: 1.0625rem; }
+    .when { color: var(--lime); font-size: 1rem; margin-bottom: 0.25rem; }
+    .skill dd { margin-top: 0.15rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hit { transition: none; }
+  }
+</style>

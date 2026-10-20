@@ -1,0 +1,106 @@
+---
+/**
+ * PROTOTYPE (resume-soe.12) direction G "Big Type": shared <head> bits, brand tokens and the
+ * plain-text top bar. Used by both G pages so the voice stays identical.
+ */
+interface Props {
+  /** Which nav item is the current page, if any. */
+  current?: 'home' | 'resume';
+}
+const { current } = Astro.props;
+const links = [
+  { href: '/directions/g/resume/', label: 'Resume', key: 'resume' },
+  { href: '/factory/', label: 'Factory', key: 'factory' },
+  { href: 'https://github.com/jsnyde0', label: 'GitHub', key: 'gh' },
+  { href: 'https://www.linkedin.com/in/jonatan-snyders/', label: 'LinkedIn', key: 'li' },
+];
+---
+<header class="g-top">
+  {current === 'home'
+    ? <h1 class="g-name"><a href="/directions/g/" aria-current="page">Jonatan Snyders</a></h1>
+    : <a class="g-name" href="/directions/g/">Jonatan Snyders</a>}
+  <nav aria-label="Main">
+    <ul>
+      {links.map((l) => (
+        <li>
+          <a href={l.href} aria-current={current === l.key ? 'page' : undefined} rel={l.href.startsWith('http') ? 'noopener' : undefined}>{l.label}</a>
+        </li>
+      ))}
+    </ul>
+  </nav>
+</header>
+
+<style is:global>
+  :root {
+    /* Brand colours, lifted from the photo and brightened so they hold up as flat fields. */
+    --g-paper: #f4f2ec;
+    --g-ink: #161514;
+    --g-lime: #c6ec74;   /* shirt: measured #abc36d, brightest #bfe784 */
+    --g-pink: #eba5d0;   /* clogs: measured #bb85a7 */
+    --g-mute: #5c5852;
+    --g-rule: #d9d5cb;
+    --g-ease: cubic-bezier(0.22, 1, 0.36, 1); /* ease-out-quint */
+    --g-gutter: clamp(1.25rem, 3vw, 2.5rem);
+  }
+  html { background: var(--g-paper); color: var(--g-ink); }
+  body {
+    margin: 0;
+    font-family: 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
+    font-optical-sizing: auto;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  ::selection { background: var(--g-lime); color: var(--g-ink); }
+  a:focus-visible { outline: 3px solid var(--g-ink); outline-offset: 4px; border-radius: 2px; }
+  .sr-only {
+    position: absolute; width: 1px; height: 1px; overflow: hidden;
+    clip-path: inset(50%); white-space: nowrap;
+  }
+
+  /* Solid colour block behind a word; drawn on a pseudo so it can sweep in via transform. */
+  .g-mark { position: relative; isolation: isolate; }
+  .g-mark::before {
+    content: '';
+    position: absolute;
+    inset: 0.1em -0.05em 0 -0.05em;
+    z-index: -1;
+    transform-origin: 0 50%;
+  }
+  .g-mark--lime::before { background: var(--g-lime); }
+  .g-mark--pink::before { background: var(--g-pink); }
+
+  /* Plain text link with an underline that thickens into a lime block on hover. */
+  .g-link {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.2em;
+    transition: background-color 0.3s var(--g-ease);
+  }
+  .g-link:hover { background-color: var(--g-lime); }
+
+  .g-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0 2rem;
+    flex-wrap: wrap;
+    padding: 0.75rem var(--g-gutter) 0;
+    font-size: 1.0625rem;
+  }
+  .g-top a { color: inherit; text-decoration: none; display: inline-block; padding: 0.6rem 0; }
+  .g-name { margin: 0; font-size: inherit; font-weight: 700; letter-spacing: -0.01em; }
+  .g-top ul { display: flex; gap: 0 1.5rem; margin: 0; padding: 0; list-style: none; flex-wrap: wrap; }
+  .g-top nav a {
+    background: linear-gradient(var(--g-ink), var(--g-ink)) 0 calc(100% - 0.35rem) / 0 2px no-repeat;
+    transition: background-size 0.4s var(--g-ease);
+  }
+  .g-top nav a:hover, .g-top nav a[aria-current='page'] { background-size: 100% 2px; }
+  @media (max-width: 640px) {
+    .g-top { font-size: 1rem; }
+    .g-top ul { gap: 0 1.1rem; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .g-top nav a, .g-link { transition: none; }
+  }
+</style>

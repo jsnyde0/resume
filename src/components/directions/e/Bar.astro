@@ -1,0 +1,70 @@
+---
+/**
+ * PROTOTYPE (resume-soe.12) direction E: top bar shared by both pages. Name left, plain links right.
+ */
+interface Props {
+  page: 'home' | 'resume';
+}
+const { page } = Astro.props;
+const links = [
+  { label: 'Resume', href: '/directions/e/resume/', current: page === 'resume' },
+  { label: 'Factory', href: '/factory/', current: false },
+  { label: 'GitHub', href: 'https://github.com/jsnyde0/', current: false },
+  { label: 'LinkedIn', href: 'https://www.linkedin.com/in/jonatan-snyders/', current: false },
+];
+---
+<header class="e-bar">
+  {page === 'home'
+    ? <h1 class="e-bar-name">Jonatan Snyders</h1>
+    : <a class="e-bar-name" href="/directions/e/">Jonatan Snyders</a>}
+  <nav aria-label="Site">
+    <ul>
+      {links.map((l) => (
+        <li><a href={l.href} aria-current={l.current ? 'page' : undefined}>{l.label}</a></li>
+      ))}
+    </ul>
+  </nav>
+</header>
+
+<style>
+  .e-bar {
+    position: relative;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.5rem var(--e-pad);
+    font-size: 0.875rem;
+    letter-spacing: 0.01em;
+  }
+  .e-bar-name {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    font-weight: 500;
+    color: var(--e-ink);
+    text-decoration: none;
+    margin: 0;
+    font-size: inherit;
+    white-space: nowrap;
+  }
+  a.e-bar-name:hover { color: var(--e-lime); }
+  ul { display: flex; gap: clamp(0.875rem, 2vw, 2rem); margin: 0; padding: 0; list-style: none; }
+  ul a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    color: var(--e-quiet);
+    text-decoration: none;
+    transition: color 0.4s var(--e-ease);
+  }
+  ul a:hover { color: var(--e-lime); }
+  ul a[aria-current='page'] { color: var(--e-lime); }
+
+  @media (max-width: 520px) {
+    .e-bar { font-size: 0.8125rem; }
+    .e-bar { flex-wrap: wrap; row-gap: 0; padding-top: 0.25rem; }
+    .e-bar-name { flex-basis: 100%; min-height: 36px; }
+  }
+</style>

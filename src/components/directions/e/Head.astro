@@ -1,0 +1,72 @@
+---
+/**
+ * PROTOTYPE (resume-soe.12) direction E "Dread, played straight": shared <head> bits and global base styles.
+ * Near-black ground, one type family (Archivo), two brand colours lifted from the photo:
+ * lime (the shirt) and pink (the clogs). Nothing else carries colour.
+ */
+interface Props {
+  title: string;
+  description?: string;
+}
+const { title, description } = Astro.props;
+---
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex, nofollow" />
+<title>{title}</title>
+{description && <meta name="description" content={description} />}
+<link rel="icon" type="image/png" href="/img/avatar_jonatan_tongue.png" />
+<!-- SHORTCUT: Google Fonts link instead of self-hosted fonts. -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..600&display=swap"
+/>
+
+<style is:global>
+  :root {
+    --e-ground: #0c0c0b;
+    --e-ink: #ecebe6;
+    --e-quiet: #a6a49e;
+    --e-hair: rgba(236, 235, 230, 0.14);
+    /* Brand: measured shirt #abc36d (brightest #bfe784) and clog #bb85a7, lifted to hold on near-black. */
+    --e-lime: #c4e47c;
+    --e-pink: #e7a6cf;
+    --e-font: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
+    --e-ease: cubic-bezier(0.16, 1, 0.3, 1);
+    --e-pad: clamp(1.25rem, 2.6vw, 2.5rem);
+    color-scheme: dark;
+  }
+  html { background: var(--e-ground); }
+  body {
+    margin: 0;
+    background: var(--e-ground);
+    color: var(--e-ink);
+    font-family: var(--e-font);
+    font-size: 1rem;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  ::selection { background: var(--e-lime); color: var(--e-ground); }
+  a { color: inherit; }
+  :focus-visible { outline: 2px solid var(--e-pink); outline-offset: 4px; border-radius: 1px; }
+
+  /* Links: lime at rest, pink on hover. Two colours, one rule. */
+  .e-link {
+    color: var(--e-lime);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.3em;
+    text-decoration-color: rgba(196, 228, 124, 0.4);
+    transition: color 0.4s var(--e-ease), text-decoration-color 0.4s var(--e-ease);
+  }
+  .e-link:hover { color: var(--e-pink); text-decoration-color: var(--e-pink); }
+  .e-link:active { opacity: 0.7; }
+
+  .e-sr {
+    position: absolute; width: 1px; height: 1px; overflow: hidden;
+    clip: rect(0 0 0 0); white-space: nowrap;
+  }
+</style>

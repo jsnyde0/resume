@@ -1,0 +1,355 @@
+---
+// PROTOTYPE (resume-soe.12) direction H "Cut-out": resume slice.
+// The body runs down the page, lighter: the shirt rises out of the lime Work band, the bibs are the black
+// Skills band, the clogs stand on the pink Education band. Between them, a plain readable two-column record.
+import DirectionSwitcher from '../../../components/directions/DirectionSwitcher.astro';
+import { resumeIntro, workExperience, education } from '../../../data/resume';
+import { skillFiles } from '../../../data/resume-skills';
+
+const photo = '/img/jonatan_posing_rocks_no_bg.png';
+
+const when = (range: string) =>
+  range.replace(/\s*-\s*\.\.\.$/, ' to now').replace(/\s*-\s*/, ' to ');
+
+// Skills grouped by folder, in data order; each skill keeps its own first paragraph from the data.
+// SHORTCUT: regex lifts the first <p> out of the skill HTML instead of a structured field in resume-skills.ts.
+const firstPara = (html: string) => html.match(/<p>([\s\S]*?)<\/p>/)?.[1] ?? '';
+// SHORTCUT: hand-kept casing map for the acronyms that appear in the skill filenames.
+const casing: Record<string, string> = { llm: 'LLM', apis: 'APIs', mmm: 'MMM', side: 'side' };
+const titleOf = (filename: string) => {
+  const t = filename
+    .replace(/\.md$/, '')
+    .split('-')
+    .map((w) => casing[w] ?? w)
+    .join(' ')
+    .replace('server side', 'server-side');
+  return t.charAt(0).toUpperCase() + t.slice(1);
+};
+const skillGroups: { folder: string; items: { title: string; text: string }[] }[] = [];
+for (const f of skillFiles) {
+  const item = { title: titleOf(f.filename), text: firstPara(f.html) };
+  const g = skillGroups.find((x) => x.folder === f.folder);
+  if (g) g.items.push(item);
+  else skillGroups.push({ folder: f.folder, items: [item] });
+}
+const groupLabel = (folder: string) => titleOf(folder);
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Resume. Jonatan Snyders</title>
+    <!-- SHORTCUT: Google Fonts link instead of self-hosted fonts. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&display=swap"
+    />
+  </head>
+  <body>
+    <header class="top wrap">
+      <a class="home" href="/directions/h/">Jonatan Snyders</a>
+      <nav aria-label="Site">
+        <ul>
+          <li><a href="/factory/">Factory</a></li>
+          <li><a href="https://github.com/jsnyde0" rel="noopener">GitHub</a></li>
+          <li><a href="https://www.linkedin.com/in/jonatan-snyders/" rel="noopener">LinkedIn</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <section class="intro wrap" aria-labelledby="resume-h">
+        <h1 id="resume-h">Resume</h1>
+        <div class="intro-body">
+          <ul class="roles" aria-label="Roles">
+            {resumeIntro.headlineBadges.map((b) => <li>{b}</li>)}
+          </ul>
+          {resumeIntro.paragraphs.map((p) => <p>{p}</p>)}
+        </div>
+      </section>
+
+      <section class="sect" aria-labelledby="work-h">
+        <div class="band band--lime">
+          <div class="wrap band-in">
+            <h2 id="work-h">Work</h2>
+            <!-- SHORTCUT: crops are hand-measured offsets into the 500px PNG, not generated assets. -->
+            <span class="cut cut--shirt" aria-hidden="true"><img src={photo} alt="" width="500" height="499" /></span>
+          </div>
+        </div>
+        <ol class="record wrap">
+          {workExperience.map((job) => (
+            <li class="entry">
+              <p class="when">{when(job.dateRange)}</p>
+              <div class="what">
+                <h3>{job.title.trim()}</h3>
+                <p class="where">{job.role}, {job.company}, {job.location}</p>
+                <p class="body" set:html={job.body} />
+                {job.links && (
+                  <p class="links">
+                    {job.links.map((l) => <a href={l.href} rel="noopener">{l.label}</a>)}
+                  </p>
+                )}
+              </div>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <section class="sect" aria-labelledby="skills-h">
+        <div class="band band--ink">
+          <div class="wrap band-in">
+            <h2 id="skills-h">Skills</h2>
+          </div>
+        </div>
+        <div class="record wrap">
+          {skillGroups.map((g) => (
+            <div class="entry">
+              <h3 class="when">{groupLabel(g.folder)}</h3>
+              <dl class="what skills">
+                {g.items.map((s) => (
+                  <div>
+                    <dt>{s.title}</dt>
+                    <dd set:html={s.text} />
+                  </div>
+                ))}
+              </dl>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section class="sect" aria-labelledby="edu-h">
+        <div class="band band--pink">
+          <div class="wrap band-in">
+            <h2 id="edu-h">Education</h2>
+            <span class="cut cut--clogs" aria-hidden="true"><img src={photo} alt="" width="500" height="499" /></span>
+          </div>
+        </div>
+        <ol class="record wrap">
+          {education.map((e) => (
+            <li class="entry">
+              <p class="when">{when(e.dateRange)}</p>
+              <div class="what">
+                <h3>{e.title.trim()}</h3>
+                <p class="where">{e.company}, {e.location}</p>
+                <p class="body" set:html={e.body} />
+              </div>
+            </li>
+          ))}
+        </ol>
+      </section>
+    </main>
+
+    <footer class="foot wrap">
+      <a href="/directions/h/">Home</a>
+      <a href="/factory/">Factory</a>
+    </footer>
+
+    <DirectionSwitcher current="h" page="resume" />
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    --h-lime: #c6e46c;
+    --h-pink: #e79bc8;
+    --h-ink: #141414;
+    --h-paper: #f2f0ea;
+    --h-muted: #55534e;
+    --h-ease: cubic-bezier(0.22, 1, 0.36, 1);
+    --h-font: 'Bricolage Grotesque', 'Helvetica Neue', Arial, sans-serif;
+  }
+  html { background: var(--h-paper); }
+  body {
+    margin: 0;
+    color: var(--h-ink);
+    font-family: var(--h-font);
+    font-size: 1.0625rem;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; }
+  a:focus-visible { outline: 3px solid var(--h-ink); outline-offset: 3px; border-radius: 2px; }
+</style>
+
+<style>
+  .wrap {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 78rem;
+    margin-inline: auto;
+    padding-inline: clamp(1.25rem, 4vw, 3rem);
+  }
+
+  /* Top bar */
+  .top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem 2rem;
+    padding-block: 1.25rem;
+  }
+  .top ul { display: flex; gap: 1.75rem; margin: 0; padding: 0; list-style: none; }
+  .top a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .top a:hover { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 0.25em; }
+  .home { font-weight: 800 !important; letter-spacing: -0.02em; }
+
+  /* Intro */
+  .intro {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: 2rem clamp(2rem, 5vw, 5rem);
+    padding-block: clamp(3rem, 8vw, 6.5rem) clamp(4rem, 9vw, 7.5rem);
+  }
+  h1 {
+    margin: 0;
+    font-size: clamp(4rem, 11vw, 9.5rem);
+    font-weight: 800;
+    font-variation-settings: 'opsz' 96;
+    line-height: 0.86;
+    letter-spacing: -0.055em;
+  }
+  .intro-body { max-width: 38rem; padding-top: 0.5rem; }
+  .intro-body p { margin: 0 0 1em; }
+  .intro-body p:first-of-type { font-size: 1.375rem; line-height: 1.4; font-weight: 500; letter-spacing: -0.01em; }
+  .roles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1.25rem;
+    margin: 0 0 1.75rem;
+    padding: 0;
+    list-style: none;
+    font-weight: 700;
+  }
+
+  /* Bands: the section system. Lime is the shirt, ink the bibs, pink the clogs. */
+  .band { position: relative; }
+  .band--lime { background: var(--h-lime); }
+  .band--ink { background: var(--h-ink); color: var(--h-paper); }
+  .band--pink { background: var(--h-pink); }
+  .band-in {
+    --band-h: clamp(6.5rem, 12vw, 10rem);
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    box-sizing: border-box;
+    min-height: var(--band-h);
+    padding-block: 1.25rem 1rem;
+  }
+  h2 {
+    margin: 0;
+    font-size: clamp(3rem, 8vw, 6.5rem);
+    font-weight: 800;
+    font-variation-settings: 'opsz' 96;
+    line-height: 0.85;
+    letter-spacing: -0.05em;
+  }
+
+  /* Cut-outs: windows into the same photo at ~1.25x, positioned so the body meets the band edge. */
+  .cut {
+    --s: 1.25;
+    position: absolute;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .cut img {
+    position: absolute;
+    width: calc(500px * var(--s));
+    height: auto;
+    max-width: none;
+  }
+  /* Head to mid-bib, cut flat at the band's bottom edge: the shirt rises out of the lime. */
+  .cut--shirt {
+    right: clamp(1rem, 12vw, 10rem);
+    bottom: 0;
+    width: calc(215px * var(--s));
+    height: calc(184px * var(--s));
+  }
+  .cut--shirt img { left: calc(-150px * var(--s)); top: calc(-30px * var(--s)); }
+  /* Shins and clogs, cut flat at the band's top edge: the legs come down into the pink and stand on its floor. */
+  .cut--clogs {
+    right: clamp(1rem, 10vw, 8rem);
+    bottom: 0;
+    width: calc(275px * var(--s));
+    height: var(--band-h);
+  }
+  .cut--clogs img { left: calc(-120px * var(--s)); bottom: calc(-16px * var(--s)); }
+
+  /* Record: date column + content column */
+  .record {
+    margin: 0 auto;
+    padding-block: clamp(2.5rem, 5vw, 4rem) clamp(4rem, 8vw, 6.5rem);
+    list-style: none;
+  }
+  .entry {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: 0.5rem clamp(2rem, 5vw, 5rem);
+    padding-block: 1.75rem;
+    border-top: 1px solid rgba(20, 20, 20, 0.16);
+  }
+  .entry:first-child { border-top: 0; }
+  .when {
+    margin: 0;
+    font-size: 1.375rem;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    line-height: 1.25;
+  }
+  .what { max-width: 38rem; }
+  h3 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+  h3.when { font-size: 1.375rem; }
+  .where { margin: 0.35rem 0 0.75rem; color: var(--h-muted); font-size: 0.9375rem; }
+  .body { margin: 0; }
+  .links { display: flex; gap: 1.25rem; margin: 0.5rem 0 0; }
+  .links a, .skills a {
+    font-weight: 600;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.2em;
+    text-decoration-color: var(--h-pink);
+  }
+  .links a { display: inline-flex; align-items: center; min-height: 44px; }
+  .links a:hover, .skills a:hover { text-decoration-color: currentColor; }
+
+  .skills { margin: 0; }
+  .skills > div + div { margin-top: 1.25rem; }
+  .skills dt { font-weight: 700; font-size: 1.125rem; }
+  .skills dd { margin: 0.15rem 0 0; }
+
+  .foot {
+    display: flex;
+    gap: 1.75rem;
+    padding-block: 2rem 6rem;
+    border-top: 1px solid rgba(20, 20, 20, 0.16);
+  }
+  .foot a { display: inline-flex; align-items: center; min-height: 44px; font-weight: 600; }
+
+  @media (max-width: 760px) {
+    .intro, .entry { grid-template-columns: minmax(0, 1fr); }
+    .intro { gap: 1.5rem; }
+    .intro-body p:first-of-type { font-size: 1.25rem; }
+    .cut { --s: 0.78; }
+    .cut--shirt { right: 0.5rem; }
+    .cut--clogs { --s: 0.62; right: 0.25rem; }
+    h2 { font-size: 2.875rem; }
+    .when, h3.when { font-size: 1.0625rem; color: var(--h-muted); }
+    h3 { font-size: 1.3125rem; }
+  }
+</style>
