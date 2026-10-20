@@ -1,0 +1,238 @@
+---
+// PROTOTYPE (resume-soe.12) direction F2 "Poster, on black": homepage.
+// F's poster, inverted: a near-black field, the name in shirt-lime at poster scale along the foot,
+// the full-colour figure standing in front of it so the outfit pops. Clog-pink is the single hit colour.
+// The shirt always sits on black (above the name); only legs and clogs cross the lime letters.
+import DirectionSwitcher from '../../../components/directions/DirectionSwitcher.astro';
+const photo = '/img/jonatan_posing_rocks_hires_no_bg.png';
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="theme-color" content="#151513" />
+    <title>Jonatan Snyders</title>
+    <meta name="description" content="Jonatan Snyders. From catwalks to startups, agent harnesses to existential dread." />
+    <!-- SHORTCUT: Google Fonts link instead of self-hosted fonts. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400..900&display=swap"
+    />
+    <link rel="preload" as="image" href={photo} />
+  </head>
+  <body>
+    <main class="field">
+      <h1 class="name">
+        <span>Jonatan</span>
+        <span>Snyders</span>
+      </h1>
+
+      <p class="tagline">
+        From catwalks to startups, agent harnesses to existential <mark>dread.</mark>
+      </p>
+
+      <nav class="links" aria-label="Site">
+        <ul class="primary">
+          <li><a href="/factory/">What excites me</a></li>
+          <li><a href="/directions/f2/resume/">What bores me</a></li>
+        </ul>
+        <ul class="secondary">
+          <li><a href="https://github.com/jsnyde0/" rel="me">GitHub</a></li>
+          <li><a href="https://www.linkedin.com/in/jonatan-snyders/" rel="me">LinkedIn</a></li>
+        </ul>
+      </nav>
+
+      <img
+        class="figure"
+        src={photo}
+        alt="Jonatan mid-stride in a lime shirt, black cycling bibs and pink clogs."
+        width="595"
+        height="1041"
+        fetchpriority="high"
+      />
+    </main>
+
+    <DirectionSwitcher current="f2" page="home" />
+  </body>
+</html>
+
+<style is:global>
+  html { background: #151513; }
+  body { margin: 0; }
+</style>
+
+<style>
+  .field {
+    /* Brand palette, lifted from the photo: shirt #abc36d -> lime type, clogs #bb85a7 -> pink hit.
+       The ground is a lifted warm near-black, not #000, so the blue-black bib shorts still read as a shape. */
+    --ground: #151513;
+    --lime: #c8ec6c;
+    --pink: #f294cc;
+    --ink: #0b0b0a;
+    --paper: #efede4;
+    --pad: clamp(1rem, 2.4vw, 2.25rem);
+    --ease: cubic-bezier(0.25, 1, 0.5, 1);
+
+    position: relative;
+    box-sizing: border-box;
+    min-height: 100svh;
+    overflow: clip;
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    grid-template-rows: auto auto 1fr auto;
+    column-gap: var(--pad);
+    padding: var(--pad) var(--pad) 0;
+    background: var(--ground);
+    color: var(--paper);
+    font-family: 'Schibsted Grotesk', 'Helvetica Neue', Arial, sans-serif;
+    font-optical-sizing: auto;
+  }
+
+  .tagline {
+    grid-column: 1 / span 7;
+    grid-row: 1;
+    margin: 0 0 clamp(1rem, 2vw, 1.5rem);
+    max-width: 19ch;
+    font-size: clamp(1.75rem, min(3.1vw, 5.2svh), 3.4rem);
+    font-weight: 800;
+    line-height: 1.02;
+    letter-spacing: -0.03em;
+    text-wrap: balance;
+  }
+
+  mark {
+    background: var(--pink);
+    color: var(--ink);
+    padding: 0 0.12em;
+    margin: 0 -0.04em;
+  }
+
+  .links {
+    grid-column: 1 / span 7;
+    grid-row: 2;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.25rem 2.5rem;
+    position: relative;
+    z-index: 3;
+  }
+  .links ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 1.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    color: var(--lime);
+    text-decoration: underline;
+    text-decoration-thickness: 0.12em;
+    text-underline-offset: 0.18em;
+    transition: background-color 160ms var(--ease), color 160ms var(--ease);
+  }
+  .primary a {
+    font-size: clamp(1.15rem, 1.5vw, 1.4rem);
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+  .secondary a {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--paper);
+  }
+  .links a:hover {
+    background: var(--pink);
+    color: var(--ink);
+    text-decoration-color: transparent;
+  }
+  .links a:focus-visible {
+    outline: 3px solid var(--pink);
+    outline-offset: 3px;
+  }
+  .links a:active { background: var(--lime); color: var(--ink); }
+
+  .name {
+    grid-column: 1 / -1;
+    grid-row: 4;
+    position: relative;
+    z-index: 1;
+    margin: 0 0 0 -0.04em;
+    color: var(--lime);
+    font-weight: 900;
+    /* Height-capped so the name's top edge stays below the shirt's hem (see .figure), and width-capped
+       so "Snyders" (about 3.3em wide) only reaches the figure's legs, never across the whole body.
+       0.5716 = the cut-out's aspect ratio (595 / 1041) applied to the figure height below. */
+    font-size: min(21vw, 30svh, calc((100vw - 0.5716 * min(94svh, 1040px) - 2 * var(--pad)) / 3.3));
+    line-height: 0.8;
+    letter-spacing: -0.055em;
+    /* Descender room for the y; the figure's clogs land on this line. */
+    padding-bottom: 0.14em;
+  }
+  .name span { display: block; }
+
+  .figure {
+    grid-column: 7 / -1;
+    grid-row: 1 / -1;
+    align-self: end;
+    justify-self: end;
+    position: relative;
+    z-index: 2;
+    display: block;
+    height: min(94svh, 1040px);
+    width: auto;
+    max-width: none;
+    /* The front clog is the cut-out's right-most pixel: no negative margin, or it gets cropped. */
+    margin-right: 0;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  @media (max-width: 760px) {
+    .field {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-rows: auto auto auto auto;
+      padding-bottom: 4.5rem; /* clears the fixed prototype switcher */
+    }
+    .name {
+      grid-column: 1;
+      grid-row: 1;
+      font-size: 23.5vw;
+      padding-bottom: 0;
+    }
+    .tagline {
+      grid-column: 1;
+      grid-row: 2;
+      margin: clamp(1.25rem, 6vw, 2rem) 0 0.75rem;
+      max-width: 14ch;
+      font-size: clamp(1.9rem, 9vw, 2.6rem);
+    }
+    .links {
+      grid-column: 1;
+      grid-row: 3;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+    .figure {
+      grid-column: 1;
+      grid-row: 4;
+      justify-self: center;
+      height: auto;
+      width: min(86%, 420px);
+      margin: 1.5rem 0 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .links a { transition: none; }
+  }
+</style>

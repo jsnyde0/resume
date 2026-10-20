@@ -20,6 +20,9 @@ export const directions: Direction[] = [
   { key: 'f', name: 'Poster', pitch: 'Flat full-bleed lime field, huge black grotesque, pink as the hit colour. Loud, simple, no ornament.' },
   { key: 'g', name: 'Big Type', pitch: 'Light page where the tagline is the interface: giant words, lime and pink highlights, type that moves.' },
   { key: 'h', name: 'Cut-out', pitch: 'The photo is the layout: you, big and cropped, with type and colour blocks built around the body.' },
+  // Round 3 (2026-10-20): F and H reworked; outfit must pop off the ground; resume = the repo explorer reworked; hi-res cut-out + more photos.
+  { key: 'f2', name: 'Poster, on black', pitch: 'F on black: lime type, the outfit pops. Resume is the repo explorer rebuilt in the poster language.' },
+  { key: 'h2', name: 'Cut-out, refined', pitch: 'H refined with a sharp hi-res cut-out and no lime behind the shirt. Resume is the repo explorer rebuilt around the body.' },
 ];
 
 export type DirectionPage = 'home' | 'resume';

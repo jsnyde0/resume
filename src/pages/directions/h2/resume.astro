@@ -1,0 +1,612 @@
+---
+// PROTOTYPE (resume-soe.12) direction H2 "Cut-out, refined": resume slice.
+// The live repo explorer (file tree + file viewer, README first), rebuilt around the body. On desktop the
+// cut-out stands full height at the left and is the page's spine: the black band runs behind his shirt and
+// carries the page title in lime plus the open file's path in pink; the tree hangs beside his leg, the open
+// file reads to its right in the homepage's type. On phone the body crops to the shoulders above the band and
+// the tree folds into a Files drawer. README shows his face; achievements carry the roaring photo.
+import DirectionSwitcher from '../../../components/directions/DirectionSwitcher.astro';
+import { achievements, education, resumeIntro, workExperience } from '../../../data/resume';
+import type { ResumeItem } from '../../../data/resume';
+import { skillFiles } from '../../../data/resume-skills';
+import { buildSection, buildSkills, itemSlug } from '../../../lib/resume-tree';
+import type { TreeFolder } from '../../../lib/resume-tree';
+
+const photo = '/img/jonatan_posing_rocks_hires_no_bg.png';
+
+const when = (range: string) =>
+  range.replace(/\s*-\s*\.\.\.$/, ' to now').replace(/\s*-\s*/, ' to ');
+
+// The tree comes from the shared builders; item panels are rendered here in this direction's markup,
+// so the builders' html is not used for items (only their paths).
+const experience = buildSection('experience', workExperience, () => '');
+const achievementSection = buildSection('achievements', achievements, () => '');
+const educationSection = buildSection('education', education, () => '');
+const skills = buildSkills(skillFiles);
+
+const folders: TreeFolder[] = [
+  { name: 'skills', files: [], subfolders: skills.subfolders },
+  { name: 'achievements', files: achievementSection.files },
+  { name: 'experience', files: experience.files },
+  { name: 'education', files: educationSection.files },
+];
+
+type Panel =
+  | { path: string; kind: 'readme' }
+  | { path: string; kind: 'item'; item: ResumeItem; roar: boolean }
+  | { path: string; kind: 'skill'; html: string };
+
+const itemPanels = (dir: string, items: ResumeItem[], roar = false): Panel[] =>
+  items.map((item) => ({ path: `${dir}/${itemSlug(item)}.md`, kind: 'item', item, roar }));
+
+const panels: Panel[] = [
+  { path: 'README.md', kind: 'readme' },
+  ...itemPanels('experience', workExperience),
+  ...itemPanels('achievements', achievements, true),
+  ...itemPanels('education', education),
+  ...Object.entries(skills.contents).map(([path, html]): Panel => ({ path, kind: 'skill', html })),
+];
+
+const DEFAULT_PATH = 'README.md';
+// The work history is open on arrival, so the tree reads as a resume beside the body before anything is clicked.
+const OPEN_DIR = 'experience';
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Resume. Jonatan Snyders</title>
+    <meta name="description" content="Resume of Jonatan Snyders: web developer, data scientist, ex-founder, and growth engineer." />
+    <!-- SHORTCUT: Google Fonts link instead of self-hosted fonts. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&display=swap"
+    />
+  </head>
+  <body>
+    <div class="shell">
+      <span class="band" aria-hidden="true"></span>
+      <img class="figure" src={photo} alt="" width="595" height="1041" fetchpriority="high" />
+
+      <header class="top">
+        <a class="home" href="/directions/h2/"><span class="long">Jonatan Snyders</span><span class="short">Home</span></a>
+        <nav aria-label="Site">
+          <ul>
+            <li><a href="/factory/">Factory</a></li>
+            <li><a href="https://github.com/jsnyde0" rel="noopener">GitHub</a></li>
+            <li><a href="https://www.linkedin.com/in/jonatan-snyders/" rel="noopener">LinkedIn</a></li>
+          </ul>
+        </nav>
+      </header>
+
+      <div class="title">
+        <h1>Resume</h1>
+        <p class="path" aria-live="polite"><span class="sr">Open file: </span><span data-path-label>{DEFAULT_PATH}</span></p>
+      </div>
+
+      <button class="drawer-toggle" type="button" aria-expanded="false" aria-controls="tree" data-drawer-toggle>
+        <span class="drawer-word">Files</span>
+        <span class="drawer-path" data-path-label>{DEFAULT_PATH}</span>
+        <svg class="chev" viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.75" /></svg>
+      </button>
+
+      <nav class="tree" id="tree" aria-label="Resume files" data-tree>
+        <ul class="lvl0">
+          <li>
+            <button class="file" type="button" data-file={DEFAULT_PATH} aria-current="true"><span>README.md</span></button>
+          </li>
+          {folders.map((folder, i) => (
+            <li>
+              <button class="dir" type="button" aria-expanded={folder.name === OPEN_DIR ? 'true' : 'false'} aria-controls={`dir-${i}`} data-dir>
+                <svg class="chev" viewBox="0 0 12 12" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.75" /></svg>
+                <span>{folder.name}/</span>
+              </button>
+              <ul class="lvl1" id={`dir-${i}`} hidden={folder.name !== OPEN_DIR}>
+                {folder.files.map((file) => (
+                  <li>
+                    <button class="file" type="button" data-file={file.path} aria-current="false"><span>{file.name}</span></button>
+                  </li>
+                ))}
+                {folder.subfolders?.map((sub, j) => (
+                  <li>
+                    <button class="dir" type="button" aria-expanded="false" aria-controls={`dir-${i}-${j}`} data-dir>
+                      <svg class="chev" viewBox="0 0 12 12" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.75" /></svg>
+                      <span>{sub.name}/</span>
+                    </button>
+                    <ul class="lvl2" id={`dir-${i}-${j}`} hidden>
+                      {sub.files.map((file) => (
+                        <li>
+                          <button class="file" type="button" data-file={file.path} aria-current="false"><span>{file.name}</span></button>
+                        </li>
+                      ))}
+                    </ul>
+                  </li>
+                ))}
+              </ul>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
+      <main class="pane" id="pane" tabindex="-1">
+        {panels.map((p) => (
+          <article class="doc" data-panel={p.path} hidden={p.path !== DEFAULT_PATH}>
+            {p.kind === 'readme' && (
+              <>
+                <img class="face" src="/img/avatar_jonatan.png" alt="Jonatan's face, in mirrored sunglasses." width="253" height="252" />
+                <h2 class="doc-title">Jonatan Snyders</h2>
+                <ul class="roles" aria-label="Roles">
+                  {resumeIntro.headlineBadges.map((b) => <li><mark>{b}</mark></li>)}
+                </ul>
+                <div class="prose">
+                  {resumeIntro.paragraphs.map((t) => <p>{t}</p>)}
+                </div>
+              </>
+            )}
+            {p.kind === 'item' && (
+              <>
+                {p.roar && (
+                  <img class="roar" src="/img/jonatan_roaring_no_bg.png" alt="" width="436" height="437" loading="lazy" />
+                )}
+                <p class="role"><mark>{p.item.role}</mark></p>
+                <h2 class="doc-title">{p.item.title.trim()}</h2>
+                <p class="meta">
+                  {[p.item.company, p.item.location, when(p.item.dateRange)].filter(Boolean).join(', ')}
+                </p>
+                <div class="prose">
+                  <p set:html={p.item.body} />
+                  {p.item.links && (
+                    <p class="links">
+                      {p.item.links.map((l) => <a href={l.href} rel="noopener">{l.label}</a>)}
+                    </p>
+                  )}
+                </div>
+              </>
+            )}
+            {p.kind === 'skill' && <div class="prose skill" set:html={p.html} />}
+          </article>
+        ))}
+      </main>
+    </div>
+
+    <DirectionSwitcher current="h2" page="resume" />
+
+    <script>
+      // The explorer: folders expand (one open per level, so the tree stays beside the body), files open in the pane.
+      const tree = document.querySelector<HTMLElement>('[data-tree]')!;
+      const toggle = document.querySelector<HTMLButtonElement>('[data-drawer-toggle]')!;
+      const pane = document.getElementById('pane')!;
+      const labels = document.querySelectorAll<HTMLElement>('[data-path-label]');
+      const drawerMode = window.matchMedia('(max-width: 1179px), (orientation: portrait)');
+
+      function setDir(btn: HTMLButtonElement, open: boolean) {
+        btn.setAttribute('aria-expanded', String(open));
+        const list = document.getElementById(btn.getAttribute('aria-controls')!);
+        if (list) list.hidden = !open;
+        if (!open) list?.querySelectorAll<HTMLButtonElement>('[data-dir]').forEach((b) => setDir(b, false));
+      }
+
+      function setDrawer(open: boolean) {
+        toggle.setAttribute('aria-expanded', String(open));
+        tree.classList.toggle('is-open', open);
+      }
+
+      function openFile(path: string) {
+        document.querySelectorAll<HTMLElement>('[data-panel]').forEach((el) => {
+          el.hidden = el.dataset.panel !== path;
+        });
+        tree.querySelectorAll<HTMLButtonElement>('[data-file]').forEach((b) => {
+          b.setAttribute('aria-current', String(b.dataset.file === path));
+        });
+        const shown = path.split('/').join(' / ');
+        labels.forEach((l) => (l.textContent = shown));
+        pane.scrollTop = 0;
+        if (drawerMode.matches) {
+          setDrawer(false);
+          toggle.scrollIntoView({ block: 'start' });
+        }
+      }
+
+      tree.addEventListener('click', (e) => {
+        const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('button');
+        if (!btn) return;
+        if (btn.dataset.file) {
+          openFile(btn.dataset.file);
+          return;
+        }
+        const open = btn.getAttribute('aria-expanded') !== 'true';
+        if (open) {
+          const siblings = btn.closest('ul')!.querySelectorAll<HTMLButtonElement>(':scope > li > [data-dir]');
+          siblings.forEach((b) => b !== btn && setDir(b, false));
+        }
+        setDir(btn, open);
+      });
+
+      toggle.addEventListener('click', () => setDrawer(toggle.getAttribute('aria-expanded') !== 'true'));
+    </script>
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    /* Same brand as the homepage: lime and pink live on type and marks, never behind the outfit. */
+    --h2-lime: #c9ea6e;
+    --h2-pink: #f0a6d2;
+    --h2-pink-ink: #b2427f; /* clog pink taken darker so it reads as a mark on paper */
+    --h2-ink: #121212;
+    --h2-muted: #5c5a55;
+    --h2-paper: #f1efe9;
+    --h2-ease: cubic-bezier(0.22, 1, 0.36, 1);
+    --h2-font: 'Bricolage Grotesque', 'Helvetica Neue', Arial, sans-serif;
+  }
+  html { background: var(--h2-paper); }
+  body {
+    margin: 0;
+    color: var(--h2-ink);
+    font-family: var(--h2-font);
+    -webkit-font-smoothing: antialiased;
+  }
+</style>
+
+<style>
+  /*
+   * Geometry, desktop: same landmarks as the homepage, in --h (rendered height of the cut-out).
+   * Shirt 0.142 to 0.322, hand 0.20 to 0.25 (fingertips at 0.87 of the width), front clog 0.83 to 0.921.
+   */
+  .shell {
+    --H: max(100svh, 680px);
+    --h: min(var(--H), 1160px);
+    --w: calc(var(--h) * 0.5716);
+    --x0: calc(var(--w) * -0.1);
+    --y0: calc(var(--H) - var(--h) * 0.985);
+    --pad: clamp(1.5rem, 3vw, 3rem);
+    --col: calc(var(--x0) + var(--w) + 0.75rem); /* clear of the front clog's toe */
+    --tree-w: clamp(18.5rem, 22vw, 20rem);
+    --pane-x: calc(var(--col) + var(--tree-w) + clamp(2rem, 3.5vw, 4rem));
+    --below: calc(var(--y0) + var(--h) * 0.344);
+    position: relative;
+    height: var(--H);
+    overflow: clip;
+  }
+  .sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .band {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(var(--y0) + var(--h) * 0.118);
+    height: calc(var(--h) * 0.226);
+    background: var(--h2-ink);
+  }
+  .figure {
+    position: absolute;
+    left: var(--x0);
+    top: var(--y0);
+    width: var(--w);
+    height: var(--h);
+    pointer-events: none;
+  }
+
+  /* Header: on paper above the band, right of his head. */
+  .top {
+    position: absolute;
+    left: var(--col);
+    right: var(--pad);
+    top: 0;
+    height: calc(var(--y0) + var(--h) * 0.118);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+  }
+  .top ul {
+    display: flex;
+    gap: clamp(1.25rem, 2.2vw, 2.25rem);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .top a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    color: var(--h2-ink);
+    font-size: 1.0625rem;
+    font-weight: 550;
+    text-decoration: none;
+    background: linear-gradient(var(--h2-pink-ink), var(--h2-pink-ink)) 0 calc(100% - 9px) / 0 2px no-repeat;
+    transition: background-size 0.35s var(--h2-ease);
+  }
+  .top a:hover { background-size: 100% 2px; }
+  .top .home { font-weight: 750; letter-spacing: -0.01em; }
+  .top .short { display: none; }
+
+  /* In the band: page title in shirt lime where the hand points, the open file's path in clog pink. */
+  .title {
+    position: absolute;
+    left: var(--col);
+    right: var(--pad);
+    top: calc(var(--y0) + var(--h) * 0.118);
+    height: calc(var(--h) * 0.226);
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+  }
+  h1 {
+    margin: 0;
+    color: var(--h2-lime);
+    font-size: min(calc(var(--h) * 0.12), 8.5rem);
+    font-weight: 800;
+    font-variation-settings: 'opsz' 96;
+    line-height: 0.9;
+    letter-spacing: -0.045em;
+    translate: 0 calc(var(--h) * 0.004);
+  }
+  .path {
+    position: absolute;
+    left: calc(var(--pane-x) - var(--col));
+    right: 0;
+    bottom: calc(var(--h) * 0.03);
+    margin: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    color: var(--h2-pink);
+    font-size: 1.125rem;
+    font-weight: 550;
+    letter-spacing: 0.005em;
+  }
+
+  /* Tree: hangs beside his leg, starts under the band, stops above the front clog. */
+  .drawer-toggle { display: none; }
+  .tree {
+    position: absolute;
+    left: var(--col);
+    width: var(--tree-w);
+    top: calc(var(--below) + 2.25rem);
+    /* Down to the switcher's clearance; top-level rows sit clear of the front clog, nested rows are indented past it. */
+    max-height: calc(var(--H) - 5.5rem - var(--below) - 2.25rem);
+    overflow: hidden auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(18, 18, 18, 0.22) transparent;
+  }
+  .tree ul { margin: 0; padding: 0; list-style: none; }
+  .tree .lvl1 { padding-left: 1.1rem; }
+  .tree .lvl2 { padding-left: 1.1rem; }
+  .tree button {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    width: 100%;
+    min-height: 2rem;
+    margin: 0;
+    padding: 0 0.25rem;
+    border: 0;
+    background: none;
+    color: var(--h2-ink);
+    font: inherit;
+    font-size: 1.0625rem;
+    text-align: left;
+    cursor: pointer;
+  }
+  .tree .dir { font-weight: 700; letter-spacing: -0.005em; }
+  .tree .file { font-weight: 450; font-size: 1rem; padding-left: calc(0.25rem + 0.75rem + 0.4rem); }
+  .tree .lvl0 > li > .file { padding-left: 0.25rem; font-weight: 700; }
+  .tree .chev { width: 0.75rem; height: 0.75rem; flex: none; transition: transform 0.3s var(--h2-ease); }
+  .tree .dir[aria-expanded='true'] .chev { transform: rotate(90deg); }
+  .tree button span {
+    white-space: nowrap;
+    padding: 0.1rem 0.3rem;
+    margin-left: -0.3rem;
+    border-radius: 2px;
+    transition: background-color 0.2s;
+  }
+  .tree button:hover span { background: rgba(18, 18, 18, 0.07); }
+  .tree .file[aria-current='true'] span { background: var(--h2-lime); }
+  .tree button:focus-visible { outline: 2px solid var(--h2-ink); outline-offset: -2px; border-radius: 3px; }
+  .tree button:active span { background: rgba(18, 18, 18, 0.14); }
+
+  /* Pane: the open file, in the homepage's type. */
+  .pane {
+    position: absolute;
+    left: var(--pane-x);
+    right: var(--pad);
+    top: var(--below);
+    bottom: 0;
+    overflow: hidden auto;
+    overscroll-behavior: contain;
+    padding: 2.25rem 0 7rem;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(18, 18, 18, 0.22) transparent;
+    outline: none;
+  }
+  .doc { max-width: 38rem; }
+  .doc[hidden] { display: none; }
+  .doc-title, .skill :global(h1) {
+    margin: 0 0 0.75rem;
+    font-size: clamp(1.875rem, 2.6vw, 2.75rem);
+    font-weight: 750;
+    font-variation-settings: 'opsz' 72;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    text-wrap: balance;
+  }
+  .role, .roles { margin: 0 0 1rem; }
+  .roles { display: flex; flex-wrap: wrap; gap: 0.5rem 0.75rem; padding: 0; list-style: none; }
+  mark {
+    padding: 0.1rem 0.35rem;
+    background: var(--h2-lime);
+    color: var(--h2-ink);
+    font-size: 0.9375rem;
+    font-weight: 650;
+    box-decoration-break: clone;
+  }
+  .meta { margin: 0 0 1.75rem; color: var(--h2-muted); font-size: 1rem; }
+  .prose { font-size: 1.125rem; line-height: 1.55; }
+  .prose :global(p) { margin: 0 0 1rem; max-width: 62ch; }
+  .prose :global(a), .links a {
+    color: var(--h2-ink);
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-color: var(--h2-pink-ink);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.2em;
+    transition: text-decoration-thickness 0.2s;
+  }
+  .prose :global(a:hover) { text-decoration-thickness: 4px; }
+  .prose :global(a:focus-visible), .top a:focus-visible {
+    outline: 2px solid var(--h2-ink);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+  .links { display: flex; gap: 1.5rem; }
+  .skill :global(h2) {
+    margin: 1.75rem 0 0.5rem;
+    color: var(--h2-muted);
+    font-size: 0.875rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .skill :global(ul) { margin: 0; padding: 0; list-style: none; }
+  .skill :global(li) { position: relative; padding-left: 1.25rem; margin-bottom: 0.35rem; }
+  .skill :global(li)::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.62em;
+    width: 0.5rem;
+    height: 0.5rem;
+    background: var(--h2-pink-ink);
+  }
+
+  /* README: his face, cut out, the prose wraps its outline. */
+  .face {
+    float: right;
+    width: clamp(8rem, 11vw, 10.5rem);
+    height: auto;
+    margin: -0.5rem 0 0.5rem 1.25rem;
+    shape-outside: url('/img/avatar_jonatan.png');
+    shape-image-threshold: 0.4;
+    shape-margin: 0.75rem;
+  }
+  /* Achievements: the roar, wrapped by the text. */
+  .roar {
+    float: right;
+    width: clamp(11rem, 16vw, 15rem);
+    height: auto;
+    margin: -1rem 0 0.5rem 0.75rem;
+    shape-outside: url('/img/jonatan_roaring_no_bg.png');
+    shape-image-threshold: 0.4;
+    shape-margin: 0.5rem;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .figure { animation: h2-in 1s var(--h2-ease) both; }
+    .band { transform-origin: left center; animation: h2-wipe 0.9s var(--h2-ease) 0.1s both; }
+    .doc:not([hidden]) { animation: h2-doc 0.45s var(--h2-ease) both; }
+    @keyframes h2-in { from { opacity: 0; transform: translateX(-2%); } }
+    @keyframes h2-wipe { from { transform: scaleX(0); } }
+    @keyframes h2-doc { from { opacity: 0; transform: translateY(0.5rem); } }
+  }
+
+  /* Phone, tablet, portrait: the body crops to the shoulders above the band (the band's bottom edge is the cut),
+     the tree folds into a Files drawer, the file reads full width below. */
+  @media (max-width: 1179px), (orientation: portrait) {
+    .shell {
+      --h: min(calc(100vw * 1.45), 640px);
+      --x0: calc(var(--w) * -0.12);
+      --y0: 3.75rem;
+      --pad: 1.25rem;
+      --below: calc(var(--y0) + var(--h) * 0.344);
+      height: auto;
+      min-height: 100svh;
+      padding-top: var(--below);
+      overflow: visible;
+    }
+    .figure { clip-path: inset(0 0 calc(var(--h) * 0.656) 0); }
+    .top {
+      left: var(--pad);
+      height: 3.75rem;
+    }
+    .top ul { gap: 1rem; }
+    .top a { font-size: 0.9375rem; }
+    .top .long { display: none; }
+    .top .short { display: inline; }
+    .title {
+      left: calc(var(--x0) + var(--w) * 0.6);
+      justify-content: flex-end;
+      align-items: flex-end;
+      padding-bottom: calc(var(--h) * 0.022);
+      box-sizing: border-box;
+    }
+    h1 { font-size: calc(var(--h) * 0.085); }
+    .path { display: none; }
+
+    .drawer-toggle {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      width: 100%;
+      min-height: 3.5rem;
+      padding: 0 var(--pad);
+      border: 0;
+      border-bottom: 1px solid rgba(18, 18, 18, 0.18);
+      background: none;
+      color: var(--h2-ink);
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      background: var(--h2-paper);
+    }
+    .drawer-word { font-weight: 750; font-size: 1.0625rem; }
+    .drawer-path {
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: var(--h2-muted);
+      font-size: 1rem;
+    }
+    .drawer-toggle .chev { width: 0.875rem; height: 0.875rem; transition: transform 0.3s var(--h2-ease); }
+    .drawer-toggle[aria-expanded='true'] .chev { transform: rotate(180deg); }
+    .drawer-toggle:focus-visible { outline: 2px solid var(--h2-ink); outline-offset: -3px; }
+
+    .tree {
+      position: static;
+      width: auto;
+      max-height: none;
+      overflow: visible;
+      display: none;
+      padding: 0.5rem var(--pad) 1rem;
+      border-bottom: 1px solid rgba(18, 18, 18, 0.18);
+    }
+    .tree.is-open { display: block; }
+    .tree button { min-height: 2.75rem; }
+
+    .pane {
+      position: static;
+      overflow: visible;
+      padding: 2rem var(--pad) 7rem;
+    }
+    .doc-title, .skill :global(h1) { font-size: clamp(1.75rem, 7.5vw, 2.5rem); }
+    .face { width: 7rem; }
+    .roar { width: 10rem; }
+  }
+</style>

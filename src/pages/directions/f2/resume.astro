@@ -1,0 +1,598 @@
+---
+// PROTOTYPE (resume-soe.12) direction F2 "Poster, on black": resume slice.
+// The live repo explorer (README landing file, folders that expand, every item a file you open),
+// rebuilt as a poster: the folders are giant lime words, the open file is set like poster type
+// beside them, pink marks the file you are in. No GitHub chrome; the tree and the type do the work.
+import DirectionSwitcher from '../../../components/directions/DirectionSwitcher.astro';
+import { achievements, education, resumeIntro, workExperience } from '../../../data/resume';
+import type { ResumeItem } from '../../../data/resume';
+import { skillFiles } from '../../../data/resume-skills';
+import { buildSection, buildSkills } from '../../../lib/resume-tree';
+import type { TreeFolder } from '../../../lib/resume-tree';
+
+const years = (range: string) => {
+  const ys = range.match(/\d{4}/g) ?? [];
+  const open = /\.\.\./.test(range);
+  const from = ys[0] ?? range;
+  const to = open ? 'now' : ys[1];
+  return to ? `${from}–${to}` : from;
+};
+
+// Skill files carry their filename as an <h1>; the poster sets a readable title instead.
+const acronyms: Record<string, string> = { llm: 'LLM', apis: 'APIs', mmm: 'MMM' };
+const titleFromFile = (f: string) =>
+  f
+    .replace(/\.md$/, '')
+    .split('-')
+    .map((w) => acronyms[w] ?? w)
+    .join(' ')
+    .replace(/^./, (c) => c.toUpperCase());
+
+const renderItem = (item: ResumeItem) => {
+  const place = [item.company, item.location].filter(Boolean).join(', ');
+  const links = item.links?.length
+    ? `<p class="p-links">${item.links
+        .map((l) => `<a href="${l.href}" target="_blank" rel="noreferrer">${l.label}</a>`)
+        .join('')}</p>`
+    : '';
+  return `
+<h2 class="p-title">${item.title.trim()}</h2>
+<p class="p-meta"><span class="p-role">${item.role}</span><span>${place}</span><span>${years(item.dateRange)}</span></p>
+<div class="p-prose"><p>${item.body}</p></div>
+${links}`;
+};
+
+const experience = buildSection('experience', workExperience, renderItem);
+const achievementSection = buildSection('achievements', achievements, renderItem);
+const educationSection = buildSection('education', education, renderItem);
+const skills = buildSkills(skillFiles);
+
+for (const [path, html] of Object.entries(skills.contents)) {
+  const file = path.split('/').pop() ?? path;
+  skills.contents[path] = `
+<h2 class="p-title">${titleFromFile(file)}</h2>
+<div class="p-prose p-skill">${html.replace(/<h1>[\s\S]*?<\/h1>/, '')}</div>`;
+}
+
+// Years shown beside each file in the tree (dated sections only).
+const itemYears: Record<string, string> = {};
+for (const [section, items] of [
+  [experience, workExperience],
+  [achievementSection, achievements],
+  [educationSection, education],
+] as const) {
+  section.files.forEach((f, i) => (itemYears[f.path] = years(items[i].dateRange)));
+}
+
+const folders: (TreeFolder & { label: string })[] = [
+  { name: 'experience', label: 'Experience', files: experience.files },
+  { name: 'achievements', label: 'Achievements', files: achievementSection.files },
+  { name: 'skills', label: 'Skills', files: [], subfolders: skills.subfolders },
+  { name: 'education', label: 'Education', files: educationSection.files },
+];
+const countFiles = (f: TreeFolder): number =>
+  f.files.length + (f.subfolders ?? []).reduce((n, s) => n + countFiles(s), 0);
+
+const readmeHtml = `
+<div class="readme">
+  <div class="readme-head">
+    <h2 class="p-title p-title--readme">Jonatan Snyders</h2>
+    <p class="readme-roles">${resumeIntro.headlineBadges.join('<br />')}</p>
+  </div>
+  <img class="readme-photo" src="/img/jonatan_roaring_no_bg.png" alt="Jonatan on all fours on a rock, roaring at the camera." width="436" height="437" loading="lazy" />
+  <div class="p-prose readme-prose">${resumeIntro.paragraphs.map((p) => `<p>${p}</p>`).join('')}</div>
+</div>`;
+
+const contents: Record<string, string> = {
+  'README.md': readmeHtml,
+  ...experience.contents,
+  ...achievementSection.contents,
+  ...skills.contents,
+  ...educationSection.contents,
+};
+const panelId = (path: string) => 'f-' + path.replace(/[^a-z0-9]+/gi, '-');
+const DEFAULT_PATH = 'README.md';
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="theme-color" content="#151513" />
+    <title>Resume | Jonatan Snyders</title>
+    <meta name="description" content="Resume of Jonatan Snyders: web developer, data scientist, ex-founder, growth engineer." />
+    <!-- SHORTCUT: Google Fonts link instead of self-hosted fonts. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400..900&display=swap"
+    />
+  </head>
+  <body class="f2">
+    <header class="top">
+      <a class="home" href="/directions/f2/">
+        <img src="/img/avatar_jonatan.png" alt="" width="253" height="252" />
+        <span>Jonatan Snyders</span>
+      </a>
+      <h1 class="top-title">Resume</h1>
+      <ul class="top-links">
+        <li><a href="https://github.com/jsnyde0/" rel="me">GitHub</a></li>
+        <li><a href="https://www.linkedin.com/in/jonatan-snyders/" rel="me">LinkedIn</a></li>
+      </ul>
+    </header>
+
+    <main class="explorer">
+      <nav class="tree" id="tree" aria-label="Resume files">
+        <ul class="tree-root">
+          <li>
+            <button
+              class="sect file"
+              type="button"
+              data-path="README.md"
+              aria-controls={panelId('README.md')}
+              aria-current="true"
+            >README</button>
+          </li>
+          {folders.map((folder) => (
+            <li class="folder">
+              <button
+                class="sect folder-toggle"
+                type="button"
+                aria-expanded="false"
+                aria-controls={`dir-${folder.name}`}
+                data-folder={folder.name}
+              >
+                <span>{folder.label}</span>
+                <span class="count" aria-label={`${countFiles(folder)} files`}>{countFiles(folder)}</span>
+              </button>
+              <ul class="files" id={`dir-${folder.name}`} hidden>
+                {folder.files.map((file) => (
+                  <li>
+                    <button class="file leaf" type="button" data-path={file.path} aria-controls={panelId(file.path)}>
+                      <span class="leaf-name">{file.name}</span>
+                      {itemYears[file.path] && <span class="leaf-meta">{itemYears[file.path]}</span>}
+                    </button>
+                  </li>
+                ))}
+                {folder.subfolders?.map((sub) => (
+                  <li class="sub">
+                    <button
+                      class="sub-toggle"
+                      type="button"
+                      aria-expanded="false"
+                      aria-controls={`dir-${folder.name}-${sub.name}`}
+                      data-folder={`${folder.name}/${sub.name}`}
+                    >
+                      {sub.name}/
+                    </button>
+                    <ul class="files files--sub" id={`dir-${folder.name}-${sub.name}`} hidden>
+                      {sub.files.map((file) => (
+                        <li>
+                          <button class="file leaf" type="button" data-path={file.path} aria-controls={panelId(file.path)}>
+                            <span class="leaf-name">{file.name}</span>
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </li>
+                ))}
+              </ul>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
+      <section class="pane" id="pane" aria-label="Open file">
+        {Object.entries(contents).map(([path, html]) => {
+          const parts = path.split('/');
+          const file = parts.pop();
+          return (
+            <article class="panel" id={panelId(path)} data-panel={path} tabindex="-1" hidden={path !== DEFAULT_PATH}>
+              <p class="p-path">
+                <a class="to-tree" href="#tree">Files</a>
+                {parts.map((p) => <span class="p-dir">{p}/</span>)}
+                <span class="p-file">{file}</span>
+              </p>
+              <Fragment set:html={html} />
+            </article>
+          );
+        })}
+      </section>
+    </main>
+
+    <DirectionSwitcher current="f2" page="resume" />
+
+    <script>
+      const DEFAULT_PATH = 'README.md';
+      const desktop = window.matchMedia('(min-width: 861px)');
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+      const fileButtons = [...document.querySelectorAll<HTMLButtonElement>('button[data-path]')];
+      const panels = [...document.querySelectorAll<HTMLElement>('[data-panel]')];
+
+      function setFolder(toggle: HTMLButtonElement, open: boolean) {
+        const list = document.getElementById(toggle.getAttribute('aria-controls') ?? '');
+        if (!list) return;
+        list.hidden = !open;
+        toggle.setAttribute('aria-expanded', String(open));
+      }
+
+      document.querySelectorAll<HTMLButtonElement>('button[data-folder]').forEach((toggle) => {
+        toggle.addEventListener('click', () => {
+          setFolder(toggle, toggle.getAttribute('aria-expanded') !== 'true');
+        });
+      });
+
+      // Open every folder on the way to a file, so a deep link shows where you are.
+      function revealInTree(path: string) {
+        const parts = path.split('/').slice(0, -1);
+        for (let i = 1; i <= parts.length; i++) {
+          const t = document.querySelector<HTMLButtonElement>(`button[data-folder="${parts.slice(0, i).join('/')}"]`);
+          if (t) setFolder(t, true);
+        }
+      }
+
+      function open(path: string, opts: { userAction: boolean }) {
+        const panel = panels.find((p) => p.dataset.panel === path);
+        if (!panel) return;
+        panels.forEach((p) => (p.hidden = p !== panel));
+        fileButtons.forEach((b) => b.setAttribute('aria-current', String(b.dataset.path === path)));
+        panel.classList.remove('is-entering');
+        void panel.offsetWidth; // restart the entrance
+        panel.classList.add('is-entering');
+        revealInTree(path);
+        history.replaceState(null, '', path === DEFAULT_PATH ? location.pathname : `#${path}`);
+        if (!opts.userAction) return;
+        const pane = document.getElementById('pane');
+        if (!pane) return;
+        if (desktop.matches) {
+          pane.scrollTop = 0;
+          if (pane.getBoundingClientRect().top < 0) pane.scrollIntoView({ behavior: reduced.matches ? 'auto' : 'smooth' });
+        } else {
+          panel.scrollIntoView({ behavior: reduced.matches ? 'auto' : 'smooth', block: 'start' });
+          panel.focus({ preventScroll: true });
+        }
+      }
+
+      fileButtons.forEach((b) => b.addEventListener('click', () => open(b.dataset.path ?? DEFAULT_PATH, { userAction: true })));
+
+      // "Files" link (mobile): back up to the tree, focusing the file you came from.
+      document.querySelectorAll<HTMLAnchorElement>('.to-tree').forEach((a) =>
+        a.addEventListener('click', (e) => {
+          e.preventDefault();
+          const current = fileButtons.find((b) => b.getAttribute('aria-current') === 'true');
+          document.getElementById('tree')?.scrollIntoView({ behavior: reduced.matches ? 'auto' : 'smooth' });
+          current?.focus({ preventScroll: true });
+        }),
+      );
+
+      const fromHash = decodeURIComponent(location.hash.slice(1));
+      if (fromHash && panels.some((p) => p.dataset.panel === fromHash)) {
+        open(fromHash, { userAction: false });
+      } else if (desktop.matches) {
+        // On wide screens there is room to show what a folder holds before anyone asks.
+        const exp = document.querySelector<HTMLButtonElement>('button[data-folder="experience"]');
+        if (exp) setFolder(exp, true);
+      }
+    </script>
+  </body>
+</html>
+
+<style is:global>
+  html { background: #151513; }
+  body { margin: 0; }
+
+  .f2 {
+    --ground: #151513;
+    --lime: #c8ec6c;
+    --lime-dim: #8fa84f;
+    --pink: #f294cc;
+    --ink: #0b0b0a;
+    --paper: #efede4;
+    --paper-2: #b9b6ab;
+    --rule: rgba(239, 237, 228, 0.16);
+    --pad: clamp(1rem, 2.4vw, 2.25rem);
+    --ease: cubic-bezier(0.25, 1, 0.5, 1);
+
+    background: var(--ground);
+    color: var(--paper);
+    font-family: 'Schibsted Grotesk', 'Helvetica Neue', Arial, sans-serif;
+    font-optical-sizing: auto;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .f2 a { color: inherit; }
+  .f2 a:focus-visible,
+  .f2 button:focus-visible {
+    /* Paper, not pink: the selected file is already pink, and the ring must stay visible on it. */
+    outline: 3px solid var(--paper);
+    outline-offset: 3px;
+  }
+
+  /* ── Top bar ─────────────────────────────────────────── */
+  .f2 .top {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--pad);
+    align-items: center;
+    padding: var(--pad) var(--pad) 0;
+  }
+  .f2 .home {
+    grid-column: 1 / span 5;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    justify-self: start;
+    min-height: 44px;
+    font-weight: 800;
+    font-size: 1.05rem;
+    letter-spacing: -0.01em;
+    text-decoration: none;
+  }
+  .f2 .home img { width: 44px; height: auto; }
+  .f2 .home:hover span { background: var(--pink); color: var(--ink); }
+  .f2 .top-title {
+    grid-column: 6 / span 3;
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: var(--lime);
+  }
+  .f2 .top-links {
+    grid-column: 9 / -1;
+    flex-wrap: wrap;
+    justify-self: end;
+    display: flex;
+    gap: 1.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .f2 .top-links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    text-underline-offset: 0.18em;
+    transition: background-color 160ms var(--ease), color 160ms var(--ease);
+  }
+  .f2 .top-links a:hover { background: var(--pink); color: var(--ink); text-decoration-color: transparent; }
+
+  /* ── Explorer: tree left, open file right ─────────────── */
+  .f2 .explorer {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--pad);
+    align-items: start;
+    padding: clamp(2rem, 5vw, 4.5rem) var(--pad) 7rem;
+  }
+  /* The tree is a size container so the longest name ("Achievements" + count) always fits its column. */
+  .f2 .tree { grid-column: 1 / span 5; container-type: inline-size; }
+  .f2 .pane {
+    grid-column: 6 / -1;
+    position: sticky;
+    top: var(--pad);
+    max-height: calc(100svh - 2 * var(--pad));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: var(--rule) transparent;
+    padding-left: clamp(0rem, 2vw, 2rem);
+  }
+
+  :where(.f2 .tree) ul { list-style: none; margin: 0; padding: 0; }
+  /* :where() keeps this reset at zero specificity so the type rules below win. */
+  :where(.f2 .tree) button {
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+    text-align: left;
+  }
+
+  /* The section names are the poster. */
+  .f2 .sect {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.12em;
+    width: 100%;
+    color: var(--lime);
+    font-weight: 900;
+    font-size: min(14.2cqi, 7rem);
+    line-height: 0.86;
+    letter-spacing: -0.055em;
+    padding: 0.06em 0 0.08em;
+    margin-left: -0.04em;
+    transition: color 160ms var(--ease);
+  }
+  .f2 .sect:hover { color: var(--paper); }
+  .f2 .sect.file[aria-current='true'] > :first-child,
+  .f2 .sect.file[aria-current='true'] { color: var(--lime); }
+  .f2 .sect.file[aria-current='true'] {
+    width: auto;
+    background: var(--pink);
+    color: var(--ink);
+    padding-inline: 0.06em;
+  }
+  .f2 .count {
+    font-size: 0.2em;
+    font-weight: 700;
+    letter-spacing: 0;
+    line-height: 1;
+    padding-top: 0.5em;
+    color: var(--paper-2);
+  }
+  .f2 .folder-toggle[aria-expanded='true'] .count { color: var(--lime); }
+
+  /* Files: plain readable lines on a strict two-column rhythm (name, years). */
+  .f2 .files {
+    margin: 0.75rem 0 1.75rem ;
+    border-top: 1px solid var(--rule);
+  }
+  .f2 .files--sub { margin: 0 0 0.5rem 1.25rem ; border-top: 0; }
+  .f2 .leaf,
+  .f2 .sub-toggle {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+    width: 100%;
+    min-height: 44px;
+    padding: 0.55rem 0.5rem ;
+    border-bottom: 1px solid var(--rule) ;
+    font-size: 1.125rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    transition: background-color 140ms var(--ease), color 140ms var(--ease);
+  }
+  .f2 .sub-toggle { color: var(--lime) ; font-weight: 800; }
+  .f2 .files--sub .leaf { font-size: 1.05rem; font-weight: 500; border-bottom-color: transparent ; min-height: 40px; }
+  .f2 .leaf-meta { color: var(--paper-2); font-weight: 500; font-variant-numeric: tabular-nums; font-size: 1rem; }
+  .f2 .leaf:hover,
+  .f2 .sub-toggle:hover { background: rgba(239, 237, 228, 0.07); }
+  .f2 .leaf[aria-current='true'] { background: var(--pink); color: var(--ink); }
+  .f2 .leaf[aria-current='true'] .leaf-meta { color: var(--ink); }
+
+  /* ── The open file, set like poster type ─────────────── */
+  .f2 .panel { outline: none; }
+  .f2 .panel.is-entering { animation: f2-enter 380ms var(--ease) both; }
+  @keyframes f2-enter {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  .f2 .p-path {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    margin: 0 0 1.5rem;
+    font-size: 0.95rem;
+    color: var(--paper-2);
+  }
+  .f2 .p-file { color: var(--lime); font-weight: 700; }
+  .f2 .to-tree { display: none; }
+
+  .f2 .p-title {
+    margin: 0 0 1.25rem;
+    max-width: 16ch;
+    color: var(--paper);
+    font-size: clamp(2.25rem, 4.2vw, 4.25rem);
+    font-weight: 850;
+    line-height: 0.98;
+    letter-spacing: -0.04em;
+    text-wrap: balance;
+  }
+  .f2 .p-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1.5rem;
+    margin: 0 0 2rem;
+    padding: 0.75rem 0;
+    border-block: 1px solid var(--rule);
+    font-size: 1.05rem;
+    color: var(--paper-2);
+  }
+  .f2 .p-role { color: var(--lime); font-weight: 800; }
+
+  .f2 .p-prose { max-width: 58ch; }
+  .f2 .p-prose p {
+    margin: 0 0 1em;
+    font-size: clamp(1.125rem, 1.35vw, 1.3rem);
+    line-height: 1.5;
+  }
+  .f2 .p-skill h2 {
+    margin: 2rem 0 0.5rem;
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: var(--lime);
+  }
+  .f2 .p-skill ul { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--rule); }
+  .f2 .p-skill li {
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--rule);
+    font-size: 1.1rem;
+    line-height: 1.4;
+  }
+  .f2 .p-links { display: flex; gap: 1.5rem; margin: 0.5rem 0 0; }
+  .f2 .p-links a,
+  .f2 .p-prose a {
+    color: var(--lime);
+    font-weight: 700;
+    text-decoration-thickness: 0.1em;
+    text-underline-offset: 0.18em;
+    transition: background-color 160ms var(--ease), color 160ms var(--ease);
+  }
+  .f2 .p-links a { display: inline-flex; align-items: center; min-height: 44px; font-size: 1.15rem; }
+  .f2 .p-links a:hover,
+  .f2 .p-prose a:hover { background: var(--pink); color: var(--ink); text-decoration-color: transparent; }
+
+  /* README: the roar earns its place next to who he is. */
+  .f2 .readme {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.8fr);
+    column-gap: var(--pad);
+    align-items: start;
+  }
+  .f2 .readme-head { grid-column: 1; }
+  .f2 .p-title--readme { font-size: clamp(2.5rem, 5vw, 5rem); max-width: 8ch; }
+  .f2 .readme-roles {
+    margin: 0;
+    color: var(--lime);
+    font-size: clamp(1.15rem, 1.6vw, 1.5rem);
+    font-weight: 800;
+    line-height: 1.2;
+    letter-spacing: -0.015em;
+  }
+  .f2 .readme-photo {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    width: 100%;
+    max-width: 436px;
+    height: auto;
+    justify-self: end;
+  }
+  .f2 .readme-prose { grid-column: 1 / -1; margin-top: 1rem; columns: 2 18rem; column-gap: var(--pad); max-width: none; }
+  .f2 .readme-prose p { break-inside: avoid; }
+
+  @media (max-width: 860px) {
+    .f2 .top { grid-template-columns: 1fr auto; row-gap: 0; }
+    .f2 .home { grid-column: 1; }
+    .f2 .top-links { grid-column: 2; gap: 0.875rem; font-size: 0.95rem; }
+    .f2 .home { font-size: 0.95rem; gap: 0.5rem; }
+    .f2 .home img { width: 36px; }
+    .f2 .top-title { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+    .f2 .explorer { grid-template-columns: minmax(0, 1fr); padding-top: 1.5rem; }
+    .f2 .tree,
+    .f2 .pane { grid-column: 1; }
+    .f2 .pane {
+      position: static;
+      max-height: none;
+      overflow: visible;
+      padding: 0;
+      margin-top: 2.5rem;
+      border-top: 1px solid var(--rule);
+      padding-top: 1.25rem;
+    }
+    .f2 .panel { scroll-margin-top: 1rem; }
+    .f2 .to-tree {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+      margin-right: 0.75rem;
+      color: var(--paper);
+      font-weight: 800;
+    }
+    .f2 .readme { grid-template-columns: minmax(0, 1fr); }
+    .f2 .readme-photo { grid-column: 1; grid-row: auto; justify-self: start; max-width: 300px; margin-top: 1.5rem; }
+    .f2 .readme-prose { columns: auto; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .f2 .panel.is-entering { animation: none; }
+    .f2 *, .f2 *::before { transition: none !important; }
+  }
+</style>
