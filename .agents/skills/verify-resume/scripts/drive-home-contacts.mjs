@@ -11,8 +11,12 @@
 //             patch x 0.89 at the contact row y 0.987 above the 1.3% contact shadow) — the alpha
 //             landmarks, never the img box edges. The target glyph's ink is found in pixels: a screenshot
 //             with the figure hidden, scanned for non-ground pixels inside the glyph's Range rect. Distance
-//             = from the landmark to the nearest ink pixel (0 = on the ink). Green: 0-4px. The sole also
-//             may not sink more than 4px below the ink top under it.
+//             = from the landmark to the nearest ink pixel (0 = on the ink). Green: 0-4px. Distance alone is
+//             blind to a landmark sunk INSIDE a glyph, so each contact also has a position bound: the tip sits
+//             within -4..+4px of the glyph's end edge at its height (not buried); the sole may not sink more
+//             than 4px below the ink top and stays within +-6px of its measured stance on the ink run under it
+//             (SOLE_STANCE), so a 10px horizontal or vertical shift of the figure fails at every size.
+//             VR_MUTATE_FIGURE="dx,dy" shifts the figure by that many px to prove this (expect failures).
 //   branch    Read from the page's own media queries, so 1280x1024 (aspect 1.25) is measured in the
 //             narrow branch the CSS actually applies (D4: narrow = <=760px or aspect <=1.3).
 //   halo      Ground pixels 2-8px from the shirt (lime pixels of the asset between the shoulder and the
@@ -20,7 +24,8 @@
 //             and HSL saturation > 0.25. The 2px inner clearance skips the antialiased photo edge.
 //   held      woff2 held 2s at first paint: every frame before the gate settles shows the tagline, name
 //             and figure hidden; fonts-ready only once the face is loaded.
-//   failed    woff2 aborted: html.fonts-failed, composition visible, fingertip clear of the tagline (>8px);
+//   failed    woff2 aborted: html.fonts-failed, composition visible, fingertip clear of the tagline (>8px) and
+//             no figure pixel within 8px of any name ink (not resting on or overlapping the name);
 //             on narrow screens the fallback drops the figure (display:none), which is contact-free too.
 //   links     Each of the four links is visible, inside the viewport, and is what a click at its centre
 //             hits; the two internal links are clicked for real and must land on their route.
@@ -46,8 +51,19 @@ const SIZES = [
   [1280, 800], [1440, 900], [1920, 1080], // wide
   [1024, 768], [1280, 1024],              // squarer (1280x1024 is narrow by D4's own query)
   [390, 844], [768, 1024],                // narrow
+  // Common real desktop viewports shorter than the matrix (all wide by D4's query): must fit 100svh, no scroll.
+  [1536, 730], [1366, 657], [1280, 680], [1440, 600],
 ];
-const BAND_PX = 4;          // contact band: 0-4px
+const MUTATE_FIGURE = process.env.VR_MUTATE_FIGURE || ""; // "dx,dy" px: mutation-test the drive itself
+const BAND_PX = 4;
+const TIP_ROWS = 1;         // rows either side of the fingertip landmark that define the glyph end edge there (crossbar vs stem differ by ~9px)
+const TIP_SINK_PX = 4;      // fingertip may bury at most this far past the glyph end edge (same band as the sole sink)
+const SOLE_OFF_PX = 6;      // clog landmark within this of its measured stance on the letter (see SOLE_STANCE)
+// Where on the ink run under the sole the landmark sits, px from the run centre, measured per branch on the
+// unmutated page (Chrome + Firefox): wide/squarer stand on the middle of the d stem / s top; narrow stands
+// toward the left stem of the n (-7.7..-10.7). A 10px horizontal shift leaves this band in either direction.
+const SOLE_STANCE = { wide: 0, squarer: 0, narrow: -9.2 };
+const NAME_CLEAR_MAX = 12;  // search radius for the fallback figure-to-name clearance (px)
 const FAILED_CLEAR_PX = 8;  // fonts-failed: fingertip at least this far from tagline ink
 const HOLD_MS = 2000;
 const HALO_OUTER = 8, HALO_INNER = 2;
@@ -165,6 +181,31 @@ const ANALYZE = async (plainB64, compB64, g, cfg) => {
     }
     return { dist: best, at: bx === null ? null : [bx, by], inkPixels: count };
   };
+  // Fingertip end edge: in each row around the landmark take the rightmost ink (he reaches in from the right),
+  // then the smallest of those: where the window straddles a stroke boundary (t crossbar vs stem, ~9px apart)
+  // the nearer edge is the one he can be touching. Rows with no ink are skipped.
+  const tipEndEdge = (pt, rect) => {
+    let edge = Infinity;
+    const x0 = Math.floor(rect.x), x1 = Math.ceil(rect.x + rect.w);
+    for (let y = Math.floor(pt.y) - cfg.TIP_ROWS; y <= Math.floor(pt.y) + cfg.TIP_ROWS; y++) {
+      let hi = -Infinity;
+      for (let x = x0; x < x1; x++) if (isInk(plain, x, y)) hi = x + 1;
+      if (hi > -Infinity) edge = Math.min(edge, hi);
+    }
+    return Number.isFinite(edge) ? edge : null;
+  };
+  // Sole stance: the contiguous ink run just under the ink top at the sole (the stem / curve he stands on).
+  const soleRun = (pt, rect, top) => {
+    if (!Number.isFinite(top)) return null;
+    const y = top + 3;
+    let seed = null;
+    for (let d = 0; d < 40 && seed === null; d++) for (const x of [Math.floor(pt.x) + d, Math.floor(pt.x) - d]) if (isInk(plain, x, y)) { seed = x; break; }
+    if (seed === null) return null;
+    let lo = seed, hi = seed;
+    while (isInk(plain, lo - 1, y)) lo--;
+    while (isInk(plain, hi + 1, y)) hi++;
+    return { lo, hi: hi + 1 };
+  };
   const inkTopNear = (pt, rect) => {
     let top = Infinity;
     for (let x = Math.floor(pt.x) - 2; x <= Math.floor(pt.x) + 2; x++)
@@ -175,6 +216,13 @@ const ANALYZE = async (plainB64, compB64, g, cfg) => {
   const tip = nearest(tipPt, g.tip.rect);
   const sole = nearest(solePt, g.sole.rect);
   const soleInkTop = inkTopNear(solePt, g.sole.rect);
+  const tipEdge = tipEndEdge(tipPt, g.tip.rect);
+  // +n = the landmark is n px outside the glyph's end edge (a gap); -n = n px buried inside the glyph.
+  tip.gap = tipEdge === null ? null : tipPt.x - tipEdge;
+  const run = soleRun(solePt, g.sole.rect, soleInkTop);
+  // Where on the letter he stands: offset of the landmark from the centre of the ink run under it.
+  sole.off = run ? solePt.x - (run.lo + run.hi) / 2 : null;
+  sole.runWidth = run ? run.hi - run.lo : null;
   const soleSink = Number.isFinite(soleInkTop) ? solePt.y - soleInkTop : null;
   // Fingertip clearance from ANY tagline ink (for the fonts-failed layout).
   const tagRect = g.tagRect || null;
@@ -188,6 +236,33 @@ const ANALYZE = async (plainB64, compB64, g, cfg) => {
     const sx = Math.floor((1 - fx) * src.w), sy = Math.floor(fy * src.h);
     return { o: (sy * src.w + sx) * 4, fy };
   };
+  // Fallback clearance from the name: smallest distance (px, capped at cfg.NAME_CLEAR_MAX) between any opaque
+  // figure pixel (alpha >= 128, mapped through the mirrored img box) and any name ink pixel (figure hidden
+  // screenshot, inside the name's box). 0 = overlapping. Null when the page has no name rect to test.
+  let nameClear = null;
+  if (g.nameRect && g.figRendered) {
+    const R = cfg.NAME_CLEAR_MAX, nr = g.nameRect;
+    const rx0 = Math.max(0, Math.floor(Math.max(nr.x, img.x - R))), rx1 = Math.min(plain.w, Math.ceil(Math.min(nr.x + nr.w, img.x + img.w + R)));
+    const ry0 = Math.max(0, Math.floor(Math.max(nr.y, img.y - R))), ry1 = Math.min(plain.h, Math.ceil(Math.min(nr.y + nr.h, img.y + img.h + R)));
+    const fx0 = Math.floor(img.x) - R, fy0 = Math.floor(img.y) - R, FW = Math.ceil(img.w) + 2 * R + 1, FH = Math.ceil(img.h) + 2 * R + 1;
+    const fm = new Uint8Array(FW * FH);
+    for (let y = 0; y < FH; y++) for (let x = 0; x < FW; x++) {
+      const s2 = srcAt(fx0 + x, fy0 + y);
+      if (s2 && src.d[s2.o + 3] >= 128) fm[y * FW + x] = 1;
+    }
+    let best = R + 1;
+    for (let y = ry0; y < ry1; y++) for (let x = rx0; x < rx1; x++) {
+      if (!isInk(plain, x, y)) continue;
+      for (let dy = -R; dy <= R; dy++) for (let dx = -R; dx <= R; dx++) {
+        const d = Math.hypot(dx, dy);
+        if (d >= best) continue;
+        const xx = x + dx - fx0, yy = y + dy - fy0;
+        if (xx < 0 || yy < 0 || xx >= FW || yy >= FH) continue;
+        if (fm[yy * FW + xx]) best = d;
+      }
+    }
+    nameClear = best > R ? R + 1 : best;
+  }
   const hsl = (r, g2, b) => {
     r /= 255; g2 /= 255; b /= 255;
     const mx = Math.max(r, g2, b), mn = Math.min(r, g2, b), l = (mx + mn) / 2;
@@ -230,7 +305,7 @@ const ANALYZE = async (plainB64, compB64, g, cfg) => {
     tipPt, solePt,
     tip: { ...tip, label: g.tip.label },
     sole: { ...sole, label: g.sole.label, inkTop: Number.isFinite(soleInkTop) ? soleInkTop : null, sink: soleSink },
-    tipClear,
+    tipClear, nameClear,
     halo: { shirtPx, ringPx: ring, limePx: lime.length, sample: lime.slice(0, 5) },
   };
 };
@@ -239,6 +314,15 @@ const fmt = (n) => (n === null || n === undefined || !Number.isFinite(n) ? Strin
 
 async function settledGeom(page) {
   await page.waitForFunction(() => /fonts-(ready|failed)/.test(document.documentElement.className), { timeout: 10000 });
+  if (MUTATE_FIGURE) {
+    // Mutation testing of this drive: shift the figure by "dx,dy" px (independent `translate` property)
+    // and expect failures. Never set in a real run.
+    await page.evaluate((m) => {
+      const [dx, dy] = m.split(",").map(Number);
+      const st = document.createElement("style"); st.textContent = `.figure{translate:${dx}px ${dy}px!important}`;
+      document.head.appendChild(st);
+    }, MUTATE_FIGURE);
+  }
   await page.evaluate(() => new Promise((r) => {
     const i = document.querySelector(".figure");
     i.complete ? r() : i.addEventListener("load", r, { once: true });
@@ -257,7 +341,7 @@ async function pixelsFor(page, g, name, extra = {}) {
   const plain = await page.screenshot({ encoding: "base64" });
   await page.evaluate(() => document.getElementById("__hc_hide").remove());
   writeFileSync(join(outDir, `${name}.png`), Buffer.from(comp, "base64"));
-  const cfg = { LM, SHIRT_ROWS, HALO_OUTER, HALO_INNER, PHOTO };
+  const cfg = { NAME_CLEAR_MAX, TIP_ROWS, LM, SHIRT_ROWS, HALO_OUTER, HALO_INNER, PHOTO };
   return page.evaluate(`(${ANALYZE.toString()})(${JSON.stringify(plain)}, ${JSON.stringify(comp)}, ${JSON.stringify({ ...g, ...extra })}, ${JSON.stringify(cfg)})`);
 }
 
@@ -284,10 +368,11 @@ async function runEngine(engineName, browser, newPage) {
         `${B} CSS branch matches D4's rule for ${w}x${h} (expected ${rec.expectedBranch})`, g.branch);
       check(`${tag}:mirrored`, /matrix\(-1/.test(g.imgTransform),
         `${B} figure is mirrored (transform ${g.imgTransform})`, g.imgTransform);
-      check(`${tag}:tip`, px.tip.inkPixels > 0 && px.tip.dist <= BAND_PX,
-        `${B} fingertip -> ${px.tip.label}: ${fmt(px.tip.dist)}px from ink (band 0-${BAND_PX}; landmark ${fmt(px.tipPt.x)},${fmt(px.tipPt.y)}; ${px.tip.inkPixels} ink px)`, px.tip);
-      check(`${tag}:sole`, px.sole.inkPixels > 0 && px.sole.dist <= BAND_PX && px.sole.sink !== null && px.sole.sink <= BAND_PX,
-        `${B} clog -> ${px.sole.label}: ${fmt(px.sole.dist)}px from ink, sink ${fmt(px.sole.sink)}px below the ink top (band 0-${BAND_PX})`, px.sole);
+      check(`${tag}:tip`, px.tip.inkPixels > 0 && px.tip.dist <= BAND_PX && px.tip.gap !== null && px.tip.gap >= -TIP_SINK_PX && px.tip.gap <= BAND_PX,
+        `${B} fingertip -> ${px.tip.label}: ${fmt(px.tip.dist)}px from ink, ${fmt(px.tip.gap)}px past the ink end edge (band: ink within ${BAND_PX}px, end gap ${-TIP_SINK_PX}..${BAND_PX}px; landmark ${fmt(px.tipPt.x)},${fmt(px.tipPt.y)}; ${px.tip.inkPixels} ink px)`, px.tip);
+      check(`${tag}:sole`, px.sole.inkPixels > 0 && px.sole.dist <= BAND_PX && px.sole.sink !== null && px.sole.sink <= BAND_PX
+          && px.sole.off !== null && Math.abs(px.sole.off - SOLE_STANCE[g.branch]) <= SOLE_OFF_PX,
+        `${B} clog -> ${px.sole.label}: ${fmt(px.sole.dist)}px from ink, sink ${fmt(px.sole.sink)}px below the ink top (band 0-${BAND_PX}), ${fmt(px.sole.off)}px from the centre of the ink run it stands on (run ${fmt(px.sole.runWidth)}px wide; stance ${SOLE_STANCE[g.branch]} +-${SOLE_OFF_PX})`, px.sole);
       check(`${tag}:halo`, px.halo.ringPx > 0 && px.halo.shirtPx > 0 && px.halo.limePx === 0,
         `${B} outfit halo: ${px.halo.limePx} lime-hued ground px in a ${px.halo.ringPx}px ring around ${px.halo.shirtPx} shirt px`, px.halo);
       check(`${tag}:links`, g.links.length === 4 && g.links.every((l) => l.visibility === "visible" && l.hits && l.rect.w > 0 && l.rect.y >= 0 && l.rect.y + l.rect.h <= g.vh && l.rect.x >= 0 && l.rect.x + l.rect.w <= g.vw),
@@ -341,7 +426,7 @@ async function runEngine(engineName, browser, newPage) {
   }
 
   // ---- woff2 aborted: settled, contact-free fallback, one size per branch ----
-  for (const [w, h] of [[1440, 900], [1024, 768], [390, 844]]) {
+  for (const [w, h] of [[1440, 900], [1440, 600], [1024, 768], [390, 844]]) {
     const tag = `${engineName}-${w}x${h}-failed`;
     const page = await newPage(w, h);
     await page.setRequestInterception(true);
@@ -349,15 +434,16 @@ async function runEngine(engineName, browser, newPage) {
     await page.goto(`${URL_BASE}/`, { waitUntil: "load" });
     const g = await settledGeom(page);
     const tagRect = await page.evaluate(() => { const r = document.querySelector(".tagline").getBoundingClientRect(); return { x: r.left, y: r.top, w: r.width, h: r.height }; });
-    const px = await pixelsFor(page, g, tag, { tagRect });
+    const nameRect = await page.evaluate(() => { const r = document.querySelector(".name").getBoundingClientRect(); return { x: r.left, y: r.top, w: r.width, h: r.height }; });
+    const px = await pixelsFor(page, g, tag, { tagRect, nameRect });
     out.sizes.push({ size: `${w}x${h}`, failed: { geom: g, px } });
     const B = `[${tag} ${g.branch}]`;
     check(`${tag}:settled`, /\bfonts-failed\b/.test(g.cls) && g.gatedVis.every((v) => v === "visible"),
       `${B} woff2 aborted: html.fonts-failed and the composition is visible (class="${g.cls}", ${JSON.stringify(g.gatedVis)})`, g.gatedVis);
-    check(`${tag}:contact-free`, g.figRendered ? px.tipClear && px.tipClear.dist > FAILED_CLEAR_PX : g.branch === "narrow",
+    check(`${tag}:contact-free`, g.figRendered ? px.tipClear && px.tipClear.dist > FAILED_CLEAR_PX && px.nameClear !== null && px.nameClear > FAILED_CLEAR_PX : g.branch === "narrow",
       g.figRendered
-        ? `${B} fallback layout is contact-free: fingertip ${fmt(px.tipClear?.dist)}px from any tagline ink (> ${FAILED_CLEAR_PX})`
-        : `${B} fallback layout is contact-free: figure not rendered (narrow fallback is type only)`, { figRendered: g.figRendered, tipClear: px.tipClear });
+        ? `${B} fallback layout is contact-free: fingertip ${fmt(px.tipClear?.dist)}px from any tagline ink, figure ${fmt(px.nameClear)}px from any name ink (both > ${FAILED_CLEAR_PX}; ${NAME_CLEAR_MAX + 1} = beyond the search radius)`
+        : `${B} fallback layout is contact-free: figure not rendered (narrow fallback is type only)`, { figRendered: g.figRendered, tipClear: px.tipClear, nameClear: px.nameClear });
     if (g.figRendered) check(`${tag}:halo`, px.halo.limePx === 0 && px.halo.ringPx > 0,
       `${B} outfit halo: ${px.halo.limePx} lime-hued ground px in a ${px.halo.ringPx}px ring`, px.halo);
     check(`${tag}:links`, g.links.length === 4 && g.links.every((l) => l.visibility === "visible" && l.hits && l.rect.y + l.rect.h <= g.vh),

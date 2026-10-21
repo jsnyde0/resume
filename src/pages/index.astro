@@ -99,8 +99,18 @@ const photo = '/img/jonatan_posing_rocks_hires_no_bg.png';
     --sx: 7.61;
     --sy: 0.733;
     --k: 2.0919;
+    /* Page height = pad + 4.97t + gap + links + 1.046f must fit 100svh (the figure and name are anchored
+       to the field's bottom, so any overflow also slides both contacts down). With t = (A f - 0.6168 u) / 8.04
+       (u = 100svh - pad, A = sx + 0.6168 k) that caps f at (1.3813 u - gap - links) / (1.046 + 0.6182 A):
+       --fit-d is that denominator (6.548 squarer, 5.669 wide). Links row is 46px (44px target + underline). */
+    --gap: clamp(1rem, 2.4svh, 1.75rem);
+    --fit-d: 6.548;
     /* Ultra-wide: cap the name by height so the figure keeps some size. */
-    --f: min(calc((100vw - 2 * var(--pad)) / 7.895), 22svh);
+    --f: min(
+      calc((100vw - 2 * var(--pad)) / 7.895),
+      22svh,
+      calc((1.3813 * (100svh - var(--pad)) - var(--gap) - 2.9rem) / var(--fit-d))
+    );
     --fig-h: min(
       calc((100svh - var(--pad) - var(--k) * var(--f)) / 0.7049),
       calc((100svh - var(--pad) - var(--sy) * var(--f)) / 0.989),
@@ -110,7 +120,7 @@ const photo = '/img/jonatan_posing_rocks_hires_no_bg.png';
     --t: calc((var(--sx) * var(--f) - 0.4348 * var(--fig-h)) / 8.04);
   }
   @media (min-aspect-ratio: 157/100) {
-    .field { --sx: 6.225; --sy: 0.92; --k: 2.0316; }
+    .field { --sx: 6.225; --sy: 0.92; --k: 2.0316; --fit-d: 5.669; }
   }
 
   /* ── The air: tagline and links, top-left corner ─────── */
@@ -122,7 +132,7 @@ const photo = '/img/jonatan_posing_rocks_hires_no_bg.png';
   }
 
   .tagline {
-    margin: 0 0 clamp(1rem, 2.4svh, 1.75rem);
+    margin: 0 0 var(--gap);
     font-size: var(--t);
     font-weight: var(--id-weight-strong);
     line-height: var(--id-leading-display);
@@ -268,14 +278,18 @@ const photo = '/img/jonatan_posing_rocks_hires_no_bg.png';
 
   /* ── Font failed: contact-free ─────────────────────────────────────
      On fallback metrics the solved contacts would land on the wrong glyph edges, so the figure leaves
-     them. Landscape: he stands flush right on the floor of the field, behind the name, his hand clear
-     of the tagline. Narrow: the column has no free space outside the solved geometry (he fills the gap
-     between tagline and name exactly), so the page settles as type only. */
+     them. Landscape: he stands flush right ABOVE the name block (a full 1rem clear of its box, so clear of
+     every glyph), shrunk if need be to fit under the top pad; his hand is clear of the tagline. Narrow: the
+     column has no free space outside the solved geometry (he fills the gap between tagline and name
+     exactly), so the page settles as type only. */
   :global(html.fonts-failed) .figure {
+    --fb-h: min(var(--fig-h), calc(100svh - var(--pad) - 1.05 * var(--f) - 1rem));
+    height: var(--fb-h);
+    width: calc(var(--fb-h) * 0.5716);
     left: auto;
     right: var(--pad);
     top: auto;
-    bottom: 0;
+    bottom: calc(1.05 * var(--f) + 1rem);
   }
   @media (max-width: 760px), (max-aspect-ratio: 13/10) {
     :global(html.fonts-failed) .figure { display: none; }
