@@ -4,11 +4,15 @@ import '../styles/tokens.css';
 interface Props {
   title?: string;
   description?: string;
+  /** Omit the site chrome (navbar, footer, .site-shell, main wrapper) and render the page bare in
+   *  <body>. For pages that own their full viewport and their own home link (D5 /resume/). */
+  bare?: boolean;
 }
 
 const {
   title = "Jonatan Snyders' Resume",
   description = "Jonatan Snyders' Resume Website",
+  bare = false,
 } = Astro.props;
 
 const year = new Date().getFullYear();
@@ -388,6 +392,8 @@ const canonicalUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).toStri
     </style>
   </head>
   <body>
+    {bare && <slot />}
+    {!bare && (
     <div class="site-shell">
       <nav class="navbar" aria-label="Primary navigation">
         <div class="navbar-inner">
@@ -435,6 +441,7 @@ const canonicalUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).toStri
         </div>
       </footer>
     </div>
+    )}
     <script>
       const button = document.querySelector('[data-menu-button]');
       const navLinks = document.querySelector('[data-nav-links]');

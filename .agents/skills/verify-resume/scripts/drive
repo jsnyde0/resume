@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # drive — run one mapped feature drive and capture its evidence.
 #
-# Usage: scripts/drive [file-tree|screenshots|font-gate]
+# Usage: scripts/drive [file-tree|reading-path|identity|screenshots|font-gate]
 #
 # Resolves the shared engine, then hands off. The drive itself is JS because it
 # compares structured before/after state; the shell's job is resolution.
@@ -11,7 +11,7 @@ source "$(dirname "${BASH_SOURCE[0]}")/_common"
 feature="${1:-file-tree}"
 
 VR_ENGINE="$(vr_engine_or_die)" || exit 1
-export VR_ENGINE VR_URL VR_EVIDENCE
+export VR_ENGINE VR_URL VR_EVIDENCE VR_LABEL
 
 if ! curl -sf -o /dev/null "$VR_URL/"; then
   echo "FAIL: nothing answering at $VR_URL — run scripts/launch first." >&2
@@ -22,10 +22,12 @@ mkdir -p "$VR_EVIDENCE"
 
 case "$feature" in
   file-tree) exec node "$VR_SCRIPT_DIR/drive-file-tree.mjs" ;;
+  reading-path) exec node "$VR_SCRIPT_DIR/drive-reading-path.mjs" ;;
+  identity) shift; exec node "$VR_SCRIPT_DIR/drive-identity.mjs" "$@" ;;
   screenshots) exec node "$VR_SCRIPT_DIR/drive-screenshots.mjs" ;;
   font-gate) exec node "$VR_SCRIPT_DIR/drive-font-gate.mjs" ;;
   *)
-    echo "FAIL: unknown feature '$feature'. Mapped drives: file-tree, screenshots, font-gate" >&2
+    echo "FAIL: unknown feature '$feature'. Mapped drives: file-tree, reading-path, identity, screenshots, font-gate" >&2
     echo "      Features documented but not yet driven are listed in references/README.md." >&2
     exit 1
     ;;

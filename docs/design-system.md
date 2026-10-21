@@ -27,12 +27,14 @@ Canonical home of the site's visual identity (D1-D3, landed on bead `resume-soe.
 
 | Family | Tokens |
 |---|---|
-| Colour | `--id-ground` #151513, `--id-paper` #efede4, `--id-paper-2` #b9b6ab, `--id-lime` #c8ec6c, `--id-lime-dim` #8fa84f, `--id-pink` #f294cc, `--id-ink` #0b0b0a, `--id-rule` (paper at 16%) |
+| Colour | `--id-ground` #151513, `--id-paper` #efede4, `--id-paper-2` #b9b6ab, `--id-lime` #c8ec6c, `--id-lime-dim` #8fa84f, `--id-pink` #f294cc, `--id-ink` #0b0b0a, `--id-rule` (paper at 16%), `--id-tint-hover` (paper at 7%, hover wash on list rows) |
 | Font | `--id-font-display`, `--id-font-body` (both Schibsted Grotesk, then `"Helvetica Neue", Arial, sans-serif`) |
 | Weight / tracking / leading | `--id-weight-body` 400, `-medium` 500, `-strong` 800, `-poster` 900; `--id-tracking-poster` -0.05em, `-display` -0.035em, `-heading` -0.01em; `--id-leading-poster` 0.9, `-display` 0.98 |
 | Poster type scale | `--id-text-poster` (name), `--id-text-display` (tagline, page titles), `--id-text-heading`, `--id-text-body`, `--id-text-small` |
 
 A page adopts the identity by reading these tokens in its own scoped CSS (ground on its outermost full-bleed container, `--id-font-*` on text). `BaseLayout`'s body ground, colour and font are still the legacy values, so unmigrated pages do not move.
+
+A page that owns its full viewport and its own home link passes `bare` to `BaseLayout`: head, tokens, font preload and gate stay; navbar, footer, `.site-shell` and the `main` wrapper are not rendered, and the page sets its own `html`/`body` ground. `/resume/` does this (D5: the face avatar is its home link).
 
 ## Font gate
 
@@ -52,9 +54,10 @@ These predate D1. They keep their values and stay in `tokens.css` while a live p
 
 | Legacy group | Tokens | Still read by |
 |---|---|---|
-| Site palette | `--base-100/200/300`, `--base-content`, `--muted-content`, `--primary(-focus/-content)`, `--success`, `--info`, `--content-bright`, `--tooltip-bg/-text`, tints `--surface-subtle`, `--border-subtle`, `--primary-tint`, `--info-tint` | `BaseLayout` chrome (navbar, footer, hero, body) and therefore `/`; `/factory/` (+ `/factory/a`, `/factory/b`; owned by bead `resume-t7j`); `/readme/` (`resume-soe.5`); `/projects/` (`ProjectCard`, `resume-soe.4`); `/resume/` (`resume-soe.3`) |
-| `--ghv-*` | GitHub-dark viewer palette, tints, radii | `/resume/` only (until `resume-soe.3` rebuilds it as the D5 explorer) |
-| Legacy fonts | `--font-body` (system stack), `--font-mono` | `BaseLayout` body, `/factory/b`, `/resume/` |
+| Site palette | `--base-100/200/300`, `--base-content`, `--muted-content`, `--primary(-focus/-content)`, `--success`, `--info`, `--content-bright`, `--tooltip-bg/-text`, tints `--surface-subtle`, `--border-subtle`, `--primary-tint`, `--info-tint` | `BaseLayout` chrome (navbar, footer, hero, body) and therefore `/`; `/factory/` (+ `/factory/a`, `/factory/b`; owned by bead `resume-t7j`); `/readme/` (`resume-soe.5`); `/projects/` (`ProjectCard`, `resume-soe.4`) |
+| Legacy fonts | `--font-body` (system stack) | `BaseLayout` body, `/factory/b` |
+
+Deleted (no reader left): `--ghv-*` and `--font-mono`, when `/resume/` became the D5 explorer on `--id-*` (`resume-soe.3`).
 
 Migration rule: do not change the value of a legacy token (pages that still read it must not move); migrate a page by switching its reads to `--id-*`, then delete any token that has no reader left. Do not add new legacy-family tokens. When `--font-body` loses its last reader, the `--id-font-*` tokens become the only font tokens.
 
@@ -66,7 +69,7 @@ Migration rule: do not change the value of a legacy token (pages that still read
 | Type scale, fixed | `--text-xs` .75rem, `--text-sm` .875rem, `--text-base` 1rem, `--text-prose-sm` .95rem, `--text-xl` 1.5rem, `--text-2xl` 1.875rem |
 | Type scale, fluid (legacy pages) | `--text-title`, `--text-lead`, `--text-card-title`, `--text-hero`, `--text-hero-lead` |
 | Spacing (n x 0.25rem) | `--space-1` .25, `-2` .5, `-3` .75, `-4` 1, `-5` 1.25, `-6` 1.5, `-8` 2, `-10` 2.5, `-12` 3 (rem); plus off-grid `--space-2-5` 0.6 |
-| Containers | `--container-prose` 42rem, `--container-narrow` 52rem (/projects/), `--container-content` 56rem (/resume/, /readme/, home), `--container-site` 80rem |
+| Containers | `--container-prose` 42rem, `--container-narrow` 52rem (/projects/), `--container-content` 56rem (/readme/), `--container-site` 80rem |
 | Radius | `--radius-sm/md/lg/xl/full`, `--radius-button` |
 | Shadow | `--shadow-card` |
 | Motion | `--transition-base` |
@@ -74,7 +77,7 @@ Migration rule: do not change the value of a legacy token (pages that still read
 
 ## Shared components
 
-- `src/components/resume/ResumeCard.astro` (props: `title?: string`, `tooltip?: string`; default slot). The card surface, used by `/readme/` and by `/resume/`. Its surface values are the `--card-*` tokens.
+- `src/components/resume/ResumeCard.astro` (props: `title?: string`, `tooltip?: string`; default slot). The card surface, used by `/readme/`. Its surface values are the `--card-*` tokens.
 - `src/components/projects/ProjectCard.astro` (prop: `project: ProjectEntry`). Same card surface via the same `--card-*` tokens, so the two cards cannot drift apart.
 
 Class names are part of the verification fingerprint (below). Renaming or adding a class on an existing element shows up as a diff, so do it only on purpose.
@@ -92,11 +95,12 @@ Class names are part of the verification fingerprint (below). Renaming or adding
 Run from `.agents/skills/verify-resume` (details in its `SKILL.md`). Evidence dirs live at the repo root, so from that directory they are `../../../.verify-evidence/...`:
 
 ```
-scripts/launch && scripts/drive font-gate && scripts/drive file-tree && scripts/cleanup
+scripts/launch && scripts/drive font-gate && scripts/drive file-tree && scripts/drive reading-path && scripts/drive identity && scripts/cleanup
 scripts/launch && scripts/drive screenshots && scripts/cleanup
 scripts/compare ../../../.verify-evidence/screenshots-<baselineTs> ../../../.verify-evidence/screenshots-<afterTs>
 ```
 
+- `identity [route ...]` checks D1 on served routes (default `/resume/`): `html`, `body` and the outermost container on `#151513`, headings on the self-hosted face, and every hex in the page's CSS declared in `tokens.css`.
 - `font-gate` proves the font contract above in a real browser: preload and same-origin woff2, `fonts-ready` only after the face is loaded, gated elements hidden while the font is held, settled visible on abort and on timeout.
 - `screenshots` captures full-page PNGs (1440 and 390 wide) and a computed-style fingerprint of every element for `/`, `/resume/`, `/readme/`, `/projects/`, `/factory/`. Capture a baseline on the unchanged tree before editing, then compare. A pure refactor must show zero diffs; every non-zero diff must be an intended change you can name. Pages you do not own must be zero. Not covered: hover/focus states, post-click JS states, `/factory/a` and `/factory/b` prototypes, and layout width (the fingerprint has no `width`/`max-width`; check the PNGs).
 - Always also run `npm run gate` (typecheck, build, projects verifier).

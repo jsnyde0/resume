@@ -57,9 +57,9 @@ for (const route of ['resume', 'readme']) {
 const resumeHtml = readFileSync(join('dist', 'resume', 'index.html'), 'utf8');
 const attrValues = (attr) =>
   [...resumeHtml.matchAll(new RegExp(`\\b${attr}="([^"]*)"`, 'g'))].map((m) => m[1]).sort();
-const treePaths = attrValues('data-ghv-path');
-const panelPaths = attrValues('data-ghv-panel');
-assert.ok(treePaths.length > 0, 'No tree entries (data-ghv-path) found in dist/resume/index.html');
+const treePaths = attrValues('data-path');
+const panelPaths = attrValues('data-panel');
+assert.ok(treePaths.length > 0, 'No tree entries (data-path) found in dist/resume/index.html');
 assert.deepEqual(
   treePaths,
   panelPaths,

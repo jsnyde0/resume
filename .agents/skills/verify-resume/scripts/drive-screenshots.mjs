@@ -27,7 +27,7 @@ if (!ENGINE || !URL_BASE || !EVIDENCE) {
   process.exit(1);
 }
 
-const LABEL = "verify-resume";
+const LABEL = process.env.VR_LABEL || "verify-resume";
 const ROUTES = [
   ["home", "/"],
   ["resume", "/resume/"],

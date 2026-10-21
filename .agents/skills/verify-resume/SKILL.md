@@ -15,7 +15,7 @@ Checks already exist here, and they are worth running first. `.claude/verificati
 - `npm run test:projects` — reads built HTML off disk and pins the `/projects/` content.
 - Cloudflare Pages preview — each route checked for route-specific content, not just HTTP 200.
 
-None of them can see **client-side behaviour**. The file-tree browser on `/resume/` and the orbit graph on `/factory/` are inline vanilla JS that rewrite the DOM on click with no URL or hash change. To a static-HTML reader they are invisible: the markup is identical whether the click handlers work or were never wired at all.
+None of them can see **client-side behaviour**. The repo explorer on `/resume/` and the orbit graph on `/factory/` are inline vanilla JS that rewrite the DOM in place on click (the explorer also rewrites the `#path` hash and, at <=860px, moves the open file inline under its row). To a static-HTML reader they are invisible: the markup is identical whether the click handlers work or were never wired at all.
 
 **This skill is not the only thing here that pays for a browser — it is the only thing that clicks.** A static-HTML or computed-style check measures a page standing still; it would pass on a page whose every handler is dead. The distinction worth holding is act-then-observe, not browser-versus-no-browser.
 
@@ -36,7 +36,7 @@ Answered from the codebase on 2026-09-05. Recorded so the next reader can check 
 | Route | Route-specific observable | Interactive? | Mapped drive |
 |---|---|---|---|
 | `/` | `From catwalks to startups, agent harnesses to existential dread.` | no | `scripts/drive screenshots` (visual + style baseline) |
-| `/resume/` | `.ghv-shell`, breadcrumb `#ghv-preview-path` | **yes** — file tree, fake PDF button | `scripts/drive file-tree`, `scripts/drive screenshots` |
+| `/resume/` | `#tree`, `[data-panel="README.md"]` | **yes** — repo explorer: two panes >860px, accordion <=860px, `#path` deep links | `scripts/drive file-tree`, `scripts/drive reading-path`, `scripts/drive identity`, `scripts/drive screenshots` |
 | `/readme/` | `<h1 class="readme-page__title">README</h1>` | no | `scripts/drive screenshots` |
 | `/projects/` | `<h1>Building</h1>` | no | `scripts/drive screenshots`; content also covered by `npm run test:projects` |
 | `/factory/` | `#graph-scene`, `#detail-panel` | **yes** — clickable orbit graph | `scripts/drive screenshots` (graph interaction: not yet — see `references/README.md`) |
@@ -55,16 +55,20 @@ The last candidate is a `$HOME`-relative path into the dotpi checkout. That is a
 scripts/doctor              # read-only: is this worth driving? (run it first)
 scripts/launch              # build, then serve dist/ on 127.0.0.1:4329
 scripts/seed                # nothing to seed here; says so and exits 0
-scripts/drive file-tree     # expand a folder, open a file, capture evidence
+scripts/drive file-tree     # expand a folder chain, open a file; 1440x900 two-pane and 390x844 accordion
+scripts/drive reading-path  # experience -> achievements in <=3 taps, no scroll; deep links; folder counts
+scripts/drive identity [route ...]  # D1 ground, self-hosted heading face, no untokenized hex (default /resume/)
 scripts/drive screenshots   # 10 full-page PNGs + 10 computed-style fingerprints
 scripts/drive font-gate     # font preload, gate hidden/ready/failed under held/aborted/stalled woff2
 scripts/compare A B         # diff two screenshots-* evidence dirs
 scripts/cleanup             # stop only what launch started; evidence survives
 ```
 
-Evidence lands in `.verify-evidence/<feature>-<timestamp>/` at the repo root: three screenshots (before, expanded, after) and an `evidence.json` holding every check with its result, the discovered file list, what was expanded, and what was clicked. `cleanup` never deletes it.
+Evidence lands in `.verify-evidence/<feature>-<timestamp>/` at the repo root: screenshots of each step and an `evidence.json` holding every check with its result and the observed state (files discovered, what was expanded and pressed, taps, first-line positions).
 
-`cleanup` stops the preview server and **only** processes it can prove are that server's descendants — it collects the ancestry before stopping anything and leaves anything else alone, loudly. It deliberately leaves the shared automation Chrome on `:9222` running, because other skills and other agents reuse it; the drive reuses one labelled tab rather than opening one per run, so nothing accumulates.
+**Parallel runs.** Two drivers sharing the automation Chrome at once (for example two worktrees) must use different ports and tab labels: `VERIFY_RESUME_PORT=<port> VERIFY_RESUME_LABEL=<label> scripts/...`. Defaults: port 4329, label `verify-resume`. The `font-gate` drive uses a throwaway browser context and needs no label. `cleanup` never deletes it.
+
+`cleanup` stops the preview server and **only** processes it can prove are that server's descendants — it collects the ancestry before stopping anything and leaves anything else alone, loudly. It deliberately leaves the shared automation Chrome on `:9222` running, because other skills and other agents reuse it; the drives reuse one labelled tab (`VERIFY_RESUME_LABEL`) rather than opening one per run, so nothing accumulates.
 
 ## Screenshots drive (before/after baseline)
 
@@ -92,14 +96,14 @@ These are the bar for any drive added to this skill. The first one is a family-w
 - **Check what came out, not the exit code.** A drive that exits 0 having discovered zero files and asserted nothing is green and worthless. Every drive prints its population — how many elements it found, which ones, what it observed before and after — so a reader can tell a real run from a vacuous one. `drive-file-tree.mjs` prints the discovered file list for exactly this reason.
 
   *On precision, the other half of that rule:* a drive asserts against a known expected state rather than emitting findings to be judged, so it has no false-positive rate to sample — its checks are right or the run is red. Precision becomes live here the moment a drive starts *reporting* things rather than asserting them.
-- **Exercise the real user path, and prove the target was reachable.** Click the thing a visitor clicks — and first check a visitor could have clicked it. Every file in this tree except `README.md` starts inside a collapsed folder, so an earlier version of the drive clicked a hidden node and passed while the entire folder-expand feature could have been dead, leaving a visitor able to open nothing. The drive now picks a *hidden* file on purpose, expands its folder chain the way a visitor does, and **refuses to click a target that is still invisible**. Do not call the page's internal function directly either; that tests the function, not the feature.
+- **Exercise the real user path, and prove the target was reachable.** Click the thing a visitor clicks — and first check a visitor could have clicked it. Most files in this tree start inside a collapsed folder, so an earlier version of the drive clicked a hidden node and passed while the entire folder-expand feature could have been dead, leaving a visitor able to open nothing. The drives now pick a *hidden* file on purpose, expand its folder chain the way a visitor does, and press only through `visitorPress` (`scripts/lib.mjs`), which **refuses any target that is off-screen or covered** (viewport plus `elementFromPoint` hit-test) and never scrolls. Presses are real mouse clicks or touchscreen taps at the target's centre. Do not call the page's internal function directly either; that tests the function, not the feature.
 - **Capture the action and the resulting state, not just a final screenshot.** A screenshot of the end state cannot distinguish "the click worked" from "it already looked like that". Capture before, act, capture after, and require the difference.
-- **Assert every observable the behaviour is supposed to move, and make them agree.** The file-tree click moves four things — selected class, `aria-current`, panel visibility, breadcrumb text — and the drive requires all four to move *and to name the same path*. Any one alone would pass while the feature was half broken.
+- **Assert every observable the behaviour is supposed to move, and make them agree.** Opening a file moves `aria-current`, panel visibility, the `#path` hash, the path line (two-pane) or the inline placement under its row (accordion), and the drive requires all of them to move *and to name the same path*. Any one alone would pass while the feature was half broken.
 - **Discover selectors from the live DOM where the markup is data-generated.** The file tree is built from repo data. A hardcoded path list would rot on the next data change and would fail as though the feature broke.
-- **Compare whole identifiers, not fragments.** The breadcrumb check resolves the rendered text back to a full path and compares that. A basename-only check would pass on a wrong directory prefix — and this tree has four basenames that each live in two directories (`mapular.md`, `moonbird.md`, `humainly.md`, `kuleuven.md`), so that is a live weakness, not a theoretical one.
+- **Compare whole identifiers, not fragments.** The path-line check resolves the rendered text back to a full path and compares that. A basename-only check would pass on a wrong directory prefix — and this tree has four basenames that each live in two directories (`mapular.md`, `moonbird.md`, `humainly.md`, `kuleuven.md`), so that is a live weakness, not a theoretical one.
 - **Count the checks, never announce a number.** The run prints how many checks it ran, derived from the checks themselves. A hardcoded count is a lie waiting for the next edit, inside the very output whose job is honesty.
 - **Route-specific observables only.** Never assert on something the homepage also has; a misrouted server would pass.
-- **Verify side effects, not only the visible surface.** Today this site has none to verify: no page writes `localStorage`, `sessionStorage` or a cookie, and the file tree changes no URL or hash, so the DOM *is* the whole effect — checked, not assumed. That is why the drives assert on the DOM alone, and it stops being true the moment a feature persists anything (a remembered theme, a saved filter, a visited-file list). When one does, asserting the rendered surface is no longer enough: read the stored value back. The skill's own side effect counts too — the evidence directory must exist after `cleanup` has run.
+- **Verify side effects, not only the visible surface.** No page writes `localStorage`, `sessionStorage` or a cookie. The one non-DOM effect is the `/resume/` explorer's `#path` hash (`history.replaceState`), and the drives read it back. That stops being enough the moment a feature persists anything (a remembered theme, a saved filter, a visited-file list). When one does, asserting the rendered surface is no longer enough: read the stored value back. The skill's own side effect counts too — the evidence directory must exist after `cleanup` has run.
 - **A "dry-run" flag must be proven to skip.** No script here takes one today. If one is ever added, a run with the flag has to be shown to leave the thing it names untouched — a dry-run that quietly does the work anyway is worse than having no flag, because it is trusted.
 
 ## Maintaining this skill

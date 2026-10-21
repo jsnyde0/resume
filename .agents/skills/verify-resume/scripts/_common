@@ -14,6 +14,9 @@ VR_REPO_ROOT="$(cd "$VR_SKILL_DIR/../../.." && pwd -P)"
 
 VR_PORT="${VERIFY_RESUME_PORT:-4329}"
 VR_URL="http://127.0.0.1:${VR_PORT}"
+# Chrome tab label the drives reuse. Two drivers sharing the automation Chrome at once
+# (parallel worktrees) must pick different labels, or each navigates the other's tab.
+VR_LABEL="${VERIFY_RESUME_LABEL:-verify-resume}"
 VR_EVIDENCE="${VERIFY_RESUME_EVIDENCE:-$VR_REPO_ROOT/.verify-evidence}"
 VR_STATE="$VR_EVIDENCE/.launch-state"
 VR_LOG="$VR_EVIDENCE/preview-server.log"

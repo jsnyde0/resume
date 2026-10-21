@@ -7,8 +7,7 @@ Seeded 2026-09-05 by `/verify scaffold` with the top five. This is a map, not an
 | Feature | Route | Driven? |
 |---|---|---|
 | [Landing pitch](landing-pitch.md) | `/` | not yet — static, low value |
-| [Resume file-tree browser](resume-file-tree.md) | `/resume/` | **yes** — `scripts/drive file-tree` |
-| [Download-PDF joke](download-pdf-joke.md) | `/resume/` | not yet |
+| [Resume repo explorer](resume-file-tree.md) | `/resume/` | **yes** — `scripts/drive file-tree`, `scripts/drive reading-path`, `scripts/drive identity` |
 | [Projects list](projects-list.md) | `/projects/` | covered statically by `npm run test:projects` |
 | Font gate (shared layer; no feature file, contract in `docs/design-system.md`) | `/` (any page) | **yes** — `scripts/drive font-gate` |
 | [Factory orbit graph](factory-orbit-graph.md) | `/factory/` | **not yet — highest-value gap** (filed: `dotpi-9a81`) |
@@ -17,9 +16,9 @@ Seeded 2026-09-05 by `/verify scaffold` with the top five. This is a map, not an
 
 ## Where the coverage actually is
 
-Two features are genuinely interactive: the file-tree browser and the orbit graph. Only the file tree has a mapped drive. **The orbit graph is the biggest hole in this map** — it is the most complex client-side behaviour on the site and nothing verifies it at all today.
+Two features are genuinely interactive: the resume explorer and the orbit graph. Only the explorer has mapped drives. **The orbit graph is the biggest hole in this map** — it is the most complex client-side behaviour on the site and nothing verifies it at all today.
 
-The three static features are cheap to check and mostly already are: `npm run test:projects` pins `/projects/` content, and `npm run build` catches compile breakage everywhere. Adding browser drives for them would buy little; they are listed so the map is honest about what exists, not because each needs a drive.
+The static features are cheap to check and mostly already are: `npm run test:projects` pins `/projects/` content, and `npm run build` catches compile breakage everywhere. Adding browser drives for them would buy little; they are listed so the map is honest about what exists, not because each needs a drive.
 
 ## Adding a drive
 

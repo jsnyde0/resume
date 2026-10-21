@@ -1,1189 +1,700 @@
 ---
+// /resume/ — the repo explorer (resume-soe.12 D5, F4). Desktop (>860px): two panes, the lime
+// section words are the tree, the open file is set like poster type on the right. <=860px: a
+// compact accordion; one section and one file open at a time, the file opens inline under its own
+// row, and that row turns pink and stays pinned while you read. Every file has a #path deep link.
+// The face avatar is the home link; the page renders bare (no site navbar), it owns the viewport.
 import BaseLayout from '../layouts/BaseLayout.astro';
-import ResumeCard from '../components/resume/ResumeCard.astro';
 import { achievements, education, resumeIntro, workExperience } from '../data/resume';
 import type { ResumeItem } from '../data/resume';
 import { skillFiles } from '../data/resume-skills';
 import { buildSection, buildSkills } from '../lib/resume-tree';
 import type { TreeFolder } from '../lib/resume-tree';
 
-// ─── File content builders ────────────────────────────────────────────────────
+const years = (range: string) => {
+  const ys = range.match(/\d{4}/g) ?? [];
+  const open = /\.\.\./.test(range);
+  const from = ys[0] ?? range;
+  const to = open ? 'now' : ys[1];
+  return to ? `${from}–${to}` : from;
+};
 
-function buildItemHtml(item: ResumeItem): string {
-  const badgeColors: Record<ResumeItem['badgeColor'], string> = {
-    primary: 'ghv-badge--primary',
-    accent: 'ghv-badge--accent',
-    secondary: 'ghv-badge--secondary',
-    info: 'ghv-badge--info',
-  };
-  const badgeClass = badgeColors[item.badgeColor];
+// Skill files carry their filename as an <h1>; the explorer sets a readable title instead.
+const acronyms: Record<string, string> = { llm: 'LLM', apis: 'APIs', mmm: 'MMM' };
+const titleFromFile = (f: string) =>
+  f
+    .replace(/\.md$/, '')
+    .split('-')
+    .map((w) => acronyms[w] ?? w)
+    .join(' ')
+    .replace(/^./, (c) => c.toUpperCase());
 
-  const linksHtml = item.links && item.links.length > 0
-    ? `<div class="ghv-item-links">${item.links.map((l) => `<a href="${l.href}" class="ghv-link" target="_blank" rel="noreferrer">${l.label}</a>`).join('')}</div>`
+const renderItem = (item: ResumeItem) => {
+  const place = [item.company, item.location].filter(Boolean).join(', ');
+  const links = item.links?.length
+    ? `<p class="p-links">${item.links
+        .map((l) => `<a href="${l.href}" target="_blank" rel="noreferrer">${l.label}</a>`)
+        .join('')}</p>`
     : '';
-
-  // Only render meta parts that are present (a current-job item may omit location/date).
-  const metaTextHtml = [item.company, item.location, item.dateRange]
-    .filter(Boolean)
-    .map((part) => `<span>${part}</span>`)
-    .join('<span>·</span>');
-
   return `
-<article class="resume-item-card ghv-item-card">
-  <div class="ghv-item-logo">
-    <img src="${item.imageUrl}" alt="${item.imageAlt}" class="ghv-item-logo__img" />
-  </div>
-  <div class="ghv-item-body ghv-md">
-    <h1>${item.title}</h1>
-    <p class="ghv-item-meta">
-      <span class="ghv-badge ${badgeClass}">${item.role}</span>
-      ${metaTextHtml}
-    </p>
-    <p>${item.body}</p>
-    ${linksHtml}
-  </div>
-</article>`;
-}
+<h2 class="p-title">${item.title.trim()}</h2>
+<p class="p-meta"><span class="p-role">${item.role}</span><span>${place}</span><span>${years(item.dateRange)}</span></p>
+<div class="p-prose"><p>${item.body}</p></div>
+${links}`;
+};
 
-// Build README content
-const readmeHtml = `
-<div class="ghv-md ghv-readme">
-  <div class="ghv-readme-profile">
-    <div class="ghv-readme-avatar">
-      <img src="/img/jonatan_avatar_smiling_no_bg.png" alt="Jonatan Snyders profile photo" class="ghv-readme-avatar__img" />
-    </div>
-    <div class="ghv-readme-intro">
-      <h1>Jonatan Snyders</h1>
-      <div class="ghv-readme-badges">
-        ${resumeIntro.headlineBadges.map((badge, i) => {
-          const cls = ['ghv-badge--primary', 'ghv-badge--accent', 'ghv-badge--secondary', 'ghv-badge--info'][i] ?? 'ghv-badge--primary';
-          return `<span class="ghv-badge ${cls}">${badge}</span>`;
-        }).join('')}
-      </div>
-      ${resumeIntro.paragraphs.map((p) => `<p>${p}</p>`).join('')}
-    </div>
-  </div>
-</div>`;
-
-// ─── File tree taxonomy ───────────────────────────────────────────────────────
-
-const experience = buildSection('experience', workExperience, buildItemHtml);
-const achievementSection = buildSection('achievements', achievements, buildItemHtml);
-const educationSection = buildSection('education', education, buildItemHtml);
+const experience = buildSection('experience', workExperience, renderItem);
+const achievementSection = buildSection('achievements', achievements, renderItem);
+const educationSection = buildSection('education', education, renderItem);
 const skills = buildSkills(skillFiles);
 
-const folders: TreeFolder[] = [
-  { name: 'skills',        files: [], subfolders: skills.subfolders },
-  { name: 'achievements',  files: achievementSection.files },
-  { name: 'experience',    files: experience.files },
-  { name: 'education',     files: educationSection.files },
-];
+for (const [path, html] of Object.entries(skills.contents)) {
+  const file = path.split('/').pop() ?? path;
+  skills.contents[path] = `
+<h2 class="p-title">${titleFromFile(file)}</h2>
+<div class="p-prose p-skill">${html.replace(/<h1>[\s\S]*?<\/h1>/, '')}</div>`;
+}
 
-// All file contents by path (insertion order is panel render order)
-const fileContents: Record<string, string> = {
+// Years shown beside each file in the tree (dated sections only).
+const itemYears: Record<string, string> = {};
+for (const [section, items] of [
+  [experience, workExperience],
+  [achievementSection, achievements],
+  [educationSection, education],
+] as const) {
+  section.files.forEach((f, i) => (itemYears[f.path] = years(items[i].dateRange)));
+}
+
+const folders: (TreeFolder & { label: string })[] = [
+  { name: 'experience', label: 'Experience', files: experience.files },
+  { name: 'achievements', label: 'Achievements', files: achievementSection.files },
+  { name: 'skills', label: 'Skills', files: [], subfolders: skills.subfolders },
+  { name: 'education', label: 'Education', files: educationSection.files },
+];
+const countFiles = (f: TreeFolder): number =>
+  f.files.length + (f.subfolders ?? []).reduce((n, s) => n + countFiles(s), 0);
+
+const readmeHtml = `
+<div class="readme">
+  <div class="readme-head">
+    <h2 class="p-title p-title--readme">Jonatan Snyders</h2>
+    <p class="readme-roles">${resumeIntro.headlineBadges.join('<br />')}</p>
+  </div>
+  <img class="readme-photo" src="/img/jonatan_roaring_no_bg.png" alt="Jonatan on all fours on a rock, roaring at the camera." width="436" height="437" loading="lazy" />
+  <div class="p-prose readme-prose">${resumeIntro.paragraphs.map((p) => `<p>${p}</p>`).join('')}</div>
+</div>`;
+
+const contents: Record<string, string> = {
   'README.md': readmeHtml,
   ...experience.contents,
   ...achievementSection.contents,
-  ...educationSection.contents,
   ...skills.contents,
+  ...educationSection.contents,
 };
-
+const panelId = (path: string) => 'f-' + path.replace(/[^a-z0-9]+/gi, '-');
 const DEFAULT_PATH = 'README.md';
-
-// Count total files for subheader
-const totalFiles = Object.keys(fileContents).length;
-
-const totalFolders = 4 + skills.subfolders.length; // experience, achievements, education, skills + skill subfolders
 ---
 
-<BaseLayout title="Resume | Jonatan Snyders" description="Resume of Jonatan Snyders — web developer, data scientist, ex-founder, and growth engineer.">
+<BaseLayout
+  bare
+  title="Resume | Jonatan Snyders"
+  description="Resume of Jonatan Snyders — web developer, data scientist, ex-founder, and growth engineer."
+>
   <div class="resume-page">
-    <h1 class="resume-page__title">Resume</h1>
+    <header class="top">
+      <a class="home" href="/">
+        <img src="/img/avatar_jonatan.png" alt="" width="253" height="252" />
+        <span>Jonatan Snyders</span>
+      </a>
+      <h1 class="top-title">Resume</h1>
+      <ul class="top-links">
+        <li><a href="https://github.com/jsnyde0/" rel="me">GitHub</a></li>
+        <li><a href="https://www.linkedin.com/in/jonatan-snyders/" rel="me">LinkedIn</a></li>
+      </ul>
+    </header>
 
-    <ResumeCard>
-      <div class="ghv-shell" role="main" aria-label="Resume repository browser">
-
-        <!-- Repo header / breadcrumb -->
-        <div class="ghv-header">
-          <div class="ghv-crumb">
-            <span class="ghv-crumb-owner">jsnyde0</span>
-            <span class="ghv-crumb-sep">/</span>
-            <span class="ghv-crumb-repo">resume</span>
-          </div>
-          <div class="ghv-header-pills">
-            <span class="ghv-pill">
-              <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.751.751 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z"/></svg>
-              Star
-            </span>
-            <span class="ghv-pill">
-              <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 5.372v.878c0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75v-.878a2.25 2.25 0 1 1 1.5 0v.878a2.25 2.25 0 0 1-2.25 2.25h-1.5v2.128a2.251 2.251 0 1 1-1.5 0V8.5h-1.5A2.25 2.25 0 0 1 3.5 6.25v-.878a2.25 2.25 0 1 1 1.5 0ZM5 3.25a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Zm6.75.75a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm-3 8.75a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Z"/></svg>
-              Fork
-            </span>
-          </div>
-        </div>
-
-        <!-- Branch + stats bar -->
-        <div class="ghv-subheader">
-          <span class="ghv-branch-badge">
-            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M9.5 3.25a2.25 2.25 0 1 1 3 2.122V6A2.5 2.5 0 0 1 10 8.5H6a1 1 0 0 0-1 1v1.128a2.251 2.251 0 1 1-1.5 0V5.372a2.25 2.25 0 1 1 1.5 0v1.836A2.493 2.493 0 0 1 6 7h4a1 1 0 0 0 1-1v-.628A2.25 2.25 0 0 1 9.5 3.25Zm-6 0a.75.75 0 1 0 1.5 0 .75.75 0 0 0-1.5 0Zm8.25-.75a.75.75 0 1 0 0 1.5.75.75 0 0 0 0-1.5ZM4.25 12a.75.75 0 1 0 0 1.5.75.75 0 0 0 0-1.5Z"/></svg>
-            main
-          </span>
-          <span class="ghv-subheader-sep">·</span>
-          <span>{totalFiles} files</span>
-          <span class="ghv-subheader-sep">·</span>
-          <span>{totalFolders} folders</span>
-
-          <!-- Download PDF button — fake-download interaction -->
-          <button
-            class="ghv-dl-btn"
-            id="ghv-dl-btn"
-            type="button"
-            aria-label="Download PDF"
-            style="margin-left:auto; position:relative; overflow:hidden;"
-          >
-            <div class="ghv-dl-spinner" id="ghv-dl-spinner" aria-hidden="true"></div>
-            <svg viewBox="0 0 16 16" aria-hidden="true" id="ghv-dl-icon"><path d="M2.75 14A1.75 1.75 0 0 1 1 12.25v-2.5a.75.75 0 0 1 1.5 0v2.5c0 .138.112.25.25.25h10.5a.25.25 0 0 0 .25-.25v-2.5a.75.75 0 0 1 1.5 0v2.5A1.75 1.75 0 0 1 13.25 14Zm-1-5.573 3.25 3.25a.75.75 0 0 0 1.06 0L9.31 8.427A.75.75 0 0 0 8.25 7.366H6.75V2.75a.75.75 0 0 0-1.5 0v4.616H3.75a.75.75 0 0 0-.53 1.28l-.47.581Z"/></svg>
-            <span id="ghv-dl-label">Download PDF</span>
-            <div class="ghv-dl-progress" id="ghv-dl-progress" aria-hidden="true"></div>
-          </button>
-        </div>
-
-        <!-- Mobile: tree toggle -->
-        <button
-          class="ghv-mobile-toggle"
-          aria-controls="ghv-tree-panel"
-          aria-expanded="false"
-          id="ghv-mobile-toggle-btn"
-          type="button"
-        >
-          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1.75 2.5a.75.75 0 0 0 0 1.5h12.5a.75.75 0 0 0 0-1.5H1.75Zm0 4a.75.75 0 0 0 0 1.5h12.5a.75.75 0 0 0 0-1.5H1.75Zm0 4a.75.75 0 0 0 0 1.5h12.5a.75.75 0 0 0 0-1.5H1.75Z"/></svg>
-          Files
-          <span class="ghv-mobile-toggle-caret" id="ghv-mobile-caret" aria-hidden="true">▼</span>
-        </button>
-
-        <!-- Two-pane body -->
-        <div class="ghv-body">
-
-          <!-- File tree sidebar -->
-          <nav class="ghv-tree" id="ghv-tree-panel" aria-label="Repository file tree">
-            <div class="ghv-tree-header">
-              <span>Files</span>
-            </div>
-
-            <div class="ghv-tree-root">
-              <!-- README.md — default selected -->
-              <div
-                class="ghv-file ghv-file--selected"
-                role="button"
-                tabindex="0"
-                data-ghv-path="README.md"
-                aria-label="README.md"
-                aria-current="true"
+    <main class="explorer">
+      <nav class="tree" id="tree" aria-label="Resume files">
+        <ul class="tree-root">
+          <li>
+            <button
+              class="sect file"
+              type="button"
+              data-path="README.md"
+              aria-controls={panelId('README.md')}
+              aria-current="true"
+            ><span>README</span><span class="mark" aria-hidden="true"></span></button>
+          </li>
+          {folders.map((folder) => (
+            <li class="folder">
+              <button
+                class="sect folder-toggle"
+                type="button"
+                aria-expanded="false"
+                aria-controls={`dir-${folder.name}`}
+                data-folder={folder.name}
               >
-                <span class="ghv-file-icon" aria-hidden="true">
-                  <svg viewBox="0 0 16 16"><path d="M2 1.75C2 .784 2.784 0 3.75 0h6.586c.464 0 .909.184 1.237.513l2.914 2.914c.329.328.513.773.513 1.237v9.586A1.75 1.75 0 0 1 13.25 16h-9.5A1.75 1.75 0 0 1 2 14.25Zm1.75-.25a.25.25 0 0 0-.25.25v12.5c0 .138.112.25.25.25h9.5a.25.25 0 0 0 .25-.25V6h-2.75A1.75 1.75 0 0 1 9 4.25V1.5Zm6.75.062V4.25c0 .138.112.25.25.25h2.688l-.011-.013-2.914-2.914-.013-.011Z"/></svg>
-                </span>
-                <span>README.md</span>
-              </div>
+                <span>{folder.label}</span>
+                <span class="count" aria-label={`${countFiles(folder)} files`}>{countFiles(folder)}</span>
+              </button>
+              <ul class="files" id={`dir-${folder.name}`} hidden>
+                {folder.files.map((file) => (
+                  <li>
+                    <button class="file leaf" type="button" data-path={file.path} aria-controls={panelId(file.path)}>
+                      <span class="leaf-name"><span class="leaf-dir">{folder.name}/</span>{file.name}</span>
+                      {itemYears[file.path] && <span class="leaf-meta">{itemYears[file.path]}</span>}
+                      <span class="mark" aria-hidden="true"></span>
+                    </button>
+                  </li>
+                ))}
+                {folder.subfolders?.map((sub) => (
+                  <li class="sub">
+                    <button
+                      class="sub-toggle"
+                      type="button"
+                      aria-expanded="false"
+                      aria-controls={`dir-${folder.name}-${sub.name}`}
+                      data-folder={`${folder.name}/${sub.name}`}
+                    >
+                      {sub.name}/
+                    </button>
+                    <ul class="files files--sub" id={`dir-${folder.name}-${sub.name}`} hidden>
+                      {sub.files.map((file) => (
+                        <li>
+                          <button class="file leaf" type="button" data-path={file.path} aria-controls={panelId(file.path)}>
+                            <span class="leaf-name"><span class="leaf-dir">{folder.name}/{sub.name}/</span>{file.name}</span>
+                            <span class="mark" aria-hidden="true"></span>
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </li>
+                ))}
+              </ul>
+            </li>
+          ))}
+        </ul>
+      </nav>
 
-              <!-- Top-level folders: experience, achievements, education, skills -->
-              {folders.map((folder, folderIdx) => (
-                <div class="ghv-folder">
-                  <div
-                    class="ghv-folder-row"
-                    role="button"
-                    tabindex="0"
-                    aria-expanded="false"
-                    aria-controls={`ghv-folder-files-${folderIdx}`}
-                    data-ghv-folder-toggle={folder.name}
-                  >
-                    <span class="ghv-folder-caret" aria-hidden="true">▶</span>
-                    <span class="ghv-folder-icon" aria-hidden="true">
-                      <svg viewBox="0 0 16 16"><path d="M1.75 1A1.75 1.75 0 0 0 0 2.75v10.5C0 14.216.784 15 1.75 15h12.5A1.75 1.75 0 0 0 16 13.25v-8.5A1.75 1.75 0 0 0 14.25 3H7.5a.25.25 0 0 1-.2-.1l-.9-1.2C6.07 1.26 5.55 1 5 1H1.75Z"/></svg>
-                    </span>
-                    <span>{folder.name}/</span>
-                  </div>
-                  <div class="ghv-folder-files" id={`ghv-folder-files-${folderIdx}`} style="display:none">
-                    {/* Direct files in this folder */}
-                    {folder.files.map((file) => (
-                      <div
-                        class="ghv-file"
-                        role="button"
-                        tabindex="0"
-                        data-ghv-path={file.path}
-                        aria-label={file.name}
-                        aria-current="false"
-                      >
-                        <span class="ghv-file-icon" aria-hidden="true">
-                          <svg viewBox="0 0 16 16"><path d="M2 1.75C2 .784 2.784 0 3.75 0h6.586c.464 0 .909.184 1.237.513l2.914 2.914c.329.328.513.773.513 1.237v9.586A1.75 1.75 0 0 1 13.25 16h-9.5A1.75 1.75 0 0 1 2 14.25Zm1.75-.25a.25.25 0 0 0-.25.25v12.5c0 .138.112.25.25.25h9.5a.25.25 0 0 0 .25-.25V6h-2.75A1.75 1.75 0 0 1 9 4.25V1.5Zm6.75.062V4.25c0 .138.112.25.25.25h2.688l-.011-.013-2.914-2.914-.013-.011Z"/></svg>
-                        </span>
-                        <span>{file.name}</span>
-                      </div>
-                    ))}
-                    {/* Skill subfolders */}
-                    {folder.subfolders && folder.subfolders.map((sub, subIdx) => (
-                      <div class="ghv-folder">
-                        <div
-                          class="ghv-folder-row ghv-folder-row--sub"
-                          role="button"
-                          tabindex="0"
-                          aria-expanded="false"
-                          aria-controls={`ghv-subfolder-files-${folderIdx}-${subIdx}`}
-                          data-ghv-subfolder-toggle={`${folder.name}/${sub.name}`}
-                          data-ghv-subfolder-panel={`ghv-subfolder-files-${folderIdx}-${subIdx}`}
-                        >
-                          <span class="ghv-folder-caret" aria-hidden="true">▶</span>
-                          <span class="ghv-folder-icon" aria-hidden="true">
-                            <svg viewBox="0 0 16 16"><path d="M1.75 1A1.75 1.75 0 0 0 0 2.75v10.5C0 14.216.784 15 1.75 15h12.5A1.75 1.75 0 0 0 16 13.25v-8.5A1.75 1.75 0 0 0 14.25 3H7.5a.25.25 0 0 1-.2-.1l-.9-1.2C6.07 1.26 5.55 1 5 1H1.75Z"/></svg>
-                          </span>
-                          <span>{sub.name}/</span>
-                        </div>
-                        <div class="ghv-folder-files" id={`ghv-subfolder-files-${folderIdx}-${subIdx}`} style="display:none">
-                          {sub.files.map((file) => (
-                            <div
-                              class="ghv-file"
-                              role="button"
-                              tabindex="0"
-                              data-ghv-path={file.path}
-                              aria-label={file.name}
-                              aria-current="false"
-                            >
-                              <span class="ghv-file-icon" aria-hidden="true">
-                                <svg viewBox="0 0 16 16"><path d="M2 1.75C2 .784 2.784 0 3.75 0h6.586c.464 0 .909.184 1.237.513l2.914 2.914c.329.328.513.773.513 1.237v9.586A1.75 1.75 0 0 1 13.25 16h-9.5A1.75 1.75 0 0 1 2 14.25Zm1.75-.25a.25.25 0 0 0-.25.25v12.5c0 .138.112.25.25.25h9.5a.25.25 0 0 0 .25-.25V6h-2.75A1.75 1.75 0 0 1 9 4.25V1.5Zm6.75.062V4.25c0 .138.112.25.25.25h2.688l-.011-.013-2.914-2.914-.013-.011Z"/></svg>
-                              </span>
-                              <span>{file.name}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </nav>
-
-          <!-- Preview pane -->
-          <div class="ghv-preview" id="ghv-preview-pane" role="region" aria-label="File preview">
-
-            <!-- Preview header bar -->
-            <div class="ghv-preview-header">
-              <div class="ghv-preview-path" id="ghv-preview-path" aria-live="polite">
-                <span>README.md</span>
-              </div>
-              <div class="ghv-preview-actions">
-                <span class="ghv-preview-btn">Raw</span>
-                <span class="ghv-preview-btn">Blame</span>
-              </div>
-            </div>
-
-            <!-- Rendered content — all panels rendered server-side, JS toggles visibility -->
-            <div class="ghv-preview-content">
-              {Object.entries(fileContents).map(([path, html]) => (
-                <div
-                  class="ghv-file-panel"
-                  data-ghv-panel={path}
-                  style={path === DEFAULT_PATH ? '' : 'display:none'}
-                  aria-hidden={path === DEFAULT_PATH ? 'false' : 'true'}
-                  set:html={html}
-                />
-              ))}
-            </div>
-
-          </div>
-        </div>
-      </div>
-    </ResumeCard>
+      <section class="pane" id="pane" aria-label="Open file">
+        {Object.entries(contents).map(([path, html]) => {
+          const parts = path.split('/');
+          const file = parts.pop();
+          return (
+            <article class="panel" id={panelId(path)} data-panel={path} tabindex="-1" hidden={path !== DEFAULT_PATH}>
+              <p class="p-path">
+                {parts.map((p) => <span class="p-dir">{p}/</span>)}
+                <span class="p-file">{file}</span>
+              </p>
+              <Fragment set:html={html} />
+            </article>
+          );
+        })}
+      </section>
+    </main>
   </div>
-
-  <script>
-    // Inline vanilla JS — no framework islands, no URL/hash changes.
-
-    const DEFAULT_PATH = 'README.md';
-
-    const previewPath = document.getElementById('ghv-preview-path');
-    const mobileToggleBtn = document.getElementById('ghv-mobile-toggle-btn');
-    const mobileCaret = document.getElementById('ghv-mobile-caret');
-    const treePanel = document.getElementById('ghv-tree-panel');
-
-    function setPreview(path: string) {
-      // Hide all panels
-      document.querySelectorAll<HTMLElement>('[data-ghv-panel]').forEach((panel) => {
-        const isActive = panel.getAttribute('data-ghv-panel') === path;
-        panel.style.display = isActive ? '' : 'none';
-        panel.setAttribute('aria-hidden', isActive ? 'false' : 'true');
-      });
-
-      // Update breadcrumb
-      if (previewPath) {
-        const parts = path.split('/');
-        if (parts.length === 1) {
-          previewPath.innerHTML = '<span>' + path + '</span>';
-        } else {
-          previewPath.innerHTML = parts.slice(0, -1).join('/') + ' / <span>' + parts[parts.length - 1] + '</span>';
-        }
-      }
-    }
-
-    function setSelected(path: string) {
-      document.querySelectorAll<HTMLElement>('[data-ghv-path]').forEach((el) => {
-        const isSelected = el.getAttribute('data-ghv-path') === path;
-        el.classList.toggle('ghv-file--selected', isSelected);
-        el.setAttribute('aria-current', isSelected ? 'true' : 'false');
-      });
-    }
-
-    function handleFileClick(el: HTMLElement) {
-      const path = el.getAttribute('data-ghv-path');
-      if (!path) return;
-      setSelected(path);
-      setPreview(path);
-      // On mobile, collapse tree after selection
-      if (window.innerWidth <= 640 && treePanel && mobileToggleBtn && mobileCaret) {
-        treePanel.classList.remove('is-mobile-open');
-        mobileToggleBtn.setAttribute('aria-expanded', 'false');
-        mobileCaret.classList.remove('is-open');
-      }
-    }
-
-    // Wire up file click / keyboard
-    document.querySelectorAll<HTMLElement>('[data-ghv-path]').forEach((el) => {
-      el.addEventListener('click', () => handleFileClick(el));
-      el.addEventListener('keydown', (e: KeyboardEvent) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          handleFileClick(el);
-        }
-      });
-    });
-
-    // Folder toggles (top-level and sub-folder)
-    document
-      .querySelectorAll<HTMLElement>('[data-ghv-folder-toggle], [data-ghv-subfolder-toggle]')
-      .forEach((toggleEl) => {
-        toggleEl.addEventListener('click', (e: Event) => {
-          e.stopPropagation(); // a sub-folder click must not trigger the parent folder toggle
-          const panelId = toggleEl.getAttribute('aria-controls');
-          if (!panelId) return;
-          const filesPanel = document.getElementById(panelId);
-          const caret = toggleEl.querySelector('.ghv-folder-caret');
-          if (!filesPanel) return;
-          const isOpen = filesPanel.style.display !== 'none';
-          filesPanel.style.display = isOpen ? 'none' : '';
-          toggleEl.setAttribute('aria-expanded', String(!isOpen));
-          caret?.classList.toggle('is-open', !isOpen);
-        });
-        toggleEl.addEventListener('keydown', (e: KeyboardEvent) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            toggleEl.click();
-          }
-        });
-      });
-
-    // Mobile tree toggle
-    mobileToggleBtn?.addEventListener('click', () => {
-      const isOpen = treePanel?.classList.contains('is-mobile-open');
-      treePanel?.classList.toggle('is-mobile-open', !isOpen);
-      mobileToggleBtn.setAttribute('aria-expanded', String(!isOpen));
-      mobileCaret?.classList.toggle('is-open', !isOpen);
-    });
-
-    // Set initial state
-    setSelected(DEFAULT_PATH);
-    setPreview(DEFAULT_PATH);
-
-    // ── Download PDF — fake-download interaction ────────────────────────────
-    const dlBtn      = document.getElementById('ghv-dl-btn') as HTMLButtonElement;
-    const dlLabel    = document.getElementById('ghv-dl-label') as HTMLElement;
-    const dlIcon     = document.querySelector('#ghv-dl-icon') as SVGElement;
-    const dlProgress = document.getElementById('ghv-dl-progress') as HTMLElement;
-    const dlSpinner  = document.getElementById('ghv-dl-spinner') as HTMLElement;
-    let dlRunning = false;
-    let dlTimer: ReturnType<typeof setTimeout> | null = null;
-
-    function dlReset() {
-      dlRunning = false;
-      if (dlTimer) { clearTimeout(dlTimer); dlTimer = null; }
-      dlSpinner.style.display = 'none';
-      dlIcon.style.display = '';
-      dlLabel.textContent = 'Download PDF';
-      dlLabel.style.whiteSpace = '';
-      dlProgress.style.transition = 'none';
-      dlProgress.style.width = '0%';
-      dlProgress.style.opacity = '1';
-      dlBtn.style.background = '';
-      dlBtn.style.borderColor = '';
-      dlBtn.style.whiteSpace = '';
-      dlBtn.setAttribute('aria-label', 'Download PDF');
-    }
-
-    dlBtn?.addEventListener('click', () => {
-      if (dlRunning) { dlReset(); return; }
-
-      dlRunning = true;
-
-      // Phase 1: loading state
-      dlIcon.style.display = 'none';
-      dlSpinner.style.display = 'block';
-      dlLabel.textContent = 'oh, shit, erm...';
-      dlBtn.setAttribute('aria-label', 'oh, shit, erm...');
-
-      // Progress bar: 0 → 85%
-      dlProgress.style.transition = 'none';
-      dlProgress.style.width = '0%';
-      dlProgress.style.opacity = '1';
-      dlBtn.offsetWidth; // force reflow
-      dlProgress.style.transition = 'width 900ms cubic-bezier(0.25, 1, 0.5, 1)';
-      dlProgress.style.width = '85%';
-
-      dlTimer = setTimeout(() => {
-        if (!dlRunning) return;
-
-        // Phase 2: reveal
-        dlSpinner.style.display = 'none';
-        dlIcon.style.display = '';
-        dlLabel.textContent = 'if you need this as a PDF, are we really a match?';
-        dlLabel.style.whiteSpace = 'normal';
-        dlBtn.setAttribute('aria-label', 'if you need this as a PDF, are we really a match?');
-        dlBtn.style.background = 'var(--ghv-border-muted)';
-        dlBtn.style.borderColor = 'var(--ghv-border)';
-        dlBtn.style.whiteSpace = 'normal';
-
-        // Complete bar then fade it
-        dlProgress.style.transition = 'width 200ms ease-out';
-        dlProgress.style.width = '100%';
-        setTimeout(() => {
-          dlProgress.style.transition = 'opacity 300ms ease-out';
-          dlProgress.style.opacity = '0';
-        }, 220);
-      }, 1100);
-    });
-  </script>
-
-  <style>
-    .resume-page {
-      width: min(100%, var(--container-content));
-      margin: 0 auto;
-    }
-
-    .resume-page__title {
-      margin: 0 0 var(--space-8);
-      font-size: var(--text-title);
-      line-height: 1.1;
-    }
-
-    /* === GITHUB-DARK SHELL === */
-    .ghv-shell {
-      background: var(--ghv-canvas);
-      color: var(--ghv-fg);
-      border: 1px solid var(--ghv-border);
-      border-radius: var(--ghv-radius);
-      overflow: hidden;
-      font-size: 14px;
-      line-height: 1.5;
-    }
-
-    /* === REPO HEADER / BREADCRUMB === */
-    .ghv-header {
-      display: flex;
-      align-items: center;
-      gap: var(--space-2);
-      padding: 12px 16px;
-      background: var(--ghv-canvas-subtle);
-      border-bottom: 1px solid var(--ghv-border);
-      flex-wrap: wrap;
-    }
-
-    .ghv-crumb {
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      font-size: 14px;
-      flex-wrap: wrap;
-    }
-
-    .ghv-crumb-owner {
-      color: var(--ghv-fg-muted);
-    }
-
-    .ghv-crumb-sep {
-      color: var(--ghv-border);
-      font-size: 1.1em;
-    }
-
-    .ghv-crumb-repo {
-      color: var(--ghv-accent);
-      font-weight: 600;
-    }
-
-    .ghv-header-pills {
-      display: flex;
-      align-items: center;
-      gap: var(--space-2);
-      margin-left: auto;
-      flex-shrink: 0;
-    }
-
-    .ghv-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.3rem;
-      padding: 3px 10px;
-      background: var(--ghv-tint-pill);
-      border: 1px solid var(--ghv-border);
-      border-radius: var(--radius-full);
-      font-size: 12px;
-      color: var(--ghv-fg-muted);
-    }
-
-    .ghv-pill svg {
-      width: 14px;
-      height: 14px;
-      fill: currentColor;
-      opacity: 0.7;
-    }
-
-    /* === SUB-HEADER (branch + stats bar) === */
-    .ghv-subheader {
-      display: flex;
-      align-items: center;
-      gap: var(--space-3);
-      padding: 8px 16px;
-      background: var(--ghv-canvas-subtle);
-      border-bottom: 1px solid var(--ghv-border);
-      font-size: 12px;
-      color: var(--ghv-fg-muted);
-      flex-wrap: wrap;
-    }
-
-    .ghv-branch-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.3rem;
-      padding: 3px 8px;
-      background: var(--ghv-tint-control);
-      border: 1px solid var(--ghv-border);
-      border-radius: var(--ghv-radius);
-      color: var(--ghv-fg);
-      font-size: 12px;
-      font-family: var(--font-mono);
-    }
-
-    .ghv-branch-badge svg {
-      width: 14px;
-      height: 14px;
-      fill: currentColor;
-    }
-
-    .ghv-subheader-sep {
-      color: var(--ghv-border);
-    }
-
-    /* === MAIN TWO-PANE === */
-    .ghv-body {
-      display: grid;
-      grid-template-columns: 260px minmax(0, 1fr);
-      min-height: 520px;
-    }
-
-    /* === FILE TREE === */
-    .ghv-tree {
-      background: var(--ghv-canvas);
-      border-right: 1px solid var(--ghv-border);
-      overflow-y: auto;
-      padding: 8px 0;
-    }
-
-    .ghv-tree-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 6px 12px 8px;
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--ghv-fg-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      border-bottom: 1px solid var(--ghv-border-muted);
-      margin-bottom: 4px;
-    }
-
-    .ghv-tree-root {
-      padding: 0 4px;
-    }
-
-    /* root README.md file */
-    .ghv-file {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 4px 12px;
-      border-radius: var(--ghv-radius-sm);
-      font-size: 13px;
-      color: var(--ghv-fg);
-      cursor: pointer;
-      user-select: none;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      position: relative;
-      transition: background 80ms ease-out, color 80ms ease-out;
-    }
-
-    .ghv-file:hover {
-      background: var(--ghv-tint-hover);
-      color: var(--ghv-fg-bright);
-    }
-
-    .ghv-file--selected {
-      background: var(--ghv-tint-selected);
-      color: var(--ghv-fg-on-emphasis);
-    }
-
-    .ghv-file--selected::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 0;
-      bottom: 0;
-      width: 2px;
-      background: var(--ghv-accent);
-      border-radius: 0 2px 2px 0;
-    }
-
-    .ghv-file--selected:hover {
-      background: var(--ghv-tint-selected-hover);
-    }
-
-    .ghv-file-icon {
-      flex-shrink: 0;
-      width: 16px;
-      height: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0.7;
-    }
-
-    .ghv-file-icon svg {
-      width: 14px;
-      height: 14px;
-      fill: currentColor;
-    }
-
-    /* folder section */
-    .ghv-folder {
-      margin-top: 2px;
-    }
-
-    .ghv-folder-row {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 4px 12px;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--ghv-fg);
-      cursor: pointer;
-      user-select: none;
-      border-radius: var(--ghv-radius-sm);
-      transition: background 80ms ease-out;
-    }
-
-    .ghv-folder-row:hover {
-      background: var(--ghv-tint-hover);
-    }
-
-    /* Subfolder rows get extra indent */
-    .ghv-folder-row--sub {
-      padding-left: 24px;
-      font-weight: 500;
-    }
-
-    .ghv-folder-icon {
-      flex-shrink: 0;
-      color: var(--ghv-accent);
-      width: 16px;
-      height: 16px;
-      display: flex;
-      align-items: center;
-    }
-
-    .ghv-folder-icon svg {
-      width: 14px;
-      height: 14px;
-      fill: currentColor;
-    }
-
-    .ghv-folder-caret {
-      flex-shrink: 0;
-      color: var(--ghv-fg-muted);
-      font-size: 10px;
-      width: 12px;
-      text-align: center;
-      transition: transform 140ms ease-out;
-    }
-
-    .ghv-folder-caret.is-open {
-      transform: rotate(90deg);
-    }
-
-    .ghv-folder-files {
-      padding-left: 20px;
-    }
-
-    .ghv-folder-files .ghv-file {
-      padding-left: 10px;
-    }
-
-    /* Nested subfolder files get extra indent */
-    .ghv-folder-files .ghv-folder-files .ghv-file {
-      padding-left: 18px;
-    }
-
-    /* === PREVIEW PANE === */
-    .ghv-preview {
-      background: var(--ghv-canvas);
-      display: flex;
-      flex-direction: column;
-      min-width: 0;
-    }
-
-    .ghv-preview-header {
-      display: flex;
-      align-items: center;
-      gap: var(--space-3);
-      padding: 10px 16px;
-      background: var(--ghv-canvas-subtle);
-      border-bottom: 1px solid var(--ghv-border);
-      flex-wrap: wrap;
-    }
-
-    .ghv-preview-path {
-      font-family: var(--font-mono);
-      font-size: 12px;
-      color: var(--ghv-fg-muted);
-      flex: 1;
-      min-width: 0;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    /* JS dynamically rewrites this span without scoped attributes — must be fully :global */
-    :global(.ghv-preview-path span) {
-      color: var(--ghv-accent);
-    }
-
-    .ghv-preview-actions {
-      display: flex;
-      align-items: center;
-      gap: var(--space-2);
-      flex-shrink: 0;
-    }
-
-    .ghv-preview-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      padding: 4px 10px;
-      background: var(--ghv-tint-control);
-      border: 1px solid var(--ghv-border);
-      border-radius: var(--ghv-radius);
-      font-size: 12px;
-      color: var(--ghv-fg);
-      cursor: default;
-    }
-
-    .ghv-preview-content {
-      padding: 24px 32px 32px;
-      overflow-y: auto;
-      flex: 1;
-    }
-
-    /* === RESUME ITEM CARD & GHV PANEL CONTENT (global — targets set:html injected content) === */
-    :global(.resume-item-card) {
-      display: flex;
-      gap: var(--space-5);
-      align-items: flex-start;
-    }
-
-    :global(.ghv-item-logo) {
-      flex: 0 0 3.5rem;
-      width: 3.5rem;
-      height: 3.5rem;
-    }
-
-    :global(.ghv-item-logo__img) {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      /* Lighten dark logos on dark background */
-      filter: brightness(1.1);
-    }
-
-    :global(.ghv-item-body) {
-      flex: 1;
-      min-width: 0;
-    }
-
-    :global(.ghv-item-meta) {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.4rem var(--space-2-5);
-      align-items: center;
-      color: var(--ghv-fg-muted);
-      font-size: var(--text-sm);
-      margin: var(--space-2) 0 var(--space-4) !important;
-    }
-
-    :global(.ghv-item-links) {
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--space-2);
-      margin-top: var(--space-3);
-    }
-
-    /* === BADGES (inside ghv panels — global) === */
-    :global(.ghv-badge) {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: var(--radius-full);
-      padding: var(--space-1) 0.65rem;
-      font-size: 0.8rem;
-      font-weight: 700;
-      line-height: 1;
-      white-space: nowrap;
-    }
-
-    :global(.ghv-badge--primary)   { background: var(--ghv-accent-emphasis); color: var(--ghv-fg-on-emphasis); }
-    :global(.ghv-badge--accent)    { background: var(--ghv-green); color: var(--ghv-canvas); }
-    :global(.ghv-badge--secondary) { background: var(--ghv-accent); color: var(--ghv-canvas); }
-    :global(.ghv-badge--info)      { background: var(--ghv-accent-light); color: var(--ghv-canvas); }
-
-    /* === README PROFILE (global) === */
-    :global(.ghv-readme-profile) {
-      display: flex;
-      gap: 1.75rem;
-      align-items: flex-start;
-      margin-bottom: var(--space-10);
-      flex-wrap: wrap;
-    }
-
-    :global(.ghv-readme-avatar) {
-      flex: 0 0 6rem;
-      width: 6rem;
-      height: 6rem;
-      border-radius: 50%;
-      overflow: hidden;
-      border: 2px solid var(--ghv-border);
-      background: var(--ghv-canvas-subtle);
-    }
-
-    :global(.ghv-readme-avatar__img) {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-    }
-
-    :global(.ghv-readme-intro) {
-      flex: 1;
-      min-width: 220px;
-    }
-
-    /* README name heading: no divider line — person's name, not a file title.
-       Fully global so it works inside set:html content; specificity [0,3,1] > [0,1,1]. */
-    :global(.ghv-readme.ghv-md .ghv-readme-intro h1) {
-      border-bottom: none;
-      padding-bottom: 0;
-      margin-bottom: var(--space-2);
-      font-size: 1.6em;
-    }
-
-    :global(.ghv-readme-badges) {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.4rem;
-      margin: 0 0 var(--space-4);
-    }
-
-    /* === Markdown-style content rendering (all fully global — targets set:html content) === */
-    :global(.ghv-md h1) {
-      font-size: 1.5em;
-      font-weight: 600;
-      color: var(--ghv-fg-bright);
-      border-bottom: 1px solid var(--ghv-border-muted);
-      padding-bottom: 0.4em;
-      margin: 0 0 0.75em;
-      line-height: 1.25;
-    }
-
-    :global(.ghv-md h2) {
-      font-size: 1.25em;
-      font-weight: 600;
-      color: var(--ghv-fg-bright);
-      border-bottom: 1px solid var(--ghv-border-muted);
-      padding-bottom: 0.3em;
-      margin: 1.5em 0 0.75em;
-      line-height: 1.25;
-    }
-
-    :global(.ghv-md p) {
-      color: var(--ghv-fg);
-      margin: 0 0 1em;
-      line-height: 1.6;
-      max-width: 72ch;
-    }
-
-    :global(.ghv-md ul) {
-      color: var(--ghv-fg);
-      margin: 0 0 1em;
-      padding-left: 1.5em;
-      line-height: 1.6;
-    }
-
-    :global(.ghv-md li) {
-      margin-bottom: 0.35em;
-      max-width: 72ch;
-    }
-
-    :global(.ghv-md strong) {
-      color: var(--ghv-fg-bright);
-      font-weight: 600;
-    }
-
-    :global(.ghv-md code) {
-      font-family: var(--font-mono);
-      font-size: 0.875em;
-      background: var(--ghv-tint-code);
-      border-radius: var(--ghv-radius-xs);
-      padding: 0.1em 0.35em;
-    }
-
-    :global(.ghv-link) {
-      color: var(--ghv-accent) !important;
-      text-decoration: none;
-    }
-
-    :global(.ghv-link:hover) {
-      text-decoration: underline;
-    }
-
-    /* === MOBILE: drawer toggle === */
-    .ghv-mobile-toggle {
-      display: none;
-      align-items: center;
-      gap: 6px;
-      width: 100%;
-      padding: 10px 16px;
-      background: var(--ghv-canvas-subtle);
-      border-bottom: 1px solid var(--ghv-border);
-      font-size: 13px;
-      color: var(--ghv-fg);
-      cursor: pointer;
-      text-align: left;
-      border-radius: 0;
-    }
-
-    .ghv-mobile-toggle svg {
-      width: 14px;
-      height: 14px;
-      fill: currentColor;
-    }
-
-    .ghv-mobile-toggle-caret {
-      margin-left: auto;
-      font-size: 11px;
-      color: var(--ghv-fg-muted);
-      transition: transform 140ms ease-out;
-    }
-
-    .ghv-mobile-toggle-caret.is-open {
-      transform: rotate(180deg);
-    }
-
-    /* === DOWNLOAD PDF BUTTON === */
-    .ghv-dl-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 4px 10px;
-      background: var(--ghv-btn-green);
-      color: var(--ghv-fg-on-emphasis);
-      border: 1px solid var(--ghv-btn-border);
-      border-radius: var(--ghv-radius);
-      font-size: 12px;
-      font-weight: 500;
-      font-family: inherit;
-      cursor: pointer;
-      white-space: nowrap;
-      line-height: 1.4;
-      transition: background 120ms ease-out;
-      flex-shrink: 0;
-    }
-
-    .ghv-dl-btn:hover { background: var(--ghv-btn-green-hover); }
-    .ghv-dl-btn:focus-visible { outline: 2px solid var(--ghv-accent); outline-offset: 2px; }
-
-    .ghv-dl-btn svg {
-      width: 13px;
-      height: 13px;
-      fill: currentColor;
-      flex-shrink: 0;
-    }
-
-    .ghv-dl-spinner {
-      width: 11px;
-      height: 11px;
-      border: 1.5px solid var(--ghv-spinner-track);
-      border-top-color: var(--ghv-fg-on-emphasis);
-      border-radius: 50%;
-      flex-shrink: 0;
-      animation: ghv-spin 700ms linear infinite;
-      display: none;
-    }
-
-    @keyframes ghv-spin {
-      to { transform: rotate(360deg); }
-    }
-
-    .ghv-dl-progress {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      height: 2px;
-      background: var(--ghv-btn-progress);
-      width: 0%;
-      border-radius: 0 0 0 6px;
-      transition: width 900ms cubic-bezier(0.25, 1, 0.5, 1);
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .ghv-dl-spinner { animation-duration: 0.01ms; }
-      .ghv-dl-progress { transition-duration: 0.01ms; }
-    }
-
-    /* === ITEM CARD — width-fill layout === */
-    /* Float the logo so body text fills full width and wraps under it */
-    :global(.resume-item-card) {
-      display: block; /* override flex */
-    }
-
-    :global(.ghv-item-logo) {
-      float: left;
-      width: 3.5rem;
-      height: 3.5rem;
-      margin: 0 var(--space-5) var(--space-3) 0;
-      flex: none; /* cancel any residual flex sizing */
-    }
-
-    :global(.ghv-item-body) {
-      /* No min-width/flex needed — it's a block that flows around the float */
-      display: block;
-    }
-
-    /* The h1 and meta sit beside the float; paragraphs wrap under it */
-    :global(.ghv-item-body p:not(.ghv-item-meta)) {
-      max-width: none; /* let body text fill full width */
-      clear: none;     /* stays beside float until float height exceeded */
-    }
-
-    /* After the card content, clear the float so next card starts fresh */
-    :global(.resume-item-card::after) {
-      content: '';
-      display: table;
-      clear: both;
-    }
-
-    /* === README PROFILE — width-fill layout === */
-    :global(.ghv-readme-profile) {
-      display: block; /* override flex */
-      margin-bottom: var(--space-10);
-    }
-
-    :global(.ghv-readme-avatar) {
-      float: left;
-      width: 6rem;
-      height: 6rem;
-      border-radius: 50%;
-      overflow: hidden;
-      border: 2px solid var(--ghv-border);
-      background: var(--ghv-canvas-subtle);
-      margin: 0 1.75rem var(--space-4) 0;
-      flex: none;
-    }
-
-    :global(.ghv-readme-intro) {
-      display: block; /* flows around float */
-      min-width: 0;
-    }
-
-    /* Paragraphs in the intro extend full width and start below the avatar
-       (name + badges stay beside it; the bio text does not wrap around it) */
-    :global(.ghv-readme-intro p) {
-      max-width: none;
-      clear: left;
-    }
-
-    /* Clear the float after profile block */
-    :global(.ghv-readme-profile::after) {
-      content: '';
-      display: table;
-      clear: both;
-    }
-
-    /* Widen ghv-md p/li inside item body and readme intro for full-width fill */
-    :global(.ghv-item-body .ghv-md p),
-    :global(.ghv-item-body .ghv-md li) {
-      max-width: none;
-    }
-
-    @media (max-width: 767px) {
-      /* On narrow screens revert to stacked block — no float needed */
-      :global(.ghv-item-logo) {
-        float: none;
-        margin: 0 0 var(--space-3) 0;
-        width: 2.75rem;
-        height: 2.75rem;
-      }
-
-      :global(.ghv-readme-avatar) {
-        float: none;
-        margin: 0 0 var(--space-4) 0;
-      }
-    }
-
-    @media (max-width: 640px) {
-      .ghv-body {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto 1fr;
-      }
-
-      .ghv-tree {
-        border-right: none;
-        border-bottom: 1px solid var(--ghv-border);
-        /* collapsed by default on mobile */
-        display: none;
-        padding: 8px 0;
-      }
-
-      .ghv-tree.is-mobile-open {
-        display: block;
-      }
-
-      .ghv-mobile-toggle {
-        display: flex;
-      }
-
-      .ghv-preview-content {
-        padding: 16px;
-      }
-
-      .ghv-header-pills {
-        display: none;
-      }
-    }
-  </style>
 </BaseLayout>
+
+<script>
+  // One set of panels, two layouts. Desktop (>860px): two panes, panels live in #pane.
+  // <=860px: an accordion; the open panel is moved into the tree, right under its own row.
+  const DEFAULT_PATH = 'README.md';
+  const desktop = window.matchMedia('(min-width: 861px)');
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const pane = document.getElementById('pane') as HTMLElement;
+
+  const fileButtons = [...document.querySelectorAll<HTMLButtonElement>('#tree button[data-path]')];
+  const panels = [...document.querySelectorAll<HTMLElement>('[data-panel]')];
+  const sectionToggles = [...document.querySelectorAll<HTMLButtonElement>('#tree .folder-toggle')];
+  let current: string | null = null;
+
+  const buttonFor = (path: string) => fileButtons.find((b) => b.dataset.path === path);
+  const panelFor = (path: string) => panels.find((p) => p.dataset.panel === path);
+  const behavior = (): ScrollBehavior => (reduced.matches ? 'auto' : 'smooth');
+
+  function setFolder(toggle: HTMLButtonElement, open: boolean) {
+    const list = document.getElementById(toggle.getAttribute('aria-controls') ?? '');
+    if (!list) return;
+    list.hidden = !open;
+    toggle.setAttribute('aria-expanded', String(open));
+  }
+
+  // Open every folder on the way to a file, so a deep link shows where you are.
+  function revealInTree(path: string) {
+    const parts = path.split('/').slice(0, -1);
+    for (let i = 1; i <= parts.length; i++) {
+      const t = document.querySelector<HTMLButtonElement>(`#tree button[data-folder="${parts.slice(0, i).join('/')}"]`);
+      if (t) setFolder(t, true);
+    }
+  }
+
+  function animateIn(panel: HTMLElement) {
+    panel.classList.remove('is-entering');
+    void panel.offsetWidth; // restart the entrance
+    panel.classList.add('is-entering');
+  }
+
+  function sync() {
+    const mobile = !desktop.matches;
+    for (const b of fileButtons) {
+      const on = b.dataset.path === current;
+      b.setAttribute('aria-current', String(on));
+      if (mobile) b.setAttribute('aria-expanded', String(on));
+      else b.removeAttribute('aria-expanded');
+      b.closest('li')?.classList.toggle('is-open', mobile && on);
+    }
+    for (const p of panels) {
+      const on = p.dataset.panel === current;
+      p.hidden = !on;
+      const btn = buttonFor(p.dataset.panel ?? '');
+      if (mobile && on && btn) btn.after(p); // inline, right under its row
+      else if (p.parentElement !== pane) pane.append(p);
+    }
+    history.replaceState(null, '', !current || current === DEFAULT_PATH ? location.pathname : `#${current}`);
+  }
+
+  function open(path: string, userAction: boolean) {
+    const panel = panelFor(path);
+    if (!panel) return;
+    if (!desktop.matches) {
+      // Accordion: one section open at a time, so the list stays short.
+      const section = path.split('/')[0];
+      sectionToggles.forEach((t) => { if (t.dataset.folder !== section) setFolder(t, false); });
+    }
+    current = path;
+    revealInTree(path);
+    sync();
+    animateIn(panel);
+    if (!userAction) return;
+    if (desktop.matches) {
+      pane.scrollTop = 0;
+      if (pane.getBoundingClientRect().top < 0) pane.scrollIntoView({ behavior: behavior() });
+    } else {
+      // The previous file has folded away above or below; bring this row to the top to read.
+      buttonFor(path)?.closest('li')?.scrollIntoView({ behavior: behavior(), block: 'start' });
+    }
+  }
+
+  function close(path: string) {
+    const btn = buttonFor(path);
+    current = null;
+    sync();
+    // Folding a long file can leave the row far above the viewport; bring it back.
+    if (btn && btn.getBoundingClientRect().top < 0) btn.scrollIntoView({ behavior: 'auto', block: 'start' });
+  }
+
+  fileButtons.forEach((b) =>
+    b.addEventListener('click', () => {
+      const path = b.dataset.path ?? DEFAULT_PATH;
+      if (!desktop.matches && current === path) close(path);
+      else open(path, true);
+    }),
+  );
+
+  document.querySelectorAll<HTMLButtonElement>('#tree button[data-folder]').forEach((toggle) => {
+    toggle.addEventListener('click', () => {
+      const opening = toggle.getAttribute('aria-expanded') !== 'true';
+      const isSection = toggle.classList.contains('folder-toggle');
+      if (!desktop.matches && isSection) {
+        if (opening) sectionToggles.forEach((t) => t !== toggle && setFolder(t, false));
+        // A file outside what is still open folds away with its folder.
+        const keep = opening ? toggle.dataset.folder : null;
+        if (current && current !== DEFAULT_PATH && current.split('/')[0] !== keep) { current = null; sync(); }
+      }
+      setFolder(toggle, opening);
+      if (!desktop.matches && opening && toggle.getBoundingClientRect().top < 0) {
+        toggle.scrollIntoView({ behavior: 'auto', block: 'start' });
+      }
+    });
+  });
+
+  // Crossing the breakpoint: desktop always shows a file (README by default); mobile keeps yours.
+  desktop.addEventListener('change', () => {
+    if (desktop.matches && !current) current = DEFAULT_PATH;
+    sync();
+  });
+
+  window.addEventListener('hashchange', () => {
+    const path = decodeURIComponent(location.hash.slice(1));
+    if (panelFor(path)) open(path, true);
+  });
+
+  const fromHash = decodeURIComponent(location.hash.slice(1));
+  const exp = document.querySelector<HTMLButtonElement>('#tree button[data-folder="experience"]');
+  if (exp) setFolder(exp, true); // the first section is open on arrival, so one tap reads a file
+  if (fromHash && panelFor(fromHash)) {
+    open(fromHash, false);
+    if (!desktop.matches) buttonFor(fromHash)?.closest('li')?.scrollIntoView({ block: 'start' });
+  } else if (desktop.matches) {
+    current = DEFAULT_PATH;
+    sync();
+  } else {
+    current = null;
+    sync();
+  }
+</script>
+
+<style is:global>
+  /* Global, not scoped: panel bodies are injected html (set:html) and the script moves panels
+     between the pane and the tree, so scoped data-attributes would not reach them. Every rule is
+     prefixed .resume-page, and this sheet ships with /resume/ only. */
+  html,
+  body { background: var(--id-ground); }
+
+  .resume-page {
+    --pad: clamp(1rem, 2.4vw, 2.25rem);
+    --ease: cubic-bezier(0.25, 1, 0.5, 1);
+
+    min-height: 100svh;
+    background: var(--id-ground);
+    color: var(--id-paper);
+    font-family: var(--id-font-body);
+    font-weight: var(--id-weight-body);
+    line-height: normal;
+    font-optical-sizing: auto;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .resume-page a { color: inherit; text-decoration: underline; }
+  .resume-page a:focus-visible,
+  .resume-page button:focus-visible {
+    /* Paper, not pink: the selected file is already pink, and the ring must stay visible on it. */
+    outline: 3px solid var(--id-paper);
+    outline-offset: 3px;
+  }
+
+  /* ── Top bar ─────────────────────────────────────────── */
+  .resume-page .top {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--pad);
+    align-items: center;
+    padding: var(--pad) var(--pad) 0;
+  }
+  .resume-page .home {
+    grid-column: 1 / span 5;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    justify-self: start;
+    min-height: 44px;
+    font-weight: var(--id-weight-strong);
+    font-size: var(--id-text-body);
+    letter-spacing: var(--id-tracking-heading);
+    text-decoration: none;
+  }
+  .resume-page .home img { width: 44px; height: auto; }
+  .resume-page .home:hover span { background: var(--id-pink); color: var(--id-ink); }
+  .resume-page .top-title {
+    grid-column: 6 / span 3;
+    margin: 0;
+    font-size: var(--id-text-body);
+    font-weight: var(--id-weight-strong);
+    color: var(--id-lime);
+  }
+  .resume-page .top-links {
+    grid-column: 9 / -1;
+    flex-wrap: wrap;
+    justify-self: end;
+    display: flex;
+    gap: 1.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .resume-page .top-links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    text-underline-offset: 0.18em;
+    transition: background-color 160ms var(--ease), color 160ms var(--ease);
+  }
+  .resume-page .top-links a:hover { background: var(--id-pink); color: var(--id-ink); text-decoration-color: transparent; }
+
+  /* ── Explorer: tree left, open file right ─────────────── */
+  .resume-page .explorer {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--pad);
+    align-items: start;
+    min-height: 0;
+    padding: clamp(2rem, 5vw, 4.5rem) var(--pad) 7rem;
+  }
+  /* The tree is a size container so the longest name ("Achievements" + count) always fits its column. */
+  .resume-page .tree { grid-column: 1 / span 5; container-type: inline-size; }
+  .resume-page .pane {
+    grid-column: 6 / -1;
+    position: sticky;
+    top: var(--pad);
+    max-height: calc(100svh - 2 * var(--pad));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: var(--id-rule) transparent;
+    padding-left: clamp(0rem, 2vw, 2rem);
+  }
+
+  :where(.resume-page .tree) ul { list-style: none; margin: 0; padding: 0; }
+  /* :where() keeps this reset at zero specificity so the type rules below win. */
+  :where(.resume-page .tree) button {
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+    text-align: left;
+  }
+
+  /* The section names are the poster. */
+  .resume-page .sect {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.12em;
+    width: 100%;
+    color: var(--id-lime);
+    font-weight: var(--id-weight-poster);
+    font-size: min(14.2cqi, 7rem);
+    line-height: 0.86;
+    letter-spacing: -0.055em;
+    padding: 0.06em 0 0.08em;
+    margin-left: -0.04em;
+    transition: color 160ms var(--ease);
+  }
+  .resume-page .sect:hover { color: var(--id-paper); }
+  .resume-page .sect.file[aria-current='true'] {
+    width: auto;
+    background: var(--id-pink);
+    color: var(--id-ink);
+    padding-inline: 0.06em;
+  }
+  .resume-page .count {
+    font-size: 0.2em;
+    font-weight: 700;
+    letter-spacing: 0;
+    line-height: 1;
+    padding-top: 0.5em;
+    color: var(--id-paper-2);
+  }
+  .resume-page .folder-toggle[aria-expanded='true'] .count { color: var(--id-lime); }
+
+  /* Files: plain readable lines on a strict two-column rhythm (name, years). */
+  .resume-page .files {
+    margin: 0.75rem 0 1.75rem;
+    border-top: 1px solid var(--id-rule);
+  }
+  .resume-page .files--sub { margin: 0 0 0.5rem 1.25rem; border-top: 0; }
+  .resume-page .leaf,
+  .resume-page .sub-toggle {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+    width: 100%;
+    min-height: 44px;
+    padding: 0.55rem 0.5rem;
+    border-bottom: 1px solid var(--id-rule);
+    font-size: 1.125rem;
+    font-weight: 600;
+    letter-spacing: var(--id-tracking-heading);
+    transition: background-color 140ms var(--ease), color 140ms var(--ease);
+  }
+  .resume-page .sub-toggle { color: var(--id-lime); font-weight: var(--id-weight-strong); }
+  .resume-page .files--sub .leaf { font-size: var(--id-text-body); font-weight: var(--id-weight-medium); border-bottom-color: transparent; min-height: 40px; }
+  .resume-page .leaf-meta { color: var(--id-paper-2); font-weight: var(--id-weight-medium); font-variant-numeric: tabular-nums; font-size: 1rem; }
+  .resume-page .leaf:hover,
+  .resume-page .sub-toggle:hover { background: var(--id-tint-hover); }
+  .resume-page .leaf[aria-current='true'] { background: var(--id-pink); color: var(--id-ink); }
+  .resume-page .leaf[aria-current='true'] .leaf-meta { color: var(--id-ink); }
+
+  /* ── The open file, set like poster type ─────────────── */
+  .resume-page .panel { outline: none; }
+  .resume-page .panel.is-entering { animation: resume-enter 380ms var(--ease) both; }
+  @keyframes resume-enter {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  .resume-page .p-path {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    margin: 0 0 1.5rem;
+    font-size: var(--id-text-small);
+    color: var(--id-paper-2);
+  }
+  .resume-page .p-file { color: var(--id-lime); font-weight: 700; }
+  .resume-page .mark { display: none; }
+  /* The folder path is only shown on the open, pinned row (<=860px), where the list above is out of view. */
+  .resume-page .leaf-dir { display: none; }
+
+  .resume-page .p-title {
+    margin: 0 0 1.25rem;
+    max-width: 16ch;
+    color: var(--id-paper);
+    font-size: var(--id-text-display);
+    font-weight: 850;
+    line-height: var(--id-leading-display);
+    letter-spacing: -0.04em;
+    text-wrap: balance;
+  }
+  .resume-page .p-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1.5rem;
+    margin: 0 0 2rem;
+    padding: 0.75rem 0;
+    border-block: 1px solid var(--id-rule);
+    font-size: var(--id-text-body);
+    color: var(--id-paper-2);
+  }
+  .resume-page .p-role { color: var(--id-lime); font-weight: var(--id-weight-strong); }
+
+  .resume-page .p-prose { max-width: 58ch; }
+  .resume-page .p-prose p {
+    margin: 0 0 1em;
+    font-size: clamp(1.125rem, 1.35vw, 1.3rem);
+    line-height: 1.5;
+  }
+  .resume-page .p-skill h2 {
+    margin: 2rem 0 0.5rem;
+    font-size: var(--id-text-small);
+    font-weight: var(--id-weight-strong);
+    color: var(--id-lime);
+  }
+  .resume-page .p-skill ul { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--id-rule); }
+  .resume-page .p-skill li {
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--id-rule);
+    font-size: 1.1rem;
+    line-height: 1.4;
+  }
+  .resume-page .p-links { display: flex; gap: 1.5rem; margin: 0.5rem 0 0; }
+  .resume-page .p-links a,
+  .resume-page .p-prose a {
+    color: var(--id-lime);
+    font-weight: 700;
+    text-decoration-thickness: 0.1em;
+    text-underline-offset: 0.18em;
+    transition: background-color 160ms var(--ease), color 160ms var(--ease);
+  }
+  .resume-page .p-links a { display: inline-flex; align-items: center; min-height: 44px; font-size: 1.15rem; }
+  .resume-page .p-links a:hover,
+  .resume-page .p-prose a:hover { background: var(--id-pink); color: var(--id-ink); text-decoration-color: transparent; }
+
+  /* README: the roar earns its place next to who he is. */
+  .resume-page .readme {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.8fr);
+    column-gap: var(--pad);
+    align-items: start;
+  }
+  .resume-page .readme-head { grid-column: 1; }
+  .resume-page .p-title--readme { font-size: clamp(2.5rem, 5vw, 5rem); max-width: 8ch; }
+  .resume-page .readme-roles {
+    margin: 0;
+    color: var(--id-lime);
+    font-size: var(--id-text-heading);
+    font-weight: var(--id-weight-strong);
+    line-height: 1.2;
+    letter-spacing: -0.015em;
+  }
+  .resume-page .readme-photo {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    width: 100%;
+    max-width: 436px;
+    height: auto;
+    justify-self: end;
+  }
+  .resume-page .readme-prose { grid-column: 1 / -1; margin-top: 1rem; columns: 2 18rem; column-gap: var(--pad); max-width: none; }
+  .resume-page .readme-prose p { break-inside: avoid; }
+
+  @media (max-width: 860px) {
+    .resume-page .top { grid-template-columns: 1fr auto; row-gap: 0; }
+    .resume-page .home { grid-column: 1; font-size: var(--id-text-small); gap: 0.5rem; }
+    .resume-page .top-links { grid-column: 2; gap: 0.875rem; font-size: var(--id-text-small); }
+    .resume-page .home img { width: 36px; }
+    .resume-page .top-title { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+    .resume-page .explorer { grid-template-columns: minmax(0, 1fr); padding-top: 1.5rem; padding-bottom: 6rem; }
+    .resume-page .tree,
+    .resume-page .pane { grid-column: 1; }
+    /* Runway under the list, so even the last file's row can scroll up to the top when opened. */
+    .resume-page .explorer:has(.is-open) { padding-bottom: 75svh; }
+    /* No second pane: the open file lives inline in the tree (see the script). */
+    .resume-page .pane { display: none; }
+
+    /* Section headings: still the poster's lime 900, but sized to a list, not a wall. */
+    .resume-page .sect {
+      font-size: clamp(2rem, 9.6vw, 2.75rem);
+      line-height: 1;
+      align-items: center;
+      min-height: 44px;
+      padding: 0.14em 0 0.16em;
+      margin-left: 0;
+      letter-spacing: -0.045em;
+    }
+    .resume-page .sect.file[aria-current='true'] { width: 100%; padding-inline: 0.12em; }
+    .resume-page .count { padding-top: 0; align-self: flex-start; margin-top: 0.45em; font-size: 0.8125rem; }
+    .resume-page .files { margin: 0.25rem 0 1.25rem; }
+    .resume-page .files--sub { margin-left: 0.75rem; }
+    .resume-page .leaf { font-size: 1.0625rem; padding-inline: 0.25rem; }
+    .resume-page .leaf-name { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+
+    /* + turns to x on the open row: the row is also its own close button. */
+    .resume-page .mark {
+      display: block;
+      position: relative;
+      flex: none;
+      width: 0.875rem;
+      height: 0.875rem;
+      align-self: center;
+      color: var(--id-paper-2);
+      transition: transform 220ms var(--ease);
+    }
+    .resume-page .sect .mark { width: 1rem; height: 1rem; margin-left: auto; margin-right: 0.25rem; }
+    .resume-page .is-open > .file .mark { color: var(--id-ink); }
+    .resume-page .mark::before,
+    .resume-page .mark::after {
+      content: '';
+      position: absolute;
+      inset: calc(50% - 1px) 0 auto;
+      height: 2px;
+      background: currentColor;
+    }
+    .resume-page .mark::after { transform: rotate(90deg); }
+    .resume-page .is-open > .file .mark { transform: rotate(45deg); }
+
+    /* The open row sticks to the top for as long as you are inside its file. */
+    .resume-page .is-open > .file {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      align-items: last baseline;
+      background: var(--id-pink);
+      color: var(--id-ink);
+    }
+    /* Pinned at top: 0, an outside ring would be cut off by the screen edge. */
+    .resume-page .is-open > .file:focus-visible { outline-color: var(--id-ink); outline-offset: -4px; }
+    .resume-page .is-open > .file .leaf-meta { color: var(--id-ink); }
+    .resume-page .is-open > .file .leaf-dir { display: block; font-size: 0.8125rem; font-weight: var(--id-weight-medium); line-height: 1.2; }
+    .resume-page .tree li { scroll-margin-top: 0; }
+
+    .resume-page .panel { padding: 1.25rem 0.25rem 2.25rem; border-bottom: 1px solid var(--id-rule); }
+    .resume-page .p-path { display: none; }
+    .resume-page .p-title { font-size: clamp(1.9rem, 8.4vw, 2.5rem); margin-bottom: 1rem; }
+    .resume-page .p-meta { margin-bottom: 1.25rem; font-size: 1rem; }
+    .resume-page .p-prose p { font-size: 1.0625rem; }
+    .resume-page .p-skill li { font-size: 1.0625rem; }
+    .resume-page .readme { grid-template-columns: minmax(0, 1fr); }
+    .resume-page .readme-photo { grid-column: 1; grid-row: auto; justify-self: start; max-width: 260px; margin-top: 1.25rem; }
+    .resume-page .p-title--readme { font-size: clamp(2.25rem, 11vw, 3rem); }
+    .resume-page .readme-prose { columns: auto; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .resume-page .panel.is-entering { animation: none; }
+    .resume-page *,
+    .resume-page *::before { transition: none !important; }
+  }
+</style>
