@@ -6,7 +6,7 @@ Seeded 2026-09-05 by `/verify scaffold` with the top five. This is a map, not an
 
 | Feature | Route | Driven? |
 |---|---|---|
-| [Landing pitch](landing-pitch.md) | `/` | not yet — static, low value |
+| [Landing pitch](landing-pitch.md) | `/` | **yes** — `scripts/drive home-contacts` (composition geometry, links) |
 | [Resume repo explorer](resume-file-tree.md) | `/resume/` | **yes** — `scripts/drive file-tree`, `scripts/drive reading-path`, `scripts/drive identity` |
 | [Projects list](projects-list.md) | `/projects/` | covered statically by `npm run test:projects` |
 | Font gate (shared layer; no feature file, contract in `docs/design-system.md`) | `/` (any page) | **yes** — `scripts/drive font-gate` |
@@ -18,7 +18,7 @@ Seeded 2026-09-05 by `/verify scaffold` with the top five. This is a map, not an
 
 Two features are genuinely interactive: the resume explorer and the orbit graph. Only the explorer has mapped drives. **The orbit graph is the biggest hole in this map** — it is the most complex client-side behaviour on the site and nothing verifies it at all today.
 
-The static features are cheap to check and mostly already are: `npm run test:projects` pins `/projects/` content, and `npm run build` catches compile breakage everywhere. Adding browser drives for them would buy little; they are listed so the map is honest about what exists, not because each needs a drive.
+The home page has no interactivity but its value is geometry (the F7 contacts), which only a browser renders, so it has a drive. The other static features are cheap to check and mostly already are: `npm run test:projects` pins `/projects/` content, and `npm run build` catches compile breakage everywhere. Adding browser drives for them would buy little; they are listed so the map is honest about what exists, not because each needs a drive.
 
 ## Adding a drive
 

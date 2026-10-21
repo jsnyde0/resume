@@ -35,7 +35,7 @@ Answered from the codebase on 2026-09-05. Recorded so the next reader can check 
 
 | Route | Route-specific observable | Interactive? | Mapped drive |
 |---|---|---|---|
-| `/` | `From catwalks to startups, agent harnesses to existential dread.` | no | `scripts/drive screenshots` (visual + style baseline) |
+| `/` | `.figure` + `.name` (the F7 home composition) | no clicks to make, but its **geometry** only a browser renders | `scripts/drive home-contacts`, `scripts/drive screenshots` |
 | `/resume/` | `#tree`, `[data-panel="README.md"]` | **yes** — repo explorer: two panes >860px, accordion <=860px, `#path` deep links | `scripts/drive file-tree`, `scripts/drive reading-path`, `scripts/drive identity`, `scripts/drive screenshots` |
 | `/readme/` | `<h1 class="readme-page__title">README</h1>` | no | `scripts/drive screenshots` |
 | `/projects/` | `<h1>Building</h1>` | no | `scripts/drive screenshots`; content also covered by `npm run test:projects` |
@@ -60,6 +60,7 @@ scripts/drive reading-path  # experience -> achievements in <=3 taps, no scroll;
 scripts/drive identity [route ...]  # D1 ground, self-hosted heading face, no untokenized hex (default /resume/)
 scripts/drive screenshots   # 10 full-page PNGs + 10 computed-style fingerprints
 scripts/drive font-gate     # font preload, gate hidden/ready/failed under held/aborted/stalled woff2
+scripts/drive home-contacts # / contacts, outfit halo, held/failed font, links: 7 sizes x Chrome + Firefox
 scripts/compare A B         # diff two screenshots-* evidence dirs
 scripts/cleanup             # stop only what launch started; evidence survives
 ```
@@ -88,6 +89,17 @@ The fingerprint is one entry per element under `<html>`/`<body>` (script/style/n
 - Fingerprint is read BEFORE the full-page screenshot. Puppeteer resizes the viewport to the page height for `fullPage`; reading styles while that is in flight flaked (`.site-shell` auto margins read 0px instead of 16px on `/factory/` mobile, 2 of 5 runs). After the reorder, 6 of 6 consecutive runs were stable.
 - Device scale factor pinned to 1; the shared Chrome's viewport and media emulation are cleared at the end of the run.
 - Not covered: hover/focus/active states, JS-driven states after clicks (see `scripts/drive file-tree`), other viewport widths, anything below `<body>` text content.
+
+## Home-contacts drive (the F7 composition on `/`)
+
+`scripts/drive home-contacts` measures what the home page is for (bead `resume-soe.18`, contract in `resume-soe.12` D4 + Verification target Signal 1). Evidence: `.verify-evidence/home-contacts-<timestamp>/evidence.json` plus a PNG per engine, size and scenario.
+
+- **Matrix:** 1280x800, 1440x900, 1920x1080, 1024x768, 1280x1024, 390x844, 768x1024, in Chrome (the shared `:9222` Chrome, inside a throwaway browser context, so it never shares a tab with another drive or agent) and Firefox (headless, launched through puppeteer-core's WebDriver BiDi from `$VERIFY_RESUME_FIREFOX`, default `/usr/bin/firefox`). WebKit is printed as `NOT RUN`: puppeteer cannot drive it. `VERIFY_RESUME_ENGINES=chrome` narrows the run.
+- **Contacts:** landmarks are fractions of the rendered, mirrored img box (the photo's alpha landmarks, never the box edges); the target glyph's ink comes from a figure-hidden screenshot scanned inside the glyph's Range rect. Pass: landmark 0-4px from the ink, and the clog no more than 4px sunk below the ink top. The branch is read from the page's own media queries (so 1280x1024, aspect 1.25, is measured in the narrow branch).
+- **Halo:** ground pixels 2-8px from the shirt must hold zero hue 60-110deg / saturation > 0.25 pixels.
+- **Held / failed font:** the woff2 held 2s keeps tagline, name and figure hidden on every frame; aborted, the page settles `fonts-failed` with a contact-free layout and reachable links.
+- **Links:** all four inside the viewport and hit at their centre at every size; both internal links clicked for real.
+- Red-capable: moving the wide clog 0.06em (`--sy`), dropping `data-font-gate` from the name, and a lime glow on the figure each turned the run red, only at the sizes they affect (resume-soe.18 ship-record).
 
 ## Evidence standards
 

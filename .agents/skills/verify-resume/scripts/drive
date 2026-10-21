@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # drive — run one mapped feature drive and capture its evidence.
 #
-# Usage: scripts/drive [file-tree|reading-path|identity|screenshots|font-gate]
+# Usage: scripts/drive [file-tree|reading-path|identity|screenshots|font-gate|home-contacts]
 #
 # Resolves the shared engine, then hands off. The drive itself is JS because it
 # compares structured before/after state; the shell's job is resolution.
@@ -26,8 +26,9 @@ case "$feature" in
   identity) shift; exec node "$VR_SCRIPT_DIR/drive-identity.mjs" "$@" ;;
   screenshots) exec node "$VR_SCRIPT_DIR/drive-screenshots.mjs" ;;
   font-gate) exec node "$VR_SCRIPT_DIR/drive-font-gate.mjs" ;;
+  home-contacts) exec node "$VR_SCRIPT_DIR/drive-home-contacts.mjs" ;;
   *)
-    echo "FAIL: unknown feature '$feature'. Mapped drives: file-tree, reading-path, identity, screenshots, font-gate" >&2
+    echo "FAIL: unknown feature '$feature'. Mapped drives: file-tree, reading-path, identity, screenshots, font-gate, home-contacts" >&2
     echo "      Features documented but not yet driven are listed in references/README.md." >&2
     exit 1
     ;;

@@ -34,7 +34,7 @@ Canonical home of the site's visual identity (D1-D3, landed on bead `resume-soe.
 
 A page adopts the identity by reading these tokens in its own scoped CSS (ground on its outermost full-bleed container, `--id-font-*` on text). `BaseLayout`'s body ground, colour and font are still the legacy values, so unmigrated pages do not move.
 
-A page that owns its full viewport and its own home link passes `bare` to `BaseLayout`: head, tokens, font preload and gate stay; navbar, footer, `.site-shell` and the `main` wrapper are not rendered, and the page sets its own `html`/`body` ground. `/resume/` does this (D5: the face avatar is its home link).
+A page that owns its full viewport and its own home link passes `bare` to `BaseLayout`: head, tokens, font preload and gate stay; navbar, footer, `.site-shell` and the `main` wrapper are not rendered, and the page sets its own `html`/`body` ground. `/resume/` does this (D5: the face avatar is its home link), and so does `/` (D4: the composition owns 100svh and its four links are the home navigation).
 
 ## Font gate
 
@@ -46,6 +46,7 @@ Geometry that depends on Schibsted Grotesk's real metrics (the home composition'
 - **Neither class yet:** gated elements are `visibility: hidden`.
 - **No JS:** `<noscript>` reveals gated elements.
 - The font is preloaded on every page (`<link rel=preload as=font type=font/woff2 crossorigin>`), so the gate normally settles within one round trip.
+- `/` accepts the 3000 ms timeout (resume-soe.18): the woff2 is preloaded and ~47 KB, so the gate settles long before it on any working connection, and a longer timeout only lengthens the blank composition for the visitor whose font never comes. Its `fonts-failed` layout is contact-free (figure flush right behind the name on landscape; type only on narrow screens). Its links are not gated, so navigation works while the gate is pending.
 - The timeout has one source: the inline script sets `data-font-gate-timeout` (ms) on `<html>`, and the `font-gate` drive reads it from there.
 
 ## Legacy tokens (retiring)
@@ -54,7 +55,7 @@ These predate D1. They keep their values and stay in `tokens.css` while a live p
 
 | Legacy group | Tokens | Still read by |
 |---|---|---|
-| Site palette | `--base-100/200/300`, `--base-content`, `--muted-content`, `--primary(-focus/-content)`, `--success`, `--info`, `--content-bright`, `--tooltip-bg/-text`, tints `--surface-subtle`, `--border-subtle`, `--primary-tint`, `--info-tint` | `BaseLayout` chrome (navbar, footer, hero, body) and therefore `/`; `/factory/` (+ `/factory/a`, `/factory/b`; owned by bead `resume-t7j`); `/readme/` (`resume-soe.5`); `/projects/` (`ProjectCard`, `resume-soe.4`) |
+| Site palette | `--base-100/200/300`, `--base-content`, `--muted-content`, `--primary(-focus/-content)`, `--success`, `--info`, `--content-bright`, `--tooltip-bg/-text`, tints `--surface-subtle`, `--border-subtle`, `--primary-tint`, `--info-tint` | `BaseLayout` chrome (navbar, footer, body; `/` renders `bare`, without the chrome, and overrides the body ground); `/factory/` (+ `/factory/a`, `/factory/b`; owned by bead `resume-t7j`); `/readme/` (`resume-soe.5`); `/projects/` (`ProjectCard`, `resume-soe.4`) |
 | Legacy fonts | `--font-body` (system stack) | `BaseLayout` body, `/factory/b` |
 
 Deleted (no reader left): `--ghv-*` and `--font-mono`, when `/resume/` became the D5 explorer on `--id-*` (`resume-soe.3`).
@@ -95,13 +96,14 @@ Class names are part of the verification fingerprint (below). Renaming or adding
 Run from `.agents/skills/verify-resume` (details in its `SKILL.md`). Evidence dirs live at the repo root, so from that directory they are `../../../.verify-evidence/...`:
 
 ```
-scripts/launch && scripts/drive font-gate && scripts/drive file-tree && scripts/drive reading-path && scripts/drive identity && scripts/cleanup
+scripts/launch && scripts/drive font-gate && scripts/drive file-tree && scripts/drive reading-path && scripts/drive identity && scripts/drive home-contacts && scripts/cleanup
 scripts/launch && scripts/drive screenshots && scripts/cleanup
 scripts/compare ../../../.verify-evidence/screenshots-<baselineTs> ../../../.verify-evidence/screenshots-<afterTs>
 ```
 
 - `identity [route ...]` checks D1 on served routes (default `/resume/`): `html`, `body` and the outermost container on `#151513`, headings on the self-hosted face, and every hex in the page's CSS declared in `tokens.css`.
 - `font-gate` proves the font contract above in a real browser: preload and same-origin woff2, `fonts-ready` only after the face is loaded, gated elements hidden while the font is held, settled visible on abort and on timeout.
+- `home-contacts` proves the home composition on `/`: contacts 0-4px at seven sizes in Chrome and Firefox, no lime pixels around the shirt, no composition on fallback metrics, links reachable (verify-resume SKILL.md "Home-contacts drive").
 - `screenshots` captures full-page PNGs (1440 and 390 wide) and a computed-style fingerprint of every element for `/`, `/resume/`, `/readme/`, `/projects/`, `/factory/`. Capture a baseline on the unchanged tree before editing, then compare. A pure refactor must show zero diffs; every non-zero diff must be an intended change you can name. Pages you do not own must be zero. Not covered: hover/focus states, post-click JS states, `/factory/a` and `/factory/b` prototypes, and layout width (the fingerprint has no `width`/`max-width`; check the PNGs).
 - Always also run `npm run gate` (typecheck, build, projects verifier).
 

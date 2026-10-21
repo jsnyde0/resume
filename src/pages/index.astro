@@ -1,26 +1,287 @@
 ---
+// Home: F7 "Poster on black", mirrored (resume-soe.12 D4; built by resume-soe.18).
+// He stands on the right, mirrored, and reaches left: his fingertip touches the end of a tagline line in
+// the top-left corner, and his planted clog stands on the lime name along the foot of the screen. Both
+// contacts are solved in CSS from measured geometry (constants block in the style), in three branches:
+// wide (fingertip on "agent", clog on the d of "Snyders"), squarer landscape (clog on the final s) and
+// narrow/portrait (name stacks, clog on the final n of "Jonatan", fingertip on the pink "dread." block).
+// The contacts are only right on Schibsted Grotesk's real metrics, so the tagline, name and figure carry
+// data-font-gate (contract: docs/design-system.md "Font gate"); under html.fonts-failed the figure steps
+// back to a contact-free position. No site navbar/footer on this page: the composition owns the full
+// viewport and its links are the home navigation (BaseLayout `bare`).
+// Verified by .agents/skills/verify-resume `scripts/drive home-contacts`.
 import BaseLayout from '../layouts/BaseLayout.astro';
+const photo = '/img/jonatan_posing_rocks_hires_no_bg.png';
 ---
 
-<BaseLayout title="Jonatan Snyders' Resume">
-  <div id="home-content" class="home-content">
-    <div class="hero-grid">
-      <div class="hero-copy">
-        <h1>Jonatan Snyders</h1>
-        <p>From catwalks to startups, agent harnesses to existential dread.</p>
-        <div class="hero-actions">
-          <a href="/factory/" class="button button-primary">
-            what excites me
-            <svg fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-              <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-            </svg>
-          </a>
-          <a href="/resume/" class="button button-secondary">what bores me</a>
-        </div>
-      </div>
-      <div class="hero-image">
-        <img src="/img/jonatan_posing_rocks_no_bg.png" alt="Jonatan posing on rocks" width="600" height="600" />
-      </div>
+<BaseLayout title="Jonatan Snyders' Resume" bare>
+  <main class="field">
+    <div class="air">
+      <!-- Line breaks are set by hand: the fingertip is solved against the end of 'agent' (wide) or of 'dread.' (narrow).
+           The 'to' moves between lines 3 and 4 per layout; the copy not shown is display:none, so it is read once. -->
+      <p class="tagline" data-font-gate>
+        <span class="l1">From catwalks</span>
+        <span class="l2"><span class="seg">to startups,</span> <span class="seg">agent</span></span>
+        <span class="l3">harnesses<span class="wide-only"> to</span></span>
+        <span class="l4"><span class="narrow-only">to </span>existential</span>
+        <span class="l5"><mark>dread.</mark></span>
+      </p>
+
+      <nav class="links" aria-label="Site">
+        <ul class="primary">
+          <li><a href="/factory/">What excites me</a></li>
+          <li><a href="/resume/">What bores me</a></li>
+        </ul>
+        <ul class="secondary">
+          <li><a href="https://github.com/jsnyde0/" rel="me">GitHub</a></li>
+          <li><a href="https://www.linkedin.com/in/jonatan-snyders/" rel="me">LinkedIn</a></li>
+        </ul>
+      </nav>
     </div>
-  </div>
+
+    <h1 class="name" data-font-gate><span class="first">Jonatan</span> <span class="last">Snyders</span></h1>
+
+    <img
+      class="figure"
+      data-font-gate
+      src={photo}
+      alt="Jonatan mid-stride in a lime shirt, black cycling bibs and pink clogs, one arm reaching out."
+      width="595"
+      height="1041"
+      fetchpriority="high"
+    />
+  </main>
 </BaseLayout>
+
+<style is:global>
+  /* Only this page ships this block: the ground runs edge to edge, overscroll included. */
+  html, body { background: var(--id-ground); }
+</style>
+
+<style>
+  .field {
+    --pad: clamp(1rem, 2.4vw, 2.25rem);
+    --ease: cubic-bezier(0.25, 1, 0.5, 1);
+
+    position: relative;
+    min-height: 100svh;
+    overflow: clip;
+    display: grid;
+    grid-template-rows: 1fr auto;
+    margin: 0;
+    padding: var(--pad) var(--pad) 0;
+    background: var(--id-ground);
+    color: var(--id-paper);
+    font-family: var(--id-font-display);
+    font-optical-sizing: auto;
+    line-height: normal;
+  }
+
+  /* ── Geometry (landscape) ─────────────────────────────────────────
+     Name: Schibsted Grotesk 900, tracking -0.05em, one line, 7.895em wide (measured in Chrome).
+     He stands on one letter, its top --sy em above the bottom of the name block, its centre --sx em
+     from the left padding (after the name's -0.045em pull):
+       d ascender (wide screens):   centre 6.225, top 0.92
+       final s (MacBook-ish 3:2):   centre 7.61,  top 0.733   (further right = smaller figure; see below)
+     Photo (595 x 1041, shown mirrored; fractions are of the mirrored image): fingertip at x 0.1294,
+       y 0.2065; planted clog's contact patch centred at x 0.89. The bottom 1.3% is a near-black contact
+       shadow, tucked behind the letter.
+     Tagline: 800, tracking -0.035em, line-height 0.98. Line 2 ("to startups, agent") ink ends at 8.17em
+       (solved at 8.04 so the fingertip lands on the t); aim 1.45em below the tagline top (its x-height).
+     Two contacts, two unknowns (figure height H, tagline size t):
+       x:  8.04t        = sx*f - (0.89 - 0.1294) * 0.5716 H              = sx*f - 0.4348H
+       y:  pad + 1.45t  = 100svh - sy*f + 0.011H - (1 - 0.2065) H        = 100svh - sy*f - 0.7825H
+     Solved: H = (100svh - pad - k*f) / 0.7049 with k = sy + sx * 1.45/8.12;  t = (sx*f - 0.4348H) / 8.04.
+     H is capped so his head never leaves the screen; past the cap the fingertip slides lower within
+     line 2 (still on the t), which is why squarer screens switch to standing on the s. Nothing else
+     sits in the viewport on this page, so the solve runs on the full 100svh. */
+  .field {
+    --sx: 7.61;
+    --sy: 0.733;
+    --k: 2.0919;
+    /* Ultra-wide: cap the name by height so the figure keeps some size. */
+    --f: min(calc((100vw - 2 * var(--pad)) / 7.895), 22svh);
+    --fig-h: min(
+      calc((100svh - var(--pad) - var(--k) * var(--f)) / 0.7049),
+      calc((100svh - var(--pad) - var(--sy) * var(--f)) / 0.989),
+      1040px
+    );
+    --fig-w: calc(var(--fig-h) * 0.5716);
+    --t: calc((var(--sx) * var(--f) - 0.4348 * var(--fig-h)) / 8.04);
+  }
+  @media (min-aspect-ratio: 157/100) {
+    .field { --sx: 6.225; --sy: 0.92; --k: 2.0316; }
+  }
+
+  /* ── The air: tagline and links, top-left corner ─────── */
+  .air {
+    grid-row: 1;
+    align-self: start;
+    position: relative;
+    z-index: 3;
+  }
+
+  .tagline {
+    margin: 0 0 clamp(1rem, 2.4svh, 1.75rem);
+    font-size: var(--t);
+    font-weight: var(--id-weight-strong);
+    line-height: var(--id-leading-display);
+    letter-spacing: var(--id-tracking-display);
+  }
+  .tagline > span { display: block; white-space: nowrap; }
+
+  /* "dread." gets its own line: the pink block squares up with the column's left edge and clears the
+     line above (the block is taller than the 0.98 line). */
+  .tagline .l5 { margin-top: 0.07em; }
+  mark {
+    background: var(--id-pink);
+    color: var(--id-ink);
+    padding: 0 0.12em;
+  }
+
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-1) var(--space-10);
+  }
+  .links ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--space-6);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    color: var(--id-lime);
+    text-decoration: underline;
+    text-decoration-thickness: 0.12em;
+    text-underline-offset: 0.18em;
+    transition: background-color 160ms var(--ease), color 160ms var(--ease);
+  }
+  .primary a {
+    font-size: clamp(1.15rem, 1.5vw, 1.4rem);
+    font-weight: var(--id-weight-strong);
+    letter-spacing: var(--id-tracking-heading);
+  }
+  .secondary a {
+    font-size: var(--text-base);
+    font-weight: var(--id-weight-medium);
+    color: var(--id-paper);
+  }
+  .links a:hover {
+    background: var(--id-pink);
+    color: var(--id-ink);
+    text-decoration-color: transparent;
+  }
+  .links a:focus-visible {
+    outline: 3px solid var(--id-pink);
+    outline-offset: 3px;
+  }
+  .links a:active { background: var(--id-lime); color: var(--id-ink); }
+
+  /* ── The floor: the name, and him on it ──────────────── */
+  .name {
+    grid-row: 2;
+    position: relative;
+    z-index: 3;
+    margin: 0 0 0 -0.045em;
+    color: var(--id-lime);
+    font-weight: var(--id-weight-poster);
+    font-size: var(--f);
+    line-height: 1;
+    letter-spacing: var(--id-tracking-poster);
+    white-space: nowrap;
+    /* The y's descender (0.19em) just clears the screen edge. */
+    padding-bottom: 0.045em;
+  }
+
+  .figure {
+    position: absolute;
+    z-index: 2;
+    /* The bottom 1.3% of the cut-out is a near-black contact shadow under the sole; it tucks behind
+       the letter (the name sits above the figure) so the pink clog meets the lime with nothing between. */
+    bottom: calc(var(--sy) * var(--f) - 0.013 * var(--fig-h));
+    left: calc(var(--pad) + var(--sx) * var(--f) - 0.89 * var(--fig-w));
+    display: block;
+    height: var(--fig-h);
+    width: var(--fig-w);
+    max-width: none;
+    /* Mirrored: he stands right and reaches left. The box doesn't move; only the pixels flip. */
+    transform: scaleX(-1);
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .narrow-only { display: none; }
+
+  /* ── Narrow / portrait ─────────────────────────────────────────────
+     The name stacks on two lines at the foot and he stands on the final n of "Jonatan" (centre 3.54em
+     from the left padding, top 0.262em below the line box at line-height 0.9). The tagline is narrower
+     and runs six lines, short where his head is; his fingertip touches the pink "dread." block.
+       fingertip x = pad + 3.3t (right edge of the block);  y = pad + 5.46t (its middle)
+       sole on the n:  fingertip x + 0.4348H = pad + 3.54f   ->   H = (pad + 3.54f - fingertip x) / 0.4348
+     The name's top margin then drops the n to the sole: n top = fingertip y + 0.7805H.
+     Page height = pad - 0.464t + 7.99f + 6rem (links: up to two 44px rows + 0.5rem) + pad (bottom)
+                 = 2 pad + 7.858f + 6rem   with t = 0.29f, so f is capped to fit 100svh. */
+  @media (max-width: 760px), (max-aspect-ratio: 13/10) {
+    .field {
+      /* "Snyders" edge to edge, unless that would push the links below the fold (see the total above). */
+      --f: min(
+        calc((100vw - 2 * var(--pad)) / 3.95),
+        calc((100svh - 6rem - 2 * var(--pad)) / 7.858)
+      );
+      /* Tagline tied to the name so the column always clears his head (t/f = 0.29). */
+      --t: calc(0.29 * var(--f));
+      --fx: calc(var(--pad) + 3.3 * var(--t));
+      --fy: calc(var(--pad) + 5.46 * var(--t));
+      --fig-h: calc((var(--pad) + 3.54 * var(--f) - var(--fx)) / 0.4348);
+      grid-template-rows: auto auto auto;
+      align-content: start;
+      padding-bottom: var(--pad);
+    }
+    .air { display: contents; }
+    .tagline { grid-row: 1; margin: 0; }
+    .tagline .seg { display: block; }
+    .wide-only { display: none; }
+    .narrow-only { display: inline; }
+    .name {
+      grid-row: 2;
+      margin-top: calc(var(--fy) + 0.7805 * var(--fig-h) - 0.262 * var(--f) - var(--pad) - 5.95 * var(--t));
+      line-height: var(--id-leading-poster);
+      padding-bottom: 0.1em;
+    }
+    .name span { display: block; }
+    .links { grid-row: 3; margin-top: var(--space-2); gap: 0 var(--space-5); }
+    .links ul { gap: 0 var(--space-5); }
+    .primary a { font-size: 1.1rem; }
+    .figure {
+      top: calc(var(--fy) - 0.2065 * var(--fig-h));
+      bottom: auto;
+      left: calc(var(--fx) - 0.074 * var(--fig-h));
+    }
+  }
+
+  /* ── Font failed: contact-free ─────────────────────────────────────
+     On fallback metrics the solved contacts would land on the wrong glyph edges, so the figure leaves
+     them. Landscape: he stands flush right on the floor of the field, behind the name, his hand clear
+     of the tagline. Narrow: the column has no free space outside the solved geometry (he fills the gap
+     between tagline and name exactly), so the page settles as type only. */
+  :global(html.fonts-failed) .figure {
+    left: auto;
+    right: var(--pad);
+    top: auto;
+    bottom: 0;
+  }
+  @media (max-width: 760px), (max-aspect-ratio: 13/10) {
+    :global(html.fonts-failed) .figure { display: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .links a { transition: none; }
+  }
+</style>
