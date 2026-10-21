@@ -27,6 +27,10 @@ export const directions: Direction[] = [
   { key: 'f3', name: 'F2 · side by side', pitch: 'Name and figure never overlap: name stacked tall on one side, you full height on the other. Mobile resume: list, then tap into a file, back button.' },
   { key: 'f4', name: 'F2 · standing on the name', pitch: 'The name is the floor: your clogs stand on top of the letters. Mobile resume: compact accordion, files open inline.' },
   { key: 'f5', name: 'F2 · through the name', pitch: 'You stand centred, the name runs huge behind you at hip height, the body cuts through it. Mobile resume: sticky section tabs.' },
+  // Round 5 (2026-10-21, final): F3 layout, tagline at top, figure physically connected to tagline + name. Resume = F4 accordion in all.
+  { key: 'f6', name: 'F3 · touch', pitch: 'F3 tightened: your fingertip touches the tagline, your front clog lands on top of the name.' },
+  { key: 'f7', name: 'F3 · mirrored', pitch: 'Photo flipped: you stand right and reach left to the tagline in the top-left corner, standing on the name.' },
+  { key: 'f8', name: 'F3 · annotated', pitch: 'F3 plus thin lime leader lines: hand to tagline, clog to name.' },
 ];
 
 export type DirectionPage = 'home' | 'resume';

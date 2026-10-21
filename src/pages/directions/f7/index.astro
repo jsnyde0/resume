@@ -1,0 +1,290 @@
+---
+// PROTOTYPE (resume-soe.12) direction F7 "F3 · mirrored": homepage.
+// F2's identity (near-black field, shirt-lime name, clog-pink as the single hit), with the cut-out mirrored
+// (transform: scaleX(-1)) so he stands on the RIGHT and reaches LEFT. Two contacts, solved from measured
+// geometry so they hold at any landscape size (constants block in the style): his fingertip lands on the
+// end of a tagline line in the top-left corner ("agent"), and his planted clog stands on the lime name
+// along the foot of the screen (the d's ascender on wide screens, the final s on squarer ones). Narrow /
+// portrait: name stacks, he stands on the n of "Jonatan" and his fingertip touches the pink "dread." block.
+import DirectionSwitcher from '../../../components/directions/DirectionSwitcher.astro';
+const photo = '/img/jonatan_posing_rocks_hires_no_bg.png';
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="theme-color" content="#151513" />
+    <title>Jonatan Snyders</title>
+    <meta name="description" content="Jonatan Snyders. From catwalks to startups, agent harnesses to existential dread." />
+    <!-- SHORTCUT: Google Fonts link instead of self-hosted fonts. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400..900&display=swap"
+    />
+    <link rel="preload" as="image" href={photo} />
+  </head>
+  <body>
+    <main class="field">
+      <div class="air">
+        <!-- Line breaks are set by hand: the fingertip is solved against the end of 'agent' (wide) or of 'dread.' (narrow).
+             The 'to' moves between lines 3 and 4 per layout; the copy not shown is display:none, so it is read once. -->
+        <p class="tagline">
+          <span class="l1">From catwalks</span>
+          <span class="l2"><span class="seg">to startups,</span> <span class="seg">agent</span></span>
+          <span class="l3">harnesses<span class="wide-only"> to</span></span>
+          <span class="l4"><span class="narrow-only">to </span>existential</span>
+          <span class="l5"><mark>dread.</mark></span>
+        </p>
+
+        <nav class="links" aria-label="Site">
+          <ul class="primary">
+            <li><a href="/factory/">What excites me</a></li>
+            <li><a href="/directions/f7/resume/">What bores me</a></li>
+          </ul>
+          <ul class="secondary">
+            <li><a href="https://github.com/jsnyde0/" rel="me">GitHub</a></li>
+            <li><a href="https://www.linkedin.com/in/jonatan-snyders/" rel="me">LinkedIn</a></li>
+          </ul>
+        </nav>
+      </div>
+
+      <h1 class="name"><span class="first">Jonatan</span> <span class="last">Snyders</span></h1>
+
+      <img
+        class="figure"
+        src={photo}
+        alt="Jonatan mid-stride in a lime shirt, black cycling bibs and pink clogs, one arm reaching out."
+        width="595"
+        height="1041"
+        fetchpriority="high"
+      />
+    </main>
+
+    <DirectionSwitcher current="f7" page="home" />
+  </body>
+</html>
+
+<style is:global>
+  html { background: #151513; }
+  body { margin: 0; }
+</style>
+
+<style>
+  .field {
+    --ground: #151513;
+    --lime: #c8ec6c;
+    --pink: #f294cc;
+    --ink: #0b0b0a;
+    --paper: #efede4;
+    --pad: clamp(1rem, 2.4vw, 2.25rem);
+    --ease: cubic-bezier(0.25, 1, 0.5, 1);
+
+    position: relative;
+    box-sizing: border-box;
+    min-height: 100svh;
+    overflow: clip;
+    display: grid;
+    grid-template-rows: 1fr auto;
+    padding: var(--pad) var(--pad) 0;
+    background: var(--ground);
+    color: var(--paper);
+    font-family: 'Schibsted Grotesk', 'Helvetica Neue', Arial, sans-serif;
+    font-optical-sizing: auto;
+  }
+
+  /* ── Geometry (landscape) ─────────────────────────────────────────
+     Name: Schibsted Grotesk 900, tracking -0.05em, one line, 7.895em wide (measured in Chrome).
+     He stands on one letter, its top --sy em above the bottom of the name block, its centre --sx em
+     from the left padding (after the name's -0.045em pull):
+       d ascender (wide screens):   centre 6.225, top 0.92
+       final s (MacBook-ish 3:2):   centre 7.61,  top 0.733   (further right = smaller figure; see below)
+     Photo (595 x 1041, mirrored): fingertip at x 0.1294, y 0.2065; planted clog's contact patch centred
+       at x 0.89. The bottom 1.3% is a near-black contact shadow, tucked behind the letter.
+     Tagline: 800, tracking -0.035em, line-height 0.98. Line 2 ("to startups, agent") ink ends at 8.17em
+       (solved at 8.04 so the fingertip lands on the t); aim 1.45em below the tagline top (its x-height).
+     Two contacts, two unknowns (figure height H, tagline size t):
+       x:  8.04t        = sx*f - (0.89 - 0.1294) * 0.5716 H              = sx*f - 0.4348H
+       y:  pad + 1.45t  = 100svh - sy*f + 0.011H - (1 - 0.2065) H        = 100svh - sy*f - 0.7825H
+     Solved: H = (100svh - pad - k*f) / 0.7049 with k = sy + sx * 1.45/8.12;  t = (sx*f - 0.4348H) / 8.04.
+     H is capped so his head never leaves the screen; past the cap the fingertip slides lower within
+     line 2 (still on the t), which is why squarer screens switch to standing on the s. */
+  .field {
+    --sx: 7.61;
+    --sy: 0.733;
+    --k: 2.0919;
+    /* Ultra-wide: cap the name by height so the figure keeps some size. */
+    --f: min(calc((100vw - 2 * var(--pad)) / 7.895), 22svh);
+    --fig-h: min(
+      calc((100svh - var(--pad) - var(--k) * var(--f)) / 0.7049),
+      calc((100svh - var(--pad) - var(--sy) * var(--f)) / 0.989),
+      1040px
+    );
+    --fig-w: calc(var(--fig-h) * 0.5716);
+    --t: calc((var(--sx) * var(--f) - 0.4348 * var(--fig-h)) / 8.04);
+  }
+  @media (min-aspect-ratio: 157/100) {
+    .field { --sx: 6.225; --sy: 0.92; --k: 2.0316; }
+  }
+
+  /* ── The air: tagline and links, top-left corner ─────── */
+  .air {
+    grid-row: 1;
+    align-self: start;
+    position: relative;
+    z-index: 3;
+  }
+
+  .tagline {
+    margin: 0 0 clamp(1rem, 2.4svh, 1.75rem);
+    font-size: var(--t);
+    font-weight: 800;
+    line-height: 0.98;
+    letter-spacing: -0.035em;
+  }
+  .tagline > span { display: block; white-space: nowrap; }
+
+  /* "dread." gets its own line: the pink block squares up with the column's left edge and clears the
+     line above (the block is taller than the 0.98 line). */
+  .tagline .l5 { margin-top: 0.07em; }
+  mark {
+    background: var(--pink);
+    color: var(--ink);
+    padding: 0 0.12em;
+  }
+
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.25rem 2.5rem;
+  }
+  .links ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 1.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    color: var(--lime);
+    text-decoration: underline;
+    text-decoration-thickness: 0.12em;
+    text-underline-offset: 0.18em;
+    transition: background-color 160ms var(--ease), color 160ms var(--ease);
+  }
+  .primary a {
+    font-size: clamp(1.15rem, 1.5vw, 1.4rem);
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+  .secondary a {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--paper);
+  }
+  .links a:hover {
+    background: var(--pink);
+    color: var(--ink);
+    text-decoration-color: transparent;
+  }
+  .links a:focus-visible {
+    outline: 3px solid var(--pink);
+    outline-offset: 3px;
+  }
+  .links a:active { background: var(--lime); color: var(--ink); }
+
+  /* ── The floor: the name, and him on it ──────────────── */
+  .name {
+    grid-row: 2;
+    position: relative;
+    z-index: 3;
+    margin: 0 0 0 -0.045em;
+    color: var(--lime);
+    font-weight: 900;
+    font-size: var(--f);
+    line-height: 1;
+    letter-spacing: -0.05em;
+    white-space: nowrap;
+    /* The y's descender (0.19em) just clears the screen edge. */
+    padding-bottom: 0.045em;
+  }
+
+  .figure {
+    position: absolute;
+    z-index: 2;
+    /* The bottom 1.3% of the cut-out is a near-black contact shadow under the sole; it tucks behind
+       the letter (the name sits above the figure) so the pink clog meets the lime with nothing between. */
+    bottom: calc(var(--sy) * var(--f) - 0.013 * var(--fig-h));
+    left: calc(var(--pad) + var(--sx) * var(--f) - 0.89 * var(--fig-w));
+    display: block;
+    height: var(--fig-h);
+    width: var(--fig-w);
+    max-width: none;
+    /* Mirrored: he stands right and reaches left. The box doesn't move; only the pixels flip. */
+    transform: scaleX(-1);
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .narrow-only { display: none; }
+
+  /* ── Narrow / portrait ─────────────────────────────────────────────
+     The name stacks on two lines at the foot and he stands on the final n of "Jonatan" (centre 3.54em
+     from the left padding, top 0.262em below the line box at line-height 0.9). The tagline is narrower
+     and runs six lines, short where his head is; his fingertip touches the pink "dread." block.
+       fingertip x = pad + 3.3t (right edge of the block);  y = pad + 5.46t (its middle)
+       sole on the n:  fingertip x + 0.4348H = pad + 3.54f   ->   H = (pad + 3.54f - fingertip x) / 0.4348
+     The name's top margin then drops the n to the sole: n top = fingertip y + 0.7805H.
+     Page height = pad - 0.464t + 7.99f + 10.5rem (links + switcher clearance) = pad + 7.858f + 10.5rem
+     with t = 0.29f, so f is capped to fit 100svh. */
+  @media (max-width: 760px), (max-aspect-ratio: 13/10) {
+    .field {
+      /* "Snyders" edge to edge, unless that would push the links below the fold (see the total below). */
+      --f: min(
+        calc((100vw - 2 * var(--pad)) / 3.95),
+        calc((100svh - 10.5rem - var(--pad)) / 7.858)
+      );
+      /* Tagline tied to the name so the column always clears his head (t/f = 0.29). */
+      --t: calc(0.29 * var(--f));
+      --fx: calc(var(--pad) + 3.3 * var(--t));
+      --fy: calc(var(--pad) + 5.46 * var(--t));
+      --fig-h: calc((var(--pad) + 3.54 * var(--f) - var(--fx)) / 0.4348);
+      grid-template-rows: auto auto auto;
+      align-content: start;
+      padding-bottom: 4.5rem; /* clears the fixed prototype switcher */
+    }
+    .air { display: contents; }
+    .tagline { grid-row: 1; margin: 0; }
+    .tagline .seg { display: block; }
+    .wide-only { display: none; }
+    .narrow-only { display: inline; }
+    .name {
+      grid-row: 2;
+      margin-top: calc(var(--fy) + 0.7805 * var(--fig-h) - 0.262 * var(--f) - var(--pad) - 5.95 * var(--t));
+      line-height: 0.9;
+      padding-bottom: 0.1em;
+    }
+    .name span { display: block; }
+    .links { grid-row: 3; margin-top: 0.5rem; gap: 0 1.25rem; }
+    .links ul { gap: 0 1.25rem; }
+    .primary a { font-size: 1.1rem; }
+    .figure {
+      top: calc(var(--fy) - 0.2065 * var(--fig-h));
+      bottom: auto;
+      left: calc(var(--fx) - 0.074 * var(--fig-h));
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .links a { transition: none; }
+  }
+</style>

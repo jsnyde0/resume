@@ -1,0 +1,301 @@
+---
+// PROTOTYPE (resume-soe.12) direction F6 "F3 · touch": homepage.
+// F3's poster (near-black field, figure left, stacked shirt-lime name right, clog-pink as the single
+// hit), tightened until the body makes contact with the type: the fingertip of his outstretched hand
+// touches the F of the tagline, and the heel of his raised front clog lands on the flat top of the J.
+// No added marks; the contact is the whole idea. Every position derives from one unit (--u) plus
+// glyph/photo constants measured once, so the touches hold at any landscape size.
+import DirectionSwitcher from '../../../components/directions/DirectionSwitcher.astro';
+const photo = '/img/jonatan_posing_rocks_hires_no_bg.png';
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="theme-color" content="#151513" />
+    <title>Jonatan Snyders</title>
+    <meta name="description" content="Jonatan Snyders. From catwalks to startups, agent harnesses to existential dread." />
+    <!-- SHORTCUT: Google Fonts link instead of self-hosted fonts. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400..900&display=swap"
+    />
+    <link rel="preload" as="image" href={photo} />
+  </head>
+  <body>
+    <main class="field">
+      <div class="stage">
+        <div class="intro">
+          <p class="tagline">
+            From catwalks to startups, agent harnesses to existential <mark>dread.</mark>
+          </p>
+
+          <nav class="links" aria-label="Site">
+            <ul class="primary">
+              <li><a href="/factory/">What excites me</a></li>
+              <li><a href="/directions/f6/resume/">What bores me</a></li>
+            </ul>
+            <ul class="secondary">
+              <li><a href="https://github.com/jsnyde0/" rel="me">GitHub</a></li>
+              <li><a href="https://www.linkedin.com/in/jonatan-snyders/" rel="me">LinkedIn</a></li>
+            </ul>
+          </nav>
+        </div>
+
+        <h1 class="name">
+          <span>Jonatan</span>
+          <span>Snyders</span>
+        </h1>
+
+        <img
+          class="figure"
+          src={photo}
+          alt="Jonatan mid-stride in a lime shirt, black cycling bibs and pink clogs, one hand reaching out."
+          width="595"
+          height="1041"
+          fetchpriority="high"
+        />
+      </div>
+    </main>
+
+    <DirectionSwitcher current="f6" page="home" />
+  </body>
+</html>
+
+<style is:global>
+  html { background: #151513; }
+  body { margin: 0; }
+</style>
+
+<style>
+  .field {
+    --ground: #151513;
+    --lime: #c8ec6c;
+    --pink: #f294cc;
+    --ink: #0b0b0a;
+    --paper: #efede4;
+    --pad: clamp(1rem, 2.4vw, 2.25rem);
+    --ease: cubic-bezier(0.25, 1, 0.5, 1);
+
+    /* The cut-out (595 x 1041), measured from its alpha channel. */
+    --tip-x: 0.8706;   /* fingertip of the outstretched hand: x 518 */
+    --tip-y: 0.2051;   /* ...and y 213.5 */
+    --heel-x: 0.7798;  /* lowest point of the raised front clog (its heel): x 464 */
+    --heel-y: 0.9212;  /* ...and y 959 */
+
+    /* Schibsted Grotesk, measured with canvas measureText + a pixel scan, in em. */
+    --name-lh: 0.8;
+    --j-top: 1.7075;   /* flat top of the J, up from the bottom of the name box (line-height 0.8, padding 0.16em) */
+    --j-land: 0.17;    /* where the heel lands on the J's top bar (bar runs 0.085 to 0.575em) */
+    --f-lsb: 0.06;     /* the F's ink starts this far right of the tagline's origin */
+    --f-mid: 0.515;    /* middle of the F's cap height, down from the top of the tagline's first line (lh 1.02) */
+    /* By-eye nudge: the cut-out's edges are soft (alpha ramps over ~2px), so the maths lands a hair
+       short. Sink the heel and the fingertip this far into the type so the contact reads solid. */
+    --sink: 2px;
+
+    /* One unit drives the whole composition so the contacts survive any landscape size.
+       In --u: name 21, figure 66 tall; the stage is 1.7075 * 21 + 0.9212 * 66 = 96.66 tall
+       and about 108 wide (name ink right edge). */
+    --u: min((100svh - var(--pad)) / 96.66, (100vw - 2 * var(--pad)) / 109, 1040px / 66);
+    --fs: calc(var(--u) * 21);
+    --fig-h: calc(var(--u) * 66);
+    --fig-w: calc(var(--fig-h) * 0.5716);
+    --ts: calc(var(--u) * 5.4);
+
+    /* Derived contact points, in stage coordinates (stage top = top of the figure's box). */
+    --heel-px: calc(var(--fig-w) * var(--heel-x));
+    --tip-px: calc(var(--fig-w) * var(--tip-x));
+
+    box-sizing: border-box;
+    min-height: 100svh;
+    overflow: clip;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding: var(--pad) var(--pad) 0;
+    background: var(--ground);
+    color: var(--paper);
+    font-family: 'Schibsted Grotesk', 'Helvetica Neue', Arial, sans-serif;
+    font-optical-sizing: auto;
+  }
+
+  .stage {
+    position: relative;
+    flex: none;
+    width: calc(var(--u) * 109);
+    height: calc(var(--fs) * var(--j-top) + var(--fig-h) * var(--heel-y));
+  }
+
+  .figure {
+    position: absolute;
+    z-index: 2;
+    top: var(--sink);
+    left: 0;
+    display: block;
+    width: var(--fig-w);
+    height: var(--fig-h);
+    max-width: none;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  /* The heel lands on the J: the name's J-top sits exactly at the heel's height, and the name is
+     shifted so the heel meets the bar --j-land in from the J's origin. */
+  .name {
+    position: absolute;
+    left: calc(var(--heel-px) - var(--fs) * var(--j-land));
+    bottom: 0;
+    margin: 0;
+    color: var(--lime);
+    font-weight: 900;
+    font-size: var(--fs);
+    line-height: var(--name-lh);
+    letter-spacing: -0.055em;
+    white-space: nowrap;
+    padding-bottom: 0.16em; /* the y's descender */
+  }
+  .name span { display: block; }
+
+  /* The fingertip touches the F: the tagline's origin sits so the F's ink begins at the fingertip,
+     and its first line is centred on the fingertip's height. */
+  .intro {
+    position: absolute;
+    z-index: 1;
+    top: calc(var(--sink) + var(--fig-h) * var(--tip-y) - var(--ts) * var(--f-mid));
+    left: calc(var(--tip-px) - var(--ts) * var(--f-lsb) - var(--sink) / 2);
+  }
+
+  .tagline {
+    margin: 0 0 calc(var(--u) * 2.2);
+    max-width: calc(var(--u) * 70);
+    font-size: var(--ts);
+    font-weight: 800;
+    line-height: 1.02;
+    letter-spacing: -0.03em;
+    text-wrap: balance;
+  }
+
+  mark {
+    background: var(--pink);
+    color: var(--ink);
+    padding: 0 0.12em;
+    margin: 0 -0.04em;
+  }
+
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.25rem 2.5rem;
+  }
+  .links ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 1.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    color: var(--lime);
+    text-decoration: underline;
+    text-decoration-thickness: 0.12em;
+    text-underline-offset: 0.18em;
+    transition: background-color 160ms var(--ease), color 160ms var(--ease);
+  }
+  .primary a {
+    font-size: clamp(1.15rem, 1.5vw, 1.4rem);
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+  .secondary a {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--paper);
+  }
+  .links a:hover {
+    background: var(--pink);
+    color: var(--ink);
+    text-decoration-color: transparent;
+  }
+  .links a:focus-visible {
+    outline: 3px solid var(--pink);
+    outline-offset: 3px;
+  }
+  .links a:active { background: var(--lime); color: var(--ink); }
+
+  /* Portrait and narrow screens. A full-width name is the only way to keep it poster-sized, so the
+     stride changes feet: as in F4, the BACK clog's flat sole stands on the J's top bar (the sole and
+     the bar are nearly the same width). The touch survives: the tagline becomes a narrow column to
+     the right of his head, and his fingertip still meets its F. The links drop below the name. */
+  @media (max-width: 760px), (max-aspect-ratio: 1/1) {
+    .field {
+      --f: calc((100vw - 2 * var(--pad)) / 3.95); /* "Snyders", the wider word, edge to edge */
+      --ts: clamp(1.25rem, 5.4vw, 2.25rem);
+      --col: 9.5rem; /* narrowest tagline column we accept beside him */
+      /* The figure is as tall as the height allows, but never so wide that the tagline column
+         beside the fingertip drops under --col. 0.7446 = fingertip x - back-sole centre, in figure widths. */
+      --fig-h: max(300px, min(
+        100svh - var(--pad) - var(--f) * 1.84 - 7rem - 4.5rem,
+        (100vw - 2 * var(--pad) - var(--f) * 0.33 - var(--col)) / 0.7446 / 0.5716,
+        1040px
+      ));
+      --sole-x: 0.126; /* back clog's flat sole runs x 20 to 130: centre */
+      --sole-y: 0.995; /* ...and is flat along y 1036 (1038 at its lowest pixel) */
+      --sink: 4px;     /* by eye: the sole's bottom edge is a soft dark shadow, so plant it a little deeper */
+      --fig-left: calc(var(--f) * 0.33 - var(--fig-w) * var(--sole-x)); /* sole centre over the bar centre */
+      align-items: center;
+      padding-bottom: 4.5rem; /* clears the fixed prototype switcher */
+    }
+    .stage {
+      width: 100%;
+      height: auto;
+      /* Figure + name are positioned; this reserves their height so the links can flow below. */
+      padding-top: calc(var(--fig-h) * var(--sole-y) - var(--sink) + var(--f) * 1.7575);
+    }
+    .figure {
+      top: 0;
+      left: var(--fig-left);
+    }
+    .name {
+      /* The J's flat top is 0.0825em under the line box top (line-height 0.86); put it at the sole. */
+      top: calc(var(--fig-h) * var(--sole-y) - var(--sink) - var(--f) * 0.0825);
+      bottom: auto;
+      left: 0;
+      font-size: var(--f);
+      line-height: 0.86;
+      letter-spacing: -0.05em;
+      padding-bottom: 0.12em;
+    }
+    .intro { display: contents; }
+    .tagline {
+      position: absolute;
+      z-index: 1;
+      top: calc(var(--fig-h) * var(--tip-y) - var(--ts) * var(--f-mid));
+      left: calc(var(--fig-left) + var(--tip-px) - var(--ts) * var(--f-lsb) - var(--sink) / 2);
+      right: 0;
+      max-width: none;
+      margin: 0;
+      font-size: var(--ts);
+      line-height: 1.02;
+    }
+    .links {
+      margin-top: clamp(1rem, 4vw, 1.75rem);
+      gap: 0 1.5rem;
+    }
+    .links ul { gap: 0 1.25rem; }
+    .primary a { font-size: 1.15rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .links a { transition: none; }
+  }
+</style>

@@ -1,0 +1,335 @@
+---
+// PROTOTYPE (resume-soe.12) direction F8 "F3 · annotated": homepage.
+// F3's layout (full-height figure left, stacked lime name right, tagline at the top of the right
+// column) with the picture tied to the words by two thin lime leader lines, drawn like annotations on
+// a technical drawing: one runs level from his outstretched fingertip into the last line of the
+// tagline, one runs level from the toe of his front clog into the S of "Snyders". Every line end is
+// computed from the same layout variables that size the figure and the type, so they stay anchored
+// at any desktop size. Mobile drops the lines and stacks like F4 (he stands on the name).
+import DirectionSwitcher from '../../../components/directions/DirectionSwitcher.astro';
+const photo = '/img/jonatan_posing_rocks_hires_no_bg.png';
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="theme-color" content="#151513" />
+    <title>Jonatan Snyders</title>
+    <meta name="description" content="Jonatan Snyders. From catwalks to startups, agent harnesses to existential dread." />
+    <!-- SHORTCUT: Google Fonts link instead of self-hosted fonts. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400..900&display=swap"
+    />
+    <link rel="preload" as="image" href={photo} />
+  </head>
+  <body>
+    <main class="field">
+      <div class="intro">
+        <p class="tagline">
+          <span>From catwalks to</span>
+          <span>startups, agent</span>
+          <span>harnesses to</span>
+          <span>existential <mark>dread.</mark></span>
+        </p>
+
+        <nav class="links" aria-label="Site">
+          <ul class="primary">
+            <li><a href="/factory/">What excites me</a></li>
+            <li><a href="/directions/f8/resume/">What bores me</a></li>
+          </ul>
+          <ul class="secondary">
+            <li><a href="https://github.com/jsnyde0/" rel="me">GitHub</a></li>
+            <li><a href="https://www.linkedin.com/in/jonatan-snyders/" rel="me">LinkedIn</a></li>
+          </ul>
+        </nav>
+      </div>
+
+      <h1 class="name">
+        <span>Jonatan</span>
+        <span>Snyders</span>
+      </h1>
+
+      <img
+        class="figure"
+        src={photo}
+        alt="Jonatan mid-stride in a lime shirt, black cycling bibs and pink clogs."
+        width="595"
+        height="1041"
+        fetchpriority="high"
+      />
+
+      <span class="lead lead--hand" aria-hidden="true"></span>
+      <span class="lead lead--foot" aria-hidden="true"></span>
+    </main>
+
+    <DirectionSwitcher current="f8" page="home" />
+  </body>
+</html>
+
+<style is:global>
+  html { background: #151513; }
+  body { margin: 0; }
+</style>
+
+<style>
+  .field {
+    --ground: #151513;
+    --lime: #c8ec6c;
+    --pink: #f294cc;
+    --ink: #0b0b0a;
+    --paper: #efede4;
+    --pad: clamp(1rem, 2.4vw, 2.25rem);
+    --ease: cubic-bezier(0.16, 1, 0.3, 1); /* ease-out-expo */
+    --rule: 2px;
+
+    /* ── The figure ── as tall as the screen allows (crisp up to its native 1041px). The cut-out is
+       595 x 1041 (aspect 0.5716). It stands with its back clog on the baseline of "Snyders", so the
+       image is lifted by --floor and is --img-h tall. */
+    /* Above 1040px it upscales: capped at 1.2x so tall screens keep the hand high enough for the
+       tagline to stay at the top (SHORTCUT: slightly soft above 1040px on 1x screens). */
+    --fig-h: min(calc(100svh - var(--pad)), 1250px);
+    --gap: clamp(1.5rem, 4.5vw, 5rem);
+    /* 3.86 = width of "Jonatan" in em at this weight and tracking (measured in F3). */
+    --fs: min(
+      calc((100vw - var(--fig-h) * 0.5716 - var(--gap) - 2 * var(--pad)) / 3.86),
+      calc((100svh - 17rem) / 1.62),
+      /* The name (1.81em tall) must fit under the hand, the tagline's last line and the links.
+         Uses the fingertip height without --floor, which depends on --fs. */
+      calc((var(--fig-h) * (1 - 0.2056) - 7rem) / 1.81),
+      26rem
+    );
+    --floor: calc(var(--fs) * 0.25);
+    --img-h: calc(var(--fig-h) - var(--floor));
+    --img-w: calc(var(--img-h) * 0.5716);
+    /* Left edge of the type column. */
+    --col: calc(var(--pad) + var(--img-w) + var(--gap));
+
+    /* ── Contact points on the cut-out, measured from its alpha channel (px / 595, px / 1041) ──
+       fingertip of the outstretched hand: (518.5, 214); toe of the front clog: (592.5, 879). */
+    --hand-x: 0.8714;
+    --hand-y: 0.2056;
+    --toe-x: 0.9958;
+    --toe-y: 0.8444;
+    /* Fingertip height, from the top of the field. The figure's top sits at 100svh - fig-h. */
+    --hand-top: calc(100svh - var(--fig-h) + var(--img-h) * var(--hand-y));
+    /* Toe height, from the bottom of the field (the figure is bottom-anchored, so this is exact). */
+    --toe-bottom: calc(var(--floor) + var(--img-h) * (1 - var(--toe-y)));
+
+    /* ── The tagline ── four set lines. The hand's leader enters the last one at the middle of its
+       x-height: 3 line boxes down, plus --tag-xmid (baseline minus half the x-height, in em of the
+       tagline, measured in Chrome). Its size is capped so that line can always reach the hand. */
+    --tag-lh: 1.02;
+    --tag-xmid: 0.605;
+    --tag-fs: clamp(
+      1.5rem,
+      min(2.7vw, 4.6svh, (var(--hand-top) - var(--pad)) / (3 * var(--tag-lh) + var(--tag-xmid))),
+      3.1rem
+    );
+
+    position: relative;
+    box-sizing: border-box;
+    min-height: 100svh;
+    overflow: clip;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-rows: auto 1fr auto;
+    column-gap: var(--gap);
+    padding: var(--pad) var(--pad) 0;
+    background: var(--ground);
+    color: var(--paper);
+    font-family: 'Schibsted Grotesk', 'Helvetica Neue', Arial, sans-serif;
+    font-optical-sizing: auto;
+  }
+
+  .figure {
+    position: relative;
+    z-index: 2;
+    grid-column: 1;
+    grid-row: 1 / -1;
+    align-self: end;
+    display: block;
+    height: var(--img-h);
+    width: auto;
+    max-width: none;
+    margin-bottom: var(--floor);
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .name {
+    grid-column: 2;
+    grid-row: 3;
+    align-self: end;
+    margin: 0 0 0 -0.045em;
+    color: var(--lime);
+    font-weight: 900;
+    font-size: var(--fs);
+    line-height: 0.8;
+    letter-spacing: -0.055em;
+    /* Room for the y's descender below the shared floor. */
+    padding-bottom: 0.21em;
+  }
+  .name span { display: block; }
+
+  .intro {
+    position: relative;
+    z-index: 3;
+    grid-column: 2;
+    grid-row: 1;
+    /* Drop the tagline until the middle of its last line is level with the fingertip. */
+    padding-top: max(
+      0px,
+      var(--hand-top) - var(--pad) - var(--tag-fs) * (3 * var(--tag-lh) + var(--tag-xmid))
+    );
+    margin-bottom: 2rem;
+  }
+
+  .tagline {
+    margin: 0 0 clamp(1rem, 2vw, 1.5rem);
+    font-size: var(--tag-fs);
+    font-weight: 800;
+    line-height: var(--tag-lh);
+    letter-spacing: -0.03em;
+  }
+  .tagline > span { display: block; white-space: nowrap; }
+
+  mark {
+    background: var(--pink);
+    color: var(--ink);
+    padding: 0 0.12em;
+    margin: 0 -0.04em;
+  }
+
+  /* ── Leader lines ── level rules, drawn under the figure so each starts hidden inside the
+     fingertip / clog and reads as growing out of it. */
+  .lead {
+    position: absolute;
+    z-index: 1;
+    height: var(--rule);
+    background: var(--lime);
+    transform-origin: left center;
+    animation: draw 900ms var(--ease) 250ms both;
+    pointer-events: none;
+  }
+  .lead--hand {
+    /* From 6px inside the fingertip to the ink edge of the e of "existential" (side bearing 0.03em). */
+    left: calc(var(--pad) + var(--img-w) * var(--hand-x) - 6px);
+    width: calc(var(--col) + var(--tag-fs) * 0.03 - var(--pad) - var(--img-w) * var(--hand-x) + 6px);
+    top: calc(var(--hand-top) - var(--rule) / 2);
+  }
+  .lead--foot {
+    /* From 6px inside the toe into the S's left stroke, where lime meets lime and the join vanishes. */
+    left: calc(var(--pad) + var(--img-w) * var(--toe-x) - 6px);
+    width: calc(var(--col) + var(--fs) * 0.08 - var(--pad) - var(--img-w) * var(--toe-x) + 6px);
+    bottom: calc(var(--toe-bottom) - var(--rule) / 2);
+  }
+  @keyframes draw {
+    from { transform: scaleX(0); }
+    to { transform: scaleX(1); }
+  }
+
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.25rem 2.5rem;
+  }
+  .links ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 1.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    color: var(--lime);
+    text-decoration: underline;
+    text-decoration-thickness: 0.12em;
+    text-underline-offset: 0.18em;
+    transition: background-color 160ms var(--ease), color 160ms var(--ease);
+  }
+  .primary a {
+    font-size: clamp(1.15rem, 1.5vw, 1.4rem);
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+  .secondary a {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--paper);
+  }
+  .links a:hover {
+    background: var(--pink);
+    color: var(--ink);
+    text-decoration-color: transparent;
+  }
+  .links a:focus-visible {
+    outline: 3px solid var(--pink);
+    outline-offset: 3px;
+  }
+  .links a:active { background: var(--lime); color: var(--ink); }
+
+  /* Portrait and narrow screens: no room for two columns, and level leaders across a stacked layout
+     would have to cross the links, so the lines go. The page stacks as F4 does on mobile: tagline and
+     links at the top, then the figure standing with his back clog on the flat top of the J. */
+  @media (max-width: 760px), (max-aspect-ratio: 1/1) {
+    .field {
+      /* "Snyders", the wider word, edge to edge (F4's measurement at -0.05em tracking). */
+      --f: calc((100vw - 2 * var(--pad)) / 3.95);
+      --mfig-h: clamp(300px, 100svh - 4.5rem - var(--f) * 1.86 - 14.5rem, 1040px);
+      --mfig-w: calc(var(--mfig-h) * 0.5716);
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-rows: auto 1fr auto;
+      padding-bottom: 4.5rem; /* clears the fixed prototype switcher */
+    }
+    .lead { display: none; }
+    .intro {
+      grid-column: 1;
+      grid-row: 1;
+      padding: 0 0 1rem;
+      margin: 0;
+    }
+    .tagline {
+      margin-bottom: 0.5rem;
+      font-size: clamp(1.6rem, 7.4vw, 2.4rem);
+      line-height: 1;
+    }
+    .links { gap: 0 1.25rem; }
+    .links ul { gap: 0 1.25rem; }
+    .primary a { font-size: 1.1rem; }
+    .figure {
+      grid-column: 1;
+      grid-row: 2;
+      align-self: end;
+      justify-self: start;
+      height: var(--mfig-h);
+      width: var(--mfig-w);
+      /* Centre of the back sole (x 0.126) over the centre of the J; the J's flat top is 0.12em below
+         its line box top, and the sole has a 0.003 transparent strip under it (F4's measurements). */
+      margin: 0 0 calc(0.003 * var(--mfig-h) - var(--f) * 0.12) calc(var(--f) * 0.245 - 0.126 * var(--mfig-w));
+    }
+    .name {
+      grid-column: 1;
+      grid-row: 3;
+      font-size: var(--f);
+      line-height: 0.86;
+      letter-spacing: -0.05em;
+      padding-bottom: 0.12em;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .links a { transition: none; }
+    .lead { animation: none; }
+  }
+</style>
