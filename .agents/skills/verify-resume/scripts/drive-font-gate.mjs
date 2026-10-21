@@ -35,8 +35,8 @@ if (!ENGINE || !URL_BASE || !EVIDENCE) {
   process.exit(1);
 }
 
-// Must match GATE_TIMEOUT_MS in src/layouts/BaseLayout.astro (documented in docs/design-system.md).
-const GATE_TIMEOUT_MS = 3000;
+// Single source: BaseLayout exposes its timeout as html[data-font-gate-timeout]; read in scenario (b).
+let GATE_TIMEOUT_MS = NaN;
 const SLACK_MS = 1000;
 const HOLD_MS = 2000;
 
@@ -67,6 +67,12 @@ const INIT = `(() => {
   probe.textContent = 'probe';
   probe.style.cssText = 'position:fixed;top:0;left:0;z-index:9999';
   h.appendChild(probe);
+  // Control: same injection, NOT opted in. The gate must never touch it.
+  const plain = document.createElement('div');
+  plain.id = '__fg_plain';
+  plain.textContent = 'plain';
+  plain.style.cssText = 'position:fixed;top:0;left:60px;z-index:9999';
+  h.appendChild(plain);
   new MutationObserver(() => {
     fg.classLog.push({ t: performance.now() - fg.t0, cls: h.className, faces: status() });
   }).observe(h, { attributes: true, attributeFilter: ['class'] });
@@ -77,6 +83,7 @@ const INIT = `(() => {
       t: performance.now() - fg.t0,
       rs: document.readyState,
       vis: getComputedStyle(probe).visibility,
+      plain: getComputedStyle(plain).visibility,
       ready: cls.includes('fonts-ready'),
       failed: cls.includes('fonts-failed'),
     });
@@ -93,7 +100,7 @@ const INIT = `(() => {
 const SNAP = `(() => {
   const h = document.documentElement;
   const probe = document.getElementById('__fg_probe');
-  const text = document.querySelector('.brand span');
+  const text = document.getElementById('__fg_plain');
   return {
     cls: h.className,
     probeVis: probe ? getComputedStyle(probe).visibility : null,
@@ -169,6 +176,10 @@ try {
       };
     });
     const snap = await page.evaluate(SNAP);
+    const attrTimeout = await page.evaluate(() => document.documentElement.getAttribute("data-font-gate-timeout"));
+    GATE_TIMEOUT_MS = Number(attrTimeout);
+    check("b0", Number.isFinite(GATE_TIMEOUT_MS) && GATE_TIMEOUT_MS > 0,
+      `BaseLayout exposes the gate timeout as html[data-font-gate-timeout] (got ${JSON.stringify(attrTimeout)})`, attrTimeout);
     scenarios.normal = { ...r, snap };
     check("b1", r.check900 === true && snap.faces.length > 0 && snap.faces.every((s) => s === "loaded"),
       `after fonts.ready, check('900 1em "Schibsted Grotesk"') is true and the face status is loaded (got ${JSON.stringify({ check900: r.check900, faces: snap.faces })})`, scenarios.normal);
@@ -201,7 +212,8 @@ try {
     const fg = await page.evaluate(() => window.__fg);
     scenarios.held = { mid, after, requestedAt, releasedAt, samples: fg.samples.length, classLog: fg.classLog };
 
-    const parsed = fg.samples.filter((s) => s.rs !== "loading" && !s.ready && !s.failed);
+    // Every unsettled sample counts, readyState "loading" included: a loading-state frame is still a frame.
+    const parsed = fg.samples.filter((s) => !s.ready && !s.failed);
     const leaked = parsed.filter((s) => s.vis !== "hidden");
     const readyEntry = fg.classLog.find((e) => /fonts-ready/.test(e.cls));
     check("c0", !!held && requestedAt && releasedAt && releasedAt - requestedAt >= HOLD_MS - 50,
@@ -210,8 +222,9 @@ try {
       `mid-hold the gated probe is hidden and html has neither fonts-ready nor fonts-failed (got ${JSON.stringify(mid)})`, mid);
     check("c2", parsed.length > 0 && leaked.length === 0,
       `every per-frame sample after parse and before settle shows the probe hidden (${parsed.length} samples, ${leaked.length} visible)`, { parsed: parsed.length, leaked: leaked.slice(0, 3) });
+    scenarios.held.sampleList = fg.samples;
     check("c3", mid.nonGatedVis === "visible",
-      `non-gated content (.brand span) is visible at the same moment: the gate hides only opted-in elements (got ${mid.nonGatedVis})`, mid.nonGatedVis);
+      `a non-gated control element injected the same way is visible at the same moment: the gate hides only opted-in elements (got ${mid.nonGatedVis})`, mid.nonGatedVis);
     check("c4", !!readyEntry && readyEntry.faces.length > 0 && readyEntry.faces.every((s) => s === "loaded"),
       `at the instant fonts-ready was added, every Schibsted face status was loaded (got ${JSON.stringify(readyEntry ?? null)})`, readyEntry ?? null);
     check("c5", after.probeVis === "visible" && /\bfonts-ready\b/.test(after.cls),

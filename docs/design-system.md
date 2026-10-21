@@ -5,7 +5,7 @@ Canonical home of the site's visual identity (D1-D3, landed on bead `resume-soe.
 ## Identity rules (D1-D3, binding)
 
 **D1 - "Poster, on black."**
-- Palette, by role (tokens in the next section): near-black ground; off-white body type; brand **lime** for the name, headings, rules and links; brand **pink** as the *single hit colour* (emphasis block, the open/selected item, hover); **ink** for type set on lime or pink. `lime-dim` and `paper-2` are the quiet derived neutrals (rest-state UI, counts and meta).
+- Palette, by role (tokens in the next section): near-black ground; off-white body type; brand **lime** and **pink** go on type, rules, marks and UI (never as a field behind the figure, D3); with pink the *single hit colour* (emphasis block, the open/selected item, hover); **ink** for type set on lime or pink. `lime-dim` and `paper-2` are the quiet derived neutrals (rest-state UI, counts and meta).
 - One type family: **Schibsted Grotesk**, weights 400-900. Heavy weights (800-900) at poster scale with tight tracking for the name, tagline and headings; 400-500 for running text.
 - Swiss-poster discipline: few elements, enormous scale contrast, no ornament. Every value comes from a token; a new colour needs a role in D1 before it ships.
 
@@ -19,7 +19,7 @@ Canonical home of the site's visual identity (D1-D3, landed on bead `resume-soe.
 ## Where things live
 
 - **Tokens:** `src/styles/tokens.css` (one `:root` block plus the `@font-face`). Imported once by `src/layouts/BaseLayout.astro`, so every page receives them. Edit tokens only there.
-- **Font file:** `public/fonts/schibsted-grotesk-latin-wght.woff2` (variable, latin subset, OFL licence beside it as `OFL.txt`). Self-hosted so the build is offline-deterministic; no `fonts.googleapis`/`fonts.gstatic` reference anywhere.
+- **Font file:** `public/fonts/schibsted-grotesk-latin-wght.woff2` (variable, latin subset, OFL licence beside it as `OFL.txt`). Self-hosted so the build is offline-deterministic; no `fonts.googleapis`/`fonts.gstatic` reference on any live page. Exception: the `/directions/` prototypes still link Google Fonts until they are deleted (resume-soe.20).
 - **Global chrome** (navbar, footer, `.button`, hero, `.site-shell`, `.content-container`): `<style is:global>` in `BaseLayout.astro`. It still reads legacy tokens and is migrated page by page (see below).
 - **Page and component CSS:** scoped `<style>` in each `.astro` file, consuming tokens via `var(--name)`.
 
@@ -40,11 +40,11 @@ Geometry that depends on Schibsted Grotesk's real metrics (the home composition'
 
 - **Opt in:** put `data-font-gate` on any element that must not show before the face is ready. Non-gated content is unaffected.
 - **`html.fonts-ready`:** `document.fonts.load()` resolved with a loaded face for both `400` and `900` (the weights the identity uses). Gated elements are visible, on real metrics.
-- **`html.fonts-failed`:** the load rejected, no face was declared by `window.load`, or `GATE_TIMEOUT_MS` (3000 ms, in the inline script) passed first. Gated elements are visible; a page styles its contact-free fallback under `html.fonts-failed`. First verdict wins and is never revised.
+- **`html.fonts-failed`:** the load rejected, no face was declared by `window.load`, or `GATE_TIMEOUT_MS` (3000 ms, in the inline script) passed first. Gated elements are visible; a page styles its contact-free fallback under `html.fonts-failed`. First verdict wins and is never revised. Trade-off: a font that arrives after the timeout leaves that visit in the `fonts-failed` state (fallback metrics) for its whole life; the page does not switch back. Pages that need the real metrics (the home composition) decide whether that is acceptable or whether to extend the timeout.
 - **Neither class yet:** gated elements are `visibility: hidden`.
 - **No JS:** `<noscript>` reveals gated elements.
 - The font is preloaded on every page (`<link rel=preload as=font type=font/woff2 crossorigin>`), so the gate normally settles within one round trip.
-- Changing the timeout means changing `GATE_TIMEOUT_MS` in `.agents/skills/verify-resume/scripts/drive-font-gate.mjs` too.
+- The timeout has one source: the inline script sets `data-font-gate-timeout` (ms) on `<html>`, and the `font-gate` drive reads it from there.
 
 ## Legacy tokens (retiring)
 
