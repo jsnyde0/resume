@@ -29,6 +29,48 @@ const canonicalUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).toStri
     {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
     <link rel="icon" type="image/png" href="/img/avatar_jonatan_tongue.png" />
     <title>{title}</title>
+    <!-- Display font (Schibsted Grotesk, self-hosted; @font-face in tokens.css). Preloaded on every page
+         so the gate below settles fast. Pages opt in to the gate with [data-font-gate]. -->
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/schibsted-grotesk-latin-wght.woff2" crossorigin />
+    <!-- Font gate. Contract (docs/design-system.md): html gets `fonts-ready` once document.fonts.load()
+         has resolved the exact weights the identity uses (400 body, 900 poster; one variable file) to
+         a loaded face, or `fonts-failed` if the load rejects, no face is declared by `load`, or GATE_TIMEOUT_MS passes first. First
+         verdict wins and is never revised. If you change the timeout, change GATE_TIMEOUT_MS in
+         .agents/skills/verify-resume/scripts/drive-font-gate.mjs too. -->
+    <script is:inline>
+      (function () {
+        var GATE_TIMEOUT_MS = 3000;
+        var html = document.documentElement;
+        var settled = false;
+        function settle(cls) {
+          if (settled) return;
+          settled = true;
+          html.classList.add(cls);
+        }
+        setTimeout(function () { settle('fonts-failed'); }, GATE_TIMEOUT_MS);
+        if (!document.fonts || !document.fonts.load) { settle('fonts-failed'); return; }
+        // The @font-face rule lives in a stylesheet that may be parsed after this script, and
+        // load() on a not-yet-declared family resolves to []. So try now, again once the document
+        // is parsed, and once more at `load`; an empty result only counts as failure at `load`.
+        function attempt(final) {
+          Promise.all([
+            document.fonts.load('400 1em "Schibsted Grotesk"'),
+            document.fonts.load('900 1em "Schibsted Grotesk"')
+          ]).then(function (faces) {
+            if (faces[0].length && faces[1].length) settle('fonts-ready');
+            else if (final) settle('fonts-failed');
+          }, function () { settle('fonts-failed'); });
+        }
+        attempt(false);
+        document.addEventListener('DOMContentLoaded', function () { attempt(false); });
+        window.addEventListener('load', function () { attempt(true); });
+      })();
+    </script>
+    <style is:global>
+      /* Font gate: opted-in elements stay hidden until the face is loaded or the gate gives up. */
+      html:not(.fonts-ready):not(.fonts-failed) [data-font-gate] { visibility: hidden; }
+    </style>
+    <noscript><style>html [data-font-gate] { visibility: visible !important; }</style></noscript>
     <style is:global>
       * { box-sizing: border-box; }
 

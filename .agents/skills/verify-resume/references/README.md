@@ -10,6 +10,7 @@ Seeded 2026-09-05 by `/verify scaffold` with the top five. This is a map, not an
 | [Resume file-tree browser](resume-file-tree.md) | `/resume/` | **yes** — `scripts/drive file-tree` |
 | [Download-PDF joke](download-pdf-joke.md) | `/resume/` | not yet |
 | [Projects list](projects-list.md) | `/projects/` | covered statically by `npm run test:projects` |
+| Font gate (shared layer; no feature file, contract in `docs/design-system.md`) | `/` (any page) | **yes** — `scripts/drive font-gate` |
 | [Factory orbit graph](factory-orbit-graph.md) | `/factory/` | **not yet — highest-value gap** (filed: `dotpi-9a81`) |
 
 **Cross-cutting: visual and computed-style baseline.** `scripts/drive screenshots` covers every route above at 1440px and 390px (full-page PNG plus a computed-style fingerprint per page and viewport), and `scripts/compare <baselineDir> <afterDir>` diffs two runs. It is a before/after gate for refactors, not a behaviour drive: it sees pages standing still. See SKILL.md "Screenshots drive".

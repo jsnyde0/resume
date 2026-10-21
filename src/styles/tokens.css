@@ -1,11 +1,62 @@
 /*
  * Design tokens: the single source of truth for the site's visual values.
  * Imported once by src/layouts/BaseLayout.astro. Documented in docs/design-system.md.
- * Additive-only rule: never rename or change an existing token (/factory consumes them).
+ * Two families live here: the D1 identity (--id-*, canonical) and the legacy site palette +
+ * --ghv-* (read only by pages not yet migrated). Legacy tokens keep their values until their
+ * last reader migrates, then are deleted. See docs/design-system.md.
  */
+
+/* Schibsted Grotesk, self-hosted (OFL, public/fonts/OFL.txt). One variable file, wght 400-900,
+ * latin subset (same unicode-range Google serves). BaseLayout preloads this exact URL. */
+@font-face {
+  font-family: "Schibsted Grotesk";
+  font-style: normal;
+  font-weight: 400 900;
+  font-display: swap;
+  src: url("/fonts/schibsted-grotesk-latin-wght.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
 :root {
   color-scheme: dark;
 
+  /* ══ D1 identity: "Poster, on black" (canonical; resume-soe.12) ══
+   * Brand colours go on type, rules, marks and UI, never as a field behind the figure
+   * (D3 outfit-pops). Pink is the single hit colour. */
+  --id-ground: #151513;     /* page ground, near-black */
+  --id-paper: #efede4;      /* body type, off-white */
+  --id-paper-2: #b9b6ab;    /* secondary type (counts, meta) */
+  --id-lime: #c8ec6c;       /* brand lime: name, headings, rules, links */
+  --id-lime-dim: #8fa84f;   /* lime at rest (quiet UI) */
+  --id-pink: #f294cc;       /* single hit: emphasis block, open/selected item, hover */
+  --id-ink: #0b0b0a;        /* type on lime / pink */
+  --id-rule: rgba(239, 237, 228, 0.16); /* hairlines: paper at 16% */
+
+  /* Fonts: one family. Fallback stack is metric-unrelated; the font gate (BaseLayout,
+   * [data-font-gate]) hides geometry-dependent elements until the real face is loaded. */
+  --id-font-display: "Schibsted Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --id-font-body: "Schibsted Grotesk", "Helvetica Neue", Arial, sans-serif;
+
+  /* Weights and tracking (poster discipline: heavy + tight at scale) */
+  --id-weight-body: 400;
+  --id-weight-medium: 500;
+  --id-weight-strong: 800;
+  --id-weight-poster: 900;
+  --id-tracking-poster: -0.05em;    /* the name */
+  --id-tracking-display: -0.035em;  /* tagline, page titles */
+  --id-tracking-heading: -0.01em;
+  --id-leading-poster: 0.9;
+  --id-leading-display: 0.98;
+
+  /* Poster type scale (fluid). Pages that solve geometry from glyph metrics (the home
+   * composition) override size locally; these are the defaults for everything else. */
+  --id-text-poster: clamp(3rem, 11vw, 7rem);          /* the name */
+  --id-text-display: clamp(2.25rem, 4.2vw, 4.25rem);  /* tagline, page titles */
+  --id-text-heading: clamp(1.15rem, 1.6vw, 1.5rem);   /* section / link headings */
+  --id-text-body: 1.05rem;
+  --id-text-small: 0.95rem;
+
+  /* ══ Legacy site palette + --ghv-* (retiring as each page migrates; see design-system.md) ══ */
   /* ── Color palette ── */
   --base-100: #101c22;
   --base-200: #0c171d;
@@ -17,12 +68,8 @@
   --primary-content: #0b1116;
 
   /* Semantic accent palette (badge / tag colors) */
-  --accent: #8b5cf6;
-  --accent-content: #f8f5ff;
   --success: #22c55e;
-  --success-content: #052e16;
   --info: #38bdf8;
-  --info-content: #082f49;
 
   /* Bright content (headings, important labels) */
   --content-bright: #f2f7fb;
@@ -30,7 +77,6 @@
   /* Tooltip */
   --tooltip-bg: #071016;
   --tooltip-text: #f7fbff;
-  --tooltip-dark-bg: #1f2937;
 
   /* Surface tints */
   --surface-subtle: rgba(255, 255, 255, 0.02);
@@ -86,7 +132,6 @@
 
   /* ── Shadows ── */
   --shadow-card: 0 16px 36px rgba(0, 0, 0, 0.28);
-  --shadow-avatar: 0 12px 28px rgba(0, 0, 0, 0.35);
 
   /* ── Transitions ── */
   --transition-base: 160ms ease;

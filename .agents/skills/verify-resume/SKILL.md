@@ -57,6 +57,7 @@ scripts/launch              # build, then serve dist/ on 127.0.0.1:4329
 scripts/seed                # nothing to seed here; says so and exits 0
 scripts/drive file-tree     # expand a folder, open a file, capture evidence
 scripts/drive screenshots   # 10 full-page PNGs + 10 computed-style fingerprints
+scripts/drive font-gate     # font preload, gate hidden/ready/failed under held/aborted/stalled woff2
 scripts/compare A B         # diff two screenshots-* evidence dirs
 scripts/cleanup             # stop only what launch started; evidence survives
 ```
