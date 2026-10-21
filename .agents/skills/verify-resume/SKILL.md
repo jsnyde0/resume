@@ -60,7 +60,7 @@ scripts/drive reading-path  # experience -> achievements in <=3 taps, no scroll;
 scripts/drive identity [route ...]  # D1 ground, self-hosted heading face, no untokenized hex (default /resume/)
 scripts/drive screenshots   # 10 full-page PNGs + 10 computed-style fingerprints
 scripts/drive font-gate     # font preload, gate hidden/ready/failed under held/aborted/stalled woff2
-scripts/drive home-contacts # / contacts, outfit halo, held/failed font, links: 7 sizes x Chrome + Firefox
+scripts/drive home-contacts # / contacts, outfit halo, held/failed font, links: 11 sizes x Chrome + Firefox
 scripts/compare A B         # diff two screenshots-* evidence dirs
 scripts/cleanup             # stop only what launch started; evidence survives
 ```
@@ -94,12 +94,12 @@ The fingerprint is one entry per element under `<html>`/`<body>` (script/style/n
 
 `scripts/drive home-contacts` measures what the home page is for (bead `resume-soe.18`, contract in `resume-soe.12` D4 + Verification target Signal 1). Evidence: `.verify-evidence/home-contacts-<timestamp>/evidence.json` plus a PNG per engine, size and scenario.
 
-- **Matrix:** 1280x800, 1440x900, 1920x1080, 1024x768, 1280x1024, 390x844, 768x1024, in Chrome (the shared `:9222` Chrome, inside a throwaway browser context, so it never shares a tab with another drive or agent) and Firefox (headless, launched through puppeteer-core's WebDriver BiDi from `$VERIFY_RESUME_FIREFOX`, default `/usr/bin/firefox`). WebKit is printed as `NOT RUN`: puppeteer cannot drive it. `VERIFY_RESUME_ENGINES=chrome` narrows the run.
-- **Contacts:** landmarks are fractions of the rendered, mirrored img box (the photo's alpha landmarks, never the box edges); the target glyph's ink comes from a figure-hidden screenshot scanned inside the glyph's Range rect. Pass: landmark 0-4px from the ink, and the clog no more than 4px sunk below the ink top. The branch is read from the page's own media queries (so 1280x1024, aspect 1.25, is measured in the narrow branch).
+- **Matrix:** 1280x800, 1440x900, 1920x1080, 1024x768, 1280x1024, 390x844, 768x1024, plus the short desktop viewports 1536x730, 1366x657, 1280x680, 1440x600 (each must fit 100svh with no scroll), in Chrome (the shared `:9222` Chrome, inside a throwaway browser context, so it never shares a tab with another drive or agent) and Firefox (headless, launched through puppeteer-core's WebDriver BiDi from `$VERIFY_RESUME_FIREFOX`, default `/usr/bin/firefox`). WebKit is printed as `NOT RUN`: puppeteer cannot drive it. `VERIFY_RESUME_ENGINES=chrome` narrows the run.
+- **Contacts:** landmarks are fractions of the rendered, mirrored img box (the photo's alpha landmarks, never the box edges); the target glyph's ink comes from a figure-hidden screenshot scanned inside the glyph's Range rect. Pass: fingertip within 4px of the ink and -4..+4px from the glyph's end edge at its height (a tip buried inside the glyph fails); clog no more than 4px sunk below the ink top and within ±6px of the branch's stance on the ink run under it. The branch is read from the page's own media queries (so 1280x1024, aspect 1.25, is measured in the narrow branch).
 - **Halo:** ground pixels 2-8px from the shirt must hold zero hue 60-110deg / saturation > 0.25 pixels.
-- **Held / failed font:** the woff2 held 2s keeps tagline, name and figure hidden on every frame; aborted, the page settles `fonts-failed` with a contact-free layout and reachable links.
+- **Held / failed font:** the woff2 held 2s keeps tagline, name and figure hidden on every frame; aborted, the page settles `fonts-failed` with a contact-free layout (no figure pixel within 8px of name ink, hand clear of the tagline) and reachable links.
 - **Links:** all four inside the viewport and hit at their centre at every size; both internal links clicked for real.
-- Red-capable: moving the wide clog 0.06em (`--sy`), dropping `data-font-gate` from the name, and a lime glow on the figure each turned the run red, only at the sizes they affect (resume-soe.18 ship-record).
+- Red-capable: moving the wide clog 0.06em (`--sy`), dropping `data-font-gate` from the name, and a lime glow on the figure each turned the run red, only at the sizes they affect; `VR_MUTATE_FIGURE="dx,dy"` shifts the figure in the drive only, and ±10px in x or y turns tip and/or sole red at all 11 sizes (resume-soe.18 ship-record).
 
 ## Evidence standards
 

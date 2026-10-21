@@ -46,7 +46,7 @@ Geometry that depends on Schibsted Grotesk's real metrics (the home composition'
 - **Neither class yet:** gated elements are `visibility: hidden`.
 - **No JS:** `<noscript>` reveals gated elements.
 - The font is preloaded on every page (`<link rel=preload as=font type=font/woff2 crossorigin>`), so the gate normally settles within one round trip.
-- `/` accepts the 3000 ms timeout (resume-soe.18): the woff2 is preloaded and ~47 KB, so the gate settles long before it on any working connection, and a longer timeout only lengthens the blank composition for the visitor whose font never comes. Its `fonts-failed` layout is contact-free (figure flush right behind the name on landscape; type only on narrow screens). Its links are not gated, so navigation works while the gate is pending.
+- `/` accepts the 3000 ms timeout (resume-soe.18): the woff2 is preloaded and ~47 KB, so the gate settles long before it on any working connection, and a longer timeout only lengthens the blank composition for the visitor whose font never comes. Its `fonts-failed` layout is contact-free (on landscape the figure stands above the name block, clear of every glyph; type only on narrow screens). Its links are not gated, so navigation works while the gate is pending.
 - The timeout has one source: the inline script sets `data-font-gate-timeout` (ms) on `<html>`, and the `font-gate` drive reads it from there.
 
 ## Legacy tokens (retiring)
@@ -103,7 +103,7 @@ scripts/compare ../../../.verify-evidence/screenshots-<baselineTs> ../../../.ver
 
 - `identity [route ...]` checks D1 on served routes (default `/resume/`): `html`, `body` and the outermost container on `#151513`, headings on the self-hosted face, and every hex in the page's CSS declared in `tokens.css`.
 - `font-gate` proves the font contract above in a real browser: preload and same-origin woff2, `fonts-ready` only after the face is loaded, gated elements hidden while the font is held, settled visible on abort and on timeout.
-- `home-contacts` proves the home composition on `/`: contacts 0-4px at seven sizes in Chrome and Firefox, no lime pixels around the shirt, no composition on fallback metrics, links reachable (verify-resume SKILL.md "Home-contacts drive").
+- `home-contacts` proves the home composition on `/`: contacts 0-4px at eleven sizes (the seven-size matrix plus four short desktop viewports) in Chrome and Firefox, no lime pixels around the shirt, no composition on fallback metrics, links reachable (verify-resume SKILL.md "Home-contacts drive").
 - `screenshots` captures full-page PNGs (1440 and 390 wide) and a computed-style fingerprint of every element for `/`, `/resume/`, `/readme/`, `/projects/`, `/factory/`. Capture a baseline on the unchanged tree before editing, then compare. A pure refactor must show zero diffs; every non-zero diff must be an intended change you can name. Pages you do not own must be zero. Not covered: hover/focus states, post-click JS states, `/factory/a` and `/factory/b` prototypes, and layout width (the fingerprint has no `width`/`max-width`; check the PNGs).
 - Always also run `npm run gate` (typecheck, build, projects verifier).
 
