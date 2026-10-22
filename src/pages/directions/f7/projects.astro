@@ -1,34 +1,100 @@
 ---
-// PROTOTYPE (resume-soe.4 + resume-soe.19): /projects in F7, with the site nav as a second axis.
-// Three page layouts (?v=A|B|C) x three nav shapes (?nav=1|2|3), switchable from the bottom bar or ←/→ (layout)
-// and ↑/↓ (nav). Real data from src/data/projects.ts.
-//   A "Bands"    — one project per band: poster-scale lime name, description at reading size, stack + links.
-//   B "Explorer" — /resume's mechanism: project names as big words left, the open project right, pink = open.
-//   C "Ledger"   — dense Swiss table grouped by status (Built / Company / Building now): name | what | stack | links.
-//   nav 1 "Top bar"   — /resume's bar extended: face + name home left, page links, GitHub/LinkedIn right.
-//   nav 2 "Masthead"  — lime name wordmark is home; page words heavy, the current one in the pink block.
-//   nav 3 "Index"     — tiny home link up top; the site index sits at the foot in home's poster voice.
+// PROTOTYPE round 2 (resume-soe.4 + resume-soe.19). Human round-1 ruling: nav = top bar, GitHub/LinkedIn move
+// to a footer; explorer feel + the ledger's status grouping; try a timeline; groups are Building now / Built;
+// harness off; switch-berlin and Mapular under Building now; more projects; the factory broken into its parts.
+//   layout B "Explorer"  — /resume's mechanism: status groups as big lime words, projects as dated rows,
+//                          the factory a folder of its parts; the open project on the right, pink = open.
+//   layout D "Timeline"  — month axis 2025 → now; one bar per project, the factory's parts as thin rows under it;
+//                          click a row to open it in the pane below.
+//   footer 1 "Quiet"     — one hairline row: name (home) left, GitHub · LinkedIn right.
+//   footer 2 "Sign-off"  — GitHub and LinkedIn as big lime words.
+//   footer 3 "Sitemap"   — page links + GitHub · LinkedIn in two short columns.
 import '../../../styles/tokens.css';
-import { projectEntries, projectsIntro } from '../../../data/projects';
-import type { ProjectTag } from '../../../data/projects';
 
-// SHORTCUT: page labels for the nav are proposals for the human; production takes whatever they pick.
+type Status = 'now' | 'built';
+interface P {
+  slug: string; title: string; status: Status; from: string; to?: string; // YYYY-MM; no `to` = ongoing
+  desc: string; stack?: string; links?: { label: string; href: string }[]; parent?: string; early?: string;
+}
+// SHORTCUT: prototype-local data (dates from git history, descriptions drafted from READMEs, not the human's
+// copy). Production moves the approved list into src/data/projects.ts with the human's wording.
+const projects: P[] = [
+  { slug: 'switch-berlin', title: 'switch-berlin', status: 'now', from: '2025-01',
+    desc: "A trust-first, organizer-centric events aggregator for Berlin's queer & alternative scene — Django + HTMX with a React island and LLM-powered scraping and ingestion.",
+    stack: 'Django · HTMX · React · LLM', links: [{ label: 'switch.berlin', href: 'https://switch.berlin' }] },
+  { slug: 'mapular', title: 'Mapular', status: 'now', from: '2025-05',
+    desc: 'Location-intelligence software for retail expansion — 20M+ competitive data points combined with demographics and travel-time catchments to analyze markets, score candidate sites, and produce ranked, decision-ready shortlists, no GIS expertise needed.',
+    links: [{ label: 'mapular.com', href: 'https://mapular.com/solutions/site-selection' }] },
+  { slug: 'factory', title: 'self-driving factory', status: 'now', from: '2026-04',
+    desc: "The agentic software factory I'm building — the system behind how I work.",
+    links: [{ label: 'See the breakdown →', href: '/factory/' }] },
+  { slug: 'orchestration', parent: 'factory', title: 'orchestration', status: 'now', from: '2026-07',
+    desc: 'A planner agent watches the issue graph and starts sessions; each session drives one task and pulls in helpers. Grants decide who may touch what.' },
+  { slug: 'mail', parent: 'factory', title: 'mail', status: 'now', from: '2026-07',
+    desc: 'Agents write to each other through a mailbox on disk: send, read, acknowledge. Nothing gets lost when a session dies.' },
+  { slug: 'memory', parent: 'factory', title: 'tiered memory', status: 'now', from: '2026-07',
+    desc: 'Raw logs, fading notes, sticky lessons, binding decisions. Items climb as they prove useful; old ones rot on schedule.' },
+  { slug: 'cockpit', parent: 'factory', title: 'cockpit', status: 'now', from: '2026-06',
+    desc: 'Every agent in its own terminal pane, one view over all of them; I can jump into any session.' },
+  { slug: 'seats', parent: 'factory', title: 'seats', status: 'now', from: '2026-09',
+    desc: 'One tool that places agents in panes, talks to them, and notices when one is stuck on a rate limit.' },
+  { slug: 'pacemaker', parent: 'factory', title: 'pacemaker', status: 'now', from: '2026-09',
+    desc: 'The one clock in the system. It sends pulses on a schedule; agents answer with a beat.' },
+  { slug: 'verify', parent: 'factory', title: 'verifiable targets', status: 'now', from: '2026-08',
+    desc: 'Each task says what done looks like and which checks prove it, so an agent can tell when it is finished.' },
+  { slug: 'personal-agent', title: 'personal agent', status: 'now', from: '2026-04',
+    desc: 'An always-on assistant I talk to over Telegram, running on my own host with a scheduler and its own sessions.' },
+  { slug: 'rip-cage', title: 'rip-cage', status: 'built', from: '2026-03', to: '2026-10',
+    desc: 'A CLI that wraps your project in a Docker container with a command-intercepting safety stack, so you can run coding agents with --dangerously-skip-permissions and keep the blast radius small.',
+    stack: 'Docker', links: [{ label: 'GitHub', href: 'https://github.com/jsnyde0/rip-cage' }] },
+  { slug: 'meshmonk', title: 'meshmonk', status: 'built', from: '2026-04', to: '2026-10', early: '2016–2021',
+    desc: 'The open-source 3D mesh-registration toolbox I built, used in KU Leuven craniofacial research and widely cited. In 2026 I rewrote it Python-first (C++20, clean API, Python bindings, PyPI).',
+    stack: 'C++20 · Python', links: [{ label: 'GitHub', href: 'https://github.com/jsnyde0/meshmonk' }] },
+  { slug: 'fetch-ladder', title: 'fetch-ladder', status: 'built', from: '2026-10', to: '2026-10',
+    desc: 'A Python package that fetches a URL the way that site allows: it remembers which client works per host, climbs to the next when one fails, and paces requests.',
+    stack: 'Python', links: [{ label: 'GitHub', href: 'https://github.com/jsnyde0/fetch-ladder' }] },
+  { slug: 'haneen', title: 'haneenkhan.com', status: 'built', from: '2026-06', to: '2026-07',
+    desc: "A static rebuild of a client's portfolio site, off Squarespace.", stack: 'Astro',
+    links: [{ label: 'haneenkhan.com', href: 'https://www.haneenkhan.com' }] },
+  { slug: 'approval-agent', title: 'approval-agent', status: 'built', from: '2026-03', to: '2026-03',
+    desc: 'A Claude Code hook that asks a fast model to triage shell commands too opaque to approve by rule.',
+    stack: 'Python · Gemini', links: [{ label: 'GitHub', href: 'https://github.com/jsnyde0/approval-agent' }] },
+  { slug: 'humble-clay', title: 'humble-clay', status: 'built', from: '2025-03', to: '2025-05',
+    desc: "A small API that runs prompts through LLMs in bulk — a humble take on Clay's AI agent.",
+    stack: 'FastAPI · LLM', links: [{ label: 'GitHub', href: 'https://github.com/jsnyde0/humble-clay' }] },
+  { slug: 'event-gulper', title: 'event-gulper', status: 'built', from: '2025-02', to: '2026-06',
+    desc: 'The agentic event scraper that came before switch-berlin.', stack: 'Python · LLM',
+    links: [{ label: 'GitHub', href: 'https://github.com/jsnyde0/event-gulper' }] },
+];
+const START = 2025 * 12; // 2025-01
+const NOW = 2026 * 12 + 9; // 2026-10
+const SPAN = NOW - START + 1;
+const m = (s: string) => { const [y, mo] = s.split('-').map(Number); return y * 12 + mo - 1; };
+const bar = (p: P) => {
+  const a = Math.max(m(p.from), START), b = p.to ? m(p.to) : NOW;
+  return `left:${((a - START) / SPAN) * 100}%;width:${((b - a + 1) / SPAN) * 100}%`;
+};
+const yrs = (p: P) => {
+  const a = p.from.slice(0, 4), b = p.to ? p.to.slice(0, 4) : 'now';
+  return a === b ? a : `${a}–${b}`;
+};
+const groups: { key: Status; label: string }[] = [
+  { key: 'now', label: 'Building now' },
+  { key: 'built', label: 'Built' },
+];
+const top = (s: Status) => projects.filter((p) => p.status === s && !p.parent);
+const kids = (slug: string) => projects.filter((p) => p.parent === slug);
 const pages = [
-  { href: '/resume/', label: 'Resume', poster: 'What bores me' },
-  { href: '/projects/', label: 'Projects', poster: "What I've built" },
-  { href: '/readme/', label: 'README', poster: 'How I work' },
-  { href: '/factory/', label: 'Factory', poster: 'What excites me' },
+  { href: '/resume/', label: 'Resume' },
+  { href: '/projects/', label: 'Projects' },
+  { href: '/readme/', label: 'README' },
+  { href: '/factory/', label: 'Factory' },
 ];
 const current = '/projects/';
-const tagLabel: Record<ProjectTag, string> = { built: 'Built', company: 'Company', 'in-progress': 'Building now' };
-const groups = (['built', 'company', 'in-progress'] as ProjectTag[]).map((t) => ({
-  tag: t,
-  items: projectEntries.filter((p) => p.tag === t),
-}));
-const ext = (external?: boolean) => (external ? { target: '_blank', rel: 'noopener noreferrer' } : {});
+const months = ['2025', 'Apr', 'Jul', 'Oct', '2026', 'Apr', 'Jul'];
 ---
 <!doctype html>
-<html lang="en" data-v="A" data-nav="1">
+<html lang="en" data-v="B" data-foot="1">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -39,105 +105,115 @@ const ext = (external?: boolean) => (external ? { target: '_blank', rel: 'noopen
     <script is:inline>
       (function () {
         var q = new URLSearchParams(location.search), h = document.documentElement;
-        h.dataset.v = (q.get('v') || 'A').toUpperCase();
-        h.dataset.nav = q.get('nav') || '1';
+        var v = (q.get('v') || 'B').toUpperCase();
+        h.dataset.v = v === 'D' ? 'D' : 'B';
+        h.dataset.foot = q.get('foot') || '1';
       })();
     </script>
   </head>
   <body>
     <div class="page">
-      <!-- ── nav 1: top bar ── -->
-      <header class="nav nav-1">
-        <a class="n1-home" href="/"><img src="/img/avatar_jonatan.png" alt="" width="253" height="252" /><span>Jonatan Snyders</span></a>
-        <nav aria-label="Site"><ul class="n1-pages">
+      <header class="topbar">
+        <a class="home" href="/"><img src="/img/avatar_jonatan.png" alt="" width="253" height="252" /><span>Jonatan Snyders</span></a>
+        <nav aria-label="Site"><ul class="pages">
           {pages.map((p) => <li><a href={p.href} aria-current={p.href === current ? 'page' : undefined}>{p.label}</a></li>)}
         </ul></nav>
-        <ul class="n1-ext">
-          <li><a href="https://github.com/jsnyde0/" rel="me">GitHub</a></li>
-          <li><a href="https://www.linkedin.com/in/jonatan-snyders/" rel="me">LinkedIn</a></li>
-        </ul>
-      </header>
-
-      <!-- ── nav 2: masthead ── -->
-      <header class="nav nav-2">
-        <a class="n2-home" href="/">Jonatan Snyders</a>
-        <nav aria-label="Site"><ul class="n2-pages">
-          {pages.map((p) => <li><a href={p.href} aria-current={p.href === current ? 'page' : undefined}>{p.label}</a></li>)}
-        </ul></nav>
-      </header>
-
-      <!-- ── nav 3: tiny home link (index sits at the foot) ── -->
-      <header class="nav nav-3">
-        <a class="n3-home" href="/">← Jonatan Snyders</a>
       </header>
 
       <main>
+        <!-- SHORTCUT: lede reworded by the prototype seat to fit the new list; the human owns the final copy. -->
         <div class="head">
-          <h1 class="title">{projectsIntro.title}</h1>
-          <p class="lede">{projectsIntro.description}</p>
+          <h1 class="title">Building</h1>
+          <p class="lede">Things I've built and am building — products, tools, and research software, and the agent factory I run them with.</p>
         </div>
-
-        <!-- ── A: bands ── -->
-        <section class="var var-A">
-          {projectEntries.map((p) => (
-            <article class="band">
-              <p class="band-tag">{tagLabel[p.tag]}</p>
-              <h2 class="band-name">{p.title}</h2>
-              <p class="band-desc">{p.description}</p>
-              <p class="band-meta">
-                {p.technologies && <span class="stack">{p.technologies.join(' · ')}</span>}
-                {p.links.map((l) => <a href={l.href} {...ext(l.external)}>{l.label}</a>)}
-              </p>
-            </article>
-          ))}
-        </section>
 
         <!-- ── B: explorer ── -->
         <section class="var var-B">
-          <ul class="ex-list">
-            {projectEntries.map((p, i) => (
-              <li><button type="button" class:list={['ex-item', { 'is-open': i === 0 }]} data-slug={p.slug}>
-                <span class="ex-name">{p.title}</span><span class="ex-tag">{tagLabel[p.tag]}</span>
-              </button></li>
-            ))}
-          </ul>
-          <div class="ex-pane">
-            {projectEntries.map((p, i) => (
-              <article class="ex-file" data-slug={p.slug} hidden={i !== 0}>
-                <p class="ex-file-tag">{tagLabel[p.tag]}</p>
-                <h2 class="ex-file-name">{p.title}</h2>
-                <p class="ex-file-desc">{p.description}</p>
-                {p.technologies && <p class="ex-file-stack">{p.technologies.join(' · ')}</p>}
-                <p class="ex-file-links">{p.links.map((l) => <a href={l.href} {...ext(l.external)}>{l.label}</a>)}</p>
-              </article>
+          <div class="ex-tree">
+            {groups.map((g) => (
+              <div class="ex-group">
+                <h2 class="ex-head">{g.label}<sup>{top(g.key).length}</sup></h2>
+                <ul>
+                  {top(g.key).map((p) => (
+                    <li>
+                      <button type="button" class="row" data-open={p.slug}><span>{p.title}</span><span class="yrs">{yrs(p)}</span></button>
+                      {kids(p.slug).length > 0 && (
+                        <ul class="sub">
+                          {kids(p.slug).map((k) => (
+                            <li><button type="button" class="row" data-open={k.slug}><span>{k.title}</span><span class="yrs">{yrs(k)}</span></button></li>
+                          ))}
+                        </ul>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
             ))}
           </div>
+          <div class="pane"><div class="pane-slot"></div></div>
         </section>
 
-        <!-- ── C: ledger ── -->
-        <section class="var var-C">
+        <!-- ── D: timeline ── -->
+        <section class="var var-D">
+          <div class="tl-axis" aria-hidden="true">
+            <span class="tl-label"></span>
+            <div class="tl-track">{months.map((t, i) => <span style={`left:${(i * 3 / SPAN) * 100}%`} class:list={[{ yr: /^\d/.test(t) }]}>{t}</span>)}<span class="tl-now" style="left:100%">now</span></div>
+          </div>
           {groups.map((g) => (
-            <div class="lg-group">
-              <h2 class="lg-head">{tagLabel[g.tag]}<sup>{g.items.length}</sup></h2>
-              {g.items.map((p) => (
-                <div class="lg-row">
-                  <h3 class="lg-name">{p.title}</h3>
-                  <p class="lg-desc">{p.description}</p>
-                  <p class="lg-stack">{p.technologies?.join(' · ')}</p>
-                  <p class="lg-links">{p.links.map((l) => <a href={l.href} {...ext(l.external)}>{l.label}</a>)}</p>
-                </div>
+            <div class="tl-group">
+              <h2 class="ex-head">{g.label}<sup>{top(g.key).length}</sup></h2>
+              {top(g.key).map((p) => (
+                <>
+                  <button type="button" class="tl-row" data-open={p.slug}>
+                    <span class="tl-label">{p.title}{p.early && <span class="tl-early"> · first {p.early}</span>}</span>
+                    <span class="tl-track"><span class:list={['tl-bar', { ongoing: !p.to }]} style={bar(p)}></span></span>
+                  </button>
+                  {kids(p.slug).map((k) => (
+                    <button type="button" class="tl-row tl-sub" data-open={k.slug}>
+                      <span class="tl-label">{k.title}</span>
+                      <span class="tl-track"><span class:list={['tl-bar', { ongoing: !k.to }]} style={bar(k)}></span></span>
+                    </button>
+                  ))}
+                </>
               ))}
             </div>
           ))}
+          <div class="pane tl-pane"><div class="pane-slot"></div></div>
         </section>
+
+        <!-- one file per project; the open one is cloned into the visible pane by the script -->
+        <div class="files" hidden>
+          {projects.map((p) => (
+            <article class="file" data-slug={p.slug}>
+              <p class="file-meta">{p.status === 'now' ? 'Building now' : 'Built'} · {yrs(p)}{p.early && ` · first version ${p.early}`}{p.parent && ' · part of the factory'}</p>
+              <h2 class="file-name">{p.title}</h2>
+              <p class="file-desc">{p.desc}</p>
+              {p.stack && <p class="file-meta">{p.stack}</p>}
+              {p.links && <p class="file-links">{p.links.map((l) => <a href={l.href} {...(l.href.startsWith('/') ? {} : { target: '_blank', rel: 'noopener noreferrer' })}>{l.label}</a>)}</p>}
+            </article>
+          ))}
+        </div>
       </main>
 
-      <!-- ── nav 3: the foot index ── -->
-      <footer class="nav nav-3 n3-index">
-        <ul>
-          {pages.map((p) => <li><a href={p.href} aria-current={p.href === current ? 'page' : undefined}>{p.poster}</a></li>)}
+      <!-- ── footers ── -->
+      <footer class="foot foot-1">
+        <a class="foot-home" href="/">Jonatan Snyders</a>
+        <ul class="ext">
+          <li><a href="https://github.com/jsnyde0/" rel="me">GitHub</a></li>
+          <li><a href="https://www.linkedin.com/in/jonatan-snyders/" rel="me">LinkedIn</a></li>
         </ul>
-        <ul class="n3-ext">
+      </footer>
+      <footer class="foot foot-2">
+        <ul class="ext-big">
+          <li><a href="https://github.com/jsnyde0/" rel="me">GitHub</a></li>
+          <li><a href="https://www.linkedin.com/in/jonatan-snyders/" rel="me">LinkedIn</a></li>
+        </ul>
+        <a class="foot-home" href="/">Jonatan Snyders</a>
+      </footer>
+      <footer class="foot foot-3">
+        <a class="foot-home" href="/">Jonatan Snyders</a>
+        <ul class="col">{pages.map((p) => <li><a href={p.href}>{p.label}</a></li>)}</ul>
+        <ul class="col">
           <li><a href="https://github.com/jsnyde0/" rel="me">GitHub</a></li>
           <li><a href="https://www.linkedin.com/in/jonatan-snyders/" rel="me">LinkedIn</a></li>
         </ul>
@@ -152,17 +228,17 @@ const ext = (external?: boolean) => (external ? { target: '_blank', rel: 'noopen
       <strong data-show="v"></strong>
       <button data-k="v" data-d="1" aria-label="Next layout">&rarr;</button>
       <span class="psw-sep"></span>
-      <span>nav</span>
-      <button data-k="nav" data-d="-1" aria-label="Previous nav">&larr;</button>
-      <strong data-show="nav"></strong>
-      <button data-k="nav" data-d="1" aria-label="Next nav">&rarr;</button>
+      <span>footer</span>
+      <button data-k="foot" data-d="-1" aria-label="Previous footer">&larr;</button>
+      <strong data-show="foot"></strong>
+      <button data-k="foot" data-d="1" aria-label="Next footer">&rarr;</button>
     </div>
 
     <script is:inline>
       (function () {
         var h = document.documentElement;
-        var opts = { v: ['A', 'B', 'C'], nav: ['1', '2', '3'] };
-        var names = { A: 'Bands', B: 'Explorer', C: 'Ledger', 1: 'Top bar', 2: 'Masthead', 3: 'Index' };
+        var opts = { v: ['B', 'D'], foot: ['1', '2', '3'] };
+        var names = { B: 'Explorer', D: 'Timeline', 1: 'Quiet', 2: 'Sign-off', 3: 'Sitemap' };
         function paint() {
           document.querySelectorAll('[data-show]').forEach(function (el) {
             var k = h.dataset[el.dataset.show]; el.textContent = k + ' · ' + names[k];
@@ -182,17 +258,20 @@ const ext = (external?: boolean) => (external ? { target: '_blank', rel: 'noopen
           if (e.target.closest('input,textarea,[contenteditable]')) return;
           if (e.key === 'ArrowRight') step('v', 1);
           if (e.key === 'ArrowLeft') step('v', -1);
-          if (e.key === 'ArrowDown') { e.preventDefault(); step('nav', 1); }
-          if (e.key === 'ArrowUp') { e.preventDefault(); step('nav', -1); }
+          if (e.key === 'ArrowDown') { e.preventDefault(); step('foot', 1); }
+          if (e.key === 'ArrowUp') { e.preventDefault(); step('foot', -1); }
         });
+        // One open project, shown in each layout's pane. SHORTCUT: no #slug deep links yet (production: like /resume).
+        function open(slug) {
+          document.querySelectorAll('[data-open]').forEach(function (b) { b.classList.toggle('is-open', b.dataset.open === slug); });
+          var f = document.querySelector('.file[data-slug="' + slug + '"]');
+          document.querySelectorAll('.pane-slot').forEach(function (s) { s.innerHTML = ''; s.appendChild(f.cloneNode(true)); });
+        }
+        document.querySelectorAll('[data-open]').forEach(function (b) {
+          b.addEventListener('click', function () { open(b.dataset.open); });
+        });
+        open('switch-berlin');
         paint();
-        // B explorer: one open project at a time.
-        document.querySelectorAll('.ex-item').forEach(function (b) {
-          b.addEventListener('click', function () {
-            document.querySelectorAll('.ex-item').forEach(function (x) { x.classList.toggle('is-open', x === b); });
-            document.querySelectorAll('.ex-file').forEach(function (f) { f.hidden = f.dataset.slug !== b.dataset.slug; });
-          });
-        });
       })();
     </script>
   </body>
@@ -207,113 +286,121 @@ const ext = (external?: boolean) => (external ? { target: '_blank', rel: 'noopen
     --pad: clamp(1rem, 2.4vw, 2.25rem);
     --ease: cubic-bezier(0.25, 1, 0.5, 1);
     min-height: 100svh;
-    padding: var(--pad) var(--pad) 6rem;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    padding: var(--pad) var(--pad) 5rem;
     color: var(--id-paper);
     font-family: var(--id-font-body);
     font-size: var(--id-text-body);
     line-height: var(--line-height-body);
     -webkit-font-smoothing: antialiased;
   }
+  main { flex: 1; margin-top: clamp(2rem, 6vw, 5rem); }
   a { color: inherit; text-underline-offset: 0.18em; transition: background-color 160ms var(--ease), color 160ms var(--ease); }
   a:hover { background: var(--id-pink); color: var(--id-ink); text-decoration-color: transparent; }
   a:focus-visible, button:focus-visible { outline: 3px solid var(--id-paper); outline-offset: 3px; }
   ul { list-style: none; margin: 0; padding: 0; }
   p, h1, h2, h3 { margin: 0; }
+  button { all: unset; box-sizing: border-box; cursor: pointer; }
 
-  /* variant gating */
-  .nav, .var { display: none; }
-  :global(html[data-nav='1']) .nav-1, :global(html[data-nav='2']) .nav-2, :global(html[data-nav='3']) .nav-3 { display: flex; }
-  :global(html[data-v='A']) .var-A, :global(html[data-v='C']) .var-C { display: block; }
-  :global(html[data-v='B']) .var-B { display: grid; }
+  .var, .foot { display: none; }
+  :global(html[data-v='B']) .var-B, :global(html[data-v='D']) .var-D { display: grid; }
+  :global(html[data-foot='1']) .foot-1, :global(html[data-foot='2']) .foot-2, :global(html[data-foot='3']) .foot-3 { display: flex; }
 
-  /* ── nav 1: top bar ── */
-  .nav-1 { align-items: center; gap: var(--space-8); flex-wrap: wrap; }
-  .n1-home { display: inline-flex; align-items: center; gap: 0.75rem; min-height: 44px; font-weight: var(--id-weight-strong); letter-spacing: var(--id-tracking-heading); text-decoration: none; }
-  .n1-home img { width: 44px; height: auto; }
-  .n1-home:hover { background: none; color: inherit; }
-  .n1-home:hover span { background: var(--id-pink); color: var(--id-ink); }
-  .nav-1 nav { margin-left: auto; }
-  .n1-pages, .n1-ext { display: flex; gap: var(--space-6); flex-wrap: wrap; }
-  .n1-pages a { display: inline-flex; align-items: center; min-height: 44px; font-weight: var(--id-weight-strong); color: var(--id-lime); text-decoration: none; }
-  .n1-pages a[aria-current] { background: var(--id-pink); color: var(--id-ink); padding: 0 0.3em; }
-  .n1-ext a { display: inline-flex; align-items: center; min-height: 44px; }
+  /* ── top bar (round-1 pick) ── */
+  .topbar { display: flex; align-items: center; gap: var(--space-4) var(--space-8); flex-wrap: wrap; }
+  .home { display: inline-flex; align-items: center; gap: 0.75rem; min-height: 44px; font-weight: var(--id-weight-strong); letter-spacing: var(--id-tracking-heading); text-decoration: none; }
+  .home img { width: 44px; height: auto; }
+  .home:hover { background: none; color: inherit; }
+  .home:hover span { background: var(--id-pink); color: var(--id-ink); }
+  .topbar nav { margin-left: auto; }
+  .pages { display: flex; gap: var(--space-6); flex-wrap: wrap; }
+  .pages a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 0.3em; font-weight: var(--id-weight-strong); color: var(--id-lime); text-decoration: none; }
+  .pages a[aria-current] { background: var(--id-pink); color: var(--id-ink); }
 
-  /* ── nav 2: masthead ── */
-  .nav-2 { align-items: baseline; justify-content: space-between; gap: var(--space-4) var(--space-8); flex-wrap: wrap; }
-  .n2-home { font-size: var(--id-text-heading); font-weight: var(--id-weight-poster); letter-spacing: var(--id-tracking-display); color: var(--id-lime); text-decoration: none; }
-  .n2-pages { display: flex; gap: var(--space-2) var(--space-6); flex-wrap: wrap; }
-  .n2-pages a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 0.12em; font-size: var(--id-text-heading); font-weight: var(--id-weight-strong); letter-spacing: var(--id-tracking-heading); text-decoration: none; }
-  .n2-pages a[aria-current] { background: var(--id-pink); color: var(--id-ink); }
-
-  /* ── nav 3: index ── */
-  .n3-home { display: inline-flex; align-items: center; min-height: 44px; font-weight: var(--id-weight-strong); color: var(--id-lime); text-decoration: none; }
-  .n3-index { flex-direction: column; gap: var(--space-8); margin-top: var(--space-12); padding-top: var(--space-8); border-top: 1px solid var(--id-rule); }
-  .n3-index ul:first-child a { font-size: var(--id-text-display); font-weight: var(--id-weight-poster); letter-spacing: var(--id-tracking-display); line-height: var(--id-leading-display); color: var(--id-lime); text-decoration: none; padding: 0 0.08em; }
-  .n3-index ul:first-child a[aria-current] { color: var(--id-paper-2); pointer-events: none; }
-  .n3-ext { display: flex; gap: var(--space-6); }
-
-  /* ── page head ── */
-  main { margin-top: clamp(2rem, 6vw, 5rem); }
+  /* ── head ── */
   .head { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); column-gap: var(--pad); align-items: end; }
   .title { font-size: var(--id-text-poster); font-weight: var(--id-weight-poster); letter-spacing: var(--id-tracking-poster); line-height: var(--id-leading-poster); color: var(--id-lime); }
   .lede { max-width: 34ch; font-size: var(--id-text-heading); font-weight: var(--id-weight-medium); line-height: 1.3; letter-spacing: var(--id-tracking-heading); }
-  .var { margin-top: clamp(3rem, 7vw, 6rem); }
-  .stack, .band-tag, .ex-tag, .ex-file-tag, .ex-file-stack, .lg-stack { color: var(--id-paper-2); font-size: var(--id-text-small); }
+  .var { margin-top: clamp(3rem, 6vw, 5rem); }
 
-  /* ── A: bands ── */
-  .band { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); column-gap: var(--pad); row-gap: var(--space-3); padding: var(--space-8) 0; border-top: 1px solid var(--id-rule); }
-  .band-tag { grid-column: 1 / -1; }
-  .band-name { grid-column: 1; font-size: var(--id-text-display); font-weight: var(--id-weight-poster); letter-spacing: var(--id-tracking-display); line-height: var(--id-leading-display); color: var(--id-lime); }
-  .band-desc { grid-column: 2; grid-row: 2 / span 2; max-width: 46ch; line-height: var(--line-height-relaxed); }
-  .band-meta { grid-column: 1; display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-5); }
-  .band-meta a { display: inline-flex; align-items: center; min-height: 44px; font-weight: var(--id-weight-strong); color: var(--id-lime); }
-  .band-meta a:hover { color: var(--id-ink); }
+  .ex-head { padding-bottom: var(--space-3); font-size: var(--id-text-display); font-weight: var(--id-weight-poster); letter-spacing: var(--id-tracking-display); line-height: var(--id-leading-display); color: var(--id-lime); }
+  .ex-head sup { margin-left: 0.2em; font-size: var(--id-text-small); font-weight: var(--id-weight-strong); letter-spacing: 0; color: var(--id-paper-2); vertical-align: top; }
 
   /* ── B: explorer ── */
   .var-B { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); column-gap: calc(2 * var(--pad)); align-items: start; }
-  .ex-item { all: unset; box-sizing: border-box; display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-4); width: 100%; padding: var(--space-1) var(--space-2); cursor: pointer; }
-  .ex-name { font-size: var(--id-text-display); font-weight: var(--id-weight-poster); letter-spacing: var(--id-tracking-display); line-height: 1.05; color: var(--id-lime); }
-  .ex-item:hover .ex-name { color: var(--id-paper); }
-  .ex-item.is-open { background: var(--id-pink); }
-  .ex-item.is-open .ex-name, .ex-item.is-open .ex-tag { color: var(--id-ink); }
-  .ex-pane { position: sticky; top: var(--pad); padding-top: var(--space-2); }
-  .ex-file { display: grid; gap: var(--space-5); }
-  .ex-file[hidden] { display: none; }
-  .ex-file-name { font-size: var(--id-text-display); font-weight: var(--id-weight-poster); letter-spacing: var(--id-tracking-display); line-height: var(--id-leading-display); }
-  .ex-file-desc { max-width: 52ch; font-size: var(--id-text-heading); line-height: 1.45; }
-  .ex-file-links { display: flex; gap: var(--space-6); }
-  .ex-file-links a { display: inline-flex; align-items: center; min-height: 44px; font-weight: var(--id-weight-strong); color: var(--id-lime); }
-  .ex-file-links a:hover { color: var(--id-ink); }
+  .ex-group + .ex-group { margin-top: var(--space-10); }
+  .row { display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-4); width: 100%; min-height: 44px; padding: var(--space-2); border-top: 1px solid var(--id-rule); font-weight: var(--id-weight-medium); }
+  .ex-group > ul > li:last-child > .row { border-bottom: 1px solid var(--id-rule); }
+  .row:hover { background: var(--id-tint-hover); }
+  .row.is-open, .tl-row.is-open .tl-label { background: var(--id-pink); color: var(--id-ink); }
+  .row.is-open .yrs { color: var(--id-ink); }
+  .yrs { color: var(--id-paper-2); font-size: var(--id-text-small); white-space: nowrap; }
+  .sub .row { min-height: 36px; padding: var(--space-1) var(--space-2) var(--space-1) var(--space-8); border-top-color: transparent; font-size: var(--id-text-small); }
+  .sub .row span:first-child::before { content: '↳ '; color: var(--id-paper-2); }
+  .sub .row.is-open span:first-child::before { color: var(--id-ink); }
+  .pane { position: sticky; top: var(--pad); }
+  .pane :global(.file) { display: grid; gap: var(--space-5); }
+  .pane :global(.file-name) { font-size: var(--id-text-display); font-weight: var(--id-weight-poster); letter-spacing: var(--id-tracking-display); line-height: var(--id-leading-display); }
+  .pane :global(.file-desc) { max-width: 52ch; font-size: var(--id-text-heading); line-height: 1.45; }
+  .pane :global(.file-meta) { color: var(--id-paper-2); font-size: var(--id-text-small); }
+  .pane :global(.file-links) { display: flex; gap: var(--space-6); }
+  .pane :global(.file-links a) { display: inline-flex; align-items: center; min-height: 44px; font-weight: var(--id-weight-strong); color: var(--id-lime); }
+  .pane :global(.file-links a:hover) { color: var(--id-ink); }
 
-  /* ── C: ledger ── */
-  .lg-group + .lg-group { margin-top: var(--space-12); }
-  .lg-head { padding-bottom: var(--space-3); font-size: var(--id-text-display); font-weight: var(--id-weight-poster); letter-spacing: var(--id-tracking-display); line-height: var(--id-leading-display); color: var(--id-lime); }
-  .lg-head sup { margin-left: 0.2em; font-size: var(--id-text-small); font-weight: var(--id-weight-strong); letter-spacing: 0; color: var(--id-paper-2); vertical-align: top; }
-  .lg-row { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 6fr) minmax(0, 2fr) minmax(0, 2fr); column-gap: var(--pad); align-items: baseline; padding: var(--space-4) var(--space-2); border-top: 1px solid var(--id-rule); }
-  .lg-row:hover { background: var(--id-tint-hover); }
-  .lg-name { font-size: var(--id-text-heading); font-weight: var(--id-weight-strong); letter-spacing: var(--id-tracking-heading); }
-  .lg-desc { line-height: var(--line-height-relaxed); max-width: 60ch; }
-  .lg-links { display: flex; flex-direction: column; align-items: flex-start; }
-  .lg-links a { display: inline-flex; align-items: center; min-height: 44px; font-weight: var(--id-weight-strong); color: var(--id-lime); }
-  .lg-links a:hover { color: var(--id-ink); }
+  /* ── D: timeline ── */
+  .var-D { --label: minmax(10rem, 3fr); grid-template-columns: minmax(0, 1fr); }
+  .tl-axis, .tl-row { display: grid; grid-template-columns: var(--label) minmax(0, 9fr); column-gap: var(--pad); align-items: center; }
+  .tl-axis { position: sticky; top: 0; z-index: 2; padding: var(--space-2) 0; background: var(--id-ground); border-bottom: 1px solid var(--id-rule); font-size: var(--id-text-small); color: var(--id-paper-2); }
+  .tl-axis .tl-track { position: relative; height: 1.5em; }
+  .tl-axis .tl-track span { position: absolute; top: 0; padding-left: 4px; border-left: 1px solid var(--id-rule); }
+  .tl-axis .tl-track .yr { color: var(--id-paper); font-weight: var(--id-weight-strong); }
+  .tl-axis .tl-now { transform: translateX(-100%); border-left: 0 !important; padding-right: 2px; color: var(--id-pink); font-weight: var(--id-weight-strong); }
+  .tl-group { margin-top: var(--space-10); }
+  .tl-row { width: 100%; min-height: 40px; border-top: 1px solid var(--id-rule); }
+  .tl-row:hover { background: var(--id-tint-hover); }
+  .tl-row .tl-label { padding: var(--space-1) var(--space-2); font-weight: var(--id-weight-medium); justify-self: start; }
+  .tl-early { color: var(--id-paper-2); font-size: var(--id-text-small); font-weight: var(--id-weight-body); }
+  .tl-row .tl-track { position: relative; height: 14px; }
+  .tl-bar { position: absolute; top: 0; height: 100%; min-width: 6px; background: var(--id-lime-dim); }
+  .tl-bar.ongoing { background: var(--id-lime); }
+  .tl-row.is-open .tl-bar { background: var(--id-pink); }
+  .tl-sub { min-height: 30px; border-top-color: transparent; }
+  .tl-sub .tl-label { padding-left: var(--space-8); font-size: var(--id-text-small); }
+  .tl-sub .tl-label::before { content: '↳ '; color: var(--id-paper-2); }
+  .tl-sub .tl-track { height: 6px; }
+  .tl-pane { position: static; margin-top: var(--space-10); padding-top: var(--space-8); border-top: 1px solid var(--id-rule); }
+
+  /* ── footers ── */
+  .foot { margin-top: var(--space-12); padding-top: var(--space-6); border-top: 1px solid var(--id-rule); gap: var(--space-6); }
+  .foot-home { display: inline-flex; align-items: center; min-height: 44px; font-weight: var(--id-weight-strong); text-decoration: none; }
+  .ext, .col { display: flex; gap: var(--space-6); }
+  .ext a, .col a { display: inline-flex; align-items: center; min-height: 44px; }
+  .foot-1 { justify-content: space-between; align-items: center; flex-wrap: wrap; }
+  .foot-2 { flex-direction: column; align-items: flex-start; }
+  .ext-big { display: flex; flex-wrap: wrap; gap: 0 var(--space-10); }
+  .ext-big a { font-size: var(--id-text-display); font-weight: var(--id-weight-poster); letter-spacing: var(--id-tracking-display); line-height: 1.1; color: var(--id-lime); text-decoration: none; padding: 0 0.08em; }
+  .foot-2 .foot-home { color: var(--id-paper-2); font-size: var(--id-text-small); }
+  .foot-3 { flex-wrap: wrap; align-items: flex-start; gap: var(--space-4) var(--space-12); }
+  .foot-3 .foot-home { margin-right: auto; }
+  .foot-3 .col { flex-direction: column; gap: 0; }
 
   @media (max-width: 760px) {
-    .nav-1 { gap: var(--space-2) var(--space-5); }
-    .nav-1 nav { margin-left: 0; order: 3; width: 100%; }
-    .n1-ext { margin-left: auto; gap: var(--space-4); font-size: var(--id-text-small); }
-    .n1-home img { width: 36px; }
-    .n1-pages { gap: 0 var(--space-4); }
-    .n1-pages a { font-size: var(--id-text-small); }
-    .n1-pages a[aria-current] { padding: 0 0.25em; }
+    .topbar { gap: var(--space-2); }
+    .topbar nav { margin-left: 0; width: 100%; }
+    .home img { width: 36px; }
+    .pages { gap: 0 var(--space-2); }
+    .pages a { font-size: var(--id-text-small); padding: 0 0.25em; }
+    .head { grid-template-columns: minmax(0, 1fr); row-gap: var(--space-5); }
+    .var-B { grid-template-columns: minmax(0, 1fr); row-gap: var(--space-8); }
+    .pane { position: static; }
+    .var-D { --label: minmax(0, 5fr); }
+    .tl-axis, .tl-row { grid-template-columns: var(--label) minmax(0, 7fr); column-gap: var(--space-2); }
+    .tl-axis .tl-track span:not(.yr):not(.tl-now) { display: none; }
+    .tl-early { display: none; }
     .psw { gap: 4px; padding: 4px 8px; font-size: 10px; }
     .psw-tag { display: none; }
-    .head { grid-template-columns: minmax(0, 1fr); row-gap: var(--space-5); }
-    .band { grid-template-columns: minmax(0, 1fr); }
-    .band-desc, .band-meta { grid-column: 1; grid-row: auto; }
-    .var-B { grid-template-columns: minmax(0, 1fr); row-gap: var(--space-8); }
-    .ex-pane { position: static; }
-    .lg-row { grid-template-columns: minmax(0, 1fr); row-gap: var(--space-2); }
-    .lg-links { flex-direction: row; gap: var(--space-5); }
   }
 
   /* ── prototype switcher (not part of any design) ── */
