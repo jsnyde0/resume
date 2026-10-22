@@ -53,9 +53,6 @@ const projects: P[] = [
   { slug: 'fetch-ladder', title: 'fetch-ladder', status: 'built', from: '2026-10', to: '2026-10',
     desc: 'A Python package that fetches a URL the way that site allows: it remembers which client works per host, climbs to the next when one fails, and paces requests.',
     stack: 'Python', links: [{ label: 'GitHub', href: 'https://github.com/jsnyde0/fetch-ladder' }] },
-  { slug: 'haneen', title: 'haneenkhan.com', status: 'built', from: '2026-06', to: '2026-07',
-    desc: "A static rebuild of a client's portfolio site, off Squarespace.", stack: 'Astro',
-    links: [{ label: 'haneenkhan.com', href: 'https://www.haneenkhan.com' }] },
   { slug: 'approval-agent', title: 'approval-agent', status: 'built', from: '2026-03', to: '2026-03',
     desc: 'A Claude Code hook that asks a fast model to triage shell commands too opaque to approve by rule.',
     stack: 'Python · Gemini', links: [{ label: 'GitHub', href: 'https://github.com/jsnyde0/approval-agent' }] },
@@ -66,14 +63,6 @@ const projects: P[] = [
     desc: 'The agentic event scraper that came before switch-berlin.', stack: 'Python · LLM',
     links: [{ label: 'GitHub', href: 'https://github.com/jsnyde0/event-gulper' }] },
 ];
-const START = 2025 * 12; // 2025-01
-const NOW = 2026 * 12 + 9; // 2026-10
-const SPAN = NOW - START + 1;
-const m = (s: string) => { const [y, mo] = s.split('-').map(Number); return y * 12 + mo - 1; };
-const bar = (p: P) => {
-  const a = Math.max(m(p.from), START), b = p.to ? m(p.to) : NOW;
-  return `left:${((a - START) / SPAN) * 100}%;width:${((b - a + 1) / SPAN) * 100}%`;
-};
 const yrs = (p: P) => {
   const a = p.from.slice(0, 4), b = p.to ? p.to.slice(0, 4) : 'now';
   return a === b ? a : `${a}–${b}`;
@@ -91,10 +80,18 @@ const pages = [
   { href: '/factory/', label: 'Factory' },
 ];
 const current = '/projects/';
-const months = ['2025', 'Apr', 'Jul', 'Oct', '2026', 'Apr', 'Jul'];
+const mon = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const fmt = (s: string) => `${mon[Number(s.slice(5)) - 1]} ${s.slice(0, 4)}`;
+const range = (p: P) => (p.to ? (p.to === p.from ? fmt(p.from) : `${fmt(p.from)} – ${fmt(p.to)}`) : `since ${fmt(p.from)}`);
+const byYear: [string, P[]][] = [];
+for (const p of projects.filter((x) => !x.parent).sort((a, b) => b.from.localeCompare(a.from))) {
+  const y = p.from.slice(0, 4);
+  const last = byYear[byYear.length - 1];
+  if (last && last[0] === y) last[1].push(p); else byYear.push([y, [p]]);
+}
 ---
 <!doctype html>
-<html lang="en" data-v="B" data-foot="1">
+<html lang="en" data-v="B">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -106,8 +103,7 @@ const months = ['2025', 'Apr', 'Jul', 'Oct', '2026', 'Apr', 'Jul'];
       (function () {
         var q = new URLSearchParams(location.search), h = document.documentElement;
         var v = (q.get('v') || 'B').toUpperCase();
-        h.dataset.v = v === 'D' ? 'D' : 'B';
-        h.dataset.foot = q.get('foot') || '1';
+        h.dataset.v = v === 'T' ? 'T' : 'B';
       })();
     </script>
   </head>
@@ -136,13 +132,17 @@ const months = ['2025', 'Apr', 'Jul', 'Oct', '2026', 'Apr', 'Jul'];
                 <ul>
                   {top(g.key).map((p) => (
                     <li>
-                      <button type="button" class="row" data-open={p.slug}><span>{p.title}</span><span class="yrs">{yrs(p)}</span></button>
-                      {kids(p.slug).length > 0 && (
-                        <ul class="sub">
-                          {kids(p.slug).map((k) => (
-                            <li><button type="button" class="row" data-open={k.slug}><span>{k.title}</span><span class="yrs">{yrs(k)}</span></button></li>
-                          ))}
-                        </ul>
+                      {kids(p.slug).length > 0 ? (
+                        <>
+                          <button type="button" class="row row-folder" data-open={p.slug} data-fold={p.slug} aria-expanded="false"><span><span class="chev" aria-hidden="true"></span>{p.title}<span class="count">{kids(p.slug).length} parts</span></span><span class="yrs">{yrs(p)}</span></button>
+                          <ul class="sub" data-sub={p.slug}>
+                            {kids(p.slug).map((k) => (
+                              <li><button type="button" class="row" data-open={k.slug}><span>{k.title}</span><span class="yrs">{yrs(k)}</span></button></li>
+                            ))}
+                          </ul>
+                        </>
+                      ) : (
+                        <button type="button" class="row" data-open={p.slug}><span>{p.title}</span><span class="yrs">{yrs(p)}</span></button>
                       )}
                     </li>
                   ))}
@@ -153,32 +153,34 @@ const months = ['2025', 'Apr', 'Jul', 'Oct', '2026', 'Apr', 'Jul'];
           <div class="pane"><div class="pane-slot"></div></div>
         </section>
 
-        <!-- ── D: timeline ── -->
-        <section class="var var-D">
-          <div class="tl-axis" aria-hidden="true">
-            <span class="tl-label"></span>
-            <div class="tl-track">{months.map((t, i) => <span style={`left:${(i * 3 / SPAN) * 100}%`} class:list={[{ yr: /^\d/.test(t) }]}>{t}</span>)}<span class="tl-now" style="left:100%">now</span></div>
-          </div>
-          {groups.map((g) => (
-            <div class="tl-group">
-              <h2 class="ex-head">{g.label}<sup>{top(g.key).length}</sup></h2>
-              {top(g.key).map((p) => (
-                <>
-                  <button type="button" class="tl-row" data-open={p.slug}>
-                    <span class="tl-label">{p.title}{p.early && <span class="tl-early"> · first {p.early}</span>}</span>
-                    <span class="tl-track"><span class:list={['tl-bar', { ongoing: !p.to }]} style={bar(p)}></span></span>
-                  </button>
-                  {kids(p.slug).map((k) => (
-                    <button type="button" class="tl-row tl-sub" data-open={k.slug}>
-                      <span class="tl-label">{k.title}</span>
-                      <span class="tl-track"><span class:list={['tl-bar', { ongoing: !k.to }]} style={bar(k)}></span></span>
-                    </button>
-                  ))}
-                </>
-              ))}
+        <!-- ── T: vertical timeline — newest first, a year heading wherever the start year changes ── -->
+        <section class="var var-T">
+          {byYear.map(([year, items]) => (
+            <div class="ty">
+              <h2 class="ty-year">{year}</h2>
+              <ol class="ty-list">
+                {items.map((p) => (
+                  <li class:list={['te', { ongoing: !p.to }]}>
+                    <p class="te-when">{p.status === 'now' ? 'Building now' : 'Built'} · {range(p)}{p.early && ` · first version ${p.early}`}</p>
+                    <h3 class="te-name">{p.title}</h3>
+                    <p class="te-desc">{p.desc}</p>
+                    {p.stack && <p class="te-when">{p.stack}</p>}
+                    {p.links && <p class="te-links">{p.links.map((l) => <a href={l.href} {...(l.href.startsWith('/') ? {} : { target: '_blank', rel: 'noopener noreferrer' })}>{l.label}</a>)}</p>}
+                    {kids(p.slug).length > 0 && (
+                      <>
+                        <button type="button" class="te-fold" data-fold={p.slug} aria-expanded="false"><span class="chev" aria-hidden="true"></span>{kids(p.slug).length} parts</button>
+                        <ul class="sub te-sub" data-sub={p.slug}>
+                          {kids(p.slug).map((k) => (
+                            <li><span class="te-sub-name">{k.title}</span> <span class="te-when">since {k.from.slice(0, 4)}</span><p>{k.desc}</p></li>
+                          ))}
+                        </ul>
+                      </>
+                    )}
+                  </li>
+                ))}
+              </ol>
             </div>
           ))}
-          <div class="pane tl-pane"><div class="pane-slot"></div></div>
         </section>
 
         <!-- one file per project; the open one is cloned into the visible pane by the script -->
@@ -195,28 +197,13 @@ const months = ['2025', 'Apr', 'Jul', 'Oct', '2026', 'Apr', 'Jul'];
         </div>
       </main>
 
-      <!-- ── footers ── -->
-      <footer class="foot foot-1">
-        <a class="foot-home" href="/">Jonatan Snyders</a>
-        <ul class="ext">
-          <li><a href="https://github.com/jsnyde0/" rel="me">GitHub</a></li>
-          <li><a href="https://www.linkedin.com/in/jonatan-snyders/" rel="me">LinkedIn</a></li>
+      <footer class="foot">
+        <ul class="icons">
+          <li><a href="https://github.com/jsnyde0/" rel="me" aria-label="GitHub"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg></a></li>
+          <li><a href="https://www.linkedin.com/in/jonatan-snyders/" rel="me" aria-label="LinkedIn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a></li>
         </ul>
-      </footer>
-      <footer class="foot foot-2">
-        <ul class="ext-big">
-          <li><a href="https://github.com/jsnyde0/" rel="me">GitHub</a></li>
-          <li><a href="https://www.linkedin.com/in/jonatan-snyders/" rel="me">LinkedIn</a></li>
-        </ul>
-        <a class="foot-home" href="/">Jonatan Snyders</a>
-      </footer>
-      <footer class="foot foot-3">
-        <a class="foot-home" href="/">Jonatan Snyders</a>
-        <ul class="col">{pages.map((p) => <li><a href={p.href}>{p.label}</a></li>)}</ul>
-        <ul class="col">
-          <li><a href="https://github.com/jsnyde0/" rel="me">GitHub</a></li>
-          <li><a href="https://www.linkedin.com/in/jonatan-snyders/" rel="me">LinkedIn</a></li>
-        </ul>
+        <!-- SHORTCUT: copyright year hard-coded; production derives it at build time. -->
+        <p class="copy">© 2026 Jonatan Snyders</p>
       </footer>
     </div>
 
@@ -227,18 +214,13 @@ const months = ['2025', 'Apr', 'Jul', 'Oct', '2026', 'Apr', 'Jul'];
       <button data-k="v" data-d="-1" aria-label="Previous layout">&larr;</button>
       <strong data-show="v"></strong>
       <button data-k="v" data-d="1" aria-label="Next layout">&rarr;</button>
-      <span class="psw-sep"></span>
-      <span>footer</span>
-      <button data-k="foot" data-d="-1" aria-label="Previous footer">&larr;</button>
-      <strong data-show="foot"></strong>
-      <button data-k="foot" data-d="1" aria-label="Next footer">&rarr;</button>
     </div>
 
     <script is:inline>
       (function () {
         var h = document.documentElement;
-        var opts = { v: ['B', 'D'], foot: ['1', '2', '3'] };
-        var names = { B: 'Explorer', D: 'Timeline', 1: 'Quiet', 2: 'Sign-off', 3: 'Sitemap' };
+        var opts = { v: ['B', 'T'] };
+        var names = { B: 'Explorer', T: 'Vertical timeline' };
         function paint() {
           document.querySelectorAll('[data-show]').forEach(function (el) {
             var k = h.dataset[el.dataset.show]; el.textContent = k + ' · ' + names[k];
@@ -258,8 +240,6 @@ const months = ['2025', 'Apr', 'Jul', 'Oct', '2026', 'Apr', 'Jul'];
           if (e.target.closest('input,textarea,[contenteditable]')) return;
           if (e.key === 'ArrowRight') step('v', 1);
           if (e.key === 'ArrowLeft') step('v', -1);
-          if (e.key === 'ArrowDown') { e.preventDefault(); step('foot', 1); }
-          if (e.key === 'ArrowUp') { e.preventDefault(); step('foot', -1); }
         });
         // One open project, shown in each layout's pane. SHORTCUT: no #slug deep links yet (production: like /resume).
         function open(slug) {
@@ -269,6 +249,15 @@ const months = ['2025', 'Apr', 'Jul', 'Oct', '2026', 'Apr', 'Jul'];
         }
         document.querySelectorAll('[data-open]').forEach(function (b) {
           b.addEventListener('click', function () { open(b.dataset.open); });
+        });
+        // Harmonica: a folder row (or the timeline's "n parts") folds its parts open and shut.
+        document.querySelectorAll('[data-fold]').forEach(function (b) {
+          b.addEventListener('click', function () {
+            var on = b.getAttribute('aria-expanded') !== 'true';
+            b.setAttribute('aria-expanded', String(on));
+            var sub = b.parentElement.querySelector('[data-sub="' + b.dataset.fold + '"]');
+            if (sub) sub.classList.toggle('is-shown', on);
+          });
         });
         open('switch-berlin');
         paint();
@@ -304,9 +293,8 @@ const months = ['2025', 'Apr', 'Jul', 'Oct', '2026', 'Apr', 'Jul'];
   p, h1, h2, h3 { margin: 0; }
   button { all: unset; box-sizing: border-box; cursor: pointer; }
 
-  .var, .foot { display: none; }
-  :global(html[data-v='B']) .var-B, :global(html[data-v='D']) .var-D { display: grid; }
-  :global(html[data-foot='1']) .foot-1, :global(html[data-foot='2']) .foot-2, :global(html[data-foot='3']) .foot-3 { display: flex; }
+  .var { display: none; }
+  :global(html[data-v='B']) .var-B, :global(html[data-v='T']) .var-T { display: grid; }
 
   /* ── top bar (round-1 pick) ── */
   .topbar { display: flex; align-items: center; gap: var(--space-4) var(--space-8); flex-wrap: wrap; }
@@ -334,7 +322,7 @@ const months = ['2025', 'Apr', 'Jul', 'Oct', '2026', 'Apr', 'Jul'];
   .row { display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-4); width: 100%; min-height: 44px; padding: var(--space-2); border-top: 1px solid var(--id-rule); font-weight: var(--id-weight-medium); }
   .ex-group > ul > li:last-child > .row { border-bottom: 1px solid var(--id-rule); }
   .row:hover { background: var(--id-tint-hover); }
-  .row.is-open, .tl-row.is-open .tl-label { background: var(--id-pink); color: var(--id-ink); }
+  .row.is-open { background: var(--id-pink); color: var(--id-ink); }
   .row.is-open .yrs { color: var(--id-ink); }
   .yrs { color: var(--id-paper-2); font-size: var(--id-text-small); white-space: nowrap; }
   .sub .row { min-height: 36px; padding: var(--space-1) var(--space-2) var(--space-1) var(--space-8); border-top-color: transparent; font-size: var(--id-text-small); }
@@ -349,42 +337,43 @@ const months = ['2025', 'Apr', 'Jul', 'Oct', '2026', 'Apr', 'Jul'];
   .pane :global(.file-links a) { display: inline-flex; align-items: center; min-height: 44px; font-weight: var(--id-weight-strong); color: var(--id-lime); }
   .pane :global(.file-links a:hover) { color: var(--id-ink); }
 
-  /* ── D: timeline ── */
-  .var-D { --label: minmax(10rem, 3fr); grid-template-columns: minmax(0, 1fr); }
-  .tl-axis, .tl-row { display: grid; grid-template-columns: var(--label) minmax(0, 9fr); column-gap: var(--pad); align-items: center; }
-  .tl-axis { position: sticky; top: 0; z-index: 2; padding: var(--space-2) 0; background: var(--id-ground); border-bottom: 1px solid var(--id-rule); font-size: var(--id-text-small); color: var(--id-paper-2); }
-  .tl-axis .tl-track { position: relative; height: 1.5em; }
-  .tl-axis .tl-track span { position: absolute; top: 0; padding-left: 4px; border-left: 1px solid var(--id-rule); }
-  .tl-axis .tl-track .yr { color: var(--id-paper); font-weight: var(--id-weight-strong); }
-  .tl-axis .tl-now { transform: translateX(-100%); border-left: 0 !important; padding-right: 2px; color: var(--id-pink); font-weight: var(--id-weight-strong); }
-  .tl-group { margin-top: var(--space-10); }
-  .tl-row { width: 100%; min-height: 40px; border-top: 1px solid var(--id-rule); }
-  .tl-row:hover { background: var(--id-tint-hover); }
-  .tl-row .tl-label { padding: var(--space-1) var(--space-2); font-weight: var(--id-weight-medium); justify-self: start; }
-  .tl-early { color: var(--id-paper-2); font-size: var(--id-text-small); font-weight: var(--id-weight-body); }
-  .tl-row .tl-track { position: relative; height: 14px; }
-  .tl-bar { position: absolute; top: 0; height: 100%; min-width: 6px; background: var(--id-lime-dim); }
-  .tl-bar.ongoing { background: var(--id-lime); }
-  .tl-row.is-open .tl-bar { background: var(--id-pink); }
-  .tl-sub { min-height: 30px; border-top-color: transparent; }
-  .tl-sub .tl-label { padding-left: var(--space-8); font-size: var(--id-text-small); }
-  .tl-sub .tl-label::before { content: '↳ '; color: var(--id-paper-2); }
-  .tl-sub .tl-track { height: 6px; }
-  .tl-pane { position: static; margin-top: var(--space-10); padding-top: var(--space-8); border-top: 1px solid var(--id-rule); }
+  /* harmonica (both layouts) */
+  .sub { display: none; }
+  .sub.is-shown { display: block; }
+  .chev::before { content: '+'; display: inline-block; width: 1.1em; color: var(--id-paper-2); font-weight: var(--id-weight-strong); }
+  [aria-expanded='true'] .chev::before { content: '−'; }
+  .row.is-open .chev::before { color: var(--id-ink); }
+  .count { margin-left: var(--space-3); color: var(--id-paper-2); font-size: var(--id-text-small); }
+  .row.is-open .count { color: var(--id-ink); }
 
-  /* ── footers ── */
-  .foot { margin-top: var(--space-12); padding-top: var(--space-6); border-top: 1px solid var(--id-rule); gap: var(--space-6); }
-  .foot-home { display: inline-flex; align-items: center; min-height: 44px; font-weight: var(--id-weight-strong); text-decoration: none; }
-  .ext, .col { display: flex; gap: var(--space-6); }
-  .ext a, .col a { display: inline-flex; align-items: center; min-height: 44px; }
-  .foot-1 { justify-content: space-between; align-items: center; flex-wrap: wrap; }
-  .foot-2 { flex-direction: column; align-items: flex-start; }
-  .ext-big { display: flex; flex-wrap: wrap; gap: 0 var(--space-10); }
-  .ext-big a { font-size: var(--id-text-display); font-weight: var(--id-weight-poster); letter-spacing: var(--id-tracking-display); line-height: 1.1; color: var(--id-lime); text-decoration: none; padding: 0 0.08em; }
-  .foot-2 .foot-home { color: var(--id-paper-2); font-size: var(--id-text-small); }
-  .foot-3 { flex-wrap: wrap; align-items: flex-start; gap: var(--space-4) var(--space-12); }
-  .foot-3 .foot-home { margin-right: auto; }
-  .foot-3 .col { flex-direction: column; gap: 0; }
+  /* ── T: vertical timeline ── */
+  .var-T { grid-template-columns: minmax(0, 1fr); }
+  .ty { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 9fr); column-gap: var(--pad); border-top: 1px solid var(--id-rule); }
+  .ty-year { position: sticky; top: var(--pad); align-self: start; padding-top: var(--space-6); font-size: var(--id-text-display); font-weight: var(--id-weight-poster); letter-spacing: var(--id-tracking-display); line-height: var(--id-leading-display); color: var(--id-lime); }
+  .ty-list { margin: 0; padding: 0 0 var(--space-6); list-style: none; border-left: 2px solid var(--id-rule); }
+  .te { position: relative; display: grid; gap: var(--space-2); padding: var(--space-6) 0 var(--space-4) var(--space-8); max-width: 60ch; }
+  .te::before { content: ''; position: absolute; left: -7px; top: calc(var(--space-6) + 0.35em); width: 12px; height: 12px; border-radius: 50%; background: var(--id-ground); border: 2px solid var(--id-paper-2); box-sizing: border-box; }
+  .te.ongoing::before { background: var(--id-lime); border-color: var(--id-lime); }
+  .te-when { color: var(--id-paper-2); font-size: var(--id-text-small); }
+  .te-name { font-size: var(--id-text-heading); font-weight: var(--id-weight-strong); letter-spacing: var(--id-tracking-heading); }
+  .te-desc { line-height: var(--line-height-relaxed); }
+  .te-links { display: flex; gap: var(--space-6); }
+  .te-links a { display: inline-flex; align-items: center; min-height: 44px; font-weight: var(--id-weight-strong); color: var(--id-lime); }
+  .te-links a:hover { color: var(--id-ink); }
+  .te-fold { justify-self: start; min-height: 44px; font-weight: var(--id-weight-strong); }
+  .te-fold:hover { color: var(--id-lime); }
+  .te-sub { padding-left: var(--space-5); border-left: 1px solid var(--id-rule); }
+  .te-sub li { padding: var(--space-2) 0; }
+  .te-sub p { color: var(--id-paper-2); font-size: var(--id-text-small); line-height: var(--line-height-relaxed); }
+  .te-sub-name { font-weight: var(--id-weight-strong); }
+
+  /* ── footer: centred icons + copyright ── */
+  .foot { display: flex; flex-direction: column; align-items: center; gap: var(--space-2); margin-top: var(--space-12); padding-top: var(--space-8); border-top: 1px solid var(--id-rule); }
+  .icons { display: flex; gap: var(--space-4); }
+  .icons a { display: grid; place-items: center; width: 44px; height: 44px; color: var(--id-paper); }
+  .icons a:hover { background: none; color: var(--id-pink); }
+  .icons svg { width: 22px; height: 22px; fill: currentColor; }
+  .copy { color: var(--id-paper-2); font-size: var(--id-text-small); }
 
   @media (max-width: 760px) {
     .topbar { gap: var(--space-2); }
@@ -395,10 +384,9 @@ const months = ['2025', 'Apr', 'Jul', 'Oct', '2026', 'Apr', 'Jul'];
     .head { grid-template-columns: minmax(0, 1fr); row-gap: var(--space-5); }
     .var-B { grid-template-columns: minmax(0, 1fr); row-gap: var(--space-8); }
     .pane { position: static; }
-    .var-D { --label: minmax(0, 5fr); }
-    .tl-axis, .tl-row { grid-template-columns: var(--label) minmax(0, 7fr); column-gap: var(--space-2); }
-    .tl-axis .tl-track span:not(.yr):not(.tl-now) { display: none; }
-    .tl-early { display: none; }
+    .ty { grid-template-columns: minmax(0, 1fr); }
+    .ty-year { position: static; }
+    .ty-list { margin-left: 6px; }
     .psw { gap: 4px; padding: 4px 8px; font-size: 10px; }
     .psw-tag { display: none; }
   }
