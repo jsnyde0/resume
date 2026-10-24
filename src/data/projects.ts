@@ -20,7 +20,7 @@ export interface Project {
 
 export const projectsIntro = {
   title: 'Building',
-  lede: "Things I've built and am building — products, tools, and research software, and the agent factory I run them with.",
+  lede: 'Products, tools and research software — and the agent factory that builds them.',
 };
 
 export const statusGroups: { key: ProjectStatus; label: string }[] = [
@@ -57,8 +57,11 @@ export const projects: Project[] = [
   { slug: 'personal-agent', title: 'personal agent', status: 'now', from: '2026-04',
     desc: 'An always-on assistant I talk to over Telegram, running on my own host with a scheduler and its own sessions.',
     stack: ['Pi', 'TypeScript', 'Telegram', 'grammY', 'whisper.cpp'] },
+  { slug: 'learning', title: 'learning', status: 'now', from: '2026-10',
+    desc: 'A project-based plan for learning to engineer with coding agents: an AI tutor holds back answers and I make the design calls. First project: my own small coding-agent harness, to see the loop, tools, permissions and context handling from the inside.',
+    stack: ['Claude Code', 'beads', 'agent skills', 'agent harness'] },
   { slug: 'rip-cage', title: 'rip-cage', status: 'built', from: '2026-03', to: '2026-10',
-    desc: 'A CLI that wraps your project in a Docker container with a command-intercepting safety stack, so you can run coding agents with --dangerously-skip-permissions and keep the blast radius small.',
+    desc: 'A CLI that runs coding agents inside a microVM with a command-intercepting safety stack, so they can work with --dangerously-skip-permissions and the blast radius stays small.',
     stack: ['microsandbox', 'Docker', 'Claude Code', 'Pi'], links: [{ label: 'GitHub', href: 'https://github.com/jsnyde0/rip-cage' }] },
   { slug: 'meshmonk', title: 'meshmonk', status: 'built', from: '2026-04', to: '2026-10', early: '2016–2021',
     desc: 'The open-source 3D mesh-registration toolbox I built, used in KU Leuven craniofacial research and widely cited. In 2026 I rewrote it Python-first (C++20, clean API, Python bindings, PyPI).',
@@ -75,6 +78,12 @@ export const projects: Project[] = [
   { slug: 'event-gulper', title: 'event-gulper', status: 'built', from: '2025-02', to: '2026-06',
     desc: 'The agentic event scraper that came before switch-berlin.', stack: ['Python', 'Prefect', 'PostgreSQL', 'OpenAI', 'pydantic-ai'],
     links: [{ label: 'GitHub', href: 'https://github.com/jsnyde0/event-gulper' }] },
+  { slug: 'ebayes', title: 'ebayes', status: 'built', from: '2024-08', to: '2024-10',
+    desc: 'A web app for Bayesian marketing-mix modelling in eCommerce: upload sales and spend, plot each channel against sales, fit a PyMC-Marketing model. At Mapular I took it further on real data: adstock and saturation curves, heuristic priors, time-varying media effects, budget optimisation, and a Google Meridian comparison.',
+    stack: ['Python', 'PyMC-Marketing', 'Meridian', 'Django', 'Plotly'], links: [{ label: 'GitHub', href: 'https://github.com/jsnyde0/ebayes' }] },
+  { slug: 'monk3d', title: 'MONK3D', status: 'built', from: '2017-10', to: '2017-10',
+    desc: "Reconstructing an object's 3D shape from a single image, with a one-page project site. Early work from when I was getting into 3D shape modelling.",
+    stack: ['3D reconstruction', 'computer vision', 'HTML/CSS/JS'] },
 ];
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
