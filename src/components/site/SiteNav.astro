@@ -1,0 +1,83 @@
+---
+// Shared top bar: face + name (home link) left, page links right; the current page is a pink block.
+// Rendered inside a `bare` BaseLayout page; the page owns the padding around it.
+export type SitePage = 'resume' | 'projects' | 'readme' | 'factory';
+
+interface Props {
+  current?: SitePage;
+}
+
+const { current } = Astro.props;
+
+const pages: { key: SitePage; href: string; label: string }[] = [
+  { key: 'resume', href: '/resume/', label: 'Resume' },
+  { key: 'projects', href: '/projects/', label: 'Projects' },
+  { key: 'readme', href: '/readme/', label: 'README' },
+  { key: 'factory', href: '/factory/', label: 'Factory' },
+];
+---
+
+<header class="site-nav">
+  <a class="home" href="/">
+    <img src="/img/avatar_jonatan.png" alt="" width="253" height="252" />
+    <span>Jonatan Snyders</span>
+  </a>
+  <nav aria-label="Site">
+    <ul class="pages">
+      {pages.map((p) => (
+        <li><a href={p.href} aria-current={p.key === current ? 'page' : undefined}>{p.label}</a></li>
+      ))}
+    </ul>
+  </nav>
+</header>
+
+<style>
+  .site-nav {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-4) var(--space-8);
+    font-family: var(--id-font-body);
+    font-size: var(--id-text-body);
+    color: var(--id-paper);
+  }
+  ul { list-style: none; margin: 0; padding: 0; }
+  a {
+    color: inherit;
+    text-underline-offset: 0.18em;
+    transition: background-color 160ms cubic-bezier(0.25, 1, 0.5, 1), color 160ms cubic-bezier(0.25, 1, 0.5, 1);
+  }
+  a:focus-visible { outline: 3px solid var(--id-paper); outline-offset: 3px; }
+  .home {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-height: 44px;
+    font-weight: var(--id-weight-strong);
+    letter-spacing: var(--id-tracking-heading);
+    text-decoration: none;
+  }
+  .home img { width: 44px; height: auto; }
+  .home:hover span { background: var(--id-pink); color: var(--id-ink); }
+  nav { margin-left: auto; }
+  .pages { display: flex; flex-wrap: wrap; gap: var(--space-6); }
+  .pages a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 0.3em;
+    font-weight: var(--id-weight-strong);
+    color: var(--id-lime);
+    text-decoration: none;
+  }
+  .pages a:hover { background: var(--id-pink); color: var(--id-ink); }
+  .pages a[aria-current='page'] { background: var(--id-pink); color: var(--id-ink); }
+
+  @media (max-width: 760px) {
+    .site-nav { gap: var(--space-2); }
+    nav { margin-left: 0; width: 100%; }
+    .home img { width: 36px; }
+    .pages { gap: 0 var(--space-2); }
+    .pages a { font-size: var(--id-text-small); padding: 0 0.25em; }
+  }
+</style>

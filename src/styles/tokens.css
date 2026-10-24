@@ -68,9 +68,8 @@
   --primary-focus: #ff6d3a;
   --primary-content: #0b1116;
 
-  /* Semantic accent palette (badge / tag colors) */
+  /* Semantic accent */
   --success: #22c55e;
-  --info: #38bdf8;
 
   /* Bright content (headings, important labels) */
   --content-bright: #f2f7fb;
@@ -83,7 +82,6 @@
   --surface-subtle: rgba(255, 255, 255, 0.02);
   --border-subtle: rgba(171, 196, 220, 0.12);
   --primary-tint: rgba(255, 127, 80, 0.08);
-  --info-tint: rgba(56, 189, 248, 0.1);
 
   /* ── Typography ── */
   --font-body: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -94,20 +92,15 @@
   --text-xs: 0.75rem;
   --text-sm: 0.875rem;
   --text-base: 1rem;
-  --text-prose-sm: 0.95rem;
   --text-xl: 1.5rem;
   --text-2xl: 1.875rem;
   /* Type scale: fluid steps (page titles and ledes) */
-  --text-title: clamp(2rem, 4vw, 2.5rem);
-  --text-lead: clamp(1rem, 2vw, 1.15rem);
-  --text-card-title: clamp(1.1rem, 2.5vw, 1.35rem);
   --text-hero: clamp(2.25rem, 7vw, 3.75rem);
   --text-hero-lead: clamp(1rem, 2vw, 1.25rem);
 
   /* ── Spacing scale (step n = n * 0.25rem) ── */
   --space-1: 0.25rem;
   --space-2: 0.5rem;
-  --space-2-5: 0.6rem;  /* off-grid step used by ProjectCard; not n * 0.25rem */
   --space-3: 0.75rem;
   --space-4: 1rem;
   --space-5: 1.25rem;
@@ -118,7 +111,6 @@
 
   /* ── Container widths ── */
   --container-prose: 42rem;   /* intro / hero copy measure */
-  --container-narrow: 52rem;  /* /projects/ */
   --container-content: 56rem; /* /readme/ */
   --container-site: 80rem;    /* site shell, navbar */
 
@@ -136,7 +128,7 @@
   /* ── Transitions ── */
   --transition-base: 160ms ease;
 
-  /* ── Card surface (shared by ResumeCard and ProjectCard) ── */
+  /* ── Card surface (used by ResumeCard) ── */
   --card-bg: var(--base-200);
   --card-radius: var(--radius-xl);
   --card-shadow: var(--shadow-card);

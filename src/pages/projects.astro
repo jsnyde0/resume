@@ -1,49 +1,276 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import ProjectCard from '../components/projects/ProjectCard.astro';
-import { projectEntries, projectsIntro } from '../data/projects';
+import SiteNav from '../components/site/SiteNav.astro';
+import SiteFooter from '../components/site/SiteFooter.astro';
+import { projects, projectsIntro, statusGroups, topLevel, partsOf, formatRange } from '../data/projects';
+import type { Project } from '../data/projects';
+
+const DEFAULT_SLUG = projects[0].slug;
+const statusLabel = (p: Project) => statusGroups.find((g) => g.key === p.status)?.label;
+const isInternal = (href: string) => href.startsWith('/');
 ---
 
-<BaseLayout title="Building | Jonatan Snyders" description="Things Jonatan Snyders has built — products, tools, and research software, from a sandboxing CLI to a cited academic toolbox and a location-intelligence platform.">
-  <div class="projects-page" id="projects">
-    <header class="projects-page__intro">
-      <h1>{projectsIntro.title}</h1>
-      <p>{projectsIntro.description}</p>
-    </header>
+<BaseLayout
+  bare
+  title="Building | Jonatan Snyders"
+  description="Things Jonatan Snyders has built and is building — products, tools, and research software, and the agent factory he runs them with."
+>
+  <div class="projects-page">
+    <SiteNav current="projects" />
 
-    <div class="projects-page__list">
-      {projectEntries.map((project) => <ProjectCard project={project} />)}
-    </div>
+    <main>
+      <div class="head">
+        <h1 class="title">{projectsIntro.title}</h1>
+        <p class="lede">{projectsIntro.lede}</p>
+      </div>
+
+      <div class="explorer">
+        <div class="tree" id="tree">
+          {statusGroups.map((g) => (
+            <section class="group" aria-labelledby={`group-${g.key}`}>
+              <h2 class="group-head" id={`group-${g.key}`}>{g.label}<sup>{topLevel(g.key).length}</sup></h2>
+              <ul class="rows">
+                {topLevel(g.key).map((p) => {
+                  const parts = partsOf(p.slug);
+                  return (
+                    <li>
+                      {parts.length > 0 ? (
+                        <>
+                          <button
+                            type="button"
+                            class="row row-folder"
+                            id={p.slug}
+                            data-slug={p.slug}
+                            data-fold={`parts-${p.slug}`}
+                            aria-expanded="false"
+                            aria-controls={`panel-${p.slug}`}
+                          >
+                            <span><span class="chev" aria-hidden="true"></span>{p.title}<span class="count">{parts.length} parts</span></span>
+                            <span class="when">{formatRange(p)}</span>
+                          </button>
+                          <ul class="parts" id={`parts-${p.slug}`} hidden>
+                            {parts.map((k) => (
+                              <li>
+                                <button type="button" class="row" id={k.slug} data-slug={k.slug} aria-controls={`panel-${k.slug}`}>
+                                  <span>{k.title}</span>
+                                  <span class="when">{formatRange(k)}</span>
+                                </button>
+                              </li>
+                            ))}
+                          </ul>
+                        </>
+                      ) : (
+                        <button type="button" class="row" id={p.slug} data-slug={p.slug} aria-controls={`panel-${p.slug}`}>
+                          <span>{p.title}</span>
+                          <span class="when">{formatRange(p)}</span>
+                        </button>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            </section>
+          ))}
+        </div>
+
+        <section class="pane" id="pane" aria-label="Open project">
+          {projects.map((p) => (
+            <article class="panel" id={`panel-${p.slug}`} data-panel={p.slug} tabindex="-1" hidden={p.slug !== DEFAULT_SLUG}>
+              <p class="meta">
+                {statusLabel(p)} · {formatRange(p)}{p.early && ` · first version ${p.early}`}{p.parent && ' · part of the factory'}
+              </p>
+              <h3 class="panel-name">{p.title}</h3>
+              <p class="panel-desc">{p.desc}</p>
+              {p.stack && <p class="meta">{p.stack.join(' · ')}</p>}
+              {p.links && (
+                <p class="panel-links">
+                  {p.links.map((l) => (
+                    <a href={l.href} {...(isInternal(l.href) ? {} : { target: '_blank', rel: 'noopener noreferrer' })}>{l.label}</a>
+                  ))}
+                </p>
+              )}
+            </article>
+          ))}
+        </section>
+      </div>
+    </main>
+
+    <SiteFooter />
   </div>
-
-  <style>
-    .projects-page {
-      width: min(100%, var(--container-narrow));
-      margin: 0 auto;
-    }
-
-    .projects-page__intro {
-      max-width: var(--container-prose);
-      margin: 0 auto var(--space-12);
-      text-align: center;
-    }
-
-    .projects-page__intro h1 {
-      margin: 0 0 var(--space-5);
-      font-size: var(--text-title);
-      line-height: 1.1;
-    }
-
-    .projects-page__intro p {
-      margin: 0;
-      font-size: var(--text-lead);
-      line-height: var(--line-height-relaxed);
-    }
-
-    .projects-page__list {
-      display: flex;
-      flex-direction: column;
-      gap: var(--space-5);
-    }
-  </style>
 </BaseLayout>
+
+<script>
+  // One set of panels, two layouts. Desktop (>760px): panels live in #pane, one open at a time.
+  // <=760px: the open panel moves into the tree, right under its own row (as on /resume/).
+  const DEFAULT_SLUG = document.querySelector<HTMLElement>('#pane [data-panel]')?.dataset.panel ?? '';
+  const desktop = window.matchMedia('(min-width: 761px)');
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const pane = document.getElementById('pane') as HTMLElement;
+  const rows = [...document.querySelectorAll<HTMLButtonElement>('#tree button[data-slug]')];
+  const panels = [...document.querySelectorAll<HTMLElement>('[data-panel]')];
+  let current: string | null = null;
+
+  const rowFor = (slug: string) => rows.find((r) => r.dataset.slug === slug);
+  const panelFor = (slug: string) => panels.find((p) => p.dataset.panel === slug);
+  const behavior = (): ScrollBehavior => (reduced.matches ? 'auto' : 'smooth');
+
+  // Harmonica: a folder row shows and hides its parts; aria-expanded tracks it.
+  function setFold(row: HTMLButtonElement, open: boolean) {
+    const list = document.getElementById(row.dataset.fold ?? '');
+    if (!list) return;
+    list.hidden = !open;
+    row.setAttribute('aria-expanded', String(open));
+  }
+
+  function sync() {
+    const mobile = !desktop.matches;
+    for (const r of rows) {
+      const on = r.dataset.slug === current;
+      r.setAttribute('aria-current', String(on));
+      // A folder's aria-expanded belongs to its harmonica; the others report their inline panel on mobile.
+      if (!r.dataset.fold) {
+        if (mobile) r.setAttribute('aria-expanded', String(on));
+        else r.removeAttribute('aria-expanded');
+      }
+      r.closest('li')?.classList.toggle('is-open', on);
+    }
+    for (const p of panels) {
+      const on = p.dataset.panel === current;
+      p.hidden = !on;
+      const row = rowFor(p.dataset.panel ?? '');
+      if (mobile && on && row) row.after(p);
+      else if (p.parentElement !== pane) pane.append(p);
+    }
+    history.replaceState(null, '', !current || current === DEFAULT_SLUG ? location.pathname : `#${current}`);
+  }
+
+  function open(slug: string, userAction: boolean) {
+    const row = rowFor(slug);
+    if (!row || !panelFor(slug)) return;
+    // A part's folder opens with it, so a deep link shows where you are.
+    const parentFold = row.closest('ul.parts')?.id;
+    const folder = parentFold && rows.find((r) => r.dataset.fold === parentFold);
+    if (folder) setFold(folder, true);
+    current = slug;
+    sync();
+    if (!userAction) return;
+    if (desktop.matches) {
+      if (pane.getBoundingClientRect().top < 0) pane.scrollIntoView({ behavior: behavior() });
+    } else {
+      row.closest('li')?.scrollIntoView({ behavior: behavior(), block: 'start' });
+    }
+  }
+
+  function close() {
+    current = null;
+    sync();
+  }
+
+  rows.forEach((row) =>
+    row.addEventListener('click', () => {
+      const slug = row.dataset.slug ?? '';
+      if (row.dataset.fold) setFold(row, row.getAttribute('aria-expanded') !== 'true');
+      if (!desktop.matches && current === slug) close();
+      else open(slug, true);
+    }),
+  );
+
+  // Crossing the breakpoint: desktop always shows a project; mobile keeps yours.
+  desktop.addEventListener('change', () => {
+    if (desktop.matches && !current) current = DEFAULT_SLUG;
+    sync();
+  });
+
+  window.addEventListener('hashchange', () => {
+    const slug = decodeURIComponent(location.hash.slice(1));
+    if (panelFor(slug)) open(slug, true);
+  });
+
+  const fromHash = decodeURIComponent(location.hash.slice(1));
+  if (fromHash && panelFor(fromHash)) {
+    open(fromHash, false);
+    if (!desktop.matches) rowFor(fromHash)?.closest('li')?.scrollIntoView({ block: 'start' });
+  } else {
+    current = desktop.matches ? DEFAULT_SLUG : null;
+    sync();
+  }
+</script>
+
+<style is:global>
+  html,
+  body { margin: 0; background: var(--id-ground); }
+</style>
+
+<style>
+  .projects-page {
+    --pad: clamp(1rem, 2.4vw, 2.25rem);
+    min-height: 100svh;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    padding: var(--pad) var(--pad) var(--space-12);
+    color: var(--id-paper);
+    font-family: var(--id-font-body);
+    font-size: var(--id-text-body);
+    line-height: var(--line-height-body);
+    -webkit-font-smoothing: antialiased;
+  }
+  main { flex: 1; margin-top: clamp(2rem, 6vw, 5rem); }
+  a { color: inherit; text-underline-offset: 0.18em; }
+  a:focus-visible, button:focus-visible { outline: 3px solid var(--id-paper); outline-offset: 3px; }
+  ul { list-style: none; margin: 0; padding: 0; }
+  p, h1, h2, h3 { margin: 0; }
+  button { all: unset; box-sizing: border-box; cursor: pointer; }
+  button:focus-visible { outline: 3px solid var(--id-paper); outline-offset: 3px; }
+  [hidden] { display: none !important; }
+
+  /* ── head ── */
+  .head { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); column-gap: var(--pad); align-items: end; }
+  .title { font-size: var(--id-text-poster); font-weight: var(--id-weight-poster); letter-spacing: var(--id-tracking-poster); line-height: var(--id-leading-poster); color: var(--id-lime); }
+  .lede { max-width: 34ch; font-size: var(--id-text-heading); font-weight: var(--id-weight-medium); line-height: 1.3; letter-spacing: var(--id-tracking-heading); }
+
+  /* ── explorer ── */
+  .explorer { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); column-gap: calc(2 * var(--pad)); align-items: start; margin-top: clamp(3rem, 6vw, 5rem); }
+  .group + .group { margin-top: var(--space-10); }
+  .group-head { padding-bottom: var(--space-3); font-size: var(--id-text-display); font-weight: var(--id-weight-poster); letter-spacing: var(--id-tracking-display); line-height: var(--id-leading-display); color: var(--id-lime); }
+  .group-head sup { margin-left: 0.2em; font-size: var(--id-text-small); font-weight: var(--id-weight-strong); letter-spacing: 0; color: var(--id-paper-2); vertical-align: top; }
+
+  .row { display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-4); width: 100%; min-height: 44px; padding: var(--space-2); border-top: 1px solid var(--id-rule); font-weight: var(--id-weight-medium); }
+  .rows > li:last-child > .row,
+  .rows > li:last-child > .parts > li:last-child > .row { border-bottom: 1px solid var(--id-rule); }
+  .row:hover { background: var(--id-tint-hover); }
+  .row[aria-current='true'] { background: var(--id-pink); color: var(--id-ink); }
+  .when { color: var(--id-paper-2); font-size: var(--id-text-small); white-space: nowrap; }
+  .row[aria-current='true'] .when,
+  .row[aria-current='true'] .count,
+  .row[aria-current='true'] .chev::before { color: var(--id-ink); }
+
+  /* harmonica */
+  .parts .row { min-height: 36px; padding: var(--space-1) var(--space-2) var(--space-1) var(--space-8); border-top-color: transparent; font-size: var(--id-text-small); }
+  .parts .row span:first-child::before { content: '↳ '; color: var(--id-paper-2); }
+  .parts .row[aria-current='true'] span:first-child::before { color: var(--id-ink); }
+  .chev::before { content: '+'; display: inline-block; width: 1.1em; color: var(--id-paper-2); font-weight: var(--id-weight-strong); }
+  [aria-expanded='true'] > span > .chev::before { content: '−'; }
+  .count { margin-left: var(--space-3); color: var(--id-paper-2); font-size: var(--id-text-small); }
+
+  /* ── detail panel (right pane on desktop, inline under its row on mobile) ── */
+  .pane { position: sticky; top: var(--pad); }
+  .panel { display: grid; gap: var(--space-5); }
+  .panel:focus { outline: none; }
+  .panel-name { font-size: var(--id-text-display); font-weight: var(--id-weight-poster); letter-spacing: var(--id-tracking-display); line-height: var(--id-leading-display); }
+  .panel-desc { max-width: 52ch; font-size: var(--id-text-heading); line-height: 1.45; }
+  .meta { color: var(--id-paper-2); font-size: var(--id-text-small); }
+  .panel-links { display: flex; flex-wrap: wrap; gap: var(--space-6); }
+  .panel-links a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 0.3em; margin-left: -0.3em; font-weight: var(--id-weight-strong); color: var(--id-lime); text-decoration: none; transition: background-color 160ms ease, color 160ms ease; }
+  .panel-links a:hover { background: var(--id-pink); color: var(--id-ink); }
+
+  @media (max-width: 760px) {
+    .head { grid-template-columns: minmax(0, 1fr); row-gap: var(--space-5); }
+    .explorer { grid-template-columns: minmax(0, 1fr); }
+    /* No second pane: the open project lives inline in the list, under its row. */
+    .pane { display: none; }
+    li > .panel { gap: var(--space-3); padding: var(--space-4) var(--space-2) var(--space-6); border-top: 1px solid var(--id-rule); }
+    li > .panel .panel-name { font-size: var(--id-text-heading); letter-spacing: var(--id-tracking-heading); line-height: 1.2; font-weight: var(--id-weight-strong); }
+    li > .panel .panel-desc { font-size: var(--id-text-body); }
+  }
+</style>

@@ -55,10 +55,11 @@ These predate D1. They keep their values and stay in `tokens.css` while a live p
 
 | Legacy group | Tokens | Still read by |
 |---|---|---|
-| Site palette | `--base-100/200/300`, `--base-content`, `--muted-content`, `--primary(-focus/-content)`, `--success`, `--info`, `--content-bright`, `--tooltip-bg/-text`, tints `--surface-subtle`, `--border-subtle`, `--primary-tint`, `--info-tint` | `BaseLayout` chrome (navbar, footer, body; `/` renders `bare`, without the chrome, and overrides the body ground); `/factory/` (+ `/factory/a`, `/factory/b`; owned by bead `resume-t7j`); `/readme/` (`resume-soe.5`); `/projects/` (`ProjectCard`, `resume-soe.4`) |
+| Site palette | `--base-100/200/300`, `--base-content`, `--muted-content`, `--primary(-focus/-content)`, `--success`, `--content-bright`, `--tooltip-bg/-text`, tints `--surface-subtle`, `--border-subtle`, `--primary-tint` | `BaseLayout` chrome (navbar, footer, body; `/` renders `bare`, without the chrome, and overrides the body ground); `/factory/` (+ `/factory/a`, `/factory/b`; owned by bead `resume-t7j`); `/readme/` (`resume-soe.5`) |
 | Legacy fonts | `--font-body` (system stack) | `BaseLayout` body, `/factory/b` |
 
 Deleted (no reader left): `--ghv-*` and `--font-mono`, when `/resume/` became the D5 explorer on `--id-*` (`resume-soe.3`).
+Deleted when `/projects/` became the explorer and `ProjectCard` retired (`resume-soe.4`): `--info`, `--info-tint`, `--text-prose-sm`, `--text-title`, `--text-lead`, `--text-card-title`, `--space-2-5`, `--container-narrow`.
 
 Migration rule: do not change the value of a legacy token (pages that still read it must not move); migrate a page by switching its reads to `--id-*`, then delete any token that has no reader left. Do not add new legacy-family tokens. When `--font-body` loses its last reader, the `--id-font-*` tokens become the only font tokens.
 
@@ -67,10 +68,10 @@ Migration rule: do not change the value of a legacy token (pages that still read
 | Family | Tokens |
 |---|---|
 | Font | `--line-height-body` (1.5), `--line-height-relaxed` (1.65) |
-| Type scale, fixed | `--text-xs` .75rem, `--text-sm` .875rem, `--text-base` 1rem, `--text-prose-sm` .95rem, `--text-xl` 1.5rem, `--text-2xl` 1.875rem |
-| Type scale, fluid (legacy pages) | `--text-title`, `--text-lead`, `--text-card-title`, `--text-hero`, `--text-hero-lead` |
-| Spacing (n x 0.25rem) | `--space-1` .25, `-2` .5, `-3` .75, `-4` 1, `-5` 1.25, `-6` 1.5, `-8` 2, `-10` 2.5, `-12` 3 (rem); plus off-grid `--space-2-5` 0.6 |
-| Containers | `--container-prose` 42rem, `--container-narrow` 52rem (/projects/), `--container-content` 56rem (/readme/), `--container-site` 80rem |
+| Type scale, fixed | `--text-xs` .75rem, `--text-sm` .875rem, `--text-base` 1rem, `--text-xl` 1.5rem, `--text-2xl` 1.875rem |
+| Type scale, fluid (legacy pages) | `--text-hero`, `--text-hero-lead` |
+| Spacing (n x 0.25rem) | `--space-1` .25, `-2` .5, `-3` .75, `-4` 1, `-5` 1.25, `-6` 1.5, `-8` 2, `-10` 2.5, `-12` 3 (rem) |
+| Containers | `--container-prose` 42rem, `--container-content` 56rem (/readme/), `--container-site` 80rem |
 | Radius | `--radius-sm/md/lg/xl/full`, `--radius-button` |
 | Shadow | `--shadow-card` |
 | Motion | `--transition-base` |
@@ -79,7 +80,7 @@ Migration rule: do not change the value of a legacy token (pages that still read
 ## Shared components
 
 - `src/components/resume/ResumeCard.astro` (props: `title?: string`, `tooltip?: string`; default slot). The card surface, used by `/readme/`. Its surface values are the `--card-*` tokens.
-- `src/components/projects/ProjectCard.astro` (prop: `project: ProjectEntry`). Same card surface via the same `--card-*` tokens, so the two cards cannot drift apart.
+- `src/components/site/SiteNav.astro` (prop: `current?: "resume" | "projects" | "readme" | "factory"`) and `SiteFooter.astro`. The shared top bar (face + name home link left; Resume · Projects · README · Factory right, current page a pink block with `aria-current="page"`) and footer (centred GitHub + LinkedIn icons, 44px targets, pink on hover; "© {year} Jonatan Snyders"). Rendered inside a `bare` BaseLayout page; the page owns its padding. Used by `/projects/` so far (resume-soe.4); `/readme/` and `/resume/` adopt it under resume-soe.19.
 
 Class names are part of the verification fingerprint (below). Renaming or adding a class on an existing element shows up as a diff, so do it only on purpose.
 
@@ -107,4 +108,4 @@ scripts/compare ../../../.verify-evidence/screenshots-<baselineTs> ../../../.ver
 - `screenshots` captures full-page PNGs (1440 and 390 wide) and a computed-style fingerprint of every element for `/`, `/resume/`, `/readme/`, `/projects/`, `/factory/`. Capture a baseline on the unchanged tree before editing, then compare. A pure refactor must show zero diffs; every non-zero diff must be an intended change you can name. Pages you do not own must be zero. Not covered: hover/focus states, post-click JS states, `/factory/a` and `/factory/b` prototypes, and layout width (the fingerprint has no `width`/`max-width`; check the PNGs).
 - Always also run `npm run gate` (typecheck, build, projects verifier).
 
-Centralization check: grep for `#hex` / `rgb(a)`, raw `rem|px` in `margin|padding|gap`, and raw `rem|px|clamp` in `font-size`, across `src/layouts/BaseLayout.astro`, the four pages and `src/components/{resume,projects}/`; remaining hits need a justification.
+Centralization check: grep for `#hex` / `rgb(a)`, raw `rem|px` in `margin|padding|gap`, and raw `rem|px|clamp` in `font-size`, across `src/layouts/BaseLayout.astro`, the four pages and `src/components/{resume,site}/`; remaining hits need a justification.
