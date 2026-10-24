@@ -81,9 +81,6 @@ export const projects: Project[] = [
   { slug: 'ebayes', title: 'ebayes', status: 'built', from: '2024-08', to: '2024-10',
     desc: 'A web app for Bayesian marketing-mix modelling in eCommerce: upload sales and spend, plot each channel against sales, fit a PyMC-Marketing model. At Mapular I took it further on real data: adstock and saturation curves, heuristic priors, time-varying media effects, budget optimisation, and a Google Meridian comparison.',
     stack: ['Python', 'PyMC-Marketing', 'Meridian', 'Django', 'Plotly'], links: [{ label: 'GitHub', href: 'https://github.com/jsnyde0/ebayes' }] },
-  { slug: 'monk3d', title: 'MONK3D', status: 'built', from: '2017-10', to: '2017-10',
-    desc: "Reconstructing an object's 3D shape from a single image, with a one-page project site. Early work from when I was getting into 3D shape modelling.",
-    stack: ['3D reconstruction', 'computer vision', 'HTML/CSS/JS'] },
 ];
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
