@@ -127,6 +127,7 @@
 
   /* ── Transitions ── */
   --transition-base: 160ms ease;
+  --ease-out: cubic-bezier(0.25, 1, 0.5, 1);          /* ease-out-quart: the one curve for UI motion */
 
   /* ── Card surface (used by ResumeCard) ── */
   --card-bg: var(--base-200);
