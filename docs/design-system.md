@@ -11,7 +11,7 @@ Canonical home of the site's visual identity (D1-D3, landed on bead `resume-soe.
 
 **D2 - No costume.**
 - No decorative borrowed-format conceit (magazine, newspaper, film slate, terminal cosplay, stickers, fake metadata, jokey microcopy). Only real copy, played straight; personality comes from scale, the photo and the tagline.
-- Carve-out: the `/resume/` repo-explorer *mechanism* (README landing, folders with file counts, `#path` deep links) is the human's own content device and functional navigation, so it stays. Decorative GitHub chrome that does nothing (Star/Fork, branch name, Raw/Blame, fake download buttons) does not.
+- Carve-out: the `/resume/` repo-explorer *mechanism* (about.md landing, folders with file counts, `#path` deep links) is the human's own content device and functional navigation, so it stays. Decorative GitHub chrome that does nothing (Star/Fork, branch name, Raw/Blame, fake download buttons) does not.
 
 **D3 - Outfit pops.**
 - The lime shirt is never placed on a lime or near-lime ground; the pink clogs never on a pink ground. Brand colours go on type, rules, marks and UI; the body sits on `--id-ground`.
