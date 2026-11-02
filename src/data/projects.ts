@@ -127,8 +127,8 @@ export const projects: Project[] = [
     desc: "A web app where an online shop uploads its sales and ad spend, sees each channel plotted against sales, and fits a Bayesian marketing-mix model. Later, at Mapular, I built a fuller model on real data: ad carry-over and saturation, effects that change over time, budget optimisation, and a Google Meridian comparison.",
     stack: ['Python', 'PyMC-Marketing', 'Meridian', 'Django', 'Plotly'], links: [{ label: 'GitHub', href: 'https://github.com/jsnyde0/ebayes' }] },
   { slug: 'meshmonk', title: 'meshmonk', status: 'built', from: '2016-10', to: '2019-06', rewritten: '2026',
-    desc: "An open-source toolbox I built at KU Leuven for fitting one 3D surface mesh onto another. In 2026 I rewrote it Python-first: a C++20 library with Python bindings, published on PyPI.",
-    stack: ['C++20', 'Python', 'nanobind', 'CMake', 'PyPI'], links: [{ label: 'GitHub', href: 'https://github.com/jsnyde0/meshmonk' }] },
+    desc: "An open-source toolbox I built at KU Leuven for fitting one 3D surface mesh onto another, used in research from facial genetics to dental and surgical planning. Its 2019 paper has over 160 citations. In 2026 I rewrote it Python-first: a C++20 library with Python bindings, on PyPI.",
+    stack: ['C++20', 'Python', 'nanobind', 'CMake', 'PyPI'], links: [{ label: 'GitHub', href: 'https://github.com/jsnyde0/meshmonk' }, { label: 'Paper (Sci Rep 2019)', href: 'https://doi.org/10.1038/s41598-019-42533-y' }] },
 ];
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
