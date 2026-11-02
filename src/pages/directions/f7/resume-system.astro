@@ -1,9 +1,8 @@
 ---
-// PROTOTYPE (resume-system): how /resume sits inside the shared design system. Three variants, ?variant=A|B|C.
-//   A "Title is the intro"   big lime "Resume" title IS the intro toggle (pink when the intro is shown); no README row.
-//   B "Intro as a row"       "Resume" is a plain title; about.md is an ordinary first row above Experience.
-//   C "Intro in the head"    roles line sits in the head's right column (like /projects' lede); pane opens on the
-//                            first Experience file; about.md is still reachable as a row.
+// PROTOTYPE (resume-system) round 2: ?variant=B2 (default) | B.
+//   B  "Intro as a row"   round-1 winner, unchanged for before/after: full-width head, pane starts below it.
+//   B2 "Top-aligned pane" same content; on desktop the title belongs to the left column only and the
+//                         pane starts level with it and runs down beside title + list.
 // Copied from src/pages/resume.astro; everything outside the head/intro question is identical across variants.
 // SHORTCUT: delete this route (and the switcher) once a variant is chosen; the build is a TDD rewrite into resume.astro.
 // /resume/ — the repo explorer (resume-soe.12 D5, F4). Desktop (>860px): two panes, the lime
@@ -103,8 +102,6 @@ const contents: Record<string, string> = {
   ...educationSection.contents,
 };
 const panelId = (path: string) => 'f-' + path.replace(/[^a-z0-9]+/gi, '-');
-// SHORTCUT: variant C default = first Experience file by position (mapular.md, newest); production: explicit data.
-const firstExperience = experience.files[0].path;
 ---
 
 {/* SHORTCUT: prototype title/description; production keeps resume.astro's. */}
@@ -113,26 +110,20 @@ const firstExperience = experience.files[0].path;
   title="Resume (prototype) | Jonatan Snyders"
   description="Prototype of the shared-system resume page."
 >
-  <div class="resume-page" data-first-exp={firstExperience}>
+  <div class="resume-page">
     <!-- SHORTCUT: variant read client-side (static site, no request-time query); inline script sets it before first paint. -->
-    <script is:inline>document.documentElement.dataset.variant = (new URLSearchParams(location.search).get('variant') || 'A').toUpperCase();</script>
+    <script is:inline>document.documentElement.dataset.variant = (new URLSearchParams(location.search).get('variant') || 'B2').toUpperCase();</script>
     <SiteNav current="resume" />
 
     <main>
       <div class="head">
-        <!-- A: the title is the intro toggle. -->
-        <h1 class="title" data-only="A" data-anchor>
-          <button class="title-btn file" type="button" data-path={ABOUT} aria-controls={panelId(ABOUT)} aria-current="true"><span>Resume</span><span class="mark" aria-hidden="true"></span></button>
-        </h1>
-        <h1 class="title" data-only="BC">Resume</h1>
-        <!-- SHORTCUT: C's lede is just the roles joined with middots, not drafted copy. -->
-        <p class="lede" data-only="C">{resumeIntro.headlineBadges.map((b, i) => <>{i > 0 && ' · '}<span class="nowrap">{b}</span></>)}</p>
+        <h1 class="title">Resume</h1>
       </div>
 
       <div class="explorer">
         <nav class="tree" id="tree" aria-label="Resume files">
           <ul class="tree-root">
-            <li class="folder" data-only="BC">
+            <li class="folder">
               <ul class="files files--about">
                 <li>
                   <button class="file leaf" type="button" data-path={ABOUT} aria-controls={panelId(ABOUT)}>
@@ -231,11 +222,11 @@ const firstExperience = experience.files[0].path;
   // One set of panels, two layouts. Desktop (>860px): two panes, panels live in #pane.
   // <=860px: an accordion; the open panel is moved into the tree, right under its own row.
   const ABOUT = 'about.md';
-  const VARIANTS = ['A', 'B', 'C'];
-  const NAMES: Record<string, string> = { A: 'Title is the intro', B: 'Intro as a row', C: 'Intro in the head' };
-  const rawVariant = (new URLSearchParams(location.search).get('variant') ?? 'A').toUpperCase();
-  const variant = VARIANTS.includes(rawVariant) ? rawVariant : 'A';
-  const DEFAULT_PATH = variant === 'C' ? (document.querySelector<HTMLElement>('.resume-page')?.dataset.firstExp ?? ABOUT) : ABOUT;
+  const VARIANTS = ['B2', 'B'];
+  const NAMES: Record<string, string> = { B2: 'Top-aligned pane', B: 'Round 1 (reference)' };
+  const rawVariant = (new URLSearchParams(location.search).get('variant') ?? 'B2').toUpperCase();
+  const variant = VARIANTS.includes(rawVariant) ? rawVariant : 'B2';
+  const DEFAULT_PATH = ABOUT;
   const desktop = window.matchMedia('(min-width: 861px)');
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
   const pane = document.getElementById('pane') as HTMLElement;
@@ -245,8 +236,7 @@ const firstExperience = experience.files[0].path;
   const sectionToggles = [...document.querySelectorAll<HTMLButtonElement>('#tree .folder-toggle')];
   let current: string | null = null;
 
-  // A and B/C both render an about.md button; only one is displayed (data-only), so pick the visible one.
-  const buttonFor = (path: string) => fileButtons.find((b) => b.dataset.path === path && b.getClientRects().length > 0) ?? fileButtons.find((b) => b.dataset.path === path);
+  const buttonFor = (path: string) => fileButtons.find((b) => b.dataset.path === path);
   const panelFor = (path: string) => panels.find((p) => p.dataset.panel === path);
   const behavior = (): ScrollBehavior => (reduced.matches ? 'auto' : 'smooth');
 
@@ -285,8 +275,7 @@ const firstExperience = experience.files[0].path;
       const on = p.dataset.panel === current;
       p.hidden = !on;
       const btn = buttonFor(p.dataset.panel ?? '');
-      const anchor = btn?.closest('[data-anchor]') ?? btn; // variant A: under the title, not inside the h1
-      if (mobile && on && anchor) anchor.after(p); // inline, right under its row
+      if (mobile && on && btn) btn.after(p); // inline, right under its row
       else if (p.parentElement !== pane) pane.append(p);
     }
     history.replaceState(null, '', location.pathname + location.search + (!current || current === DEFAULT_PATH ? '' : `#${current}`));
@@ -310,7 +299,7 @@ const firstExperience = experience.files[0].path;
       if (pane.getBoundingClientRect().top < 0) pane.scrollIntoView({ behavior: behavior() });
     } else {
       // The previous file has folded away above or below; bring this row to the top to read.
-      (buttonFor(path)?.closest('[data-anchor]') ?? buttonFor(path)?.closest('li'))?.scrollIntoView({ behavior: behavior(), block: 'start' });
+      buttonFor(path)?.closest('li')?.scrollIntoView({ behavior: behavior(), block: 'start' });
     }
   }
 
@@ -363,7 +352,7 @@ const firstExperience = experience.files[0].path;
   if (exp) setFolder(exp, true); // the first section is open on arrival, so one tap reads a file
   if (fromHash && panelFor(fromHash)) {
     open(fromHash, false);
-    if (!desktop.matches) (buttonFor(fromHash)?.closest('[data-anchor]') ?? buttonFor(fromHash)?.closest('li'))?.scrollIntoView({ block: 'start' });
+    if (!desktop.matches) buttonFor(fromHash)?.closest('li')?.scrollIntoView({ block: 'start' });
   } else if (desktop.matches) {
     current = DEFAULT_PATH;
     sync();
@@ -420,11 +409,6 @@ const firstExperience = experience.files[0].path;
     outline-offset: 3px;
   }
 
-  /* Variant gating: elements tagged data-only render for the listed variants only. */
-  html[data-variant='A'] [data-only]:not([data-only*='A']),
-  html[data-variant='B'] [data-only]:not([data-only*='B']),
-  html[data-variant='C'] [data-only]:not([data-only*='C']) { display: none !important; }
-
   /* Same shell as /projects: the layout's global main padding is reset, the page sets its own rhythm. */
   .resume-page {
     box-sizing: border-box;
@@ -438,13 +422,6 @@ const firstExperience = experience.files[0].path;
   /* ── head (same grid and tokens as /projects) ── */
   .resume-page .head { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); column-gap: calc(2 * var(--pad)); align-items: end; }
   .resume-page .title { margin: 0; font-size: var(--id-text-poster); font-weight: var(--id-weight-poster); letter-spacing: var(--id-tracking-poster); line-height: var(--id-leading-poster); color: var(--id-lime); }
-  .resume-page .nowrap { white-space: nowrap; }
-  .resume-page .lede { margin: 0; max-width: 30ch; text-wrap: pretty; font-size: var(--id-text-heading); font-weight: var(--id-weight-medium); line-height: 1.3; letter-spacing: var(--id-tracking-heading); }
-  /* SHORTCUT: variant A's title button is not pinned/sticky on mobile like an open row; production decides if it should be. */
-  /* Variant A: the title is a button. */
-  .resume-page .title-btn { display: inline-flex; align-items: flex-start; gap: 0.12em; font: inherit; letter-spacing: inherit; line-height: inherit; color: inherit; background: none; border: 0; padding: 0 0.04em; margin-left: -0.04em; cursor: pointer; text-align: left; transition: color 160ms var(--ease); }
-  .resume-page .title-btn:hover { color: var(--id-paper); }
-  .resume-page .title-btn[aria-current='true'] { background: var(--id-pink); color: var(--id-ink); }
 
   /* ── Explorer: tree left, open file right ─────────────── */
   .resume-page .explorer {
@@ -642,9 +619,24 @@ const firstExperience = experience.files[0].path;
   .resume-page .readme-prose { grid-column: 1 / -1; margin-top: 1rem; columns: 2 18rem; column-gap: var(--pad); max-width: none; }
   .resume-page .readme-prose p { break-inside: avoid; }
 
+  /* SHORTCUT: B2 flattens .explorer with display:contents and re-grids <main>; production should restructure the markup (title, tree, pane as direct grid children) rather than rely on this. */
+  /* B2, desktop: one grid for the whole page body. The title is a left-column row; the pane spans
+     from the top of the content area down past the list, level with the title. */
+  @media (min-width: 861px) {
+    html[data-variant='B2'] .resume-page main {
+      display: grid;
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      column-gap: calc(2 * var(--pad));
+      align-content: start;
+    }
+    html[data-variant='B2'] .resume-page .head { grid-column: 1; grid-row: 1; display: block; }
+    html[data-variant='B2'] .resume-page .explorer { display: contents; }
+    html[data-variant='B2'] .resume-page .tree { grid-column: 1; grid-row: 2; margin-top: clamp(3rem, 6vw, 5rem); padding-bottom: 4rem; }
+    html[data-variant='B2'] .resume-page .pane { grid-column: 2; grid-row: 1 / span 2; align-self: start; }
+  }
+
   @media (max-width: 860px) {
     .resume-page .head { grid-template-columns: minmax(0, 1fr); row-gap: var(--space-5); }
-    .resume-page .lede { max-width: 34ch; }
     .resume-page .explorer { grid-template-columns: minmax(0, 1fr); margin-top: 2.5rem; padding-bottom: 3rem; }
     .resume-page .tree,
     .resume-page .pane { grid-column: 1; }
@@ -655,8 +647,6 @@ const firstExperience = experience.files[0].path;
 
     .resume-page .sect { align-items: center; min-height: 44px; }
     .resume-page .count { align-self: flex-start; margin-top: 0.45em; font-size: 0.8125rem; padding-top: 0; }
-    .resume-page .title-btn { width: 100%; align-items: center; }
-    .resume-page .title-btn[aria-current='true'] { padding-inline: 0.12em; }
     .resume-page .files--sub { margin-left: 0.75rem; }
     .resume-page .leaf { font-size: 1.0625rem; padding-inline: 0.25rem; }
     .resume-page .leaf-name { flex: 1; min-width: 0; overflow-wrap: anywhere; }
@@ -673,8 +663,6 @@ const firstExperience = experience.files[0].path;
       transition: transform 220ms var(--ease);
     }
     .resume-page .sect .mark { width: 1rem; height: 1rem; margin-left: auto; margin-right: 0.25rem; }
-    .resume-page .title-btn .mark { width: 1.5rem; height: 1.5rem; margin-left: auto; margin-right: 0.25rem; }
-    .resume-page .title-btn[aria-current='true'] .mark { color: var(--id-ink); transform: rotate(45deg); }
     .resume-page .is-open > .file .mark { color: var(--id-ink); }
     .resume-page .mark::before,
     .resume-page .mark::after {
