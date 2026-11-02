@@ -5,6 +5,7 @@ import type { Project } from '../data/projects';
 
 const DEFAULT_SLUG = projects[0].slug;
 const statusLabel = (p: Project) => statusGroups.find((g) => g.key === p.status)?.label;
+const parentTitle = (slug: string) => projects.find((q) => q.slug === slug)?.title ?? slug;
 const isInternal = (href: string) => href.startsWith('/');
 ---
 
@@ -40,7 +41,7 @@ const isInternal = (href: string) => href.startsWith('/');
                     aria-expanded="false"
                     aria-controls={`panel-${p.slug}`}
                   >
-                    <span class="name"><span class="chev" aria-hidden="true"></span>{p.title}<span class="count">{parts.length} parts</span></span>
+                    <span class="name"><span class="chev" aria-hidden="true"></span>{p.title}<span class="count">{parts.length} {p.partsNoun ?? 'parts'}</span></span>
                     <span class="when">{formatRange(p)}</span>
                   </button>
                   <ul class="parts" id={`parts-${p.slug}`} hidden>
@@ -72,7 +73,7 @@ const isInternal = (href: string) => href.startsWith('/');
   {projects.map((p) => (
     <article class="panel" id={`panel-${p.slug}`} data-panel={p.slug} tabindex="-1" hidden={p.slug !== DEFAULT_SLUG}>
       <p class="meta">
-        {statusLabel(p)} · {formatRange(p)}{p.rewritten && ` · rewritten ${p.rewritten}`}{p.parent && ' · part of the factory'}
+        {statusLabel(p)} · {formatRange(p)}{p.rewritten && ` · rewritten ${p.rewritten}`}{p.parent && ` · part of ${parentTitle(p.parent)}`}{p.note && ` · ${p.note}`}
       </p>
       <h3 class="panel-name">{p.title}</h3>
       <p class="panel-desc">{p.desc}</p>

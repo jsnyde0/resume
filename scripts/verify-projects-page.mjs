@@ -50,7 +50,43 @@ assert.ok(subList, `No parts list id="${subId}"`);
 assert.equal([...subList[1].matchAll(/<button\b[^>]*\bdata-slug=/g)].length, 7, 'Parts list must hold 7 part rows');
 assert.match(subList[0].slice(0, subList[0].indexOf('>') + 1), /\bhidden\b/, 'Parts list must start hidden');
 assert.match(html, /setAttribute\(['"]aria-expanded['"]/, 'Script must flip aria-expanded');
-assert.equal(rows.filter((r) => attr(r, 'data-fold')).length, 1, 'Only the factory is a harmonica');
+assert.match(html, />\s*7 parts\s*</, 'Factory count label stays "7 parts"');
+
+// --- Agent-skill categories: four harmonicas in Now, directly after factory, in this order ---
+const SKILLS = {
+  'skills-wayfinding': ['wayfinding skills', ['brainstorm', 'prototype', 'spike', 'research']],
+  'skills-learning': ['learning skills', ['learn-chart', 'learn-mission', 'learn-tutor', 'learn-assistant']],
+  'skills-plain': ['making the models make sense', ['guide', 'tldr', 'cold-reader']],
+  'skills-substrate': ['working substrate', ['decompose', 'send-it', 'adversarial-review', 'recall', 'note', 'retro', 'promote', 'clear-resume']],
+};
+const nowSlugs = projects.filter((p) => p.status === 'now' && !p.parent).map((p) => p.slug);
+const fi = nowSlugs.indexOf('factory');
+assert.deepEqual(nowSlugs.slice(fi + 1, fi + 5), Object.keys(SKILLS), 'Four skill categories must follow factory in Now, in order');
+const htmlOrder = Object.keys(SKILLS).map((s) => html.indexOf(`id="${s}"`));
+assert.ok(htmlOrder.every((v, i) => v > (i ? htmlOrder[i - 1] : html.indexOf('id="factory"'))), 'Category rows render in order after factory');
+for (const [slug, [title, kids]] of Object.entries(SKILLS)) {
+  const cat = projects.find((p) => p.slug === slug);
+  assert.ok(cat && cat.title === title, `Category ${slug} must be titled "${title}"`);
+  assert.deepEqual(partsOf(slug).map((k) => k.slug.replace(/^skill-/, '')), kids, `${slug} children`);
+  const row = rows.find((r) => attr(r, 'id') === slug);
+  assert.ok(row, `No row for ${slug}`);
+  assert.equal(attr(row, 'aria-expanded'), 'false', `${slug} must start aria-expanded="false"`);
+  assert.equal(attr(row, 'aria-controls'), `panel-${slug}`, `${slug} aria-controls its panel`);
+  const list = html.match(new RegExp(`<ul\\b[^>]*\\bid="${attr(row, 'data-fold')}"[^>]*>([\\s\\S]*?)</ul>`));
+  assert.ok(list, `${slug} parts list`);
+  assert.match(list[0].slice(0, list[0].indexOf('>') + 1), /\bhidden\b/, `${slug} parts list starts hidden`);
+  const ids = [...list[1].matchAll(/<button\b[^>]*\bid="([^"]*)"/g)].map((m) => m[1]);
+  assert.equal(ids.length, kids.length, `${slug} must hold ${kids.length} child rows`);
+  assert.ok(html.includes(`${kids.length} skills`), `${slug} count label "${kids.length} skills"`);
+  for (const k of kids) {
+    const id = k === 'cold-reader' ? k : `skill-${k}`;
+    assert.ok(ids.includes(id), `${slug} must contain row id="${id}"`);
+    assert.ok(rows.some((r) => attr(r, 'id') === id), `Row id="${id}" renders`);
+  }
+}
+assert.equal(rows.filter((r) => attr(r, 'data-fold')).length, 5, 'Factory plus four skill categories are the harmonicas');
+assert.ok(html.includes('part of working substrate'), 'Pane meta names its parent generically');
+assert.equal(html.includes('part of the factory'), false, 'No hardcoded "part of the factory"');
 
 // --- Top bar: Resume / Projects / README / Factory, Projects current ---
 const nav = html.match(/<nav\b[^>]*aria-label="Site"[^>]*>([\s\S]*?)<\/nav>/);
