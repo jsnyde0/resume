@@ -1,0 +1,368 @@
+---
+// PROTOTYPE (resume-soe.4): three category-pane renderings for the agent-skills lists, ?variant=A|B|C on this route.
+// Everything else is a copy of /projects. Question: how should a skill read so name and desc stop looking like plain text?
+//   A "Subsections"  - skill name as in-file sub-heading, desc under it, hairline between.
+//   B "Meta-bar rows" - one bordered row per skill, lime name left, desc right (stacks on mobile).
+//   C "Invocations"   - /name in lime, desc beneath, a small "since" meta, no borders.
+import ExplorerLayout from '../../../components/site/ExplorerLayout.astro';
+import { projects, projectsIntro, statusGroups, topLevel, partsOf, formatRange } from '../../../data/projects';
+import type { Project } from '../../../data/projects';
+
+const DEFAULT_SLUG = projects[0].slug;
+const statusLabel = (p: Project) => statusGroups.find((g) => g.key === p.status)?.label;
+const parentTitle = (slug: string) => projects.find((q) => q.slug === slug)?.title ?? slug;
+const isInternal = (href: string) => href.startsWith('/');
+---
+
+<ExplorerLayout
+  page="projects"
+  title="Building | Jonatan Snyders"
+  description="Things Jonatan Snyders has built and is building — products, tools, and research software, and the agent factory he runs them with."
+  listLabel="Projects"
+  paneLabel="Open project"
+>
+  <Fragment slot="head">
+    <h1 class="title">{projectsIntro.title}</h1>
+    <p class="lede">{projectsIntro.lede}</p>
+  </Fragment>
+
+  <Fragment slot="list">
+  {statusGroups.map((g) => (
+    <section class="group" aria-labelledby={`group-${g.key}`}>
+      <h2 class="group-head" id={`group-${g.key}`}>{g.label}<sup>{topLevel(g.key).length}</sup></h2>
+      <ul class="rows">
+        {topLevel(g.key).map((p) => {
+          const parts = partsOf(p.slug);
+          return (
+            <li>
+              {parts.length > 0 ? (
+                <>
+                  <button
+                    type="button"
+                    class="row row-folder"
+                    id={p.slug}
+                    data-slug={p.slug}
+                    data-fold={`parts-${p.slug}`}
+                    aria-expanded="false"
+                    aria-controls={`panel-${p.slug}`}
+                  >
+                    <span class="name"><span class="chev" aria-hidden="true"></span>{p.title}<span class="count">{parts.length} {p.partsNoun ?? 'parts'}</span></span>
+                    <span class="when">{formatRange(p)}</span>
+                  </button>
+                  <ul class="parts" id={`parts-${p.slug}`} hidden>
+                    {parts.map((k) => (
+                      <li>
+                        <button type="button" class="row" id={k.slug} data-slug={k.slug} aria-controls={`panel-${k.slug}`}>
+                          <span class="name">{k.title}</span>
+                          <span class="when">{formatRange(k)}</span>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              ) : (
+                <button type="button" class="row" id={p.slug} data-slug={p.slug} aria-controls={`panel-${p.slug}`}>
+                  <span class="name">{p.title}</span>
+                  <span class="when">{formatRange(p)}</span>
+                </button>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+    </section>
+  ))}
+  </Fragment>
+
+  <Fragment slot="pane">
+  {projects.map((p) => (
+    <article class="panel" id={`panel-${p.slug}`} data-panel={p.slug} tabindex="-1" hidden={p.slug !== DEFAULT_SLUG}>
+      <p class="meta">
+        {statusLabel(p)} · {formatRange(p)}{p.rewritten && ` · rewritten ${p.rewritten}`}{p.parent && ` · part of ${parentTitle(p.parent)}`}
+      </p>
+      <h3 class="panel-name">{p.title}</h3>
+      <p class="panel-desc">{p.desc}</p>
+      {p.items && (
+        <>
+          {/* SHORTCUT: all three variants are rendered and CSS-switched by html[data-variant]; production renders one. */}
+          <div class="v v-A">
+            {p.items.map((i) => (
+              <section class="sub">
+                <h4 class="sub-name">{i.name}{i.note && <span class="item-note"> · {i.note}</span>}</h4>
+                <p class="sub-desc">{i.desc}</p>
+              </section>
+            ))}
+          </div>
+          <ul class="v v-B bars">
+            {p.items.map((i) => (
+              <li class="bar">
+                <span class="bar-name">{i.name}{i.note && <span class="item-note"> · {i.note}</span>}</span>
+                <span class="bar-desc">{i.desc}</span>
+              </li>
+            ))}
+          </ul>
+          <div class="v v-C cmds">
+            {p.items.map((i) => (
+              <div class="cmd">
+                <p class="cmd-name">{i.note ? i.name : `/${i.name}`}</p>
+                <p class="cmd-desc">{i.desc}</p>
+                {/* SHORTCUT: no per-skill date in the data; faked from the category's `from`. Production needs a per-skill `from`. */}
+                <p class="cmd-meta">{i.note ?? `since ${new Date(p.from + '-01').toLocaleString('en', { month: 'short', year: 'numeric' })}`}</p>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+      {p.stack && <p class="meta">{p.stack.join(' · ')}</p>}
+      {p.links && (
+        <p class="panel-links">
+          {p.links.map((l) => (
+            <a href={l.href} {...(isInternal(l.href) ? {} : { target: '_blank', rel: 'noopener noreferrer' })}>{l.label}</a>
+          ))}
+        </p>
+      )}
+    </article>
+  ))}
+  </Fragment>
+</ExplorerLayout>
+
+<div class="proto-switcher" role="group" aria-label="Prototype variant">
+  <button type="button" data-step="-1" aria-label="Previous variant">←</button>
+  <span class="proto-label" aria-live="polite"></span>
+  <button type="button" data-step="1" aria-label="Next variant">→</button>
+</div>
+
+<script>
+  // PROTOTYPE switcher, inline. SHORTCUT: shows in production on this route by design; delete with the route.
+  const VARIANTS: Record<string, string> = { A: 'Subsections', B: 'Meta-bar rows', C: 'Invocations' };
+  const keys = Object.keys(VARIANTS);
+  const label = document.querySelector<HTMLElement>('.proto-label')!;
+  function setVariant(k: string, write: boolean) {
+    if (!VARIANTS[k]) k = 'A';
+    document.documentElement.dataset.variant = k;
+    label.textContent = `${k} · ${VARIANTS[k]}`;
+    if (write) { const u = new URL(location.href); u.searchParams.set('variant', k); history.replaceState(null, '', u); }
+  }
+  setVariant(new URLSearchParams(location.search).get('variant') ?? 'A', false);
+  const step = (d: number) => setVariant(keys[(keys.indexOf(document.documentElement.dataset.variant ?? 'A') + d + keys.length) % keys.length], true);
+  document.querySelectorAll<HTMLElement>('.proto-switcher [data-step]').forEach((b) => b.addEventListener('click', () => step(Number(b.dataset.step))));
+  window.addEventListener('keydown', (e) => {
+    if ((e.target as HTMLElement).closest('input,textarea,[contenteditable]')) return;
+    if (e.key === 'ArrowLeft') step(-1);
+    if (e.key === 'ArrowRight') step(1);
+  });
+  // The copied page script rewrites the URL with replaceState and would drop ?variant; keep the query.
+  const rs = history.replaceState.bind(history);
+  history.replaceState = (d, t, url) => rs(d, t, url && typeof url === 'string' && !url.includes('?') ? url + location.search : url);
+</script>
+
+<script>
+  // One set of panels, two layouts. Desktop (>860px): panels live in #pane, one open at a time.
+  // <=860px: the open panel moves into the tree, right under its own row (as on /resume/).
+  const DEFAULT_SLUG = document.querySelector<HTMLElement>('#pane [data-panel]')?.dataset.panel ?? '';
+  const desktop = window.matchMedia('(min-width: 861px)');
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const pane = document.getElementById('pane') as HTMLElement;
+  const rows = [...document.querySelectorAll<HTMLButtonElement>('#tree button[data-slug]')];
+  const panels = [...document.querySelectorAll<HTMLElement>('[data-panel]')];
+  let current: string | null = null;
+
+  const rowFor = (slug: string) => rows.find((r) => r.dataset.slug === slug);
+  const panelFor = (slug: string) => panels.find((p) => p.dataset.panel === slug);
+  const behavior = (): ScrollBehavior => (reduced.matches ? 'auto' : 'smooth');
+
+  // Harmonica: a folder row shows and hides its parts; aria-expanded tracks it.
+  function setFold(row: HTMLButtonElement, open: boolean) {
+    const list = document.getElementById(row.dataset.fold ?? '');
+    if (!list) return;
+    list.hidden = !open;
+    row.setAttribute('aria-expanded', String(open));
+  }
+
+  function sync() {
+    const mobile = !desktop.matches;
+    for (const r of rows) {
+      const on = r.dataset.slug === current;
+      r.setAttribute('aria-current', String(on));
+      // A folder's aria-expanded belongs to its harmonica; the others report their inline panel on mobile.
+      if (!r.dataset.fold) {
+        if (mobile) r.setAttribute('aria-expanded', String(on));
+        else r.removeAttribute('aria-expanded');
+      }
+      r.closest('li')?.classList.toggle('is-open', on);
+    }
+    for (const p of panels) {
+      const on = p.dataset.panel === current;
+      p.hidden = !on;
+      const row = rowFor(p.dataset.panel ?? '');
+      if (mobile && on && row) row.after(p);
+      else if (p.parentElement !== pane) pane.append(p);
+    }
+    history.replaceState(null, '', !current || current === DEFAULT_SLUG ? location.pathname : `#${current}`);
+  }
+
+  // Entrance, as on /resume/: the panel rises and fades in (CSS handles reduced motion).
+  function enter(panel: HTMLElement | undefined) {
+    if (!panel) return;
+    panel.classList.remove('is-entering');
+    void panel.offsetWidth;
+    panel.classList.add('is-entering');
+    panel.addEventListener('animationend', () => panel.classList.remove('is-entering'), { once: true });
+  }
+
+  function open(slug: string, userAction: boolean) {
+    const row = rowFor(slug);
+    if (!row || !panelFor(slug)) return;
+    // A part's folder opens with it, so a deep link shows where you are.
+    const parentFold = row.closest('ul.parts')?.id;
+    const folder = parentFold && rows.find((r) => r.dataset.fold === parentFold);
+    if (folder) setFold(folder, true);
+    const changed = current !== slug;
+    current = slug;
+    sync();
+    if (changed) enter(panelFor(slug));
+    if (!userAction) return;
+    if (desktop.matches) {
+      if (pane.getBoundingClientRect().top < 0) pane.scrollIntoView({ behavior: behavior() });
+    } else {
+      row.closest('li')?.scrollIntoView({ behavior: behavior(), block: 'start' });
+    }
+  }
+
+  function close() {
+    current = null;
+    sync();
+  }
+
+  rows.forEach((row) =>
+    row.addEventListener('click', () => {
+      const slug = row.dataset.slug ?? '';
+      if (row.dataset.fold) setFold(row, row.getAttribute('aria-expanded') !== 'true');
+      if (!desktop.matches && current === slug) close();
+      else open(slug, true);
+    }),
+  );
+
+  // Crossing the breakpoint: desktop always shows a project; mobile keeps yours.
+  desktop.addEventListener('change', () => {
+    if (desktop.matches && !current) current = DEFAULT_SLUG;
+    sync();
+  });
+
+  window.addEventListener('hashchange', () => {
+    const slug = resolve(decodeURIComponent(location.hash.slice(1)));
+    if (panelFor(slug)) open(slug, true);
+  });
+
+  // Old deep links to single skills land on the category that now lists them.
+  const SKILL_HOME: Record<string, string> = {
+    brainstorm: 'skills-wayfinding', prototype: 'skills-wayfinding', spike: 'skills-wayfinding', research: 'skills-wayfinding',
+    'learn-chart': 'skills-learning', 'learn-mission': 'skills-learning', 'learn-tutor': 'skills-learning', 'learn-assistant': 'skills-learning',
+    guide: 'skills-plain', tldr: 'skills-plain',
+    decompose: 'skills-substrate', 'send-it': 'skills-substrate', 'adversarial-review': 'skills-substrate', recall: 'skills-substrate',
+    note: 'skills-substrate', retro: 'skills-substrate', promote: 'skills-substrate', 'clear-resume': 'skills-substrate',
+  };
+  const resolve = (h: string) => (h === 'cold-reader' ? 'skills-plain' : h.startsWith('skill-') && SKILL_HOME[h.slice(6)]) || h;
+  const fromHash = resolve(decodeURIComponent(location.hash.slice(1)));
+  if (fromHash && panelFor(fromHash)) {
+    open(fromHash, false);
+    if (!desktop.matches) rowFor(fromHash)?.closest('li')?.scrollIntoView({ block: 'start' });
+  } else {
+    current = desktop.matches ? DEFAULT_SLUG : null;
+    sync();
+    // PROTOTYPE default: agent skills expanded, working substrate open.
+    const folder = rows.find((r) => r.dataset.fold === 'parts-skills');
+    if (folder) setFold(folder, true);
+    open('skills-substrate', false);
+  }
+</script>
+
+<style>
+  /* Layout, head, group heads, pane and the mobile shell live in ExplorerLayout. This file owns the rows and panels. */
+  /* ── rows ── */
+  .row { display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-4); width: 100%; min-height: 44px; padding: var(--space-2); border-top: 1px solid var(--id-rule); font-weight: var(--id-weight-medium); transition: background-color 160ms var(--ease-out), color 160ms var(--ease-out); }
+  .rows > li:last-child > .row,
+  .rows > li:last-child > .parts > li:last-child > .row { border-bottom: 1px solid var(--id-rule); }
+  .row:hover { background: var(--id-tint-hover); }
+  /* Ring sits inside the row so neighbouring rules never clip it; ink on the pink open row. */
+  .row:focus-visible { outline-offset: -3px; }
+  .row[aria-current='true']:focus-visible { outline-color: var(--id-ink); }
+  /* Count rides the cap line of the word, not the line box. */
+  .group-head sup { margin: 0.2em 0 0 0.2em; font-size: var(--id-text-small); font-weight: var(--id-weight-strong); line-height: 1; letter-spacing: 0; color: var(--id-paper-2); }
+  /* Wrapped names hang under their own first letter, past the + / arrow. */
+  .name { min-width: 0; padding-left: 1.1em; text-indent: -1.1em; }
+  .row:not(.row-folder):not(.parts .row) .name { padding-left: 0; text-indent: 0; }
+  .when { color: var(--id-paper-2); font-size: var(--id-text-small); white-space: nowrap; }
+  .row[aria-current='true'] .when,
+  .row[aria-current='true'] .count,
+  .row[aria-current='true'] .chev::before { color: var(--id-ink); }
+
+  /* harmonica */
+  .parts .row { min-height: 36px; padding: var(--space-1) var(--space-2) var(--space-1) var(--space-8); border-top-color: transparent; font-size: var(--id-text-small); }
+  .parts .row span:first-child::before { content: '↳ '; color: var(--id-paper-2); }
+  .parts .row[aria-current='true'] span:first-child::before { color: var(--id-ink); }
+  .chev { text-indent: 0; }
+  .chev::before { content: '+'; display: inline-block; width: 1.1em; color: var(--id-paper-2); font-weight: var(--id-weight-strong); }
+  [aria-expanded='true'] > span > .chev::before { content: '−'; }
+  .count { margin-left: var(--space-3); white-space: nowrap; text-indent: 0; color: var(--id-paper-2); font-size: var(--id-text-small); }
+
+  /* ── panel (in the pane on desktop, inline under its row on mobile) ── */
+  .panel { display: grid; gap: var(--space-5); }
+  .panel-name { font-size: var(--id-text-display); font-weight: var(--id-weight-poster); letter-spacing: var(--id-tracking-display); line-height: var(--id-leading-display); }
+  .panel-desc { max-width: 52ch; font-size: var(--id-text-heading); line-height: 1.45; }
+  .items { display: grid; gap: var(--space-1); max-width: 56ch; }
+  .items dt { margin-top: var(--space-3); font-weight: var(--id-weight-medium); font-size: var(--id-text-body); }
+  .items dd { margin: 0; font-size: var(--id-text-body); line-height: 1.45; }
+  .item-note { color: var(--id-paper-2); font-size: var(--id-text-small); font-weight: normal; }
+  .meta { color: var(--id-paper-2); font-size: var(--id-text-small); }
+  .panel-links { display: flex; flex-wrap: wrap; gap: var(--space-6); }
+  .panel-links a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 0.3em; margin-left: -0.3em; font-weight: var(--id-weight-strong); color: var(--id-lime); text-decoration: none; transition: background-color 160ms ease, color 160ms ease; }
+  .panel-links a:hover { background: var(--id-pink); color: var(--id-ink); }
+
+  @media (max-width: 860px) {
+    li > .panel { gap: var(--space-3); padding: var(--space-4) var(--space-2) var(--space-6); border-top: 1px solid var(--id-rule); }
+    li > .panel .panel-name { font-size: var(--id-text-heading); letter-spacing: var(--id-tracking-heading); line-height: 1.2; font-weight: var(--id-weight-strong); }
+    li > .panel .panel-desc { font-size: var(--id-text-body); }
+  }
+
+
+  /* ── PROTOTYPE variants ── */
+  .v { display: none; }
+  :global(html:not([data-variant])) .v-A, :global(html[data-variant='A']) .v-A { display: block; }
+  :global(html[data-variant='B']) .v-B { display: block; }
+  :global(html[data-variant='C']) .v-C { display: grid; }
+
+  /* A: sub-headings like /resume's in-file h2, hairline between */
+  .v-A { max-width: 58ch; border-top: 1px solid var(--id-rule); }
+  .sub { padding: var(--space-4) 0; border-bottom: 1px solid var(--id-rule); }
+  .sub-name { margin: 0 0 var(--space-1); font-size: var(--id-text-heading); font-weight: var(--id-weight-strong); letter-spacing: var(--id-tracking-heading); color: var(--id-lime); }
+  .sub-desc { margin: 0; font-size: var(--id-text-body); line-height: 1.5; }
+
+  /* B: /resume's p-meta bar, once per skill */
+  .bars { margin: 0; padding: 0; list-style: none; max-width: 72ch; }
+  .bar { display: grid; grid-template-columns: minmax(9rem, 11rem) 1fr; gap: var(--space-1) var(--space-6); padding: var(--space-3) 0; border-block: 1px solid var(--id-rule); }
+  .bar + .bar { border-top: 0; }
+  .bar-name { color: var(--id-lime); font-weight: var(--id-weight-strong); font-size: var(--id-text-body); overflow-wrap: anywhere; }
+  .bar-desc { color: var(--id-paper); font-size: var(--id-text-body); line-height: 1.45; }
+
+  /* C: invocations, space instead of borders */
+  .cmds { gap: var(--space-8); max-width: 58ch; padding-top: var(--space-2); }
+  .cmd { display: grid; gap: var(--space-1); }
+  .cmd p { margin: 0; }
+  .cmd-name { font-size: var(--id-text-heading); font-weight: var(--id-weight-strong); letter-spacing: var(--id-tracking-heading); color: var(--id-lime); }
+  .cmd-desc { font-size: var(--id-text-body); line-height: 1.5; }
+  .cmd-meta { font-size: var(--id-text-small); color: var(--id-paper-2); }
+
+  @media (max-width: 860px) {
+    .bar { grid-template-columns: 1fr; }
+  }
+
+  .proto-switcher { position: fixed; z-index: 50; left: 50%; bottom: var(--space-4); transform: translateX(-50%); display: flex; align-items: center; gap: var(--space-2); padding: var(--space-1); background: var(--id-paper); color: var(--id-ink); border-radius: 999px; box-shadow: 0 6px 24px rgba(0,0,0,0.5); font-weight: var(--id-weight-strong); font-size: var(--id-text-small); }
+  .proto-switcher button { width: 44px; height: 44px; border-radius: 50%; background: transparent; color: var(--id-ink); font-size: 1.2rem; }
+  .proto-switcher button:hover { background: var(--id-pink); }
+  .proto-label { min-width: 11rem; text-align: center; white-space: nowrap; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .row, .panel-links a { transition: none; }
+  }
+</style>
