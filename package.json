@@ -10,7 +10,8 @@
     "build": "astro build",
     "preview": "astro preview",
     "test:projects": "node scripts/verify-projects-page.mjs",
-    "gate": "astro check && astro build && node scripts/verify-projects-page.mjs",
+    "test:resume": "node scripts/verify-resume-page.mjs",
+    "gate": "astro check && astro build && node scripts/verify-projects-page.mjs && node scripts/verify-resume-page.mjs",
     "astro": "astro"
   },
   "dependencies": {

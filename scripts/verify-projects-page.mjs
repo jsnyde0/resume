@@ -14,6 +14,13 @@ const tags = (re) => [...html.matchAll(re)].map((m) => m[0]);
 assert.match(html, /<title>Building \| Jonatan Snyders<\/title>/, 'Page title must be "Building | Jonatan Snyders"');
 assert.match(html, /<h1[^>]*>Building<\/h1>/, 'On-page h1 must be "Building"');
 
+// --- D3: lede sits in the left column, under the h1, in the same head block as the title ---
+const head = html.match(/<div\b[^>]*class="head"[^>]*>([\s\S]*?)<\/div>/);
+assert.ok(head, 'Missing .head block');
+assert.match(head[1], /<h1[^>]*>Building<\/h1>\s*<p[^>]*class="lede"/, 'Lede must directly follow the h1 inside .head');
+assert.ok(html.indexOf('class="head"') < html.indexOf('class="tree"') && html.indexOf('class="tree"') < html.indexOf('class="pane"'), 'Order inside .explorer: head, tree, pane');
+assert.equal(/<main\b[^>]*>\s*<div class="head"/.test(html), false, 'Head must be inside .explorer, not a full-width row above it');
+
 // --- Two status groups, labelled Now / Past ---
 const heads = [...html.matchAll(/<h2[^>]*class="[^"]*\bgroup-head\b[^"]*"[^>]*>([^<]*)</g)].map((m) => m[1].trim());
 assert.deepEqual(heads, statusGroups.map((g) => g.label), 'Groups must be exactly Now, Past in order');

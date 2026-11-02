@@ -36,7 +36,7 @@ Answered from the codebase on 2026-09-05. Recorded so the next reader can check 
 | Route | Route-specific observable | Interactive? | Mapped drive |
 |---|---|---|---|
 | `/` | `.figure` + `.name` (the F7 home composition) | no clicks to make, but its **geometry** only a browser renders | `scripts/drive home-contacts`, `scripts/drive screenshots` |
-| `/resume/` | `#tree`, `[data-panel="README.md"]` | **yes** — repo explorer: two panes >860px, accordion <=860px, `#path` deep links | `scripts/drive file-tree`, `scripts/drive reading-path`, `scripts/drive identity`, `scripts/drive screenshots` |
+| `/resume/` | `#tree`, `[data-panel="about.md"]` | **yes** — repo explorer: two panes >860px, accordion <=860px, `#path` deep links | `scripts/drive file-tree`, `scripts/drive explorer`, `scripts/drive reading-path`, `scripts/drive identity`, `scripts/drive screenshots` |
 | `/readme/` | `<h1 class="readme-page__title">README</h1>` | no | `scripts/drive screenshots` |
 | `/projects/` | `<h1>Building</h1>` | no | `scripts/drive screenshots`; content also covered by `npm run test:projects` |
 | `/factory/` | `#graph-scene`, `#detail-panel` | **yes** — clickable orbit graph | `scripts/drive screenshots` (graph interaction: not yet — see `references/README.md`) |

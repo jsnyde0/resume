@@ -1,10 +1,10 @@
 ---
-// /resume/ — the repo explorer (resume-soe.12 D5, F4). Desktop (>860px): two panes, the lime
-// section words are the tree, the open file is set like poster type on the right. <=860px: a
-// compact accordion; one section and one file open at a time, the file opens inline under its own
-// row, and that row turns pink and stays pinned while you read. Every file has a #path deep link.
-// The face avatar is the home link; the page renders bare (no site navbar), it owns the viewport.
-import BaseLayout from '../layouts/BaseLayout.astro';
+// /resume/ — the repo explorer (resume-soe.12 D5, F4) on the shared head+explorer layout.
+// Desktop (>860px): title and list on the left, the open file on the right, level with the title.
+// <=860px: a compact accordion; one section and one file open at a time, the file opens inline
+// under its own row, and that row turns pink and stays pinned while you read. Every file has a
+// #path deep link. The intro is an ordinary first row, about.md, open by default on desktop.
+import ExplorerLayout from '../components/site/ExplorerLayout.astro';
 import { achievements, education, resumeIntro, workExperience } from '../data/resume';
 import type { ResumeItem } from '../data/resume';
 import { skillFiles } from '../data/resume-skills';
@@ -74,131 +74,124 @@ const folders: (TreeFolder & { label: string })[] = [
 const countFiles = (f: TreeFolder): number =>
   f.files.length + (f.subfolders ?? []).reduce((n, s) => n + countFiles(s), 0);
 
-const readmeHtml = `
-<div class="readme">
-  <div class="readme-head">
-    <h2 class="p-title p-title--readme">Jonatan Snyders</h2>
-    <p class="readme-roles">${resumeIntro.headlineBadges.join('<br />')}</p>
+const aboutHtml = `
+<div class="about">
+  <div class="about-head">
+    <h2 class="p-title p-title--about">Jonatan Snyders</h2>
+    <p class="about-roles">${resumeIntro.headlineBadges.join('<br />')}</p>
   </div>
-  <img class="readme-photo" src="/img/jonatan_roaring_no_bg.png" alt="Jonatan on all fours on a rock, roaring at the camera." width="436" height="437" loading="lazy" />
-  <div class="p-prose readme-prose">${resumeIntro.paragraphs.map((p) => `<p>${p}</p>`).join('')}</div>
+  <img class="about-photo" src="/img/jonatan_roaring_no_bg.png" alt="Jonatan on all fours on a rock, roaring at the camera." width="436" height="437" loading="lazy" />
+  <div class="p-prose about-prose">${resumeIntro.paragraphs.map((p) => `<p>${p}</p>`).join('')}</div>
 </div>`;
 
+const ABOUT = 'about.md';
 const contents: Record<string, string> = {
-  'README.md': readmeHtml,
+  [ABOUT]: aboutHtml,
   ...experience.contents,
   ...achievementSection.contents,
   ...skills.contents,
   ...educationSection.contents,
 };
 const panelId = (path: string) => 'f-' + path.replace(/[^a-z0-9]+/gi, '-');
-const DEFAULT_PATH = 'README.md';
 ---
 
-<BaseLayout
-  bare
+<ExplorerLayout
+  page="resume"
   title="Resume | Jonatan Snyders"
   description="Resume of Jonatan Snyders — web developer, data scientist, ex-founder, and growth engineer."
+  listLabel="Resume files"
+  paneLabel="Open file"
 >
-  <div class="resume-page">
-    <header class="top">
-      <a class="home" href="/">
-        <img src="/img/avatar_jonatan.png" alt="" width="253" height="252" />
-        <span>Jonatan Snyders</span>
-      </a>
-      <h1 class="top-title">Resume</h1>
-      <ul class="top-links">
-        <li><a href="https://github.com/jsnyde0/" rel="me">GitHub</a></li>
-        <li><a href="https://www.linkedin.com/in/jonatan-snyders/" rel="me">LinkedIn</a></li>
-      </ul>
-    </header>
+  <h1 slot="head" class="title">Resume</h1>
 
-    <main class="explorer">
-      <nav class="tree" id="tree" aria-label="Resume files">
-        <ul class="tree-root">
+  <Fragment slot="list">
+    <ul class="tree-root">
+      <li class="group">
+        <ul class="files files--about">
           <li>
-            <button
-              class="sect file"
-              type="button"
-              data-path="README.md"
-              aria-controls={panelId('README.md')}
-              aria-current="true"
-            ><span>README</span><span class="mark" aria-hidden="true"></span></button>
+            <button class="file leaf" type="button" data-path={ABOUT} aria-controls={panelId(ABOUT)}>
+              <span class="leaf-name">{ABOUT}</span>
+              <span class="mark" aria-hidden="true"></span>
+            </button>
           </li>
-          {folders.map((folder) => (
-            <li class="folder">
-              <button
-                class="sect folder-toggle"
-                type="button"
-                aria-expanded="false"
-                aria-controls={`dir-${folder.name}`}
-                data-folder={folder.name}
-              >
-                <span>{folder.label}</span>
-                <span class="count" aria-label={`${countFiles(folder)} files`}>{countFiles(folder)}</span>
-              </button>
-              <ul class="files" id={`dir-${folder.name}`} hidden>
-                {folder.files.map((file) => (
-                  <li>
-                    <button class="file leaf" type="button" data-path={file.path} aria-controls={panelId(file.path)}>
-                      <span class="leaf-name"><span class="leaf-dir">{folder.name}/</span>{file.name}</span>
-                      {itemYears[file.path] && <span class="leaf-meta">{itemYears[file.path]}</span>}
-                      <span class="mark" aria-hidden="true"></span>
-                    </button>
-                  </li>
-                ))}
-                {folder.subfolders?.map((sub) => (
-                  <li class="sub">
-                    <button
-                      class="sub-toggle"
-                      type="button"
-                      aria-expanded="false"
-                      aria-controls={`dir-${folder.name}-${sub.name}`}
-                      data-folder={`${folder.name}/${sub.name}`}
-                    >
-                      {sub.name}/
-                    </button>
-                    <ul class="files files--sub" id={`dir-${folder.name}-${sub.name}`} hidden>
-                      {sub.files.map((file) => (
-                        <li>
-                          <button class="file leaf" type="button" data-path={file.path} aria-controls={panelId(file.path)}>
-                            <span class="leaf-name"><span class="leaf-dir">{folder.name}/{sub.name}/</span>{file.name}</span>
-                            <span class="mark" aria-hidden="true"></span>
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                  </li>
-                ))}
-              </ul>
-            </li>
-          ))}
         </ul>
-      </nav>
+      </li>
+      {folders.map((folder) => (
+        <li class="group">
+          <h2 class="group-head">
+            <button
+              class="sect folder-toggle"
+              type="button"
+              aria-expanded="false"
+              aria-controls={`dir-${folder.name}`}
+              data-folder={folder.name}
+            >
+              <span>{folder.label}</span>
+              <span class="count" aria-label={`${countFiles(folder)} files`}>{countFiles(folder)}</span>
+              <span class="mark" aria-hidden="true"></span>
+            </button>
+          </h2>
+          <ul class="files" id={`dir-${folder.name}`} hidden>
+            {folder.files.map((file) => (
+              <li>
+                <button class="file leaf" type="button" data-path={file.path} aria-controls={panelId(file.path)}>
+                  <span class="leaf-name"><span class="leaf-dir">{folder.name}/</span>{file.name}</span>
+                  {itemYears[file.path] && <span class="leaf-meta">{itemYears[file.path]}</span>}
+                  <span class="mark" aria-hidden="true"></span>
+                </button>
+              </li>
+            ))}
+            {folder.subfolders?.map((sub) => (
+              <li class="sub">
+                <button
+                  class="sub-toggle"
+                  type="button"
+                  aria-expanded="false"
+                  aria-controls={`dir-${folder.name}-${sub.name}`}
+                  data-folder={`${folder.name}/${sub.name}`}
+                >
+                  {sub.name}/
+                </button>
+                <ul class="files files--sub" id={`dir-${folder.name}-${sub.name}`} hidden>
+                  {sub.files.map((file) => (
+                    <li>
+                      <button class="file leaf" type="button" data-path={file.path} aria-controls={panelId(file.path)}>
+                        <span class="leaf-name"><span class="leaf-dir">{folder.name}/{sub.name}/</span>{file.name}</span>
+                        <span class="mark" aria-hidden="true"></span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </li>
+            ))}
+          </ul>
+        </li>
+      ))}
+    </ul>
+  </Fragment>
 
-      <section class="pane" id="pane" aria-label="Open file">
-        {Object.entries(contents).map(([path, html]) => {
-          const parts = path.split('/');
-          const file = parts.pop();
-          return (
-            <article class="panel" id={panelId(path)} data-panel={path} tabindex="-1" hidden={path !== DEFAULT_PATH}>
-              <p class="p-path">
-                {parts.map((p) => <span class="p-dir">{p}/</span>)}
-                <span class="p-file">{file}</span>
-              </p>
-              <Fragment set:html={html} />
-            </article>
-          );
-        })}
-      </section>
-    </main>
-  </div>
-</BaseLayout>
+  <Fragment slot="pane">
+    {Object.entries(contents).map(([path, html]) => {
+      const parts = path.split('/');
+      const file = parts.pop();
+      return (
+        <article class="panel" id={panelId(path)} data-panel={path} tabindex="-1" hidden={path !== ABOUT}>
+          <p class="p-path">
+            {parts.map((p) => <span class="p-dir">{p}/</span>)}
+            <span class="p-file">{file}</span>
+          </p>
+          <Fragment set:html={html} />
+        </article>
+      );
+    })}
+  </Fragment>
+</ExplorerLayout>
 
 <script>
   // One set of panels, two layouts. Desktop (>860px): two panes, panels live in #pane.
   // <=860px: an accordion; the open panel is moved into the tree, right under its own row.
-  const DEFAULT_PATH = 'README.md';
+  const ABOUT = 'about.md';
+  const DEFAULT_PATH = ABOUT;
   const desktop = window.matchMedia('(min-width: 861px)');
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
   const pane = document.getElementById('pane') as HTMLElement;
@@ -250,7 +243,7 @@ const DEFAULT_PATH = 'README.md';
       if (mobile && on && btn) btn.after(p); // inline, right under its row
       else if (p.parentElement !== pane) pane.append(p);
     }
-    history.replaceState(null, '', !current || current === DEFAULT_PATH ? location.pathname : `#${current}`);
+    history.replaceState(null, '', location.pathname + (!current || current === DEFAULT_PATH ? '' : `#${current}`));
   }
 
   function open(path: string, userAction: boolean) {
@@ -299,7 +292,7 @@ const DEFAULT_PATH = 'README.md';
         if (opening) sectionToggles.forEach((t) => t !== toggle && setFolder(t, false));
         // A file outside what is still open folds away with its folder.
         const keep = opening ? toggle.dataset.folder : null;
-        if (current && current !== DEFAULT_PATH && current.split('/')[0] !== keep) { current = null; sync(); }
+        if (current && current !== ABOUT && current.split('/')[0] !== keep) { current = null; sync(); }
       }
       setFolder(toggle, opening);
       if (!desktop.matches && opening && toggle.getBoundingClientRect().top < 0) {
@@ -308,18 +301,23 @@ const DEFAULT_PATH = 'README.md';
     });
   });
 
-  // Crossing the breakpoint: desktop always shows a file (README by default); mobile keeps yours.
+  // Crossing the breakpoint: desktop always shows a file ; mobile keeps yours.
   desktop.addEventListener('change', () => {
     if (desktop.matches && !current) current = DEFAULT_PATH;
     sync();
   });
 
   window.addEventListener('hashchange', () => {
-    const path = decodeURIComponent(location.hash.slice(1));
+    const path = hashPath();
     if (panelFor(path)) open(path, true);
   });
 
-  const fromHash = decodeURIComponent(location.hash.slice(1));
+  // The intro used to be README.md; old deep links still land on it.
+  const hashPath = () => {
+    const h = decodeURIComponent(location.hash.slice(1));
+    return h === 'README.md' ? ABOUT : h;
+  };
+  const fromHash = hashPath();
   const exp = document.querySelector<HTMLButtonElement>('#tree button[data-folder="experience"]');
   if (exp) setFolder(exp, true); // the first section is open on arrival, so one tap reads a file
   if (fromHash && panelFor(fromHash)) {
@@ -337,152 +335,38 @@ const DEFAULT_PATH = 'README.md';
 <style is:global>
   /* Global, not scoped: panel bodies are injected html (set:html) and the script moves panels
      between the pane and the tree, so scoped data-attributes would not reach them. Every rule is
-     prefixed .resume-page, and this sheet ships with /resume/ only. */
-  html,
-  body { background: var(--id-ground); }
+     prefixed .resume-page. The grid, head, pane, group heads and the mobile shell are in ExplorerLayout. */
+  .resume-page { line-height: normal; font-weight: var(--id-weight-body); font-optical-sizing: auto; }
+  .resume-page .panel a { color: inherit; text-decoration: underline; }
 
-  .resume-page {
-    --pad: clamp(1rem, 2.4vw, 2.25rem);
-    --ease: cubic-bezier(0.25, 1, 0.5, 1);
-
-    min-height: 100svh;
-    background: var(--id-ground);
-    color: var(--id-paper);
-    font-family: var(--id-font-body);
-    font-weight: var(--id-weight-body);
-    line-height: normal;
-    font-optical-sizing: auto;
-    -webkit-font-smoothing: antialiased;
-  }
-
-  .resume-page a { color: inherit; text-decoration: underline; }
-  .resume-page a:focus-visible,
-  .resume-page button:focus-visible {
-    /* Paper, not pink: the selected file is already pink, and the ring must stay visible on it. */
-    outline: 3px solid var(--id-paper);
-    outline-offset: 3px;
-  }
-
-  /* ── Top bar ─────────────────────────────────────────── */
-  .resume-page .top {
-    display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    column-gap: var(--pad);
-    align-items: center;
-    padding: var(--pad) var(--pad) 0;
-  }
-  .resume-page .home {
-    grid-column: 1 / span 5;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.75rem;
-    justify-self: start;
-    min-height: 44px;
-    font-weight: var(--id-weight-strong);
-    font-size: var(--id-text-body);
-    letter-spacing: var(--id-tracking-heading);
-    text-decoration: none;
-  }
-  .resume-page .home img { width: 44px; height: auto; }
-  .resume-page .home:hover span { background: var(--id-pink); color: var(--id-ink); }
-  .resume-page .top-title {
-    grid-column: 6 / span 3;
-    margin: 0;
-    font-size: var(--id-text-body);
-    font-weight: var(--id-weight-strong);
-    color: var(--id-lime);
-  }
-  .resume-page .top-links {
-    grid-column: 9 / -1;
-    flex-wrap: wrap;
-    justify-self: end;
-    display: flex;
-    gap: 1.5rem;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-  .resume-page .top-links a {
-    display: inline-flex;
-    align-items: center;
-    min-height: 44px;
-    text-underline-offset: 0.18em;
-    transition: background-color 160ms var(--ease), color 160ms var(--ease);
-  }
-  .resume-page .top-links a:hover { background: var(--id-pink); color: var(--id-ink); text-decoration-color: transparent; }
-
-  /* ── Explorer: tree left, open file right ─────────────── */
-  .resume-page .explorer {
-    display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    column-gap: var(--pad);
-    align-items: start;
-    min-height: 0;
-    padding: clamp(2rem, 5vw, 4.5rem) var(--pad) 7rem;
-  }
-  /* The tree is a size container so the longest name ("Achievements" + count) always fits its column. */
-  .resume-page .tree { grid-column: 1 / span 5; container-type: inline-size; }
-  .resume-page .pane {
-    grid-column: 6 / -1;
-    position: sticky;
-    top: var(--pad);
-    max-height: calc(100svh - 2 * var(--pad));
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    scrollbar-width: thin;
-    scrollbar-color: var(--id-rule) transparent;
-    padding-left: clamp(0rem, 2vw, 2rem);
-  }
-
-  :where(.resume-page .tree) ul { list-style: none; margin: 0; padding: 0; }
-  /* :where() keeps this reset at zero specificity so the type rules below win. */
-  :where(.resume-page .tree) button {
-    font: inherit;
-    color: inherit;
-    background: none;
-    border: 0;
-    padding: 0;
-    cursor: pointer;
-    text-align: left;
-  }
-
-  /* The section names are the poster. */
+  /* ── Tree: section heads, then plain readable lines on a strict two-column rhythm (name, years) ── */
+  /* The section word is the shared .group-head (h2); the button inside inherits its type. */
   .resume-page .sect {
     display: flex;
     align-items: flex-start;
     gap: 0.12em;
     width: 100%;
-    color: var(--id-lime);
-    font-weight: var(--id-weight-poster);
-    font-size: min(14.2cqi, 7rem);
-    line-height: 0.86;
-    letter-spacing: -0.055em;
-    padding: 0.06em 0 0.08em;
-    margin-left: -0.04em;
+    padding: 0 0 var(--space-3);
     transition: color 160ms var(--ease);
   }
+  .resume-page .group-head { padding-bottom: 0; }
   .resume-page .sect:hover { color: var(--id-paper); }
-  .resume-page .sect.file[aria-current='true'] {
-    width: auto;
-    background: var(--id-pink);
-    color: var(--id-ink);
-    padding-inline: 0.06em;
-  }
   .resume-page .count {
-    font-size: 0.2em;
-    font-weight: 700;
+    font-size: var(--id-text-small);
+    font-weight: var(--id-weight-strong);
     letter-spacing: 0;
     line-height: 1;
-    padding-top: 0.5em;
+    padding-top: 0.2em;
     color: var(--id-paper-2);
   }
   .resume-page .folder-toggle[aria-expanded='true'] .count { color: var(--id-lime); }
 
-  /* Files: plain readable lines on a strict two-column rhythm (name, years). */
   .resume-page .files {
-    margin: 0.75rem 0 1.75rem;
+    margin: 0;
     border-top: 1px solid var(--id-rule);
   }
+  .resume-page .files--about { border-bottom: 1px solid var(--id-rule); }
+  .resume-page .files--about .leaf { border-bottom: 0; }
   .resume-page .files--sub { margin: 0 0 0.5rem 1.25rem; border-top: 0; }
   .resume-page .leaf,
   .resume-page .sub-toggle {
@@ -504,17 +388,9 @@ const DEFAULT_PATH = 'README.md';
   .resume-page .leaf-meta { color: var(--id-paper-2); font-weight: var(--id-weight-medium); font-variant-numeric: tabular-nums; font-size: 1rem; }
   .resume-page .leaf:hover,
   .resume-page .sub-toggle:hover { background: var(--id-tint-hover); }
-  .resume-page .leaf[aria-current='true'] { background: var(--id-pink); color: var(--id-ink); }
   .resume-page .leaf[aria-current='true'] .leaf-meta { color: var(--id-ink); }
 
   /* ── The open file, set like poster type ─────────────── */
-  .resume-page .panel { outline: none; }
-  .resume-page .panel.is-entering { animation: resume-enter 380ms var(--ease) both; }
-  @keyframes resume-enter {
-    from { opacity: 0; transform: translateY(14px); }
-    to { opacity: 1; transform: none; }
-  }
-
   .resume-page .p-path {
     display: flex;
     flex-wrap: wrap;
@@ -582,16 +458,16 @@ const DEFAULT_PATH = 'README.md';
   .resume-page .p-links a:hover,
   .resume-page .p-prose a:hover { background: var(--id-pink); color: var(--id-ink); text-decoration-color: transparent; }
 
-  /* README: the roar earns its place next to who he is. */
-  .resume-page .readme {
+  /* About: the roar earns its place next to who he is. */
+  .resume-page .about {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 0.8fr);
     column-gap: var(--pad);
     align-items: start;
   }
-  .resume-page .readme-head { grid-column: 1; }
-  .resume-page .p-title--readme { font-size: clamp(2.5rem, 5vw, 5rem); max-width: 8ch; }
-  .resume-page .readme-roles {
+  .resume-page .about-head { grid-column: 1; }
+  .resume-page .p-title--about { font-size: clamp(2.5rem, 5vw, 5rem); max-width: 8ch; }
+  .resume-page .about-roles {
     margin: 0;
     color: var(--id-lime);
     font-size: var(--id-text-heading);
@@ -599,7 +475,7 @@ const DEFAULT_PATH = 'README.md';
     line-height: 1.2;
     letter-spacing: -0.015em;
   }
-  .resume-page .readme-photo {
+  .resume-page .about-photo {
     grid-column: 2;
     grid-row: 1 / span 2;
     width: 100%;
@@ -607,36 +483,16 @@ const DEFAULT_PATH = 'README.md';
     height: auto;
     justify-self: end;
   }
-  .resume-page .readme-prose { grid-column: 1 / -1; margin-top: 1rem; columns: 2 18rem; column-gap: var(--pad); max-width: none; }
-  .resume-page .readme-prose p { break-inside: avoid; }
+  .resume-page .about-prose { grid-column: 1 / -1; margin-top: 1rem; columns: 2 18rem; column-gap: var(--pad); max-width: none; }
+  .resume-page .about-prose p { break-inside: avoid; }
+
 
   @media (max-width: 860px) {
-    .resume-page .top { grid-template-columns: 1fr auto; row-gap: 0; }
-    .resume-page .home { grid-column: 1; font-size: var(--id-text-small); gap: 0.5rem; }
-    .resume-page .top-links { grid-column: 2; gap: 0.875rem; font-size: var(--id-text-small); }
-    .resume-page .home img { width: 36px; }
-    .resume-page .top-title { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
-    .resume-page .explorer { grid-template-columns: minmax(0, 1fr); padding-top: 1.5rem; padding-bottom: 6rem; }
-    .resume-page .tree,
-    .resume-page .pane { grid-column: 1; }
     /* Runway under the list, so even the last file's row can scroll up to the top when opened. */
     .resume-page .explorer:has(.is-open) { padding-bottom: 75svh; }
-    /* No second pane: the open file lives inline in the tree (see the script). */
-    .resume-page .pane { display: none; }
 
-    /* Section headings: still the poster's lime 900, but sized to a list, not a wall. */
-    .resume-page .sect {
-      font-size: clamp(2rem, 9.6vw, 2.75rem);
-      line-height: 1;
-      align-items: center;
-      min-height: 44px;
-      padding: 0.14em 0 0.16em;
-      margin-left: 0;
-      letter-spacing: -0.045em;
-    }
-    .resume-page .sect.file[aria-current='true'] { width: 100%; padding-inline: 0.12em; }
-    .resume-page .count { padding-top: 0; align-self: flex-start; margin-top: 0.45em; font-size: 0.8125rem; }
-    .resume-page .files { margin: 0.25rem 0 1.25rem; }
+    .resume-page .sect { align-items: center; min-height: 44px; }
+    .resume-page .count { align-self: flex-start; margin-top: 0.45em; font-size: 0.8125rem; padding-top: 0; }
     .resume-page .files--sub { margin-left: 0.75rem; }
     .resume-page .leaf { font-size: 1.0625rem; padding-inline: 0.25rem; }
     .resume-page .leaf-name { flex: 1; min-width: 0; overflow-wrap: anywhere; }
@@ -665,17 +521,8 @@ const DEFAULT_PATH = 'README.md';
     .resume-page .mark::after { transform: rotate(90deg); }
     .resume-page .is-open > .file .mark { transform: rotate(45deg); }
 
-    /* The open row sticks to the top for as long as you are inside its file. */
-    .resume-page .is-open > .file {
-      position: sticky;
-      top: 0;
-      z-index: 2;
-      align-items: last baseline;
-      background: var(--id-pink);
-      color: var(--id-ink);
-    }
-    /* Pinned at top: 0, an outside ring would be cut off by the screen edge. */
-    .resume-page .is-open > .file:focus-visible { outline-color: var(--id-ink); outline-offset: -4px; }
+    /* The open row is pinned (ExplorerLayout); the folder path shows beside its name. */
+    .resume-page .is-open > .file { align-items: last baseline; }
     .resume-page .is-open > .file .leaf-meta { color: var(--id-ink); }
     .resume-page .is-open > .file .leaf-dir { display: block; font-size: 0.8125rem; font-weight: var(--id-weight-medium); line-height: 1.2; }
     .resume-page .tree li { scroll-margin-top: 0; }
@@ -686,15 +533,10 @@ const DEFAULT_PATH = 'README.md';
     .resume-page .p-meta { margin-bottom: 1.25rem; font-size: 1rem; }
     .resume-page .p-prose p { font-size: 1.0625rem; }
     .resume-page .p-skill li { font-size: 1.0625rem; }
-    .resume-page .readme { grid-template-columns: minmax(0, 1fr); }
-    .resume-page .readme-photo { grid-column: 1; grid-row: auto; justify-self: start; max-width: 260px; margin-top: 1.25rem; }
-    .resume-page .p-title--readme { font-size: clamp(2.25rem, 11vw, 3rem); }
-    .resume-page .readme-prose { columns: auto; }
+    .resume-page .about { grid-template-columns: minmax(0, 1fr); }
+    .resume-page .about-photo { grid-column: 1; grid-row: auto; justify-self: start; max-width: 260px; margin-top: 1.25rem; }
+    .resume-page .p-title--about { font-size: clamp(2.25rem, 11vw, 3rem); }
+    .resume-page .about-prose { columns: auto; }
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .resume-page .panel.is-entering { animation: none; }
-    .resume-page *,
-    .resume-page *::before { transition: none !important; }
-  }
 </style>

@@ -1,0 +1,121 @@
+---
+// Shared head + explorer layout for /resume/ and /projects/ (resume-soe.23, D2-D4).
+// Desktop (>860px): two columns 5fr/7fr. LEFT = the page head (title, optional lede) then the
+// list; RIGHT = the detail pane, starting level with the title, sticky, scrolling on its own.
+// <=860px: one column; the page script moves the open panel into the list, under its own row.
+// Title, list and pane are direct children of one `.explorer` grid.
+//
+// Slots: `head` (h1 and optional lede), `list` (the tree contents), `pane` (the panels).
+// Rendered inside a `bare` BaseLayout; this component owns the padding, nav and footer.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SiteNav from './SiteNav.astro';
+import SiteFooter from './SiteFooter.astro';
+import type { SitePage } from './SiteNav.astro';
+
+interface Props {
+  page: SitePage;
+  title: string;
+  description: string;
+  listLabel: string;
+  paneLabel: string;
+}
+
+const { page, title, description, listLabel, paneLabel } = Astro.props;
+---
+
+<BaseLayout bare title={title} description={description}>
+  <div class={`explorer-page ${page}-page`}>
+    <SiteNav current={page} />
+
+    <main>
+      <div class="explorer">
+        <div class="head"><slot name="head" /></div>
+        <nav class="tree" id="tree" aria-label={listLabel}><slot name="list" /></nav>
+        <section class="pane" id="pane" aria-label={paneLabel}><slot name="pane" /></section>
+      </div>
+    </main>
+
+    <SiteFooter />
+  </div>
+</BaseLayout>
+
+<style is:global>
+  /* Global, not scoped: panel bodies can be injected html and the page scripts move panels between
+     the pane and the list. Every rule is prefixed .explorer-page. */
+  html,
+  body { margin: 0; background: var(--id-ground); }
+
+  /* Zero-specificity base: a page overrides any of it with one class. */
+  :where(.explorer-page) {
+    color: var(--id-paper);
+    font-family: var(--id-font-body);
+    font-size: var(--id-text-body);
+    line-height: var(--line-height-body);
+    -webkit-font-smoothing: antialiased;
+  }
+  :where(.explorer-page) a { color: inherit; text-underline-offset: 0.18em; }
+  :where(.explorer-page) ul { list-style: none; margin: 0; padding: 0; }
+  :where(.explorer-page) :is(p, h1, h2, h3) { margin: 0; }
+  :where(.explorer-page) button { box-sizing: border-box; font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; text-align: left; }
+
+  .explorer-page {
+    --pad: clamp(1rem, 2.4vw, 2.25rem);
+    --ease: var(--ease-out);
+    box-sizing: border-box;
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+    padding: var(--pad) var(--pad) var(--space-6);
+    background: var(--id-ground);
+  }
+  /* BaseLayout's global `main` carries its own padding and min-height; this page sets its own rhythm. */
+  .explorer-page main { flex: 1; min-height: 0; padding: 0; margin-top: clamp(2rem, 6vw, 5rem); }
+  .explorer-page [hidden] { display: none !important; }
+  .explorer-page a:focus-visible,
+  .explorer-page button:focus-visible { outline: 3px solid var(--id-paper); outline-offset: 3px; }
+
+  /* ── head: one lime h1, plain and non-interactive, plus an optional lede ── */
+  .explorer-page .head { display: grid; row-gap: var(--space-5); align-content: start; }
+  .explorer-page .title { font-size: var(--id-text-poster); font-weight: var(--id-weight-poster); letter-spacing: var(--id-tracking-poster); line-height: var(--id-leading-poster); color: var(--id-lime); }
+  .explorer-page .lede { max-width: 30ch; text-wrap: pretty; font-size: var(--id-text-heading); font-weight: var(--id-weight-medium); line-height: 1.3; letter-spacing: var(--id-tracking-heading); }
+
+  /* ── explorer grid: head, list and pane are direct children ── */
+  .explorer-page .explorer { display: grid; grid-template-columns: minmax(0, 1fr); padding-bottom: 4rem; }
+  .explorer-page .tree { margin-top: clamp(2.5rem, 6vw, 5rem); }
+  /* Group heads: "Now" / "Past" on /projects, the sections on /resume. */
+  .explorer-page .group + .group { margin-top: var(--space-10); }
+  .explorer-page .group-head { display: flex; align-items: flex-start; padding-bottom: var(--space-3); font-size: var(--id-text-display); font-weight: var(--id-weight-poster); letter-spacing: var(--id-tracking-display); line-height: var(--id-leading-display); color: var(--id-lime); }
+
+  /* The open row is pink; ink on top of it. */
+  .explorer-page .tree button[aria-current='true'] { background: var(--id-pink); color: var(--id-ink); }
+
+  /* ── detail pane: sticky, and scrollable on its own so a long file never runs off a short screen ── */
+  .explorer-page .pane { position: sticky; top: var(--pad); max-height: calc(100svh - 2 * var(--pad)); overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: var(--id-rule) transparent; }
+  .explorer-page .pane:has(.is-entering) { overflow-y: hidden; } /* no scrollbar flash while the panel rises */
+  .explorer-page .panel { outline: none; }
+  .explorer-page .panel.is-entering { animation: explorer-panel-in 380ms var(--ease) both; }
+  @keyframes explorer-panel-in { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+  @media (min-width: 861px) {
+    .explorer-page .explorer { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); column-gap: calc(2 * var(--pad)); align-items: start; }
+    .explorer-page .head { grid-column: 1; grid-row: 1; }
+    .explorer-page .tree { grid-column: 1; grid-row: 2; }
+    /* From the top of the content area, level with the title, down beside title + list. */
+    .explorer-page .pane { grid-column: 2; grid-row: 1 / span 2; }
+  }
+
+  @media (max-width: 860px) {
+    .explorer-page .lede { max-width: 34ch; }
+    /* No second pane: the open panel lives inline in the list, under its own row. */
+    .explorer-page .pane { display: none; }
+    /* The open row stays pinned while you read its panel. */
+    .explorer-page .is-open > button { position: sticky; top: 0; z-index: 2; background: var(--id-pink); color: var(--id-ink); }
+    .explorer-page .is-open > button:focus-visible { outline-color: var(--id-ink); outline-offset: -4px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .explorer-page .panel.is-entering { animation: none; }
+    .explorer-page *,
+    .explorer-page *::before { transition: none !important; }
+  }
+</style>

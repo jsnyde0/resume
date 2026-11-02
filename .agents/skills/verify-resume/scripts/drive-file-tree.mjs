@@ -53,10 +53,10 @@ try {
     check(before.visiblePaths.length < before.paths.length,
       `${tag} every file was already visible: folders start collapsed, so the collapse is broken or the markup changed`);
     if (L.name === "desktop") {
-      check(before.ariaCurrent.length === 1 && before.ariaCurrent[0] === "README.md",
-        `${tag} README.md should be the one current file on arrival, got ${JSON.stringify(before.ariaCurrent)}`);
-      check(before.visiblePanels.length === 1 && before.visiblePanels[0] === "README.md",
-        `${tag} README.md should be the one visible panel on arrival, got ${JSON.stringify(before.visiblePanels)}`);
+      check(before.ariaCurrent.length === 1 && before.ariaCurrent[0] === "about.md",
+        `${tag} about.md should be the one current file on arrival, got ${JSON.stringify(before.ariaCurrent)}`);
+      check(before.visiblePanels.length === 1 && before.visiblePanels[0] === "about.md",
+        `${tag} about.md should be the one visible panel on arrival, got ${JSON.stringify(before.visiblePanels)}`);
     } else {
       check(before.visiblePanels.length <= 1, `${tag} more than one panel open on arrival: ${JSON.stringify(before.visiblePanels)}`);
     }
