@@ -1,0 +1,320 @@
+---
+// PROTOTYPE (readme-system): how /readme looks inside the shared design system. ?variant=A|B|C
+//   A "Explorer"        ExplorerLayout as /resume and /projects: sections are list rows, the pane shows the open one.
+//   B "One long read"   single column, every section stacked, display headings, large bullets.
+//   C "Index + scroll"  left = title + sticky section index (scroll-spy, pink = current); right = all sections.
+// All three render inside ExplorerLayout (same nav, footer, head, grid); B and C only re-lay that grid with CSS.
+// Copy is verbatim from src/pages/readme.astro.
+// SHORTCUT: variant read client-side from the query (static build has no server params); first paint is A.
+// SHORTCUT: switcher is injected by script at the body end, visible in prod on purpose (noindex, unlinked, deleted with /directions/).
+// SHORTCUT: no tests and no gate verifier for this route; delete the route once a variant is chosen.
+// SHORTCUT: one DOM serves three layouts, so ARIA (section rows as buttons with aria-current) is tuned for A, not B/C.
+import ExplorerLayout from '../../../components/site/ExplorerLayout.astro';
+
+const sections = [
+  {
+    id: 'quirks',
+    title: 'Quirks',
+    items: [
+      `I'm prone to overthinking, but a quick "just do it" snaps me out of it.`,
+      `I try to resist shiny new tech, sticking to <a href="https://mcfunley.com/choose-boring-technology" target="_blank" rel="noreferrer">boring technology</a> until key moments.`,
+      `I keep a running commentary to be more <a href="https://www.stevestreeting.com/2010/09/04/work-2-0/" target="_blank" rel="noreferrer">interruptible</a>.`,
+      `I struggle with being overruled when something feels like it's my responsibility.`,
+      `I fundamentally assume everyone's doing their best, even when it doesn't seem that way.`,
+      `I try to consider social imbalances and my own privilege, that I probably don't fully grasp.`,
+      `I get restless in my comfort zone - I enjoy pushing boundaries and learning about myself.`,
+    ],
+  },
+  {
+    id: 'what-i-value',
+    title: 'What I Value',
+    items: [
+      `Directness, especially when it's tough to say or hear.`,
+      `Learning to set boundaries when you've been raised to please.`,
+      `Transparency that fosters connection and inclusion.`,
+      `Owning your work, responsibilities, and mistakes.`,
+      `Honestly considering feedback before reacting defensively.`,
+      `Asynchronous communication over constant meetings.`,
+      `Autonomously tracking work, even when you can't act on it right away.`,
+      `Allowing non-critical mistakes to foster ownership.`,
+      `Pointing out my blind spots, including those tied to privilege.`,
+    ],
+  },
+  {
+    id: 'how-i-can-help-you',
+    title: 'How I can help you',
+    items: [
+      `I'm good at organizing roles, projects, and tasks.`,
+      `I consider your feedback honestly before jumping to defend myself.`,
+      `I pick up complex stuff fast and enjoy sharing what I've learned.`,
+      `I'm all about growth, so if you're into self-improvement, I'm here for it.`,
+      `I can help you with direct non-violent communication.`,
+      `I stay optimistic and focus on fixing systems, not placing blame, when things go wrong.`,
+      `As an ex-founder, I don't need hand-holding to get things done.`,
+      `Whether it's tech, business, or personal growth, I'm here to coach and support you.`,
+    ],
+  },
+  {
+    id: 'how-you-can-help-me',
+    title: 'How you can help me',
+    items: [
+      `Tell me to "just do it" when I'm stuck in perfectionism - that's usually all it takes.`,
+      `Give feedback, don't jump in - I want to maintain my sense of ownership.`,
+      `Own your tasks; managing others' work drains me.`,
+      `Meet with clear agendas so we use time well.`,
+      `Remind me I can ask for help - I tend to tackle everything solo.`,
+    ],
+  },
+];
+---
+
+<ExplorerLayout
+  page="readme"
+  title="README (prototype) | Jonatan Snyders"
+  description="Prototype of the README page in the shared design system."
+  listLabel="README sections"
+  paneLabel="README"
+>
+  <h1 slot="head" class="title">README</h1>
+
+  <Fragment slot="list">
+    <ul class="tree-root">
+      {sections.map((s) => (
+        <li class="row">
+          <button class="rrow" type="button" data-id={s.id} aria-controls={`p-${s.id}`}>
+            <span class="rname">{s.title}</span>
+            <span class="rcount" aria-hidden="true">{s.items.length}</span>
+            <span class="mark" aria-hidden="true"></span>
+          </button>
+        </li>
+      ))}
+    </ul>
+  </Fragment>
+
+  <Fragment slot="pane">
+    {sections.map((s, i) => (
+      <article class="rsec panel" id={`p-${s.id}`} data-panel={s.id} tabindex="-1" hidden={i > 0}>
+        <h2 class="rtitle">{s.title}</h2>
+        <ul class="rlist">
+          {s.items.map((html) => <li><Fragment set:html={html} /></li>)}
+        </ul>
+      </article>
+    ))}
+  </Fragment>
+</ExplorerLayout>
+
+<script>
+  const VARIANTS = { A: 'Explorer', B: 'One long read', C: 'Index + scroll' } as const;
+  type V = keyof typeof VARIANTS;
+  const keys = Object.keys(VARIANTS) as V[];
+  const root = document.querySelector<HTMLElement>('.explorer-page')!;
+  const pane = document.getElementById('pane') as HTMLElement;
+  const desktop = window.matchMedia('(min-width: 861px)');
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const rows = [...document.querySelectorAll<HTMLButtonElement>('#tree .rrow')];
+  const panels = [...document.querySelectorAll<HTMLElement>('[data-panel]')];
+  const ids = panels.map((p) => p.dataset.panel!);
+  const panelFor = (id: string) => panels.find((p) => p.dataset.panel === id)!;
+  const rowFor = (id: string) => rows.find((r) => r.dataset.id === id)!;
+  const behavior = (): ScrollBehavior => (reduced.matches ? 'auto' : 'smooth');
+
+  let variant: V = 'A';
+  let current: string | null = ids[0];
+
+  // Switcher
+  const sw = document.createElement('div');
+  sw.className = 'proto-switch';
+  sw.setAttribute('role', 'group');
+  sw.setAttribute('aria-label', 'Prototype variant');
+  sw.innerHTML = `<button type="button" data-dir="-1" aria-label="Previous variant">←</button>
+    ${keys.map((v) => `<button type="button" data-v="${v}" aria-pressed="false">${v}</button>`).join('')}
+    <span class="proto-label" aria-live="polite"></span>
+    <button type="button" data-dir="1" aria-label="Next variant">→</button>`;
+  document.body.append(sw);
+  const label = sw.querySelector('.proto-label')!;
+
+  function readVariant(): V {
+    const v = new URLSearchParams(location.search).get('variant')?.toUpperCase();
+    return v === 'B' || v === 'C' ? v : 'A';
+  }
+
+  function render() {
+    root.dataset.variant = variant;
+    const mobile = !desktop.matches;
+    for (const r of rows) {
+      const on = r.dataset.id === current;
+      r.setAttribute('aria-current', String(on));
+      if (variant === 'A' && mobile) r.setAttribute('aria-expanded', String(on));
+      else r.removeAttribute('aria-expanded');
+      r.closest('li')?.classList.toggle('is-open', variant === 'A' && mobile && on);
+    }
+    for (const p of panels) {
+      const id = p.dataset.panel!;
+      p.hidden = variant === 'A' ? id !== current : false;
+    }
+    if (variant === 'A' && mobile) {
+      for (const p of panels) {
+        if (p.dataset.panel === current) rowFor(current).after(p);
+        else pane.append(p);
+      }
+    } else {
+      panels.forEach((p) => pane.append(p));
+    }
+    sw.querySelectorAll('button[data-v]').forEach((b) => b.setAttribute('aria-pressed', String((b as HTMLElement).dataset.v === variant)));
+    label.textContent = `${variant} · ${VARIANTS[variant]}`;
+  }
+
+  function setVariant(v: V) {
+    variant = v;
+    const u = new URL(location.href);
+    u.searchParams.set('variant', v);
+    history.replaceState(null, '', u);
+    current = ids[0];
+    window.scrollTo(0, 0);
+    render();
+    spy();
+  }
+
+  function animateIn(p: HTMLElement) {
+    p.classList.remove('is-entering');
+    void p.offsetWidth;
+    p.classList.add('is-entering');
+  }
+
+  rows.forEach((r) =>
+    r.addEventListener('click', () => {
+      const id = r.dataset.id!;
+      if (variant === 'A') {
+        current = !desktop.matches && current === id ? null : id;
+        render();
+        if (current) {
+          animateIn(panelFor(id));
+          if (!desktop.matches) r.closest('li')?.scrollIntoView({ behavior: behavior(), block: 'start' });
+          else pane.scrollTop = 0;
+        }
+      } else {
+        panelFor(id).scrollIntoView({ behavior: behavior(), block: 'start' });
+        current = id;
+        render();
+      }
+    }),
+  );
+
+  // Scroll-spy for C: the last section whose top has passed 35% of the viewport.
+  function spy() {
+    if (variant !== 'C') return;
+    let best = ids[0];
+    for (const p of panels) if (p.getBoundingClientRect().top <= innerHeight * 0.35) best = p.dataset.panel!;
+    if (best !== current) { current = best; render(); }
+  }
+  addEventListener('scroll', spy, { passive: true });
+  desktop.addEventListener('change', render);
+
+  const step = (d: number) => setVariant(keys[(keys.indexOf(variant) + d + keys.length) % keys.length]);
+  sw.addEventListener('click', (e) => {
+    const b = (e.target as HTMLElement).closest('button');
+    if (!b) return;
+    if (b.dataset.v) setVariant(b.dataset.v as V);
+    else if (b.dataset.dir) step(Number(b.dataset.dir));
+  });
+  addEventListener('keydown', (e) => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.key === 'ArrowRight') step(1);
+    if (e.key === 'ArrowLeft') step(-1);
+  });
+
+  variant = readVariant();
+  render();
+  spy();
+</script>
+
+<style is:global>
+  .readme-page .tree-root { border-top: 1px solid var(--id-rule); }
+  .readme-page .rrow {
+    display: flex; align-items: baseline; gap: 1rem; width: 100%; min-height: 44px;
+    padding: 0.55rem 0.5rem; border-bottom: 1px solid var(--id-rule);
+    font-size: 1.125rem; font-weight: 600; letter-spacing: var(--id-tracking-heading);
+    transition: background-color 140ms var(--ease), color 140ms var(--ease);
+  }
+  .readme-page .rname { flex: 1; min-width: 0; }
+  .readme-page .rcount { color: var(--id-paper-2); font-weight: var(--id-weight-medium); font-variant-numeric: tabular-nums; }
+  .readme-page .rrow[aria-current='true'] .rcount { color: var(--id-ink); }
+  .readme-page .rrow:hover { background: var(--id-tint-hover); }
+  .readme-page .rrow[aria-current='true']:hover { background: var(--id-pink); }
+  .readme-page .mark { display: none; }
+
+  .readme-page .rtitle {
+    margin: 0 0 1.25rem; color: var(--id-paper); font-size: var(--id-text-display);
+    font-weight: var(--id-weight-poster); letter-spacing: var(--id-tracking-display);
+    line-height: var(--id-leading-display); text-wrap: balance;
+  }
+  .readme-page .rlist { max-width: 58ch; border-top: 1px solid var(--id-rule); }
+  .readme-page .rlist li {
+    padding: 0.7rem 0; border-bottom: 1px solid var(--id-rule);
+    font-size: clamp(1.125rem, 1.35vw, 1.3rem); line-height: 1.45; text-wrap: pretty;
+  }
+  .readme-page .rlist a { color: var(--id-lime); font-weight: 700; text-decoration-thickness: 0.1em; transition: background-color 160ms var(--ease), color 160ms var(--ease); }
+  .readme-page .rlist a:hover { background: var(--id-pink); color: var(--id-ink); text-decoration-color: transparent; }
+
+  /* B and C: the pane shows every section, unsticky */
+  .readme-page[data-variant='B'] .pane,
+  .readme-page[data-variant='C'] .pane { display: block; position: static; max-height: none; overflow: visible; }
+  .readme-page[data-variant='B'] .rsec + .rsec,
+  .readme-page[data-variant='C'] .rsec + .rsec { margin-top: var(--space-10); }
+  .readme-page[data-variant='B'] .rtitle,
+  .readme-page[data-variant='C'] .rtitle { color: var(--id-lime); }
+  .readme-page[data-variant='B'] .rsec,
+  .readme-page[data-variant='C'] .rsec { scroll-margin-top: var(--pad); }
+
+  /* B: one column, bigger reading */
+  .readme-page[data-variant='B'] .tree { display: none; }
+  .readme-page[data-variant='B'] .explorer { grid-template-columns: minmax(0, 1fr); }
+  .readme-page[data-variant='B'] .head { grid-column: 1; grid-row: 1; }
+  .readme-page[data-variant='B'] .pane { grid-column: 1; grid-row: 2; margin-top: clamp(2.5rem, 6vw, 5rem); }
+  .readme-page[data-variant='B'] .rsec + .rsec { margin-top: clamp(4rem, 9vw, 8rem); }
+  .readme-page[data-variant='B'] .rtitle { margin-bottom: 1.75rem; }
+  .readme-page[data-variant='B'] .rlist { max-width: 52ch; border-top: 0; }
+  .readme-page[data-variant='B'] .rlist li { padding: 0; border-bottom: 0; font-size: clamp(1.35rem, 2.2vw, 1.9rem); font-weight: var(--id-weight-medium); line-height: 1.25; letter-spacing: var(--id-tracking-heading); }
+  .readme-page[data-variant='B'] .rlist li + li { margin-top: 1.1rem; }
+
+  /* C: sticky index left, everything right */
+  .readme-page[data-variant='C'] .tree { position: sticky; top: var(--pad); }
+  .readme-page[data-variant='C'] .rcount,
+  .readme-page[data-variant='C'] .mark { display: none; }
+
+  @media (max-width: 860px) {
+    .readme-page .explorer { padding-bottom: 6rem; }
+    .readme-page[data-variant='A'] .explorer:has(.is-open) { padding-bottom: 75svh; }
+    .readme-page[data-variant='A'] .rrow { font-size: 1.0625rem; }
+    .readme-page[data-variant='A'] .mark {
+      display: block; position: relative; flex: none; width: 0.875rem; height: 0.875rem; align-self: center;
+      color: var(--id-paper-2); transition: transform 220ms var(--ease);
+    }
+    .readme-page[data-variant='A'] .mark::before,
+    .readme-page[data-variant='A'] .mark::after { content: ''; position: absolute; inset: calc(50% - 1px) 0 auto; height: 2px; background: currentColor; }
+    .readme-page[data-variant='A'] .mark::after { transform: rotate(90deg); }
+    .readme-page[data-variant='A'] .is-open > .rrow .mark { color: var(--id-ink); transform: rotate(45deg); }
+    .readme-page[data-variant='A'] .rcount { display: none; }
+    .readme-page[data-variant='A'] .panel { padding: 1.25rem 0.25rem 2.25rem; border-bottom: 1px solid var(--id-rule); }
+    .readme-page .rtitle { font-size: clamp(1.9rem, 8.4vw, 2.5rem); }
+    /* C on mobile: the index becomes a sticky strip of section names */
+    .readme-page[data-variant='C'] .tree { top: 0; z-index: 3; margin: 1.5rem calc(-1 * var(--pad)) 0; padding: 0 var(--pad); background: var(--id-ground); overflow-x: auto; scrollbar-width: none; }
+    .readme-page[data-variant='C'] .tree-root { display: flex; gap: 0.25rem; border-top: 0; border-bottom: 1px solid var(--id-rule); }
+    .readme-page[data-variant='C'] .rrow { width: auto; white-space: nowrap; border-bottom: 0; padding-inline: 0.75rem; align-items: center; }
+    .readme-page[data-variant='C'] .pane { margin-top: 2rem; }
+    .readme-page[data-variant='C'] .rsec { scroll-margin-top: 4rem; }
+  }
+
+  /* Prototype switcher */
+  .proto-switch {
+    position: fixed; z-index: 50; left: 50%; bottom: 1rem; transform: translateX(-50%);
+    display: flex; align-items: center; gap: 0.25rem; padding: 0.25rem;
+    background: var(--id-ground); border: 1px solid var(--id-paper-2); font-family: var(--id-font-body); color: var(--id-paper);
+  }
+  .proto-switch button { min-width: 44px; min-height: 44px; font: inherit; font-weight: 800; color: var(--id-paper); background: none; border: 0; cursor: pointer; }
+  .proto-switch button:hover { background: var(--id-tint-hover); }
+  .proto-switch button[aria-pressed='true'] { background: var(--id-pink); color: var(--id-ink); }
+  .proto-switch button:focus-visible { outline: 3px solid var(--id-paper); outline-offset: -3px; }
+  .proto-label { padding: 0 0.75rem; font-size: var(--id-text-small); white-space: nowrap; min-width: 9.5rem; text-align: center; }
+  @media (max-width: 480px) { .proto-label { min-width: 0; padding: 0 0.4rem; font-size: 0.8125rem; } }
+</style>
