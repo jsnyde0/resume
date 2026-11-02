@@ -73,10 +73,20 @@ const isInternal = (href: string) => href.startsWith('/');
   {projects.map((p) => (
     <article class="panel" id={`panel-${p.slug}`} data-panel={p.slug} tabindex="-1" hidden={p.slug !== DEFAULT_SLUG}>
       <p class="meta">
-        {statusLabel(p)} · {formatRange(p)}{p.rewritten && ` · rewritten ${p.rewritten}`}{p.parent && ` · part of ${parentTitle(p.parent)}`}{p.note && ` · ${p.note}`}
+        {statusLabel(p)} · {formatRange(p)}{p.rewritten && ` · rewritten ${p.rewritten}`}{p.parent && ` · part of ${parentTitle(p.parent)}`}
       </p>
       <h3 class="panel-name">{p.title}</h3>
       <p class="panel-desc">{p.desc}</p>
+      {p.items && (
+        <dl class="items">
+          {p.items.map((i) => (
+            <>
+              <dt>{i.name}{i.note && <span class="item-note"> · {i.note}</span>}</dt>
+              <dd>{i.desc}</dd>
+            </>
+          ))}
+        </dl>
+      )}
       {p.stack && <p class="meta">{p.stack.join(' · ')}</p>}
       {p.links && (
         <p class="panel-links">
@@ -184,11 +194,20 @@ const isInternal = (href: string) => href.startsWith('/');
   });
 
   window.addEventListener('hashchange', () => {
-    const slug = decodeURIComponent(location.hash.slice(1));
+    const slug = resolve(decodeURIComponent(location.hash.slice(1)));
     if (panelFor(slug)) open(slug, true);
   });
 
-  const fromHash = decodeURIComponent(location.hash.slice(1));
+  // Old deep links to single skills land on the category that now lists them.
+  const SKILL_HOME: Record<string, string> = {
+    brainstorm: 'skills-wayfinding', prototype: 'skills-wayfinding', spike: 'skills-wayfinding', research: 'skills-wayfinding',
+    'learn-chart': 'skills-learning', 'learn-mission': 'skills-learning', 'learn-tutor': 'skills-learning', 'learn-assistant': 'skills-learning',
+    guide: 'skills-plain', tldr: 'skills-plain',
+    decompose: 'skills-substrate', 'send-it': 'skills-substrate', 'adversarial-review': 'skills-substrate', recall: 'skills-substrate',
+    note: 'skills-substrate', retro: 'skills-substrate', promote: 'skills-substrate', 'clear-resume': 'skills-substrate',
+  };
+  const resolve = (h: string) => (h === 'cold-reader' ? 'skills-plain' : h.startsWith('skill-') && SKILL_HOME[h.slice(6)]) || h;
+  const fromHash = resolve(decodeURIComponent(location.hash.slice(1)));
   if (fromHash && panelFor(fromHash)) {
     open(fromHash, false);
     if (!desktop.matches) rowFor(fromHash)?.closest('li')?.scrollIntoView({ block: 'start' });
@@ -231,6 +250,10 @@ const isInternal = (href: string) => href.startsWith('/');
   .panel { display: grid; gap: var(--space-5); }
   .panel-name { font-size: var(--id-text-display); font-weight: var(--id-weight-poster); letter-spacing: var(--id-tracking-display); line-height: var(--id-leading-display); }
   .panel-desc { max-width: 52ch; font-size: var(--id-text-heading); line-height: 1.45; }
+  .items { display: grid; gap: var(--space-2); max-width: 52ch; }
+  .items dt { margin-top: var(--space-3); font-weight: var(--id-weight-medium); font-size: var(--id-text-body); }
+  .items dd { font-size: var(--id-text-body); line-height: 1.45; }
+  .item-note { color: var(--id-paper-2); font-size: var(--id-text-small); font-weight: normal; }
   .meta { color: var(--id-paper-2); font-size: var(--id-text-small); }
   .panel-links { display: flex; flex-wrap: wrap; gap: var(--space-6); }
   .panel-links a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 0.3em; margin-left: -0.3em; font-weight: var(--id-weight-strong); color: var(--id-lime); text-decoration: none; transition: background-color 160ms ease, color 160ms ease; }

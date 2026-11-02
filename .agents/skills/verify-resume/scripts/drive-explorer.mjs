@@ -83,10 +83,10 @@ try {
 
   // Agent-skill categories (resume-soe.4): evidence shots, expanded substrate with recall open, and a category open on mobile.
   await setLayout(page, 1440, 900);
-  await fresh("/projects/#skill-recall");
-  await shot("projects-1440-skills-recall.png");
+  await fresh("/projects/#skills-substrate");
+  await shot("projects-1440-skills-substrate.png");
   await setLayout(page, 390, 844);
-  await fresh("/projects/#skill-brainstorm");
+  await fresh("/projects/#skills-learning");
   await shot("projects-390-skills-category.png");
 
   // ── Desktop ──
@@ -143,7 +143,7 @@ try {
     check(aligned(g), `${tag} pane top-aligned again after crossing back`);
   }
 
-  // ── Agent-skill categories: desktop ──
+  // ── Agent skills: desktop ──
   {
     const tag = "[desktop skills]";
     const exp = (id) => page.evaluate((i) => document.getElementById(i)?.getAttribute("aria-expanded"), id);
@@ -151,29 +151,29 @@ try {
       const list = document.getElementById(document.getElementById(i).dataset.fold);
       return [...list.querySelectorAll("button[data-slug]")].filter((b) => b.offsetParent !== null).length;
     }, cat);
+    const items = (slug) => page.evaluate((s) => [...document.querySelectorAll(`[data-panel="${s}"] dt`)].map((e) => e.textContent.trim()), slug);
     await setLayout(page, 1440, 900);
     await load(page, "/projects/");
-    check((await exp("skills-substrate")) === "false", `${tag} working substrate starts collapsed`);
+    check((await exp("skills")) === "false", `${tag} agent skills starts collapsed`);
+    await bringIntoView("#skills");
+    await visitorPress(page, "#skills", false);
+    check((await exp("skills")) === "true", `${tag} clicking "agent skills" must set aria-expanded=true`);
+    const cats = await visibleKids("skills");
+    check(cats === 4, `${tag} 4 category rows must be visible, got ${cats}`);
     await bringIntoView("#skills-substrate");
     await visitorPress(page, "#skills-substrate", false);
-    check((await exp("skills-substrate")) === "true", `${tag} clicking "working substrate" must set aria-expanded=true`);
-    const kids = await visibleKids("skills-substrate");
-    check(kids === 8, `${tag} 8 child rows must be visible, got ${kids}`);
-    await bringIntoView("#skill-recall");
-    await visitorPress(page, "#skill-recall", false);
     const g = await geom();
-    const desc = await page.evaluate(() => document.querySelector('[data-panel="skill-recall"] .panel-desc')?.textContent ?? "");
-    check(g.vis[0] === "skill-recall" && /Looks through saved notes and past decisions/.test(desc), `${tag} recall pane must show its desc, got ${JSON.stringify(g.vis)} / "${desc.slice(0, 40)}"`);
-    check(g.hash === "skill-recall", `${tag} URL hash must be #skill-recall, got #${g.hash}`);
-    evidence["skills-desktop-recall"] = g;
-    // Deep link opens the skill and expands its category.
-    await load(page, "/projects/#skill-brainstorm");
-    g2 = await geom();
-    check(g2.open[0] === "skill-brainstorm" && (await exp("skills-wayfinding")) === "true", `${tag} /projects/#skill-brainstorm must open it and expand wayfinding skills, got ${JSON.stringify(g2.open)}`);
-    // Cold Reader is an output style.
+    const its = await items("skills-substrate");
+    check(g.vis[0] === "skills-substrate" && its.length === 8 && its.some((n) => n.startsWith("recall")), `${tag} working substrate pane must list 8 items incl. recall, got ${JSON.stringify(its)}`);
+    evidence["skills-desktop-substrate"] = g;
+    // Old single-skill deep link lands on its category and expands agent skills.
+    await load(page, "/projects/#skill-recall");
+    const g2 = await geom();
+    check(g2.open[0] === "skills-substrate" && (await exp("skills")) === "true", `${tag} /projects/#skill-recall must open working substrate and expand agent skills, got ${JSON.stringify(g2.open)}`);
     await load(page, "/projects/#cold-reader");
-    const meta = await page.evaluate(() => document.querySelector('[data-panel="cold-reader"] .meta')?.textContent ?? "");
-    check(/output style/.test(meta) && /part of making the models make sense/.test(meta), `${tag} Cold Reader meta must say output style, got "${meta}"`);
+    const plain = await items("skills-plain");
+    const meta = await page.evaluate(() => document.querySelector('[data-panel="skills-plain"]')?.textContent ?? "");
+    check((await geom()).open[0] === "skills-plain" && plain.length === 3 && /output style, not a skill/.test(meta), `${tag} #cold-reader must open "making the models make sense" with the output-style note`);
   }
 
   // ── Mobile ──
@@ -197,24 +197,23 @@ try {
     const tag = "[mobile skills]";
     await setLayout(page, 390, 844);
     await load(page, "/projects/");
+    await page.evaluate(() => document.getElementById("skills").scrollIntoView({ block: "center" }));
+    await settle(page);
+    await visitorPress(page, "#skills", true);
+    const c = await page.evaluate(() => {
+      const r = document.getElementById("skills"), list = document.getElementById(r.dataset.fold);
+      return { exp: r.getAttribute("aria-expanded"), kids: [...list.querySelectorAll("button[data-slug]")].filter((b) => b.offsetParent !== null).length };
+    });
+    check(c.exp === "true" && c.kids === 4, `${tag} tapping agent skills must show its 4 categories, got ${JSON.stringify(c)}`);
     await page.evaluate(() => document.getElementById("skills-learning").scrollIntoView({ block: "center" }));
     await settle(page);
     await visitorPress(page, "#skills-learning", true);
-    const c = await page.evaluate(() => {
-      const r = document.getElementById("skills-learning");
-      const list = document.getElementById(r.dataset.fold);
-      return { exp: r.getAttribute("aria-expanded"), kids: [...list.querySelectorAll("button[data-slug]")].filter((b) => b.offsetParent !== null).length };
-    });
-    check(c.exp === "true" && c.kids === 4, `${tag} tapping a category must show its 4 skills, got ${JSON.stringify(c)}`);
-    await page.evaluate(() => document.getElementById("skill-learn-tutor").scrollIntoView({ block: "center" }));
-    await settle(page);
-    await visitorPress(page, "#skill-learn-tutor", true);
     const k = await page.evaluate(() => {
-      const row = document.getElementById("skill-learn-tutor"), panel = row.nextElementSibling;
-      return { isPanel: !!panel?.matches("[data-panel]"), hidden: panel?.hidden, gap: panel ? Math.abs(panel.getBoundingClientRect().top - row.getBoundingClientRect().bottom) : null };
+      const row = document.getElementById("skills-learning"), panel = row.nextElementSibling;
+      return { isPanel: !!panel?.matches("[data-panel]"), hidden: panel?.hidden, items: panel ? [...panel.querySelectorAll("dt")].length : 0, gap: panel ? Math.abs(panel.getBoundingClientRect().top - row.getBoundingClientRect().bottom) : null };
     });
     evidence["skills-mobile-tap"] = { c, k };
-    check(k.isPanel && !k.hidden && k.gap <= 2, `${tag} tapping a skill must open it inline under its row, got ${JSON.stringify(k)}`);
+    check(k.isPanel && !k.hidden && k.items === 4 && k.gap <= 2, `${tag} tapping a category must open its 4-skill list inline under its row, got ${JSON.stringify(k)}`);
   }
 
   check(consoleErrors.length === 0, `0 console errors, got ${JSON.stringify(consoleErrors)}`);
