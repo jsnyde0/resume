@@ -10,9 +10,12 @@ const variants = [
   { key: '2a', label: '2a — flat world, camera flies', href: '/factory/2a/' },
   { key: '2b', label: '2b — type is the world', href: '/factory/2b/' },
   { key: '2c', label: '2c — native scroll, depth', href: '/factory/2c/' },
+  // Round 3 (2026-11-02): 2a's flat world + camera, new spine device → brain → recursive dispatch → close the lid.
+  { key: '3a', label: '3a — scopes as nested territory', href: '/factory/3a/' },
+  { key: '3b', label: '3b — dispatch tree grows', href: '/factory/3b/' },
 ];
 interface Props {
-  current: 'now' | 'A' | 'B' | '2a' | '2b' | '2c';
+  current: 'now' | 'A' | 'B' | '2a' | '2b' | '2c' | '3a' | '3b';
 }
 const { current } = Astro.props;
 const i = variants.findIndex((v) => v.key === current);
@@ -25,7 +28,7 @@ const show = import.meta.env.DEV;
 {show && (
   <nav class="proto-switcher" aria-label="Prototype variant switcher" data-prev={prev.href} data-next={next.href}>
     <a href={prev.href} aria-label="Previous variant">←</a>
-    <span><strong>PROTOTYPE</strong> · {variants[i].label}</span>
+    <span><strong>PROTOTYPE</strong> · <span class="full">{variants[i].label}</span><span class="short">{variants[i].key}</span></span>
     <a href={next.href} aria-label="Next variant">→</a>
   </nav>
 )}
@@ -46,6 +49,13 @@ const show = import.meta.env.DEV;
     color: #000;
     font: 600 0.85rem/1.2 ui-monospace, monospace;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+  }
+  .proto-switcher { white-space: nowrap; }
+  .proto-switcher .short { display: none; }
+  @media (max-width: 600px) {
+    .proto-switcher { bottom: 0.5rem; padding: 0.3rem 0.8rem; font-size: 0.75rem; }
+    .proto-switcher .full { display: none; }
+    .proto-switcher .short { display: inline; }
   }
   .proto-switcher a {
     color: #000;

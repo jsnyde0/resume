@@ -1,0 +1,310 @@
+---
+// PROTOTYPE (resume-t7j round 3, variant 3a): 2a's flat SVG world + scroll camera, but scopes are nested territory:
+// a dispatch outlines a foggy region of the map, the camera zooms INTO it and it is the map again (via <use>), one level down.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SiteNav from '../../components/site/SiteNav.astro';
+import SiteFooter from '../../components/site/SiteFooter.astro';
+import PrototypeSwitcher from '../../components/factory-prototype/PrototypeSwitcher.astro';
+import { intro, beats, creditsHeading, credits } from '../../components/factory-prototype/beats-v3';
+import { BX, BY, SB, RX, RY, SS, MAPX, MAPY } from '../../components/factory-prototype/3a/keyframes';
+
+type Blob = [number, number, number][];
+const blobBig: Blob = [[0, 0, 200], [-150, 60, 130], [140, -80, 140], [40, 120, 110]];
+const blobCover: Blob = [[0, 0, 620], [-520, -60, 470], [520, 60, 470], [-200, -330, 400], [220, 330, 400]];
+const blobChild: Blob = [[0, 0, 185], [-260, 30, 140], [260, -30, 140], [-130, -60, 130], [130, 60, 130]];
+// project map is 2100x1500; every map (top level and inside a scope) is this same territory
+const MW = 2100, MH = 1500;
+const grid = [
+  ...Array.from({ length: MW / 150 - 1 }, (_, i) => `M${150 * (i + 1)} 0V${MH}`),
+  ...Array.from({ length: MH / 150 - 1 }, (_, i) => `M0 ${150 * (i + 1)}H${MW}`),
+].join('');
+const built: [number, number][] = [[300, 200], [1700, 260], [60, 700], [2000, 680], [1040, 1430], [1800, 1440]];
+const fogT: [number, number][] = [[480, 380], [520, 1160], [1560, 1270]];
+// children inside a scope: [rect x, y, w, h, label, mark kind, channel index]
+const kids = [
+  { x: 150, y: 500, label: 'Driver · spike', mark: 'driver', branch: 'M1050 340V700H1000' },
+  { x: 1100, y: 500, label: 'Driver · prototype', mark: 'driver', branch: 'M1050 340V700H1100' },
+  { x: 150, y: 1000, label: 'Driver · build', mark: 'driver', branch: 'M1050 340V1200H1000' },
+  { x: 1100, y: 1000, label: 'Worker', mark: 'worker', branch: 'M1050 340V1200H1100' },
+];
+const KW = 850, KH = 400;
+const hill = 'M2600 1280V1130H2800V980H3000V830H3200V680H3400V530H3600V1280Z';
+---
+
+<BaseLayout bare title="How I build (prototype 3a) | Jonatan Snyders" description="Follow one task through a factory of AI agents.">
+  <div class="p3a">
+    <div class="navwrap"><SiteNav current="factory" /></div>
+
+    <section class="track" id="track" aria-label="Follow one task through the factory">
+      <div class="stage" id="stage">
+        <svg id="world-svg" class="svg" aria-hidden="true" focusable="false">
+          <!-- SHORTCUT: no viewBox, the camera is a JS transform on #world; without JS the world is unframed. Production needs a no-JS static fallback. -->
+          <defs>
+            <!-- the same marks at every level -->
+            <!-- SHORTCUT: SVG labels (BRAIN, SCOPE, DRIVER · SPIKE...) are decorative aria-hidden text; production needs an accessible description of the world. -->
+            <g id="m-brain">
+              <circle r="110" fill="var(--id-ground)" stroke="var(--id-lime)" stroke-width="8" />
+              <circle r="34" fill="var(--id-lime)" />
+            </g>
+            <!-- SHORTCUT: portrait sub-map labels are ~12px (whole 2x2 scope in a phone width); production zooms per child. Worker sandbox mark is a second static mark, not the same agent travelling. -->
+            <g id="m-driver"><rect x="-60" y="-60" width="120" height="120" fill="var(--id-ground)" stroke="var(--id-lime)" stroke-width="8" /></g>
+            <g id="m-worker"><rect x="-60" y="-60" width="120" height="120" fill="var(--id-lime)" /></g>
+            <g id="m-stamp">
+              <circle r="76" fill="var(--id-ground)" stroke="var(--id-lime)" stroke-width="10" />
+              <path d="M-36 4L-10 32L38 -26" fill="none" stroke="var(--id-lime)" stroke-width="14" stroke-linecap="square" />
+            </g>
+            <!-- the territory: clear ground, a grid, a few built things. Used for the project map AND again inside a scope. -->
+            <g id="terr">
+              <rect width={MW} height={MH} fill="var(--id-ground)" />
+              <rect width={MW} height={MH} fill="var(--id-paper)" fill-opacity="0.05" />
+              <path d={grid} stroke="var(--id-rule)" stroke-width="3" fill="none" />
+              <rect width={MW} height={MH} fill="none" stroke="var(--id-paper-2)" stroke-width="6" />
+              <g fill="var(--id-lime)">{built.map(([x, y]) => <rect x={x} y={y} width="60" height="60" />)}</g>
+            </g>
+          </defs>
+          <g id="world">
+            <!-- ===== my laptop (W level) ===== -->
+            <g id="laptop">
+              <g id="lid">
+                <rect x="180" y="200" width="300" height="192" fill="var(--id-ground)" stroke="var(--id-paper-2)" stroke-width="5" />
+                <g data-ch="scr" fill="var(--id-paper-2)" opacity="0.5">
+                  <rect x="206" y="226" width="150" height="9" />
+                  <rect x="206" y="250" width="210" height="9" />
+                  <rect x="206" y="274" width="120" height="9" />
+                  <rect x="206" y="340" width="12" height="22" fill="var(--id-lime)" />
+                </g>
+              </g>
+              <rect x="150" y="392" width="360" height="22" fill="var(--id-paper-2)" />
+              <text x="150" y="446" class="lab" font-size="22" data-ch="labs">MY LAPTOP</text>
+            </g>
+            <path d="M510 403H684V620" pathLength="1" stroke="var(--id-lime)" stroke-width="4" fill="none" stroke-dasharray="1" stroke-dashoffset="1" data-draw="ssh1" />
+            <g data-ch="labs"><text x="720" y="520" class="lab" font-size="22" data-ch="ssh1">SSH</text></g>
+
+            <!-- ===== the home box (B level: its whole interior is the factory) ===== -->
+            <g id="box" transform={`translate(${BX} ${BY}) scale(${SB})`}>
+              <rect width="4000" height="2400" fill="var(--id-ground)" />
+              <rect width="4000" height="2400" fill="var(--id-lime)" fill-opacity="0.12" data-ch="boxlit" />
+              <rect width="4000" height="2400" fill="none" stroke="var(--id-paper-2)" stroke-width="44" />
+              <rect width="4000" height="2400" fill="none" stroke="var(--id-lime)" stroke-width="44" data-ch="boxlit" />
+              <!-- project map -->
+              <g transform={`translate(${MAPX} ${MAPY})`} data-ch="map">
+                <use href="#terr" />
+                {fogT.map(([cx, cy]) => (
+                  <g data-fog="fogT" data-cx={cx} data-cy={cy}>
+                    <g fill="var(--id-ground)">{blobBig.map(([dx, dy, r]) => <circle cx={dx} cy={dy} r={r} />)}</g>
+                    <g fill="var(--id-paper-2)" opacity="0.34">{blobBig.map(([dx, dy, r]) => <circle cx={dx} cy={dy} r={r} />)}</g>
+                  </g>
+                ))}
+              </g>
+              <text x={MAPX} y={MAPY - 30} class="lab" font-size="64" data-ch="map">PROJECT MAP</text>
+
+              <!-- ssh line terminates at the brain -->
+              <path d="M1200 0V310" pathLength="1" stroke="var(--id-lime)" stroke-width="10" fill="none" stroke-dasharray="1" stroke-dashoffset="1" data-draw="ssh2" />
+              <g transform="translate(1200 420)" data-ch="brain"><use href="#m-brain" /></g>
+              <text x="1070" y="440" class="lab" font-size="64" text-anchor="end" data-ch="brain">BRAIN</text>
+
+              <!-- the scope: a region of the map, which is itself a map -->
+              <g id="region" transform={`translate(${RX} ${RY}) scale(${SS})`}>
+                <g data-ch="sub">
+                  <use href="#terr" />
+                  {kids.map((k, i) => (
+                    <path d={k.branch} pathLength="1" stroke="var(--id-lime)" stroke-width="10" fill="none" stroke-dasharray="1" stroke-dashoffset="1" data-draw={`d${i}`} />
+                  ))}
+                  {kids.map((k, i) => (
+                    <g data-fog={`f${i}`} data-cx={k.x + KW / 2} data-cy={k.y + KH / 2}>
+                      <g fill="var(--id-ground)">{blobChild.map(([dx, dy, r]) => <circle cx={dx} cy={dy} r={r} />)}</g>
+                      <g fill="var(--id-paper-2)" opacity="0.34">{blobChild.map(([dx, dy, r]) => <circle cx={dx} cy={dy} r={r} />)}</g>
+                    </g>
+                  ))}
+                  {kids.map((k, i) => (
+                    <>
+                      <rect x={k.x} y={k.y} width={KW} height={KH} pathLength="1" fill="none" stroke="var(--id-lime)" stroke-width="8" stroke-dasharray="1" stroke-dashoffset="1" data-draw={`d${i}`} />
+                      <text x={k.x} y={k.y - 24} class="lab sc" font-size="68" data-ch={`d${i}`} data-off="0.6">{k.label}</text>
+                      <g transform={`translate(${k.x + 100} ${k.y + 100})`}><g data-pop={`d${i}`} data-off="0.5"><use href={`#m-${k.mark}`} /></g></g>
+                    </>
+                  ))}
+                </g>
+                <!-- foggy cover: the scope starts as an unknown region -->
+                <g data-fog="sfog" data-cx="1050" data-cy="750">
+                  <g fill="var(--id-ground)">{blobCover.map(([dx, dy, r]) => <circle cx={dx} cy={dy} r={r} />)}</g>
+                  <g fill="var(--id-paper-2)" opacity="0.34">{blobCover.map(([dx, dy, r]) => <circle cx={dx} cy={dy} r={r} />)}</g>
+                </g>
+                <rect width={MW} height={MH} pathLength="1" fill="none" stroke="var(--id-lime)" stroke-width="10" stroke-dasharray="1" stroke-dashoffset="1" data-draw="sout" />
+                <g transform="translate(1050 230)"><g data-pop="smark"><use href="#m-brain" /></g></g>
+                <text x="1210" y="250" class="lab sc" font-size="68" data-ch="smark">Sub-brain</text>
+                <g transform="translate(1840 1110)"><g data-pop="stamp1"><use href="#m-stamp" /></g></g>
+              </g>
+              <!-- brain draws the boundary: dispatch line to the scope -->
+              <path d="M1200 530V1100H1650V1208" pathLength="1" stroke="var(--id-lime)" stroke-width="6" fill="none" stroke-dasharray="1" stroke-dashoffset="1" data-draw="sline" />
+              <text x={RX} y={RY - 24} class="lab sc" font-size="40" data-ch="sout">Scope</text>
+
+              <!-- sandbox with a stepped hill -->
+              <g data-ch="map">
+              <rect x="2500" y="180" width="1350" height="1150" fill="none" stroke="var(--id-lime)" stroke-width="8" />
+              <path d={hill} fill="var(--id-paper)" fill-opacity="0.12" stroke="var(--id-paper-2)" stroke-width="5" />
+              <text x="2540" y="270" class="lab" font-size="64">SANDBOX</text>
+              <g transform="translate(2640 400)" data-ch="w2"><use href="#m-worker" /></g>
+              <text x="2730" y="420" class="lab sc" font-size="64" data-ch="w2">Worker</text>
+              <path d="M3100 1330V1500" stroke="var(--id-lime-dim)" stroke-width="8" fill="none" />
+              <circle cx="3100" cy="1330" r="26" fill="var(--id-lime)" />
+              </g>
+
+              <!-- stamps: one per level -->
+              <g transform={`translate(${RX + SS * 2100} ${RY})`}><g data-pop="stamp2"><use href="#m-stamp" /></g></g>
+            </g>
+
+            <!-- box heartbeat -->
+            <g data-ch="hb" opacity="0">
+              <rect class="hb" x={BX} y={BY} width={4000 * SB} height={2400 * SB} fill="none" stroke="var(--id-lime)" stroke-width="3" />
+              <rect class="hb hb2" x={BX} y={BY} width={4000 * SB} height={2400 * SB} fill="none" stroke="var(--id-lime)" stroke-width="3" />
+            </g>
+            <text x={BX} y={BY + 2400 * SB + 34} class="lab" font-size="22" data-ch="labs">HOME BOX</text>
+
+            <!-- blackout veil: everything above dims; paper + task are drawn after it -->
+            <rect id="dark" x="-4000" y="-3000" width="12000" height="9000" fill="var(--id-ground)" opacity="0" />
+
+            <g transform={`translate(${BX} ${BY}) scale(${SB})`}>
+              <g id="paper" transform="translate(2800 1560)" data-ch="map">
+                <rect x="0" y="40" width="640" height="480" fill="var(--id-paper-2)" />
+                <rect x="26" y="26" width="640" height="480" fill="var(--id-paper-2)" stroke="var(--id-ground)" stroke-width="6" />
+                <rect x="52" y="12" width="620" height="480" fill="var(--id-paper-2)" stroke="var(--id-ground)" stroke-width="6" />
+                <rect x="78" y="0" width="560" height="480" fill="var(--id-paper)" stroke="var(--id-ground)" stroke-width="6" />
+                <g fill="var(--id-ink)" opacity="0.4">
+                  <rect x="110" y="40" width="300" height="20" /><rect x="110" y="86" width="400" height="20" /><rect x="110" y="410" width="220" height="20" />
+                </g>
+                <text x="78" y="590" class="lab" font-size="64" style="fill: var(--id-paper)">PAPER</text>
+              </g>
+            </g>
+
+            <!-- THE TASK: one pink shape that never leaves -->
+            <g id="task">
+              <circle id="glow2" r="100" fill="none" stroke="var(--id-pink)" stroke-width="4" opacity="0" />
+              <circle id="glow1" r="100" fill="none" stroke="var(--id-pink)" stroke-width="10" opacity="0" />
+              <rect id="task-rect" x="-55" y="-55" width="110" height="110" rx="55" fill="var(--id-pink)" />
+              <path id="task-chk" d="M0 0" fill="none" stroke="var(--id-ink)" stroke-linecap="square" stroke-linejoin="miter" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1" opacity="0" />
+            </g>
+          </g>
+        </svg>
+
+        <div class="copy-layer">
+          <div class="col" id="col" aria-hidden="true"></div>
+          <header class="copy copy-intro" data-txt="intro">
+            <h1>{intro.title}</h1>
+            <p class="lede">{intro.lede}</p>
+          </header>
+          {beats.map((b, i) => (
+            <article class="copy" data-txt={String(i)} aria-labelledby={`beat-${b.key}`}>
+              <p class="kicker">{b.kicker}</p>
+              <h2 id={`beat-${b.key}`}>{b.title}</h2>
+              {b.body.map((t) => <p class="body">{t}</p>)}
+              {b.credit && <p class="credit">{b.credit.text} <a href={b.credit.href}>{b.credit.name}</a></p>}
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section class="credits" aria-labelledby="credits-h">
+      <h2 id="credits-h">{creditsHeading}</h2>
+      <ul>
+        {credits.map((c) => <li><a href={c.href}>{c.name}</a></li>)}
+      </ul>
+    </section>
+
+    <SiteFooter />
+    <PrototypeSwitcher current="3a" />
+  </div>
+</BaseLayout>
+
+<style is:global>
+  html, body { margin: 0; background: var(--id-ground); }
+</style>
+<style>
+  .p3a {
+    position: relative;
+    background: var(--id-ground);
+    color: var(--id-paper);
+    font-family: var(--id-font-body);
+    min-height: 100vh;
+  }
+  .navwrap { position: absolute; top: 0; left: 0; right: 0; z-index: 5; padding: var(--space-4) clamp(1rem, 4vw, 4rem); pointer-events: none; }
+  .navwrap :global(a) { pointer-events: auto; }
+
+  .track { position: relative; height: calc(100svh * 10.9); }
+  .stage { position: sticky; top: 0; height: 100svh; overflow: hidden; }
+  .svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .svg .lab { font-family: var(--id-font-display); font-weight: 800; font-size: 40px; letter-spacing: 0.02em; fill: var(--id-paper-2); }
+
+  .copy-layer { position: absolute; inset: 0; pointer-events: none; }
+  /* flat poster column the world slides under, so type never fights drawn shapes */
+  .col { position: absolute; left: 0; top: 0; bottom: 0; width: 42vw; background: var(--id-ground); border-right: 1px solid var(--id-rule); opacity: 0; }
+  .copy {
+    position: absolute;
+    left: clamp(1.25rem, 4vw, 4rem);
+    top: 50%;
+    width: min(36vw, 36rem);
+    translate: 0 -50%;
+    pointer-events: auto;
+    will-change: opacity, transform;
+  }
+  .kicker { margin: 0 0 var(--space-4); color: var(--id-lime); font-weight: var(--id-weight-strong); font-size: var(--id-text-body); letter-spacing: var(--id-tracking-heading); }
+  .copy h2 {
+    margin: 0 0 var(--space-6);
+    font-size: clamp(2.2rem, 4.2vw, 4.4rem);
+    font-weight: var(--id-weight-poster);
+    letter-spacing: var(--id-tracking-display);
+    line-height: var(--id-leading-display);
+    color: var(--id-paper);
+  }
+  .copy h1 {
+    margin: 0 0 var(--space-6);
+    font-size: clamp(4rem, 8.5vw, 9rem);
+    font-weight: var(--id-weight-poster);
+    letter-spacing: var(--id-tracking-poster);
+    line-height: var(--id-leading-poster);
+    color: var(--id-lime);
+  }
+  .lede { margin: 0; max-width: 28ch; font-size: clamp(1.15rem, 1.7vw, 1.6rem); font-weight: var(--id-weight-medium); line-height: 1.3; }
+  .body { margin: 0 0 var(--space-3); max-width: 38ch; font-size: var(--id-text-body); line-height: 1.45; color: var(--id-paper); }
+  .credit { margin: var(--space-4) 0 0; font-size: var(--id-text-small); color: var(--id-paper-2); }
+  a { color: var(--id-lime); text-underline-offset: 0.18em; }
+  a:hover { background: var(--id-pink); color: var(--id-ink); }
+  a:focus-visible { outline: 3px solid var(--id-paper); outline-offset: 3px; }
+
+  .credits { padding: var(--space-12) clamp(1.25rem, 4vw, 4rem); border-top: 1px solid var(--id-rule); }
+  .credits h2 { margin: 0 0 var(--space-4); font-size: var(--id-text-heading); font-weight: var(--id-weight-strong); color: var(--id-paper-2); }
+  .credits ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0 var(--space-8); }
+  .credits a { display: inline-flex; align-items: center; min-height: 44px; font-weight: var(--id-weight-strong); font-size: var(--id-text-heading); }
+
+  @media (max-aspect-ratio: 9/10) {
+    .col { right: 0; bottom: auto; width: auto; height: 52svh; border-right: 0; border-bottom: 1px solid var(--id-rule); }
+    .copy { top: 7rem; translate: 0 0; width: auto; right: 1.25rem; }
+    .copy h2 { font-size: clamp(1.7rem, 7.4vw, 2.4rem); margin-bottom: var(--space-3); }
+    .copy h1 { font-size: clamp(3.4rem, 19vw, 6rem); }
+    .kicker { margin-bottom: var(--space-2); font-size: var(--id-text-small); }
+    .body { font-size: var(--id-text-small); line-height: 1.38; margin-bottom: var(--space-2); max-width: none; }
+    .lede { max-width: 26ch; }
+  }
+
+  /* reduced motion: static, fully legible stack; the world is shown once as an overview */
+  @media (prefers-reduced-motion: reduce) {
+    .track { height: auto; }
+    .stage { position: static; height: auto; overflow: visible; }
+    .stage { padding-top: 6rem; }
+    .svg { position: relative; height: 60svh; }
+    .col { display: none; }
+    .copy-layer { position: static; padding: var(--space-8) clamp(1.25rem, 4vw, 4rem); display: grid; gap: var(--space-12); }
+    .copy { position: static; translate: none; width: auto; max-width: 40rem; opacity: 1 !important; visibility: visible !important; transform: none !important; }
+  }
+</style>
+
+<style>
+  .svg .sc { text-transform: uppercase; letter-spacing: 0.08em; }
+  .hb { transform-box: fill-box; transform-origin: center; animation: hb 2.6s cubic-bezier(0.16, 1, 0.3, 1) infinite; }
+  .hb2 { animation-delay: 1.3s; }
+  @keyframes hb { 0% { transform: scale(1); opacity: 0.9; } 70%, 100% { transform: scale(1.5); opacity: 0; } }
+  @media (prefers-reduced-motion: reduce) { .hb { animation: none; opacity: 0.5; } }
+</style>
+<script>
+  import '../../components/factory-prototype/3a/camera';
+</script>
