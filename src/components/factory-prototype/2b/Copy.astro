@@ -1,0 +1,29 @@
+---
+// PROTOTYPE (resume-t7j round 2, variant 2b): one beat's running text; rendered once in the pinned band (desktop) and once inside the panel (portrait).
+// SHORTCUT: the copy is rendered twice and one set is display:none per breakpoint; production would reflow one set with container queries.
+import type { Beat } from '../beats';
+interface Props { beat: Beat; index: number; }
+const { beat, index } = Astro.props;
+---
+<article class="copy" data-copy={index}>
+  <div class="head">
+    <p class="kicker">{beat.kicker}</p>
+    <h2>{beat.title}</h2>
+  </div>
+  <div class="body">
+    {beat.body.map((p) => <p>{p}</p>)}
+    {beat.credit && (
+      <p class="credit">{beat.credit.text} <a href={beat.credit.href}>{beat.credit.name}</a></p>
+    )}
+  </div>
+</article>
+<style>
+  .copy { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.9rem; align-content: start; }
+  .kicker { margin: 0 0 0.5rem; color: var(--id-lime); font-weight: var(--id-weight-strong); font-size: var(--id-text-small); letter-spacing: 0.01em; }
+  h2 { margin: 0; font-weight: var(--id-weight-poster); font-size: clamp(1.45rem, 2.3vw, 2.15rem); line-height: var(--id-leading-display); letter-spacing: var(--id-tracking-display); color: var(--id-paper); max-width: 18ch; text-wrap: balance; }
+  .body p { margin: 0 0 0.7rem; font-size: var(--id-text-body); line-height: 1.5; color: var(--id-paper-2); max-width: 46ch; }
+  .body .credit { font-size: var(--id-text-small); color: var(--id-paper-2); }
+  .credit a { color: var(--id-lime); text-underline-offset: 3px; }
+  .credit a:hover { color: var(--id-pink); }
+  .credit a:focus-visible { outline: 2px solid var(--id-pink); outline-offset: 3px; }
+</style>

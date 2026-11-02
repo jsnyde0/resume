@@ -1,0 +1,247 @@
+---
+// PROTOTYPE (resume-t7j round 2, variant 2a): one flat Swiss-poster SVG world; scroll drives a camera (pan + zoom)
+// through per-beat keyframes while one pink shape (the task) morphs and travels the whole way.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SiteNav from '../../components/site/SiteNav.astro';
+import SiteFooter from '../../components/site/SiteFooter.astro';
+import PrototypeSwitcher from '../../components/factory-prototype/PrototypeSwitcher.astro';
+import { intro, beats, credits } from '../../components/factory-prototype/beats';
+import { FOG_CENTERS } from '../../components/factory-prototype/2a/keyframes';
+
+// fog patch = union of 3 flat discs, offsets relative to the patch centre
+const blobs: [number, number, number][][] = [
+  [[0, 0, 190], [-120, 60, 120], [110, -80, 130]],
+  [[0, 0, 140], [90, 70, 90], [-90, -60, 90]],
+  [[0, 0, 170], [130, -40, 100], [-100, 90, 110]],
+  [[0, 0, 130], [-80, -50, 90], [80, 60, 80]],
+  [[0, 0, 110], [70, -50, 80], [-60, 60, 70]],
+];
+const steps = 'M2340 1440 L2340 1350 L2480 1350 L2480 1250 L2620 1250 L2620 1150 L2760 1150 L2760 1050 L2900 1050 L2900 1440 Z';
+const dotPts: [number, number][] = [];
+for (const x of [1380, 1470, 1560]) for (let y = 300; y <= 1500; y += 150) dotPts.push([x, y]);
+for (let x = 2350; x <= 3000; x += 90) for (const y of [250, 330, 410, 490]) dotPts.push([x, y]);
+for (let x = 1400; x <= 3000; x += 100) dotPts.push([x, 1580]);
+const gridX = Array.from({ length: 8 }, (_, i) => 80 + i * 150);
+const gridY = Array.from({ length: 11 }, (_, i) => 150 + i * 150);
+---
+
+<BaseLayout bare title="How I build (prototype 2a) | Jonatan Snyders" description="Follow one task through a factory of AI agents.">
+  <div class="p2a">
+    <div class="navwrap"><SiteNav current="factory" /></div>
+
+    <!-- SHORTCUT: track height (11 segments x 90vh + 100vh) is a magic number; production tunes pacing per beat. -->
+    <section class="track" id="track" aria-label="Follow one task through the factory">
+      <div class="stage" id="stage">
+        <svg id="world-svg" class="svg" aria-hidden="true" focusable="false">
+          <!-- SHORTCUT: no viewBox, the camera is a JS transform on #world; without JS the world is unframed. Production needs a no-JS static fallback. -->
+          <g id="world">
+            <!-- ===== the map ===== -->
+            <rect x="80" y="150" width="1100" height="1500" fill="var(--id-paper)" fill-opacity="0.05" />
+            {gridX.map((x) => <line x1={x} y1="150" x2={x} y2="1650" stroke="var(--id-rule)" stroke-width="2" />)}
+            {gridY.map((y) => <line x1="80" y1={y} x2="1180" y2={y} stroke="var(--id-rule)" stroke-width="2" />)}
+            <rect x="80" y="150" width="1100" height="1500" fill="none" stroke="var(--id-paper-2)" stroke-width="4" />
+            <!-- built things on clear ground -->
+            <g fill="var(--id-lime)">
+              <rect x="190" y="260" width="40" height="40" />
+              <rect x="640" y="230" width="40" height="40" />
+              <rect x="1000" y="940" width="40" height="40" />
+              <rect x="640" y="1500" width="40" height="40" />
+              <rect x="180" y="860" width="40" height="40" />
+            </g>
+            <g stroke="var(--id-lime-dim)" stroke-width="4" fill="none">
+              <path d="M210 300 L210 520 L660 520 L660 270" />
+              <path d="M200 880 L200 1000 L1020 1000 L1020 980" />
+              <path d="M660 1540 L660 1560" />
+            </g>
+            <text x="110" y="120" class="lab">MAP</text>
+            <!-- fog -->
+            {FOG_CENTERS.map(([cx, cy], i) => (
+              <g class="fog" transform={`translate(${cx} ${cy})`}>
+                <g fill="var(--id-ground)">{blobs[i].map(([dx, dy, r]) => <circle cx={dx} cy={dy} r={r} />)}</g>
+                <g fill="var(--id-paper-2)" opacity="0.34">{blobs[i].map(([dx, dy, r]) => <circle cx={dx} cy={dy} r={r} />)}</g>
+              </g>
+            ))}
+
+            <!-- ===== home box + machine ===== -->
+            <rect x="1300" y="150" width="1800" height="1500" fill="none" stroke="var(--id-paper-2)" stroke-width="4" />
+            <text x="1330" y="120" class="lab">HOME BOX</text>
+
+            <!-- the task's route -->
+            <path d="M520 700 L1250 700 L1250 520 L1540 520" fill="none" stroke="var(--id-lime-dim)" stroke-width="4" stroke-dasharray="14 14" />
+            <g stroke="var(--id-lime-dim)" stroke-width="4" fill="none">
+              <line x1="1740" y1="480" x2="1990" y2="385" />
+              <line x1="1730" y1="560" x2="1995" y2="640" />
+              <line x1="2105" y1="640" x2="2415" y2="640" />
+              <line x1="2470" y1="695" x2="2470" y2="780" />
+              <line x1="2300" y1="1100" x2="2130" y2="1100" />
+              <line x1="1650" y1="630" x2="1650" y2="1180" />
+              <line x1="1650" y1="1180" x2="1760" y2="1180" />
+            </g>
+            <!-- brains -->
+            <circle cx="1650" cy="520" r="110" fill="var(--id-ground)" stroke="var(--id-lime)" stroke-width="8" />
+            <circle cx="1650" cy="520" r="34" fill="var(--id-lime)" />
+            <circle cx="2050" cy="360" r="65" fill="var(--id-ground)" stroke="var(--id-lime)" stroke-width="8" />
+            <circle cx="2050" cy="360" r="20" fill="var(--id-lime)" />
+            <text x="1650" y="690" class="lab" text-anchor="middle" dx="-70">BRAIN</text>
+            <text x="2050" y="270" class="lab" text-anchor="middle">SUB-BRAIN</text>
+            <!-- driver + worker -->
+            <rect x="2000" y="590" width="105" height="105" fill="var(--id-ground)" stroke="var(--id-lime)" stroke-width="8" />
+            <text x="2052" y="740" class="lab" text-anchor="middle">DRIVER</text>
+            <rect x="2415" y="585" width="110" height="110" fill="var(--id-lime)" />
+            <text x="2470" y="560" class="lab" text-anchor="middle">WORKER</text>
+            <!-- sandbox room with a stepped hill -->
+            <rect x="2300" y="780" width="700" height="700" fill="none" stroke="var(--id-lime)" stroke-width="8" />
+            <path d={steps} fill="var(--id-paper)" fill-opacity="0.12" stroke="var(--id-paper-2)" stroke-width="3" />
+            <text x="2330" y="850" class="lab">SANDBOX</text>
+            <!-- doorbell -->
+            <circle cx="2300" cy="1100" r="20" fill="var(--id-lime)" />
+
+            <!-- ===== blackout veil (everything above is dimmed; paper + task are drawn after) ===== -->
+            <rect id="dark" x="-3000" y="-2000" width="9200" height="5800" fill="var(--id-ground)" opacity="0" />
+
+            <!-- ===== paper stack ===== -->
+            <g id="paper">
+              <rect x="1750" y="1070" width="380" height="300" fill="var(--id-paper-2)" />
+              <rect x="1764" y="1056" width="380" height="300" fill="var(--id-paper-2)" stroke="var(--id-ground)" stroke-width="3" />
+              <rect x="1778" y="1042" width="380" height="300" fill="var(--id-paper-2)" stroke="var(--id-ground)" stroke-width="3" />
+              <rect x="1792" y="1028" width="340" height="300" fill="var(--id-paper)" stroke="var(--id-ground)" stroke-width="3" />
+              <g fill="var(--id-ink)" opacity="0.4">
+                <rect x="1820" y="1056" width="200" height="12" />
+                <rect x="1820" y="1086" width="260" height="12" />
+                <rect x="1820" y="1280" width="150" height="12" />
+              </g>
+              <circle cx="2090" cy="1290" r="34" fill="none" stroke="var(--id-ink)" stroke-width="6" opacity="0.6" />
+              <text x="1792" y="1410" class="lab" style="fill: var(--id-paper)">PAPER</text>
+            </g>
+
+            <!-- ===== other tasks (appear on the zoom-out) ===== -->
+            <g id="dots" fill="var(--id-paper-2)" opacity="0">
+              {dotPts.map(([x, y]) => <circle cx={x} cy={y} r="16" />)}
+            </g>
+
+            <!-- ===== THE TASK: one pink shape that never leaves ===== -->
+            <g id="task">
+              <circle id="glow2" r="100" fill="none" stroke="var(--id-pink)" stroke-width="4" opacity="0" />
+              <circle id="glow1" r="100" fill="none" stroke="var(--id-pink)" stroke-width="10" opacity="0" />
+              <rect id="task-rect" x="-55" y="-55" width="110" height="110" rx="55" fill="var(--id-pink)" />
+              <path id="task-chk" d="M0 0" fill="none" stroke="var(--id-ink)" stroke-linecap="square" stroke-linejoin="miter" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1" opacity="0" />
+            </g>
+          </g>
+        </svg>
+
+        <div class="copy-layer">
+          <div class="col" id="col" aria-hidden="true"></div>
+          <header class="copy copy-intro" data-txt="intro">
+            <h1>{intro.title}</h1>
+            <p class="lede">{intro.lede}</p>
+          </header>
+          {beats.map((b, i) => (
+            <article class="copy" data-txt={String(i)} aria-labelledby={`beat-${b.key}`}>
+              <p class="kicker">{b.kicker}</p>
+              <h2 id={`beat-${b.key}`}>{b.title}</h2>
+              {b.body.map((t) => <p class="body">{t}</p>)}
+              {b.credit && <p class="credit">{b.credit.text} <a href={b.credit.href}>{b.credit.name}</a></p>}
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section class="credits" aria-labelledby="credits-h">
+      <h2 id="credits-h">Ideas borrowed from</h2>
+      <ul>
+        {credits.map((c) => <li><a href={c.href}>{c.name}</a></li>)}
+      </ul>
+    </section>
+
+    <SiteFooter />
+    <PrototypeSwitcher current="2a" />
+  </div>
+</BaseLayout>
+
+<style is:global>
+  html, body { margin: 0; background: var(--id-ground); }
+</style>
+<style>
+  .p2a {
+    position: relative;
+    background: var(--id-ground);
+    color: var(--id-paper);
+    font-family: var(--id-font-body);
+    min-height: 100vh;
+  }
+  .navwrap { position: absolute; top: 0; left: 0; right: 0; z-index: 5; padding: var(--space-4) clamp(1rem, 4vw, 4rem); pointer-events: none; }
+  .navwrap :global(a) { pointer-events: auto; }
+
+  .track { position: relative; height: calc(100svh * 10.9); }
+  .stage { position: sticky; top: 0; height: 100svh; overflow: hidden; }
+  .svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .svg .lab { font-family: var(--id-font-display); font-weight: 800; font-size: 40px; letter-spacing: 0.02em; fill: var(--id-paper-2); }
+
+  .copy-layer { position: absolute; inset: 0; pointer-events: none; }
+  /* flat poster column the world slides under, so type never fights drawn shapes */
+  .col { position: absolute; left: 0; top: 0; bottom: 0; width: 42vw; background: var(--id-ground); border-right: 1px solid var(--id-rule); opacity: 0; }
+  .copy {
+    position: absolute;
+    left: clamp(1.25rem, 4vw, 4rem);
+    top: 50%;
+    width: min(36vw, 36rem);
+    translate: 0 -50%;
+    pointer-events: auto;
+    will-change: opacity, transform;
+  }
+  .kicker { margin: 0 0 var(--space-4); color: var(--id-lime); font-weight: var(--id-weight-strong); font-size: var(--id-text-body); letter-spacing: var(--id-tracking-heading); }
+  .copy h2 {
+    margin: 0 0 var(--space-6);
+    font-size: clamp(2.2rem, 4.2vw, 4.4rem);
+    font-weight: var(--id-weight-poster);
+    letter-spacing: var(--id-tracking-display);
+    line-height: var(--id-leading-display);
+    color: var(--id-paper);
+  }
+  .copy h1 {
+    margin: 0 0 var(--space-6);
+    font-size: clamp(4rem, 8.5vw, 9rem);
+    font-weight: var(--id-weight-poster);
+    letter-spacing: var(--id-tracking-poster);
+    line-height: var(--id-leading-poster);
+    color: var(--id-lime);
+  }
+  .lede { margin: 0; max-width: 28ch; font-size: clamp(1.15rem, 1.7vw, 1.6rem); font-weight: var(--id-weight-medium); line-height: 1.3; }
+  .body { margin: 0 0 var(--space-3); max-width: 38ch; font-size: var(--id-text-body); line-height: 1.45; color: var(--id-paper); }
+  .credit { margin: var(--space-4) 0 0; font-size: var(--id-text-small); color: var(--id-paper-2); }
+  a { color: var(--id-lime); text-underline-offset: 0.18em; }
+  a:hover { background: var(--id-pink); color: var(--id-ink); }
+  a:focus-visible { outline: 3px solid var(--id-paper); outline-offset: 3px; }
+
+  .credits { padding: var(--space-12) clamp(1.25rem, 4vw, 4rem); border-top: 1px solid var(--id-rule); }
+  .credits h2 { margin: 0 0 var(--space-4); font-size: var(--id-text-heading); font-weight: var(--id-weight-strong); color: var(--id-paper-2); }
+  .credits ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0 var(--space-8); }
+  .credits a { display: inline-flex; align-items: center; min-height: 44px; font-weight: var(--id-weight-strong); font-size: var(--id-text-heading); }
+
+  @media (max-aspect-ratio: 9/10) {
+    .col { right: 0; bottom: auto; width: auto; height: 54svh; border-right: 0; border-bottom: 1px solid var(--id-rule); }
+    .copy { top: 7rem; translate: 0 0; width: auto; right: 1.25rem; }
+    .copy h2 { font-size: clamp(1.7rem, 7.4vw, 2.4rem); margin-bottom: var(--space-3); }
+    .copy h1 { font-size: clamp(3.4rem, 19vw, 6rem); }
+    .kicker { margin-bottom: var(--space-2); font-size: var(--id-text-small); }
+    .body { font-size: var(--id-text-small); line-height: 1.38; margin-bottom: var(--space-2); max-width: none; }
+    .lede { max-width: 26ch; }
+  }
+
+  /* reduced motion: static, fully legible stack; the world is shown once as an overview */
+  @media (prefers-reduced-motion: reduce) {
+    .track { height: auto; }
+    .stage { position: static; height: auto; overflow: visible; }
+    .stage { padding-top: 6rem; }
+    .svg { position: relative; height: 60svh; }
+    .col { display: none; }
+    .copy-layer { position: static; padding: var(--space-8) clamp(1.25rem, 4vw, 4rem); display: grid; gap: var(--space-12); }
+    .copy { position: static; translate: none; width: auto; max-width: 40rem; opacity: 1 !important; visibility: visible !important; transform: none !important; }
+  }
+</style>
+
+<!-- SHORTCUT: SVG labels (BRAIN, DRIVER...) are decorative aria-hidden text; production needs a real alt/description of the world for assistive tech. -->
+<script>
+  import '../../components/factory-prototype/2a/camera';
+</script>

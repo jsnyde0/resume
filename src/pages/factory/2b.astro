@@ -1,0 +1,397 @@
+---
+// PROTOTYPE (resume-t7j round 2, variant 2b): "type is the world" — one very wide poster strip of huge words pans sideways under a sticky stage while one pink block travels through it.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SiteNav from '../../components/site/SiteNav.astro';
+import SiteFooter from '../../components/site/SiteFooter.astro';
+import PrototypeSwitcher from '../../components/factory-prototype/PrototypeSwitcher.astro';
+import Copy from '../../components/factory-prototype/2b/Copy.astro';
+import { intro, beats, credits } from '../../components/factory-prototype/beats';
+
+const L = (w: string) => [...w];
+// Where the block stands on a letter: fraction down the letter box (cap top).
+const CAP = '0.17';
+// SHORTCUT: the strip is hand-composed per beat (words, stops, sizes tuned by eye); production needs a data-driven layout and font-metric-based cap offsets.
+---
+
+<BaseLayout bare title="How I build, type is the world (prototype 2b)" description="Follow one task through Jonatan's factory of AI agents.">
+  <div class="page">
+    <SiteNav current="factory" />
+
+    <header class="intro">
+      <h1>{intro.title}</h1>
+      <p class="lede">{intro.lede}</p>
+    </header>
+
+    <div class="world" data-world>
+      <div class="track" data-track>
+        <div class="stage" data-stage>
+          <div class="view">
+            <div class="strip" data-strip>
+              <div class="fogfield t-fog" aria-hidden="true">
+                <span>FOG FOG FOG FOG FOG FOG</span>
+                <span>FOG FOG FOG FOG FOG FOG</span>
+                <span>FOG FOG FOG FOG FOG FOG</span>
+              </div>
+
+              <!-- 01 FOG -->
+              <section class="panel" data-panel="0">
+                <div class="word fogword t" aria-hidden="true" style="--fs:44vh">
+                  <span class="l">F</span><span class="l" data-wp data-ay=".55" data-vis=".55" data-blur="18" data-s=".9">O</span><span class="l">G</span>
+                </div>
+                <div class="m-copy"><Copy beat={beats[0]} index={0} /></div>
+              </section>
+
+              <!-- 02 CLEAR -->
+              <section class="panel" data-panel="1">
+                <div class="word t" aria-hidden="true" style="--fs:36vh">
+                  <span class="l">C</span><span class="l">L</span><span class="l" data-wp data-ay={CAP}>E</span><span class="l">A</span><span class="l">R</span>
+                </div>
+                <div class="m-copy"><Copy beat={beats[1]} index={1} /></div>
+              </section>
+
+              <!-- 03 CHECK -->
+              <section class="panel" data-panel="2">
+                <div class="word t" aria-hidden="true" style="--fs:36vh">
+                  <span class="l" data-wp data-ay={CAP} data-lit>C</span><span class="l">H</span><span class="l">E</span><span class="l">C</span><span class="l" data-wp data-ay={CAP} data-check="1" data-hop="1" data-lit>K</span>
+                </div>
+                <div class="m-copy"><Copy beat={beats[2]} index={2} /></div>
+              </section>
+
+              <!-- 04 BRAIN -->
+              <section class="panel" data-panel="3">
+                <div class="word t" aria-hidden="true" style="--fs:40vh">
+                  {L('BRAIN').map((c) => <span class="l" data-wp data-ay={CAP} data-hop="1" data-check="1" data-lit>{c}</span>)}
+                </div>
+                <div class="m-copy"><Copy beat={beats[3]} index={3} /></div>
+              </section>
+
+              <!-- 05 SANDBOX: staircase inside a locked room -->
+              <section class="panel" data-panel="4">
+                <div class="room t" aria-hidden="true">
+                  <div class="word stair" style="--fs:26vh">
+                    {L('SANDBOX').map((c, i) => <span class="l" style={`--i:${i}`} data-wp data-ay={CAP} data-hop="1" data-check="1" data-lit>{c}</span>)}
+                  </div>
+                </div>
+                <div class="m-copy"><Copy beat={beats[4]} index={4} /></div>
+              </section>
+
+              <!-- 06 PAPER -->
+              <section class="panel" data-panel="5">
+                <div class="word t" aria-hidden="true" style="--fs:36vh">
+                  <span class="l">P</span><span class="l" data-wp data-ay={CAP} data-hop="1" data-check="1">A</span><span class="l">P</span><span class="l">E</span><span class="l">R</span>
+                </div>
+                <div class="stack keep" aria-hidden="true">
+                  <i class="ln" data-wp data-ay="0" data-s=".1" data-sx="3.2" data-check="1"></i>
+                  <i class="ln" style="--w:86%"></i>
+                  <i class="ln" style="--w:100%"></i>
+                  <i class="ln" style="--w:64%"></i>
+                  <i class="ln" style="--w:92%"></i>
+                  <i class="ln" style="--w:74%"></i>
+                  <i class="ln" style="--w:48%"></i>
+                </div>
+                <div class="m-copy"><Copy beat={beats[5]} index={5} /></div>
+              </section>
+
+              <!-- 07 LIGHTS OUT: the block stays on the paper lines while all type drops away -->
+              <section class="panel" data-panel="6">
+                <span class="pin" data-wp data-beat="6" data-pin-of=".stack .ln" data-ay="0" data-s=".1" data-sx="3.2" data-check="1"></span>
+                <div class="word out t" aria-hidden="true" style="--fs:28vh">
+                  <span>LIGHTS</span><span>OUT</span>
+                </div>
+                <div class="m-copy"><Copy beat={beats[6]} index={6} /></div>
+              </section>
+
+              <!-- 08 HOME -->
+              <section class="panel" data-panel="7">
+                <div class="fleet" aria-hidden="true">
+                  {Array.from({ length: 70 }, (_, i) => i === 33
+                    ? <i class="cell" data-wp data-ay="1" data-s=".29" data-sx=".29" data-check="0"></i>
+                    : <i class="cell"></i>)}
+                </div>
+                <div class="word t" aria-hidden="true" style="--fs:40vh">
+                  {L('HOME').map((c) => <span class="l">{c}</span>)}
+                </div>
+                <div class="m-copy"><Copy beat={beats[7]} index={7} /></div>
+              </section>
+
+              <!-- 09 SHIPPED -->
+              <section class="panel" data-panel="8">
+                <div class="word t" aria-hidden="true" style="--fs:30vh;--fv:17vw">
+                  {L('SHIPPED').map((c, i) => <span class="l" {...(i === 6 ? { 'data-wp': '', 'data-ay': CAP, 'data-check': '1', 'data-hop': '1' } : {})}>{c}</span>)}
+                </div>
+                <div class="word less t" aria-hidden="true" style="--fs:12vh"><span class="l">less FOG</span></div>
+                <div class="m-copy"><Copy beat={beats[8]} index={8} /></div>
+              </section>
+
+              <div class="block" data-block aria-hidden="true"></div>
+              <div class="chk" data-chk aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="100%" height="100%"><path d="M5 12.5l4.6 4.6L19 7.5" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="square"/></svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="band">
+            <div class="copies">
+              {beats.map((b, i) => <Copy beat={b} index={i} />)}
+            </div>
+            <div class="rail" aria-hidden="true"><i data-bar></i></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <section class="credits" aria-labelledby="credits-h">
+      <h2 id="credits-h">Built on other people’s ideas</h2>
+      <!-- SHORTCUT: this heading is invented copy (beats.ts exports only the credits list). -->
+      <ul>
+        {credits.map((c) => <li><a href={c.href}>{c.name}</a></li>)}
+      </ul>
+    </section>
+
+    <SiteFooter />
+  </div>
+  <PrototypeSwitcher current="2b" />
+</BaseLayout>
+
+<style is:global>
+  html, body { margin: 0; background: var(--id-ground); }
+</style>
+
+<style>
+  .page { background: var(--id-ground); color: var(--id-paper); font-family: var(--id-font-body); padding: 0 clamp(1rem, 3vw, 2.5rem); overflow-x: clip; }
+
+  .intro { padding: clamp(3rem, 12vh, 7rem) 0 clamp(2.5rem, 8vh, 5rem); min-height: 56svh; display: flex; flex-direction: column; justify-content: flex-end; }
+  .intro h1 { margin: 0; font-weight: var(--id-weight-poster); font-size: clamp(3.4rem, 17vw, 16rem); line-height: var(--id-leading-poster); letter-spacing: var(--id-tracking-poster); color: var(--id-lime); }
+  .lede { margin: 1.5rem 0 0; max-width: 34ch; font-size: clamp(1.15rem, 1.8vw, 1.6rem); line-height: 1.35; color: var(--id-paper); font-weight: var(--id-weight-medium); }
+
+  /* ---------- portrait / static mode (default; also reduced motion) ---------- */
+  .world { --b: 22vw; --dark: 0; --fog: 0; --fogo: 1; position: relative; }
+  .stage { position: relative; }
+  .strip { position: relative; display: block; }
+  .panel { position: relative; padding: 5rem 0 4rem; min-height: 100svh; display: flex; flex-direction: column; justify-content: flex-start; gap: 2.5rem; }
+  .band { display: none; }
+  .word { font-size: var(--fv, clamp(4rem, 30vw, 9rem)); font-weight: var(--id-weight-poster); letter-spacing: var(--id-tracking-poster); line-height: 0.82; white-space: nowrap; color: var(--id-paper); margin-top: calc(var(--b) * 1.1); }
+  .l { display: inline-block; }
+  .t { opacity: calc(1 - var(--dark) * 0.95); }
+  .fogword { filter: blur(calc(var(--fog) * 1px)); }
+  .fogfield { position: absolute; inset: 0 0 auto 0; height: 100svh; overflow: hidden; display: flex; flex-direction: column; justify-content: space-around; font-weight: var(--id-weight-poster); letter-spacing: var(--id-tracking-poster); font-size: 28vw; line-height: 0.8; color: var(--id-paper-2); opacity: calc(0.12 * var(--fogo)); pointer-events: none; z-index: 2; white-space: nowrap; }
+  .room { border: 2px solid var(--id-paper-2); padding: calc(var(--b) * 1.2) 1rem 1rem; margin-top: calc(var(--b) * 1.2); align-self: flex-start; }
+  .room .word { margin-top: 0; font-size: clamp(2.6rem, 17vw, 6rem); }
+  .stair .l { transform: translateY(calc(var(--i) * -0.9vw)); }
+  .out { display: flex; flex-direction: column; }
+  .pin { position: absolute; left: 0; top: 0; width: 1px; height: 1px; }
+  .stack { display: flex; flex-direction: column; gap: 0.7rem; width: min(70vw, 18rem); margin-top: 1rem; }
+  .ln { display: block; height: 0.5rem; background: var(--id-paper-2); width: var(--w, 100%); }
+  .stack .ln:first-child { width: 100%; }
+  .fleet { display: grid; grid-template-columns: repeat(10, 1fr); gap: 0.55rem; width: min(80vw, 22rem); margin-top: 1rem; }
+  .cell { display: block; aspect-ratio: 1; background: var(--id-paper-2); opacity: 0.35; }
+  .less { margin-top: 0.5rem; color: var(--id-paper-2); }
+  .less .l { font-size: 0.5em; }
+  .m-copy { margin-top: auto; padding-top: 2rem; max-width: 34rem; }
+
+  .block, .chk { display: none; position: absolute; left: 0; top: 0; pointer-events: none; will-change: transform, opacity; z-index: 3; }
+  .world[data-ready] .block, .world[data-ready] .chk { display: block; }
+  .block { width: var(--b); height: var(--b); margin: calc(var(--b) * -1) 0 0 calc(var(--b) / -2); background: var(--id-pink); transform-origin: 50% 100%; }
+  .chk { width: calc(var(--b) * 0.42); height: calc(var(--b) * 0.42); color: var(--id-ink); background: var(--id-lime); padding: calc(var(--b) * 0.05); box-sizing: border-box; opacity: 0; }
+  .word .l.on { color: var(--id-lime); }
+
+  .credits { padding: 5rem 0 6rem; }
+  .credits h2 { margin: 0 0 1.5rem; font-size: clamp(1.6rem, 4vw, 3rem); font-weight: var(--id-weight-poster); letter-spacing: var(--id-tracking-display); line-height: var(--id-leading-display); }
+  .credits ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.5rem 1.8rem; }
+  .credits a { color: var(--id-lime); font-size: var(--id-text-body); font-weight: var(--id-weight-strong); text-underline-offset: 4px; display: inline-block; padding: 0.6rem 0; }
+  .credits a:hover { color: var(--id-pink); }
+  .credits a:focus-visible { outline: 2px solid var(--id-pink); outline-offset: 3px; }
+
+  /* ---------- horizontal sticky poster (desktop, motion allowed) ---------- */
+  @media (min-width: 861px) and (prefers-reduced-motion: no-preference) {
+    .world { --b: 11vh; }
+    .track { height: var(--track-h, 1000vh); }
+    .stage { position: sticky; top: 0; height: 100svh; display: grid; grid-template-rows: minmax(0, 1fr) auto; margin: 0 calc(clamp(1rem, 3vw, 2.5rem) * -1); background: var(--id-ground); }
+    .view { position: relative; overflow: hidden; }
+    .strip { position: absolute; left: 0; top: 0; height: 100%; display: flex; align-items: flex-end; gap: 16vh; padding: 0 40vw 5vh 50vh; will-change: transform; }
+    .panel { position: static; flex: none; min-height: 0; padding: 0; display: flex; flex-direction: row; align-items: flex-end; gap: 10vh; }
+    .word { font-size: var(--fs, 40vh); margin-top: 0; }
+    .m-copy { display: none; }
+    .fogfield { position: absolute; left: 0; top: 0; bottom: 0; height: auto; width: 240vh; font-size: 24vh; mask-image: linear-gradient(to right, #000 55%, transparent); justify-content: space-between; padding: 2vh 0 0; }
+    .room { margin: 0; padding: 14vh 3.2vh 3.2vh; }
+    .room .word { font-size: var(--fs); }
+    .stair .l { transform: translateY(calc(var(--i) * -3.4vh)); }
+    .stack { width: 36vh; gap: 1.6vh; margin: 0; }
+    .ln { height: 1.2vh; }
+    .fleet { width: 48vh; gap: 1.4vh; margin: 0; align-self: flex-end; }
+    .less { margin: 0; align-self: flex-end; }
+    .less .l { font-size: 1em; }
+    .out { line-height: 0.82; }
+    .band { display: grid; grid-template-columns: minmax(0, 1fr); position: relative; height: 31svh; padding: 0 clamp(1rem, 3vw, 2.5rem); border-top: 1px solid var(--id-rule); background: var(--id-ground); z-index: 5; }
+    .copies { display: grid; padding-top: 2.2vh; }
+    .copies :global(.copy) { grid-area: 1 / 1; grid-template-columns: minmax(0, 24rem) minmax(0, 36rem); gap: 3rem; opacity: 0; transform: translate3d(0, 1.2vh, 0); transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1), transform 0.45s cubic-bezier(0.16, 1, 0.3, 1); pointer-events: none; }
+    .copies :global(.copy.on) { opacity: 1; transform: none; pointer-events: auto; }
+    .copies :global(.body p:first-child) { margin-top: 1.5rem; }
+    .rail { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: var(--id-rule); }
+    .rail i { display: block; height: 100%; background: var(--id-lime); transform-origin: 0 50%; transform: scaleX(0); }
+  }
+
+  @media (max-width: 860px) {
+    .intro h1 { font-size: 22vw; }
+  }
+</style>
+
+<script>
+  // PROTOTYPE (resume-t7j round 2, variant 2b): scroll -> timeline -> transforms only. Stops are DOM elements ([data-wp] block stops, [data-cam] camera-only stops).
+  // SHORTCUT: no resize-throttling beyond rAF, no IntersectionObserver gating; the loop runs only on scroll/resize events but touches all vars each frame.
+  const world = document.querySelector<HTMLElement>('[data-world]')!;
+  const track = world.querySelector<HTMLElement>('[data-track]')!;
+  const strip = world.querySelector<HTMLElement>('[data-strip]')!;
+  const block = world.querySelector<HTMLElement>('[data-block]')!;
+  const chk = world.querySelector<HTMLElement>('[data-chk]')!;
+  const bar = world.querySelector<HTMLElement>('[data-bar]')!;
+  const copies = [...world.querySelectorAll<HTMLElement>('.copies .copy')];
+  const mq = matchMedia('(min-width: 861px) and (prefers-reduced-motion: no-preference)');
+
+  interface Stop { x: number; y: number; m: number; beat: number; sx: number; sy: number; vis: number; blur: number; check: number; hop: number; el: HTMLElement; }
+  interface Seg { k: 'dwell' | 'walk' | 'transit'; a: number; b: number; w: number; beat: number; start: number; }
+  let H = false, stops: Stop[] = [], segs: Seg[] = [], W = 1, bPx = 0, vw = 0, vh = 0, stripW = 0;
+  let trackTop = 0, trackSpan = 1, stripTopAbs = 0;
+  let panels: { top: number; h: number }[] = [];
+  let lastCopy = -1, lastLit: HTMLElement | null = null, raf = 0;
+
+  const clamp = (v: number, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+  const sm = (u: number) => u * u * (3 - 2 * u);
+  const sm2 = (a: number, b: number, v: number) => sm(clamp((v - a) / (b - a)));
+  const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+
+  function measure() {
+    H = mq.matches;
+    world.classList.toggle('is-h', H);
+    world.style.removeProperty('--track-h');
+    vw = innerWidth; vh = innerHeight;
+    bPx = block.offsetWidth || vh * 0.11;
+    const sr = strip.getBoundingClientRect();
+    stripW = strip.scrollWidth;
+    stripTopAbs = sr.top + scrollY;
+    panels = [...strip.querySelectorAll<HTMLElement>('[data-panel]')].map((p) => { const r = p.getBoundingClientRect(); return { top: r.top - sr.top, h: r.height }; });
+
+    const els = [...strip.querySelectorAll<HTMLElement>('[data-wp],[data-cam]')];
+    stops = [];
+    const perBeat: Record<number, number[]> = {};
+    els.forEach((el) => {
+      let ref = el;
+      if (el.dataset.pinOf) ref = document.querySelector<HTMLElement>(el.dataset.pinOf) ?? el;
+      const r = ref.getBoundingClientRect();
+      const beat = el.dataset.beat ? Number(el.dataset.beat) : Number(el.closest<HTMLElement>('[data-panel]')!.dataset.panel);
+      const ax = Number(el.dataset.ax ?? 0.5), ay = Number(el.dataset.ay ?? 0);
+      const camOnly = el.hasAttribute('data-cam');
+      const prev = stops[stops.length - 1];
+      const s = Number(el.dataset.s ?? 1);
+      const st: Stop = {
+        x: r.left - sr.left + ax * r.width, y: r.top - sr.top + ay * r.height, m: 0, beat,
+        sx: Number(el.dataset.sx ?? s), sy: s, vis: Number(el.dataset.vis ?? 1), blur: Number(el.dataset.blur ?? 0),
+        check: Number(el.dataset.check ?? (prev ? prev.check : 0)), hop: Number(el.dataset.hop ?? 0), el,
+      };
+      if (camOnly && prev) Object.assign(st, { y: prev.y, sx: prev.sx, sy: prev.sy, vis: prev.vis, blur: prev.blur, check: prev.check, hop: 0 });
+      const camX = r.left - sr.left + ax * r.width;
+      st.m = camX;
+      if (camOnly && prev) { /* keep block at previous x, but camera at camX */ st.x = prev.x; }
+      (perBeat[beat] ??= []).push(stops.length);
+      stops.push(st);
+    });
+    if (!H) {
+      Object.values(perBeat).forEach((idxs) => idxs.forEach((si, k) => {
+        const p = panels[stops[si].beat];
+        stops[si].m = p.top + p.h * (0.2 + 0.4 * (idxs.length === 1 ? 0.5 : k / (idxs.length - 1)));
+      }));
+    }
+
+    segs = []; W = 0;
+    const nB = panels.length;
+    for (let b = 0; b < nB; b++) {
+      const idxs = perBeat[b];
+      const f = idxs[0], l = idxs[idxs.length - 1];
+      const add = (k: Seg['k'], a: number, bb: number, w: number) => { segs.push({ k, a, b: bb, w, beat: b, start: W }); W += w; };
+      if (idxs.length > 1) {
+        add('dwell', f, f, 0.5);
+        for (let i = 0; i < idxs.length - 1; i++) add('walk', idxs[i], idxs[i + 1], 0.9);
+      }
+      add('dwell', l, l, b === 0 ? 1.2 : b === 6 ? 1.6 : 0.9);
+      if (b < nB - 1) add('transit', l, perBeat[b + 1][0], 1.1);
+    }
+    if (H) {
+      const unit = vh * 0.42;
+      world.style.setProperty('--track-h', `${vh + W * unit}px`);
+      const tr = track.getBoundingClientRect();
+      trackTop = tr.top + scrollY; trackSpan = W * unit;
+    }
+    frame();
+  }
+
+  function stateAt(a: Stop, b: Stop, e: number, hopOn: boolean) {
+    const lift = hopOn && b.hop ? Math.sin(Math.PI * e) * bPx * 0.7 * (b.hop) : 0;
+    return {
+      x: lerp(a.x, b.x, e), y: lerp(a.y, b.y, e) - lift, sx: lerp(a.sx, b.sx, e), sy: lerp(a.sy, b.sy, e),
+      vis: lerp(a.vis, b.vis, e), blur: lerp(a.blur, b.blur, e), check: lerp(a.check, b.check, sm2(0.55, 0.95, e)),
+    };
+  }
+  const bEase = (u: number) => sm(clamp((u - 0.18) / 0.64));
+
+  function frame() {
+    raf = 0;
+    if (!stops.length) return;
+    let a = stops[0], b = stops[0], e = 0, bpos = 0, camLeft = 0, litEl: HTMLElement | null = null, activeBeat = 0;
+    if (H) {
+      const T = clamp((scrollY - trackTop) / trackSpan) * W;
+      let s = segs[segs.length - 1];
+      for (let i = 0; i < segs.length; i++) if (T < segs[i].start + segs[i].w) { s = segs[i]; break; }
+      const u = clamp((T - s.start) / s.w);
+      a = stops[s.a]; b = stops[s.b];
+      const cam = s.k === 'dwell' ? a.m : lerp(a.m, b.m, sm(u));
+      camLeft = clamp(cam - vw * 0.4, 0, Math.max(0, stripW - vw));
+      e = s.k === 'dwell' ? 0 : bEase(u);
+      bpos = s.beat + (s.k === 'transit' ? u : 0);
+      activeBeat = Math.round(bpos) > 8 ? 8 : Math.round(bpos);
+      if (s.k === 'dwell') litEl = a.el; else litEl = e < 0.5 ? a.el : b.el;
+      strip.style.transform = `translate3d(${-camLeft}px,0,0)`;
+      bar.style.transform = `scaleX(${T / W})`;
+      if (activeBeat !== lastCopy) {
+        copies.forEach((c, i) => { const on = i === activeBeat; c.classList.toggle('on', on); on ? c.removeAttribute('inert') : c.setAttribute('inert', ''); });
+        lastCopy = activeBeat;
+      }
+    } else {
+      const c = scrollY + vh * 0.5 - stripTopAbs;
+      let j = 0;
+      for (let i = 0; i < stops.length; i++) if (stops[i].m <= c) j = i;
+      a = stops[j]; b = stops[Math.min(j + 1, stops.length - 1)];
+      const span = b.m - a.m;
+      const u = span > 1 ? clamp((c - a.m) / span) : 0;
+      e = bEase(u);
+      let pi = 0;
+      panels.forEach((p, i) => { if (c >= p.top) pi = i; });
+      const fr = clamp((c - panels[pi].top) / panels[pi].h);
+      bpos = pi + sm2(0.55, 1, fr);
+      litEl = e < 0.5 ? a.el : b.el;
+      strip.style.transform = '';
+    }
+    const st = stateAt(a, b, e, H && a !== b);
+    block.style.transform = `translate3d(${st.x}px,${st.y}px,0) scale(${st.sx},${st.sy})`;
+    block.style.opacity = String(st.vis);
+    block.style.filter = st.blur > 0.3 ? `blur(${st.blur}px)` : 'none';
+    const t = bPx * 0.42;
+    chk.style.transform = `translate3d(${st.x + (bPx * st.sx) / 2 - t * 0.5}px,${st.y - bPx * st.sy - t * 0.5}px,0) scale(${0.6 + 0.4 * st.check})`;
+    chk.style.opacity = String(clamp(st.check));
+    if (litEl !== lastLit) { lastLit?.classList.remove('on'); if (litEl && litEl.hasAttribute('data-lit')) litEl.classList.add('on'); lastLit = litEl; }
+
+    const dark = sm2(5.5, 6, bpos) - sm2(6.4, 7, bpos);
+    world.style.setProperty('--dark', dark.toFixed(3));
+    world.style.setProperty('--fog', (18 * (1 - sm2(0.3, 1, bpos))).toFixed(2));
+    world.style.setProperty('--fogo', (1 - sm2(0.5, 1.6, bpos)).toFixed(3));
+  }
+
+  const kick = () => { if (!raf) raf = requestAnimationFrame(frame); };
+  addEventListener('scroll', kick, { passive: true });
+  let rt = 0;
+  const remeasure = () => { clearTimeout(rt); rt = window.setTimeout(measure, 120); };
+  addEventListener('resize', remeasure);
+  mq.addEventListener('change', measure);
+  world.setAttribute('data-ready', '');
+  document.fonts.ready.then(() => requestAnimationFrame(measure));
+  measure();
+</script>

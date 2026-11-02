@@ -6,9 +6,13 @@ const variants = [
   { key: 'now', label: 'current /factory', href: '/factory/' },
   { key: 'A', label: 'A — how I think', href: '/factory/a/' },
   { key: 'B', label: 'B — how the machine works', href: '/factory/b/' },
+  // Round 2 (2026-11-02): one merged spine, panning camera, three build/animation techniques.
+  { key: '2a', label: '2a — flat world, camera flies', href: '/factory/2a/' },
+  { key: '2b', label: '2b — type is the world', href: '/factory/2b/' },
+  { key: '2c', label: '2c — native scroll, depth', href: '/factory/2c/' },
 ];
 interface Props {
-  current: 'now' | 'A' | 'B';
+  current: 'now' | 'A' | 'B' | '2a' | '2b' | '2c';
 }
 const { current } = Astro.props;
 const i = variants.findIndex((v) => v.key === current);

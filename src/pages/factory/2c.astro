@@ -1,0 +1,226 @@
+---
+// PROTOTYPE (resume-t7j round 2, variant 2c): zero-JS native scroll-driven CSS depth world; camera dollies through 11 planes, one pink task in the foreground.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SiteNav from '../../components/site/SiteNav.astro';
+import SiteFooter from '../../components/site/SiteFooter.astro';
+import PrototypeSwitcher from '../../components/factory-prototype/PrototypeSwitcher.astro';
+import Decor from '../../components/factory-prototype/2c/Decor.astro';
+import { intro, beats, credits } from '../../components/factory-prototype/beats';
+
+// SHORTCUT: static/reduced-motion/Firefox fallback is just the stacked planes with their art; the pink task is hidden there (production needs a per-beat static task mark).
+// SHORTCUT: keyframes are generated into an inline <style> via set:html (no JS at runtime), and stop/hold percentages are hand-tuned constants; production would derive from beat count.
+// SHORTCUT: 'Credits' heading is invented UI label (beats.ts has none); intro 'Scroll' hint also not in beats.ts.
+// SHORTCUT: Firefox/Safari without animation-timeline get the static layout only; not tested outside Chromium.
+// 11 stops: 0 intro, 1..9 beats, 10 credits. Stop s is "held" at scroll fraction s/10 (+-3%), travel in between.
+const N = 11;
+const kinds = ['map', 'clear', 'target', 'handoff', 'climb', 'paper', 'blackout', 'home', 'close'] as const;
+// lateral stagger of planes, in units of --u (camera pans to each plane's x)
+const lat = [0, 1, -1, 1, -1, 1, -1, 1, -1, 1, 0];
+
+// ---- Generated keyframes (everything below is data -> CSS; no runtime JS anywhere on the page) ----
+interface Shape { sx: number; sy: number; r: number; blur: number; op: number }
+interface Pose { xy: [number, number]; shape: Shape; check: number; lines: number; halo: number }
+const dot = (sx: number): Shape => ({ sx, sy: +(sx * 200 / 260).toFixed(3), r: 50, blur: 0, op: 1 });
+const P = (xy: [number, number], shape: Shape, o: Partial<Pick<Pose, 'check' | 'lines' | 'halo'>> = {}): Pose => ({ xy, shape, check: 0, lines: 0, halo: 0, ...o });
+const EASE = 'cubic-bezier(0.65, 0, 0.35, 1)';
+// per stop: pose at hold start, optional pose at hold end, optional easing inside the hold
+const stops: { a: Pose; b?: Pose; hold?: string }[] = [
+  { a: P([0, 0], dot(0.12)) }, // 0 intro: a dot
+  { a: P([0.12, -0.12], { sx: 1.1, sy: 0.846, r: 50, blur: 22, op: 0.8 }) }, // 1 map: a patch of fog
+  { a: P([0.12, -0.12], { sx: 0.85, sy: 0.654, r: 45, blur: 5, op: 0.9 }) }, // 2 clear: fog condensing
+  { a: P([0, 0], { sx: 0.95, sy: 0.96, r: 7, blur: 0, op: 1 }, { check: 1 }) }, // 3 target: card + lime check
+  { a: P([0.42, 0], { sx: 0.3, sy: 0.23, r: 14, blur: 0, op: 1 }), b: P([0, 0], { sx: 0.3, sy: 0.23, r: 14, blur: 0, op: 1 }), hold: 'cubic-bezier(0.2, 0.7, 0.2, 1)' }, // 4 handoff: passed in through the rings
+  { a: P([-0.28, 0.28], { sx: 0.26, sy: 0.2, r: 16, blur: 0, op: 1 }), b: P([0.26, -0.2], { sx: 0.26, sy: 0.2, r: 16, blur: 0, op: 1 }), hold: 'steps(5, jump-end)' }, // 5 climb: five treads
+  { a: P([0, 0], { sx: 0.85, sy: 0.85, r: 2, blur: 0, op: 1 }, { lines: 1 }) }, // 6 paper: laid on the sheet
+  { a: P([0, 0], { sx: 0.5, sy: 0.5, r: 2, blur: 0, op: 1 }, { lines: 1, halo: 1 }) }, // 7 blackout: only lit thing
+  { a: P([0.14, 0.14], dot(0.09)) }, // 8 home: one dot among many
+  { a: P([0, 0], dot(0.13)) }, // 9 close: shipped, sitting in the cleared ground
+  { a: P([0, 0], dot(0.09)) }, // 10 credits
+];
+const pct = (n: number) => `${+Math.max(0, Math.min(100, n)).toFixed(2)}%`;
+function frames(name: string, fn: (p: Pose, s: number, end: boolean) => string) {
+  let out = `@keyframes ${name} {\n`;
+  stops.forEach((st, s) => {
+    const hold = st.hold ?? 'linear';
+    out += `${pct(s * 10 - 3)} { ${fn(st.a, s, false)} animation-timing-function: ${hold}; }\n`;
+    out += `${pct(s * 10 + 3)} { ${fn(st.b ?? st.a, s, true)} animation-timing-function: ${EASE}; }\n`;
+  });
+  return out + '}\n';
+}
+const A = (n: number) => `calc(var(--A) * ${n})`;
+const css = [
+  // camera: dolly in Z (+-0.04 of a plane gap during each hold) and pan to the plane's lateral x
+  (() => {
+    let out = '@keyframes c2-cam {\n';
+    for (let s = 0; s < N; s++) {
+      const t = (z: number) => `transform: translate3d(calc(var(--u) * ${-lat[s]}), 0, calc(var(--D) * ${+(s + z).toFixed(2)}));`;
+      out += `${pct(s * 10 - 3)} { ${t(-0.04)} animation-timing-function: linear; }\n`;
+      out += `${pct(s * 10 + 3)} { ${t(0.04)} animation-timing-function: ${EASE}; }\n`;
+    }
+    return out + '}\n';
+  })(),
+  frames('c2-move', (p) => `transform: translate(${A(p.xy[0])}, ${A(p.xy[1])});`),
+  frames('c2-shape', (p) => `transform: scale(${p.shape.sx}, ${p.shape.sy}); border-radius: ${p.shape.r}%; filter: blur(${p.shape.blur}px); opacity: ${p.shape.op};`),
+  frames('c2-check', (p) => `opacity: ${p.check};`),
+  frames('c2-lines', (p) => `opacity: ${p.lines}; transform: scale(${+(p.shape.sx / 0.85).toFixed(3)});`),
+  frames('c2-halo', (p) => `opacity: ${p.halo * 0.55};`),
+].join('\n');
+
+const planes = [
+  { key: 'intro', first: true },
+  ...beats.map((b, i) => ({ key: b.key, beat: b, kind: kinds[i] })),
+  { key: 'credits', last: true },
+];
+---
+
+<BaseLayout bare title="How I build | Jonatan Snyders" description="A factory of AI agents that runs on a small computer at home. Follow one task through it.">
+  <Fragment set:html={`<style>${css}</style>`} />
+  <div class="page">
+    <div class="navwrap"><SiteNav current="factory" /></div>
+
+    <main class="track" id="track">
+      <div class="stage">
+        <div class="scene">
+          {planes.map((pl: any, s) => (
+            <section
+              class:list={['plane', pl.first && 'is-first', pl.last && 'is-last']}
+              style={`--s:${s}; --x: calc(var(--u) * ${lat[s]});`}
+              aria-labelledby={`h-${pl.key}`}
+            >
+              <div class="copy">
+                {pl.first && (<>
+                  <h1 id="h-intro" class="poster">{intro.title}</h1>
+                  <p class="lede">{intro.lede}</p>
+                  <p class="hint">Scroll</p>
+                </>)}
+                {pl.beat && (<>
+                  <p class="kicker">{pl.beat.kicker}</p>
+                  <h2 id={`h-${pl.key}`}>{pl.beat.title}</h2>
+                  {pl.beat.body.map((t: string) => <p class="para">{t}</p>)}
+                  {pl.beat.credit && (
+                    <p class="credit">{pl.beat.credit.text} <a href={pl.beat.credit.href} rel="noopener">{pl.beat.credit.name}</a></p>
+                  )}
+                </>)}
+                {pl.last && (<>
+                  <h2 id="h-credits" class="kicker-h">Credits</h2>
+                  <ul class="credits">
+                    {credits.map((c) => <li><a href={c.href} rel="noopener">{c.name}</a></li>)}
+                  </ul>
+                </>)}
+              </div>
+              {pl.kind && <div class="art" aria-hidden="true"><Decor kind={pl.kind} /></div>}
+            </section>
+          ))}
+        </div>
+
+        <!-- The one persistent task. Decorative: the story is in the DOM text. -->
+        <div class="task" aria-hidden="true">
+          <div class="halo"></div>
+          <div class="body"></div>
+          <div class="lines"></div>
+          <div class="check"></div>
+        </div>
+      </div>
+    </main>
+
+    <SiteFooter />
+  </div>
+  <PrototypeSwitcher current="2c" />
+</BaseLayout>
+
+<style is:global>
+  html, body { margin: 0; background: var(--id-ground); }
+</style>
+
+<style>
+  .page {
+    --pt: 6rem; --pb: 3rem; --D: 1400px; --P: 1000px;
+    --A: min(40vw, 58vh);
+    --u: 16vw;
+    background: var(--id-ground);
+    color: var(--id-paper);
+    font-family: var(--id-font-body);
+    min-height: 100vh;
+  }
+  .navwrap { position: relative; z-index: 30; padding: 1rem 1.5rem 0; }
+  .page :global(.site-nav) { padding: 0; }
+
+  /* ---- Base = static, legible layout (no-support browsers, reduced motion) ---- */
+  .plane { padding: 3rem 1.25rem; box-sizing: border-box; display: grid; gap: 2rem; align-items: center; }
+  .copy { max-width: 40rem; }
+  .kicker { margin: 0 0 1rem; color: var(--id-lime); font-weight: var(--id-weight-strong); font-size: var(--id-text-small); letter-spacing: var(--id-tracking-heading); }
+  h1.poster { margin: 0; font-size: clamp(3.4rem, 14vw, 11rem); line-height: var(--id-leading-poster); letter-spacing: var(--id-tracking-poster); font-weight: var(--id-weight-poster); color: var(--id-lime); }
+  h2 { margin: 0 0 1.25rem; font-size: clamp(2.1rem, 5.4vw, 5.4rem); line-height: var(--id-leading-display); letter-spacing: var(--id-tracking-display); font-weight: var(--id-weight-poster); color: var(--id-paper); text-wrap: balance; }
+  .lede { margin: 1.5rem 0 0; font-size: clamp(1.15rem, 1.8vw, 1.6rem); line-height: 1.35; font-weight: var(--id-weight-medium); max-width: 30ch; }
+  .hint { margin: 2rem 0 0; color: var(--id-paper-2); font-size: var(--id-text-small); }
+  .para { margin: 0 0 0.9rem; font-size: var(--id-text-body); line-height: 1.5; color: var(--id-paper-2); max-width: 46ch; }
+  .credit { margin: 1.2rem 0 0; font-size: var(--id-text-small); color: var(--id-paper-2); }
+  a { color: var(--id-lime); text-underline-offset: 0.18em; }
+  a:hover { color: var(--id-pink); }
+  a:focus-visible { outline: 3px solid var(--id-paper); outline-offset: 3px; }
+  .credits { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.25rem; font-size: clamp(1.6rem, 3.4vw, 3rem); font-weight: var(--id-weight-poster); letter-spacing: var(--id-tracking-display); line-height: 1.1; }
+  .credits a { display: inline-block; padding: 0.15rem 0; min-height: 44px; }
+  .kicker-h { color: var(--id-lime); font-size: var(--id-text-small); letter-spacing: var(--id-tracking-heading); margin-bottom: 1rem; }
+  .art { width: min(100%, 22rem); aspect-ratio: 1; }
+  .task { display: none; }
+  @media (min-width: 861px) {
+    .plane { grid-template-columns: 1fr 1fr; padding-inline: 6vw; min-height: 70vh; }
+  }
+
+  /* ---- Depth world: only where scroll-driven animation exists AND motion is welcome ---- */
+  @supports (animation-timeline: scroll()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .track { height: 1500svh; view-timeline: --track block; position: relative; }
+      .navwrap { position: fixed; inset: 0 0 auto 0; padding: 1rem 1.25rem 0; pointer-events: none; }
+      .navwrap :global(a) { pointer-events: auto; }
+      .stage { position: sticky; top: 0; height: 100svh; overflow: hidden; perspective: var(--P); perspective-origin: 50% 50%; }
+      .scene { position: absolute; inset: 0; transform-style: preserve-3d; animation: c2-cam linear both; animation-timeline: --track; animation-range: contain 0% contain 100%; }
+      .plane {
+        position: absolute; inset: 0; padding: var(--pt) 6vw var(--pb); min-height: 0;
+        transform: translate3d(var(--x), 0, calc(var(--s) * var(--D) * -1));
+        pointer-events: none; visibility: hidden; opacity: 0;
+        animation: c2-life linear both; animation-timeline: --track;
+        animation-range: contain calc(var(--s) * 10% - 8%) contain calc(var(--s) * 10% + 5.5%);
+      }
+      .plane.is-first { visibility: visible; opacity: 1; animation-name: c2-first; animation-range: contain 0% contain 5.5%; }
+      .plane.is-last { animation-name: c2-last; animation-range: contain 92% contain 97%; }
+      .plane a { pointer-events: auto; }
+      .art { position: absolute; left: 72vw; top: calc(var(--pt) + (100svh - var(--pt) - var(--pb)) / 2); width: var(--A); height: var(--A); margin: calc(var(--A) / -2) 0 0 calc(var(--A) / -2); aspect-ratio: auto; }
+      .copy { align-self: center; width: 44vw; }
+      .plane.is-last .copy { width: auto; }
+      .task { display: block; position: absolute; left: 72vw; top: calc(var(--pt) + (100svh - var(--pt) - var(--pb)) / 2); width: 0; height: 0; z-index: 5; pointer-events: none; animation: c2-move linear both; animation-timeline: --track; animation-range: contain 0% contain 100%; }
+      .task > * { position: absolute; left: 0; top: 0; animation-timeline: --track; animation-range: contain 0% contain 100%; animation-fill-mode: both; animation-timing-function: linear; }
+      .body { width: 200px; height: 260px; margin: -130px 0 0 -100px; background: var(--id-pink); animation-name: c2-shape; }
+      .halo { width: 200px; height: 260px; margin: -130px 0 0 -100px; background: var(--id-pink); border-radius: 50%; filter: blur(46px); transform: scale(0.9); animation-name: c2-halo; }
+      .lines { width: 120px; height: 150px; margin: -75px 0 0 -60px; background: repeating-linear-gradient(to bottom, transparent 0 14px, var(--id-ink) 14px 16px); opacity: 0; animation-name: c2-lines; mix-blend-mode: normal; }
+      .check { width: 74px; height: 38px; margin: -30px 0 0 -37px; border-left: 12px solid var(--id-lime); border-bottom: 12px solid var(--id-lime); box-sizing: border-box; transform: rotate(-45deg); opacity: 0; animation-name: c2-check; }
+      /* mobile = portrait recomposition: copy on top, art + task in the lower half */
+      @media (max-width: 860px) {
+        .page { --A: min(70vw, 34svh); --u: 9vw; --pt: 8.4rem; }
+        .plane { padding-inline: 1.25rem; }
+        .copy { width: auto; align-self: start; }
+        .art, .task { left: 50vw; top: 74svh; }
+        h2 { font-size: clamp(1.9rem, 9vw, 2.6rem); margin-bottom: 0.8rem; }
+        h1.poster { font-size: clamp(3.6rem, 21vw, 6rem); }
+        .para { font-size: 0.98rem; line-height: 1.4; margin-bottom: 0.6rem; }
+        .kicker { margin-bottom: 0.6rem; }
+        .credits { font-size: 1.6rem; }
+        .plane.is-last .copy { align-self: start; }
+      }
+    }
+  }
+</style>
+
+<style is:global>
+  /* SHORTCUT: plane opacity/visibility keyframes live here (global) so the generated-keyframes block and these share one scope; production colocates. */
+  @keyframes c2-life {
+    0% { opacity: 0; visibility: hidden; }
+    1% { visibility: visible; }
+    37% { opacity: 1; }
+    81.5% { opacity: 1; }
+    99% { visibility: visible; }
+    100% { opacity: 0; visibility: hidden; }
+  }
+  @keyframes c2-first { 0%, 45% { opacity: 1; } 99% { visibility: visible; } 100% { opacity: 0; visibility: hidden; } }
+  @keyframes c2-last { 0% { opacity: 0; visibility: hidden; } 1% { visibility: visible; } 100% { opacity: 1; visibility: visible; } }
+</style>

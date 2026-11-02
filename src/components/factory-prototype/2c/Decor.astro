@@ -1,0 +1,79 @@
+---
+// PROTOTYPE (resume-t7j round 2, variant 2c): flat SVG art for each depth plane. 400x400 box, centre (200,200).
+// SHORTCUT: no inner depth parallax inside a plane (opacity on planes flattens preserve-3d); production would layer art/copy at distinct translateZ with per-layer fades.
+// The pink task object is NOT here; it lives in the stage and is positioned over this art's coordinates.
+// SHORTCUT: art is minimal line work; production would be designed per beat (and drawn at higher fidelity).
+interface Props { kind: 'map' | 'clear' | 'target' | 'handoff' | 'climb' | 'paper' | 'blackout' | 'home' | 'close' }
+const { kind } = Astro.props;
+const lines = Array.from({ length: 9 }, (_, i) => 40 + i * 40); // 40..360
+const dots: [number, number][] = [];
+for (let i = 0; i < 10; i++) for (let j = 0; j < 10; j++) if (!(i === 6 && j === 6)) dots.push([40 + i * 36, 40 + j * 36]);
+const grid = kind === 'map' || kind === 'clear' || kind === 'close';
+---
+
+<svg viewBox="0 0 400 400" class={`art-svg k-${kind}`} focusable="false">
+  <defs>
+    <filter id={`blur-${kind}`} x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="14" /></filter>
+  </defs>
+  {grid && (
+    <g class="grid">
+      {lines.map((p) => (<><line x1={p} y1="20" x2={p} y2="380" /><line x1="20" y1={p} x2="380" y2={p} /></>))}
+    </g>
+  )}
+  {kind === 'map' && (
+    <g filter={`url(#blur-${kind})`}>
+      <circle cx="248" cy="152" r="96" class="fog-hide" /><circle cx="262" cy="170" r="70" class="fog-haze" />
+      <circle cx="170" cy="90" r="40" class="fog-hide" /><circle cx="320" cy="300" r="50" class="fog-hide" />
+    </g>
+  )}
+  {kind === 'clear' && (
+    <g filter={`url(#blur-${kind})`}>
+      <circle cx="248" cy="152" r="60" class="fog-haze" /><circle cx="330" cy="290" r="44" class="fog-hide" />
+    </g>
+  )}
+  {kind === 'close' && (
+    <g filter={`url(#blur-${kind})`}>
+      <circle cx="326" cy="84" r="64" class="fog-hide" /><circle cx="320" cy="92" r="40" class="fog-haze" />
+    </g>
+  )}
+  {kind === 'target' && <rect x="105" y="70" width="190" height="260" rx="14" class="outline" />}
+  {kind === 'handoff' && (
+    <g class="rings">
+      <circle cx="200" cy="200" r="184" /><circle cx="200" cy="200" r="124" /><circle cx="200" cy="200" r="76" /><circle cx="200" cy="200" r="38" />
+    </g>
+  )}
+  {kind === 'climb' && (
+    <g>
+      <rect x="20" y="20" width="360" height="360" class="walls" />
+      <path d="M22 338 H110 V299.6 H154 V261 H198 V222 H241 V184 H284 V146 H378" class="hill" />
+    </g>
+  )}
+  {(kind === 'paper' || kind === 'blackout') && (
+    <g class={kind === 'blackout' ? 'sheet dim' : 'sheet'}>
+      <rect x="40" y="10" width="320" height="380" rx="3" class="page" />
+      <line x1="76" y1="58" x2="230" y2="58" /><line x1="76" y1="334" x2="324" y2="334" /><line x1="76" y1="354" x2="280" y2="354" />
+    </g>
+  )}
+  {kind === 'home' && (
+    <g class="dots">
+      <rect x="14" y="14" width="372" height="372" rx="6" class="outline" />
+      {dots.map(([x, y]) => <circle cx={x} cy={y} r="4.5" />)}
+    </g>
+  )}
+</svg>
+
+<style>
+  .art-svg { width: 100%; height: 100%; overflow: visible; display: block; }
+  .grid line { stroke: var(--id-rule); stroke-width: 1.5; }
+  .fog-hide { fill: var(--id-ground); }
+  .fog-haze { fill: var(--id-paper); opacity: 0.16; }
+  .outline { fill: none; stroke: var(--id-paper-2); stroke-width: 1.5; }
+  .rings circle { fill: none; stroke: var(--id-paper-2); stroke-width: 1.5; }
+  .walls { fill: none; stroke: var(--id-lime-dim); stroke-width: 6; }
+  .hill { fill: none; stroke: var(--id-paper-2); stroke-width: 3; }
+  .sheet .page { fill: var(--id-tint-hover); stroke: var(--id-paper-2); stroke-width: 1.5; }
+  .sheet line { stroke: var(--id-rule); stroke-width: 2; }
+  .sheet.dim { opacity: 0.3; }
+  .dots circle { fill: var(--id-lime-dim); }
+  .dots .outline { stroke: var(--id-rule); }
+</style>
