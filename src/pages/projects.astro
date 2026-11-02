@@ -77,7 +77,7 @@ const isInternal = (href: string) => href.startsWith('/');
           {projects.map((p) => (
             <article class="panel" id={`panel-${p.slug}`} data-panel={p.slug} tabindex="-1" hidden={p.slug !== DEFAULT_SLUG}>
               <p class="meta">
-                {statusLabel(p)} · {formatRange(p)}{p.early && ` · first version ${p.early}`}{p.parent && ' · part of the factory'}
+                {statusLabel(p)} · {formatRange(p)}{p.rewritten && ` · rewritten ${p.rewritten}`}{p.parent && ' · part of the factory'}
               </p>
               <h3 class="panel-name">{p.title}</h3>
               <p class="panel-desc">{p.desc}</p>

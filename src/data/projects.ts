@@ -11,7 +11,7 @@ export interface Project {
   status: ProjectStatus;
   from: string; // YYYY-MM
   to?: string; // YYYY-MM; no `to` = ongoing
-  early?: string; // earlier incarnation, e.g. "2016–2021"
+  rewritten?: string; // later rewrite, e.g. "2026"
   desc: string;
   stack?: string[];
   links?: ProjectLink[];
@@ -60,27 +60,27 @@ export const projects: Project[] = [
   { slug: 'learning', title: 'learning', status: 'now', from: '2026-10',
     desc: 'A project-based plan for learning to engineer with coding agents: an AI tutor holds back answers and I make the design calls. First project: my own small coding-agent harness, to see the loop, tools, permissions and context handling from the inside.',
     stack: ['Claude Code', 'beads', 'agent skills', 'agent harness'] },
-  { slug: 'rip-cage', title: 'rip-cage', status: 'built', from: '2026-03', to: '2026-10',
+  { slug: 'rip-cage', title: 'rip-cage', status: 'now', from: '2026-03',
     desc: 'A CLI that runs coding agents inside a microVM with a command-intercepting safety stack, so they can work with --dangerously-skip-permissions and the blast radius stays small.',
     stack: ['microsandbox', 'Docker', 'Claude Code', 'Pi'], links: [{ label: 'GitHub', href: 'https://github.com/jsnyde0/rip-cage' }] },
-  { slug: 'meshmonk', title: 'meshmonk', status: 'built', from: '2026-04', to: '2026-10', early: '2016–2021',
-    desc: 'The open-source 3D mesh-registration toolbox I built, used in KU Leuven craniofacial research and widely cited. In 2026 I rewrote it Python-first (C++20, clean API, Python bindings, PyPI).',
-    stack: ['C++20', 'Python', 'nanobind', 'CMake', 'NumPy', 'PyPI'], links: [{ label: 'GitHub', href: 'https://github.com/jsnyde0/meshmonk' }] },
   { slug: 'fetch-ladder', title: 'fetch-ladder', status: 'built', from: '2026-10', to: '2026-10',
     desc: 'A Python package that fetches a URL the way that site allows: it remembers which client works per host, climbs to the next when one fails, and paces requests.',
     stack: ['Python', 'httpx', 'curl_cffi', 'Jina', 'Firecrawl'], links: [{ label: 'GitHub', href: 'https://github.com/jsnyde0/fetch-ladder' }] },
+  { slug: 'event-gulper', title: 'event-gulper', status: 'built', from: '2025-02', to: '2026-06',
+    desc: 'The agentic event scraper that came before switch-berlin.', stack: ['Python', 'Prefect', 'PostgreSQL', 'OpenAI', 'pydantic-ai'],
+    links: [{ label: 'GitHub', href: 'https://github.com/jsnyde0/event-gulper' }] },
   { slug: 'approval-agent', title: 'approval-agent', status: 'built', from: '2026-03', to: '2026-03',
     desc: 'A Claude Code hook that asks a fast model to triage shell commands too opaque to approve by rule.',
     stack: ['Python', 'Claude Code hooks', 'LiteLLM', 'Click'], links: [{ label: 'GitHub', href: 'https://github.com/jsnyde0/approval-agent' }] },
   { slug: 'humble-clay', title: 'humble-clay', status: 'built', from: '2025-03', to: '2025-05',
     desc: "A small API that runs prompts through LLMs in bulk — a humble take on Clay's AI agent.",
     stack: ['FastAPI', 'OpenRouter', 'Google Apps Script', 'Prefect'], links: [{ label: 'GitHub', href: 'https://github.com/jsnyde0/humble-clay' }] },
-  { slug: 'event-gulper', title: 'event-gulper', status: 'built', from: '2025-02', to: '2026-06',
-    desc: 'The agentic event scraper that came before switch-berlin.', stack: ['Python', 'Prefect', 'PostgreSQL', 'OpenAI', 'pydantic-ai'],
-    links: [{ label: 'GitHub', href: 'https://github.com/jsnyde0/event-gulper' }] },
   { slug: 'ebayes', title: 'ebayes', status: 'built', from: '2024-08', to: '2024-10',
     desc: 'A web app for Bayesian marketing-mix modelling in eCommerce: upload sales and spend, plot each channel against sales, fit a PyMC-Marketing model. At Mapular I took it further on real data: adstock and saturation curves, heuristic priors, time-varying media effects, budget optimisation, and a Google Meridian comparison.',
     stack: ['Python', 'PyMC-Marketing', 'Meridian', 'Django', 'Plotly'], links: [{ label: 'GitHub', href: 'https://github.com/jsnyde0/ebayes' }] },
+  { slug: 'meshmonk', title: 'meshmonk', status: 'built', from: '2016-10', to: '2019-06', rewritten: '2026',
+    desc: 'The open-source 3D mesh-registration toolbox I built, used in KU Leuven craniofacial research and widely cited. In 2026 I rewrote it Python-first (C++20, clean API, Python bindings, PyPI).',
+    stack: ['C++20', 'Python', 'nanobind', 'CMake', 'NumPy', 'PyPI'], links: [{ label: 'GitHub', href: 'https://github.com/jsnyde0/meshmonk' }] },
 ];
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
