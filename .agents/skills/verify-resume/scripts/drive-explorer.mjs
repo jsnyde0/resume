@@ -164,7 +164,7 @@ try {
     await visitorPress(page, "#skills-substrate", false);
     const g = await geom();
     const its = await items("skills-substrate");
-    check(g.vis[0] === "skills-substrate" && its.length === 8 && its.some((n) => n.startsWith("recall")), `${tag} working substrate pane must list 8 items incl. recall, got ${JSON.stringify(its)}`);
+    check(g.vis[0] === "skills-substrate" && its.length === 9 && its.some((n) => n.startsWith("recall")), `${tag} working substrate pane must list 9 items incl. recall, got ${JSON.stringify(its)}`);
     evidence["skills-desktop-substrate"] = g;
     // Old single-skill deep link lands on its category and expands agent skills.
     await load(page, "/projects/#skill-recall");

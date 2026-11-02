@@ -57,7 +57,7 @@ const CATS = {
   'skills-wayfinding': ['wayfinding skills', ['brainstorm', 'prototype', 'spike', 'research']],
   'skills-learning': ['learning skills', ['learn-chart', 'learn-mission', 'learn-tutor', 'learn-assistant']],
   'skills-plain': ['making the models make sense', ['guide', 'tldr', 'Cold Reader']],
-  'skills-substrate': ['working substrate', ['decompose', 'send-it', 'adversarial-review', 'recall', 'note', 'retro', 'promote', 'clear-resume']],
+  'skills-substrate': ['working substrate', ['decompose', 'verify', 'send-it', 'adversarial-review', 'recall', 'note', 'retro', 'promote', 'clear-resume']],
 };
 const nowSlugs = projects.filter((p) => p.status === 'now' && !p.parent).map((p) => p.slug);
 assert.equal(nowSlugs[nowSlugs.indexOf('factory') + 1], 'skills', 'One "skills" row must follow factory in Now');

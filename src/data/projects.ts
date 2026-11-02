@@ -85,6 +85,7 @@ export const projects: Project[] = [
     desc: "Skills that manage the work itself: splitting tasks, finishing them, reviewing, and keeping memory and decisions across sessions.",
     items: [
       { name: 'decompose', desc: "Splits a task that is too big into smaller tasks. Together, their definitions of done add up to the parent's." },
+      { name: 'verify', desc: "Designs the check an agent climbs toward: a command it can run, what passing looks like, and why it matters. The agent iterates against that signal instead of guessing when it is done." },
       { name: 'send-it', desc: "Drives one task or a whole group of tasks to done. It picks which of my other skills to use as it goes, with no fixed pipeline." },
       { name: 'adversarial-review', desc: "Has a fresh agent with no prior context critique my own design, plan or code change, to catch what I missed." },
       { name: 'recall', desc: "Looks through saved notes and past decisions before work starts, so the agent does not repeat old mistakes or contradict earlier choices." },
